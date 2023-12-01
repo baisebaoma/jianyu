@@ -1,5 +1,5 @@
 
-local bsbmavatars = require "packages/BsbmAvatars/bsbmavatars"
+local jianyu_lpl = require "packages/jianyu/jianyu_lpl"
 return {
-     bsbmavatars,
+     jianyu_lpl,
 }
