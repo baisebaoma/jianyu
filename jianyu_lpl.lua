@@ -29,38 +29,36 @@ local hongwen = fk.CreateFilterSkill{
 local zouwei = fk.CreateDistanceSkill{
   name = "zouwei",
   correct_func = function(self, from, to)
-    -- 装备区有牌时，你视为装备-1马
+    -- 有装备时视为-1
     if from:hasSkill(self) and from:getCardIds(from.Equip) ~= 0 then
       return -1
     end
-    -- 装备区没牌时，你视为装备+1马
-    if to:hasSkill(self) and from:getCardIds(from.Equip) == 0 then
+    -- 没装备时视为+1
+    if to:hasSkill(self) and to:getCardIds(to.Equip) == 0 then
       return 1
     end
     return 0
   end,
 }
-
 local zouwei_audio = fk.CreateTriggerSkill{
   name = "#zouwei_audio",
 
-  refresh_events = {fk.EquipChanged},
+  refresh_events = {fk.HpChanged},
   can_refresh = function(self, event, target, player, data)
     return target == player and player:hasSkill("zouwei") and not player:isFakeSkill("zouwei")
   end,
   on_refresh = function(self, event, target, player, data)
     local room = player.room
-    if player:getCardIds(player.Equip) ~= 0 then
+    if player.hp > 2 and data.num > 0 and player.hp - data.num < 3 then
       room:notifySkillInvoked(player, "zouwei", "offensive")
       player:broadcastSkillInvoke("zouwei", 1)
-    elseif player:getCardIds(player.Equip) == 0 then
+    elseif player.hp < 3 and data.num < 0 and player.hp - data.num > 2 then
       room:notifySkillInvoked(player, "zouwei", "defensive")
       player:broadcastSkillInvoke("zouwei", 2)
     end
   end,
 }
 zouwei:addRelatedSkill(zouwei_audio)
-
 
 -- 圣弩
 -- 参考自formation包的君刘备
@@ -100,18 +98,23 @@ local shengnu = fk.CreateTriggerSkill{
 
 
 -- 转会
-local zhuanhui = fk.CreateMaxCardsSkill {
-  name = "zhuanhui",
-  correct_func = function(self, player)
-      if player:hasSkill(self.name) then
-          local kingdoms = {}
-          for _, p in ipairs(Fk:currentRoom().alive_players) do
-              table.insertIfNeed(kingdoms, p.kingdom)
-          end
-          return #kingdoms
-      else
-          return 0
+local zhuanhui = fk.CreateTriggerSkill{
+  name = "zhuanhui",  -- kaiju$是主公技
+  anim_type = "masochism",
+  frequency = Skill.Compulsory,
+  events = {},  -- 这里是故意的，因为本来这个技能就没有实际效果
+  can_trigger = function(self, event, target, player, data)
+    return target == player and player:hasSkill(self.name) and player.phase == Player.Start
+  end,
+  on_use = function(self, event, target, player, data)
+    local room = player.room
+    for _, p in ipairs(room:getOtherPlayers(player, true)) do
+      if not p:isAllNude() then
+        local id = room:askForCardChosen(p, p, "#kaiju-choose", self.name)  -- 他自己选一张牌
+        room:obtainCard(player, id, false, fk.ReasonPrey)  -- 我从他那里拿一张牌来
+        room:useVirtualCard("slash", nil, p, player, self.name, true)  -- 杀
       end
+    end
   end,
 }
 
