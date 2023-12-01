@@ -100,7 +100,20 @@ local shengnu = fk.CreateTriggerSkill{
 
 
 -- 转会
-
+local zhuanhui = fk.CreateMaxCardsSkill {
+  name = "zhuanhui",
+  correct_func = function(self, player)
+      if player:hasSkill(self.name) then
+          local kingdoms = {}
+          for _, p in ipairs(Fk:currentRoom().alive_players) do
+              table.insertIfNeed(kingdoms, p.kingdom)
+          end
+          return #kingdoms
+      else
+          return 0
+      end
+  end,
+}
 
 -- 洗澡
 local xizao = fk.CreateTriggerSkill{
@@ -129,15 +142,60 @@ local xizao = fk.CreateTriggerSkill{
 }
 
 -- 开局
--- 没写完，不过先拿去玩吧
+-- 参考forest包贾诩 刘备 god包神曹操
+
+local kaiju = fk.CreateTriggerSkill{
+  name = "kaiju",  -- kaiju$是主公技
+  anim_type = "masochism",
+  frequency = Skill.Compulsory,
+  events = {fk.EventPhaseStart},
+  can_trigger = function(self, event, target, player, data)
+    return target == player and player:hasSkill(self.name) and player.phase == Player.Start
+  end,
+  on_use = function(self, event, target, player, data)
+    local room = player.room
+    for _, p in ipairs(room:getOtherPlayers(player, true)) do
+      if not p:isAllNude() then
+        local id = room:askForCardChosen(p, p, "#kaiju-choose", self.name)  -- 他自己选一张牌
+        room:obtainCard(player, id, false, fk.ReasonPrey)  -- 我从他那里拿一张牌来
+        room:useVirtualCard("slash", nil, p, player, self.name, true)  -- 杀
+      end
+    end
+  end,
+}
+
+-- 这个版本可以用，但是是你从所有人那里抽一张
+-- local kaiju = fk.CreateTriggerSkill{
+--   name = "kaiju",  -- kaiju$是主公技
+--   anim_type = "masochism",
+--   frequency = Skill.Compulsory,
+--   events = {fk.EventPhaseStart},
+--   can_trigger = function(self, event, target, player, data)
+--     return target == player and player:hasSkill(self.name) and player.phase == Player.Start
+--   end,
+--   on_use = function(self, event, target, player, data)
+--     local room = player.room
+--     for _, p in ipairs(room:getOtherPlayers(player, true)) do
+--       if not p:isAllNude() then
+--         local id = room:askForCardChosen(player, p, "hej", self.name)  -- 我选他一张牌
+--         room:obtainCard(player, id, false, fk.ReasonPrey)  -- 我从他那里拿一张牌来
+--         room:useVirtualCard("slash", nil, p, player, self.name, true)  -- 杀
+--       end
+--     end
+--   end,
+-- }
+
+-- 主公技，锁定技，当你的回合开始时，所有其他有牌的武将需要交给你一张牌，并视为对你使用一张【杀】。
+
+-- room:useVirtualCard("slash", nil, player, table.map(self.cost_data, Util.Id2PlayerMapper), self.name, true)
 
 
 jianzihao:addSkill(hongwen)
 jianzihao:addSkill(zouwei)
 jianzihao:addSkill(shengnu)
--- jianzihao:addSkill(zhuanhui)
+jianzihao:addSkill(zhuanhui)
 jianzihao:addSkill(xizao)
--- jianzihao:addSkill(kaiju)
+jianzihao:addSkill(kaiju)
 
 
 Fk:loadTranslationTable{
@@ -149,7 +207,7 @@ Fk:loadTranslationTable{
   ["$hongwen2"] = "哎，兄弟我为什么不打四带两对啊，兄弟？",
   ["$hongwen3"] = "好难受啊！",
   ["$hongwen4"] = "操，可惜！",
-  ["$hongwen4"] = "那他咋想的呀？",
+  ["$hongwen5"] = "那他咋想的呀？",
 
   ["zouwei"] = "走位",
   [":zouwei"] = "锁定技，当你的装备区没有牌时，其他角色计算与你的距离时，始终+1；当你的装备区有牌时，你计算与其他角色的距离时，始终-1。",
@@ -161,8 +219,9 @@ Fk:loadTranslationTable{
   ["$shengnu1"] = "哎兄弟们我这个牌不能拆吧？",
 
   ["zhuanhui"] = "转会",
-  [":zhuanhui"] = "当你的体力值减少时，你可以变更势力。你无法变更为已经成为过的势力。",
-  ["$zhuanhui1"] = "现在站在你面前的是S赛13冠王！",
+  [":zhuanhui"] = "锁定技，这个技能没有什么屌用，但是能让你看起来有6个技能，很帅！<strong>这个武将由熊俊博设计！</strong>",
+  -- [":zhuanhui"] = "<del>当你的体力值减少时，你可以变更势力。你无法变更为已经成为过的势力。</del>",
+  ["$zhuanhui1"] = "被秀了，操。",
 
   ["xizao"] = "洗澡",
   [":xizao"] = "限定技，当你处于濒死状态时，你可以将体力恢复至1，摸三张牌，然后翻面。",
@@ -170,8 +229,10 @@ Fk:loadTranslationTable{
   ["$xizao2"] = "也不是稳赢吧，我觉得赢了！",
 
   ["kaiju"] = "开局",
-  [":kaiju"] = "主公技，锁定技，当你的回合开始时，与你势力不同的武将需要交给你一张牌（没有牌则不用交），并视为对你使用一张【杀】。",
-  ["$kaiju1"] = "不是啊，我在一对鬼的时候我在打什么打一对是一对是他4个9炸我我不输了吗？",
+  [":kaiju"] = "锁定技，当你的回合开始时，所有其他有牌的武将需要交给你一张牌，并视为对你使用一张【杀】。",
+  ["$kaiju1"] = "不是啊，我炸一对鬼的时候我在打什么，打一对10。一对十，他四个9炸我，我不输了吗？",
+  ["$kaiju2"] = "哇袄！！",
+  ["#kaiju-choose"] = "简自豪的【开局】：你选择一张牌交给他，然后视为你对他使用了一张【杀】。",
 
   ["~jianzihao"] = "好像又要倒下了……",
 }
