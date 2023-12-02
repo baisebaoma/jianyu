@@ -39,3 +39,6 @@ luac.out
 *.x86_64
 *.hex
 
+# original images and losslesscut project files
+*.webp
+*.lls

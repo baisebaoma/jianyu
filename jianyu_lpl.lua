@@ -2,13 +2,14 @@ local extension = Package:new("jianyu_lpl")
 extension.extensionName = "jianyu"
 
 Fk:loadTranslationTable {
-     ["jianyu_lpl"] = "监狱：LPL篇",
+     ["jianyu_lpl"] = "监狱-LPL",
      ["god"] = "神话再临·神",
+     ["first"] = "第一代",
 }
 
 
 -- 简自豪 设计：熊俊博 实现：反赌专家
-local jianzihao = General(extension, "jianzihao", "god", 3, 3, General.Male)
+local first__jianzihao = General(extension, "first__jianzihao", "god", 3, 3, General.Male)
 
 -- 红温
 local hongwen = fk.CreateFilterSkill{
@@ -120,10 +121,8 @@ local shengnu = fk.CreateTriggerSkill{
 -- 转会
 local zhuanhui = fk.CreateTriggerSkill{
   name = "zhuanhui",  -- kaiju$是主公技
-  anim_type = "masochism",
-  visible = false,
   frequency = Skill.Compulsory,
-  events = {},  -- 这里是故意的，因为本来这个技能就没有实际效果
+  events = {},  -- 这是故意的，因为本来这个技能就没有实际效果
   can_trigger = function(self, event, target, player, data)
     return false
   end,
@@ -196,34 +195,47 @@ local kaiju = fk.CreateTriggerSkill{
 -- room:useVirtualCard("slash", nil, player, table.map(self.cost_data, Util.Id2PlayerMapper), self.name, true)
 
 
-jianzihao:addSkill(zhuanhui)
-jianzihao:addSkill(kaiju)
-jianzihao:addSkill(hongwen)
-jianzihao:addSkill(zouwei)
-jianzihao:addSkill(shengnu)
-jianzihao:addSkill(xizao)
+first__jianzihao:addSkill(kaiju)
+first__jianzihao:addSkill(hongwen)
+first__jianzihao:addSkill(zouwei)
+first__jianzihao:addSkill(shengnu)
+first__jianzihao:addSkill(xizao)
+first__jianzihao:addSkill(zhuanhui)
 
 
 Fk:loadTranslationTable{
-  ["jianzihao"] = "简自豪",
+  ["first__jianzihao"] = "简自豪",
 
   ["zhuanhui"] = "转会",
-  [":zhuanhui"] = "<strong>这个武将由熊俊博设计！</strong>",
+  [":zhuanhui"] = [[锁定技，这个技能是为了告诉你下面这些提示。<br>
+  <font size="1"><strong>这个武将由熊俊博于2023年12月1日设计！</strong><br>
+  <strong>玩法提示</strong><br>
+  活过第一轮！<br>
+  如果有防具，你就能安全、强大地偷牌。<br>
+  你很脆，但你很强。寻求保护！<br>
+  <strong>队友提示</strong><br>
+  优先将防具、【闪】、【桃】、【酒】交给他。<br>
+  <strong>敌方提示</strong><br>
+  使用能增强【杀】的技能和武器，如【无双】、【青釭剑】。<br>
+  优先拆除防具。<br>
+  谨慎对待摸到的【诸葛连弩】。<br></font>
+
+  ]],
   -- [":zhuanhui"] = "<del>当你的体力值减少时，你可以变更势力。你无法变更为已经成为过的势力。</del>",
-  ["$zhuanhui1"] = "被秀了，操。",
 
   ["kaiju"] = "开局",
-  [":kaiju"] = "锁定技，当你的回合开始时，所有其他有牌的武将需要交给你一张牌，并视为对你使用一张【杀】。",
+  [":kaiju"] = [[锁定技，当你的回合开始时，所有其他有牌的武将需要交给你一张牌，并视为对你使用一张【杀】。<br>
+  <font size="2"><i>“从未如此美妙的开局！”——简自豪</i></font>]],
   ["$kaiju1"] = "不是啊，我炸一对鬼的时候我在打什么，打一对10。一对10，他四个9炸我，我不输了吗？",
-  ["$kaiju2"] = "怎么赢啊？你别瞎说啊，兄弟们。",
+  ["$kaiju2"] = "怎么赢啊？你别瞎说啊！",
   ["$kaiju3"] = "打这牌怎么打？兄弟们快教我，我看着头晕！",
   ["$kaiju4"] = "好亏呀，我每一波都。",
-  ["#kaiju-choose"] = "简自豪【开局】，交给他一张牌，并视为对他使用一张【杀】",
+  ["#kaiju-choose"] = "交给简自豪一张牌，视为对他使用一张【杀】",
 
   ["hongwen"] = "红温",
   [":hongwen"] = "锁定技，你的♠牌视为<font color='red'>♥</font>牌，你的♣牌视为<font color='red'>♦</font>牌。",
   ["$hongwen1"] = "唉，不该出水银的。",
-  ["$hongwen2"] = "哎，兄弟我为什么不打四带两对啊，兄弟？",
+  ["$hongwen2"] = "哎，兄弟我为什么不打四带两对儿啊，兄弟？",
   ["$hongwen3"] = "好难受啊！",
   ["$hongwen4"] = "操，可惜！",
   ["$hongwen5"] = "那他咋想的呀？",
@@ -236,13 +248,15 @@ Fk:loadTranslationTable{
   ["shengnu"] = "圣弩",
   [":shengnu"] = "锁定技，当【诸葛连弩】移至弃牌堆或其他角色的装备区时，你获得此【诸葛连弩】。",
   ["$shengnu1"] = "哎兄弟们我这个牌不能拆吧？",
+  ["$shengnu2"] = "补刀瞬间回来了！",
 
   ["xizao"] = "洗澡",
   [":xizao"] = "限定技，当你处于濒死状态时，你可以将体力恢复至1，摸三张牌，然后翻面。",
-  ["$xizao1"] = "哇袄！",
+  ["$xizao1"] = "呃啊啊啊啊啊啊啊！！",
   ["$xizao2"] = "也不是稳赢吧，我觉得赢了！",
+  ["$xizao3"] = "被秀了，操。",
 
-  ["~jianzihao"] = "好像又要倒下了……",
+  ["~first__jianzihao"] = "好像又要倒下了……",
 }
 
 
@@ -250,7 +264,7 @@ local houguoyu = General(extension, "houguoyu", "shu", 0, 999, General.Male)
 houguoyu.hidden = true
 
 Fk:loadTranslationTable {
-     ["jianzihao"] = "简自豪",
+     ["first__jianzihao"] = "简自豪",
      ["houguoyu"] = "侯国玉",
 }
 
