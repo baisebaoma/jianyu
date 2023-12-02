@@ -274,104 +274,107 @@ Fk:loadTranslationTable {
 
 
 -- 第二代简自豪
--- local second__jianzihao = General(extension, "second__jianzihao", "god", 3, 3, General.Male)
--- second__jianzihao.hidden = true
+local second__jianzihao = General(extension, "second__jianzihao", "god", 3, 3, General.Male)
+second__jianzihao.hidden = true
 
--- local sanjian = fk.CreateTriggerSkill{
---   name = "sanjian",
---   anim_type = "offensive",
---   frequency = Skill.Compulsory,
---   events = {fk.EventPhase},
---   can_trigger = function(self, event, target, player, data)
---     if not player:hasSkill(self.name) then return end
---     for _, move in ipairs(data) do
---       if move.from == player.id then
---         for _, info in ipairs(move.moveInfo) do
---           if info.fromArea == Card.PlayerEquip or info.toArea == Card.PlayerEquip then
---             -- 当装备等于1的时候触发
---             -- standard_cards/init.lua, line 1080: local handcards = player:getCardIds(Player.Hand)，我也不知道为啥用的是Player.Hand而不是player.hand，写就对了
---             if #player:getCardIds(Player.Equip) == 1 then
---               return true
---             end
---           end
---         end
---       end
---     end
---   end,
---   on_use = function(self, event, target, player, data)
---     -- local room = player.room
---     -- room:useVirtualCard("peach", nil, player, player, self.name, false)  -- 酒
---     player:drawCards(2)
---   end,
--- }
+local sanjian = fk.CreateTriggerSkill{
+  name = "sanjian",
+  anim_type = "offensive",
+  frequency = Skill.Compulsory,
+  events = {fk.EventPhase},
+  can_trigger = function(self, event, target, player, data)
+    if not player:hasSkill(self.name) then return end
+    for _, move in ipairs(data) do
+      if move.from == player.id then
+        for _, info in ipairs(move.moveInfo) do
+          if info.fromArea == Card.PlayerEquip or info.toArea == Card.PlayerEquip then
+            -- 当装备等于1的时候触发
+            -- standard_cards/init.lua, line 1080: local handcards = player:getCardIds(Player.Hand)，我也不知道为啥用的是Player.Hand而不是player.hand，写就对了
+            if #player:getCardIds(Player.Equip) == 1 then
+              return true
+            end
+          end
+        end
+      end
+    end
+  end,
+  on_use = function(self, event, target, player, data)
+    -- local room = player.room
+    -- room:useVirtualCard("peach", nil, player, player, self.name, false)  -- 酒
+    player:drawCards(2)
+  end,
+}
 
--- local sanjian = fk.CreateTriggerSkill{
---   name = "sanjian",
---   anim_type = "drawcard",
---   frequency = Skill.Compulsory,
---   events = {fk.EventPhaseStart},  -- 事件开始时
---   can_trigger = function(self, event, target, player, data)
---     return target == player and player:hasSkill(self.name)  -- 如果是我这个角色，如果是有这个技能的角色，如果是出牌阶段，如果这个角色的装备数是3
---       and player.phase == Player.Play and #player:getCardIds(Player.Equip) >= 3
---   end,
---   on_use = function(self, event, target, player, data)
---     local room = player.room
---     if #player:getCardIds(Player.Equip) >= 3 then 
---       room:useVirtualCard("analeptic", nil, player, player, self.name, false)
---     elseif #player:getCardIds(Player.Equip) >= 4 then 
---       room:useVirtualCard("ex_nihilo", nil, player, player, self.name, false)
---     end
---   end,
--- }
+local sanjian = fk.CreateTriggerSkill{
+  name = "sanjian",
+  anim_type = "drawcard",
+  frequency = Skill.Compulsory,
+  events = {fk.EventPhaseStart},  -- 事件开始时
+  can_trigger = function(self, event, target, player, data)
+    return target == player and player:hasSkill(self.name)  -- 如果是我这个角色，如果是有这个技能的角色，如果是出牌阶段，如果这个角色的装备数是3
+      and player.phase == Player.Play and #player:getCardIds(Player.Equip) >= 3
+  end,
+  on_use = function(self, event, target, player, data)
+    local room = player.room
+    if #player:getCardIds(Player.Equip) >= 3 then 
+      room:useVirtualCard("analeptic", nil, player, player, self.name, false)
+    elseif #player:getCardIds(Player.Equip) >= 4 then 
+      room:useVirtualCard("peach", nil, player, player, self.name, false)
+    end
+  end,
+}
 
--- local xizao_2 = fk.CreateTriggerSkill{
---   name = "xizao_2",
---   anim_type = "defensive",
---   frequency = Skill.Limited,
---   events = {fk.AskForPeaches},
---   can_trigger = function(self, event, target, player, data)
---     return target == player and player:hasSkill(self) and player.dying and player:usedSkillTimes(self.name, Player.HistoryGame) == 0
---   end,
---   on_use = function(self, event, target, player, data)
---     local room = player.room
---     if player.dead then return end
---     -- player:reset()
---     player:drawCards(3, self.name)
---     if player.dead or not player:isWounded() then return end
---     -- 将体力回复至3点
---     room:recover({
---       who = player,
---       num = math.min(1, player.maxHp) - player.hp,
---       recoverBy = player,
---       skillName = self.name,
---     })
---     player:throwAllCards("he")
---   end,
--- }
+local xizao_2 = fk.CreateTriggerSkill{
+  name = "xizao_2",
+  anim_type = "defensive",
+  frequency = Skill.Limited,
+  events = {fk.AskForPeaches},
+  can_trigger = function(self, event, target, player, data)
+    return target == player and player:hasSkill(self) and player.dying and player:usedSkillTimes(self.name, Player.HistoryGame) == 0
+  end,
+  on_use = function(self, event, target, player, data)
+    local room = player.room
+    if player.dead then return end
+    -- player:reset()
+    player:drawCards(3, self.name)
+    if player.dead or not player:isWounded() then return end
+    -- 将体力回复至3点
+    room:recover({
+      who = player,
+      num = math.min(1, player.maxHp) - player.hp,
+      recoverBy = player,
+      skillName = self.name,
+    })
+    player:throwAllCards("e")
+    room:handleAddLoseSkills(player, "-"..table.concat({"kaiju"}, "|-"), nil, true, false)
+  end,
 
--- second__jianzihao:addSkill("zhiheng")
--- second__jianzihao:addSkill("jianxiong")
--- second__jianzihao:addSkill(sanjian)
--- second__jianzihao:addSkill("kaiju")
--- second__jianzihao:addSkill("hongwen")
--- second__jianzihao:addSkill("zouwei")
--- second__jianzihao:addSkill("shengnu")
--- second__jianzihao:addSkill(xizao_2)
+}
+
+second__jianzihao:addSkill("benghuai")
+second__jianzihao:addSkill("zhiheng")
+second__jianzihao:addSkill("jianxiong")
+second__jianzihao:addSkill(sanjian)
+second__jianzihao:addSkill("kaiju")
+second__jianzihao:addSkill("hongwen")
+second__jianzihao:addSkill("zouwei")
+second__jianzihao:addSkill("shengnu")
+second__jianzihao:addSkill(xizao_2)
 
 
--- Fk:loadTranslationTable{
---   ["second__jianzihao"] = "简自豪",
+Fk:loadTranslationTable{
+  ["second__jianzihao"] = "简自豪",
 
---   ["sanjian"] = "三件",
---   [":sanjian"] = "锁定技，出牌阶段开始时，如果你的装备区有至少3张牌，你视为使用了一张【酒】；如果你的装备区有至少4张牌，你视为使用了一张【无中生有】。",
+  ["sanjian"] = "三件",
+  [":sanjian"] = "锁定技，出牌阶段开始时，如果你的装备区有至少3张牌，你视为使用了一张【酒】；如果你的装备区有至少4张牌，你视为使用了一张【桃】。",
 
---   ["xizao_2"] = "驾崩",
---   [":xizao_2"] = "限定技，当你处于濒死状态时，你可以将体力恢复至1，然后弃掉所有手牌和装备区的牌。",
---   ["$xizao_21"] = "呃啊啊啊啊啊啊啊！！",
---   ["$xizao_22"] = "也不是稳赢吧，我觉得赢了！",
+  ["xizao_2"] = "落幕",
+  [":xizao_2"] = "限定技，当你处于濒死状态时，你可以失去技能【开局】并弃掉所有装备，将体力恢复至1。",
+  ["$xizao_21"] = "呃啊啊啊啊啊啊啊！！",
+  ["$xizao_22"] = "也不是稳赢吧，我觉得赢了！",
 
---   ["~second__jianzihao"] = "好像又要倒下了……",
--- }
+  ["~second__jianzihao"] = "好像又要倒下了……",
+}
 
 Fk:loadTranslationTable {
      ["jianzihao"] = "简自豪",
