@@ -13,6 +13,7 @@ local jianzihao = General(extension, "jianzihao", "god", 3, 3, General.Male)
 -- 红温
 local hongwen = fk.CreateFilterSkill{
   name = "hongwen",
+  -- mute = true,
   card_filter = function(self, to_select, player)
     return (to_select.suit == Card.Spade or to_select.suit == Card.Club) and player:hasSkill(self)
   end,
@@ -30,29 +31,48 @@ local zouwei = fk.CreateDistanceSkill{
   name = "zouwei",
   correct_func = function(self, from, to)
     -- 有装备时视为-1
-    if from:hasSkill(self) and from:getCardIds(from.Equip) ~= 0 then
+    if from:hasSkill(self) and #from:getCardIds(Player.Equip) ~= 0 then
+      -- 请使用#from:getCardIds(Player.Equip)来代表长度，
+      -- 如果你只用from:getCardIds(Player.Equip)的话是代表这个数组
       return -1
     end
     -- 没装备时视为+1
-    if to:hasSkill(self) and to:getCardIds(to.Equip) == 0 then
+    if to:hasSkill(self) and #to:getCardIds(Player.Equip) == 0 then
       return 1
     end
     return 0
   end,
 }
+-- 参考自孙尚香
 local zouwei_audio = fk.CreateTriggerSkill{
   name = "#zouwei_audio",
 
-  refresh_events = {fk.HpChanged},
+  refresh_events = {fk.AfterCardsMove},
+  -- 这个函数只有在装备区牌量变动时才检测
   can_refresh = function(self, event, target, player, data)
-    return target == player and player:hasSkill("zouwei") and not player:isFakeSkill("zouwei")
+    if not player:hasSkill(self.name) then return end
+    for _, move in ipairs(data) do
+      if move.from == player.id then
+        for _, info in ipairs(move.moveInfo) do
+          if info.fromArea == Card.PlayerEquip then
+            -- 当装备等于0或1的时候触发
+            -- standard_cards/init.lua, line 1080: local handcards = player:getCardIds(Player.Hand)，我也不知道为啥用的是Player.Hand而不是player.hand，写就对了
+            if #player:getCardIds(Player.Equip) <= 1 then
+              return true
+            end
+          end
+        end
+      end
+    end
   end,
   on_refresh = function(self, event, target, player, data)
     local room = player.room
-    if player.hp > 2 and data.num > 0 and player.hp - data.num < 3 then
+    -- 有装备时，-1马
+    if #player:getCardIds(player.Equip) ~= 0 then
       room:notifySkillInvoked(player, "zouwei", "offensive")
       player:broadcastSkillInvoke("zouwei", 1)
-    elseif player.hp < 3 and data.num < 0 and player.hp - data.num > 2 then
+    -- 无装备时，+1马
+    elseif #player:getCardIds(player.Equip) == 0 then
       room:notifySkillInvoked(player, "zouwei", "defensive")
       player:broadcastSkillInvoke("zouwei", 2)
     end
@@ -101,20 +121,14 @@ local shengnu = fk.CreateTriggerSkill{
 local zhuanhui = fk.CreateTriggerSkill{
   name = "zhuanhui",  -- kaiju$是主公技
   anim_type = "masochism",
+  visible = false,
   frequency = Skill.Compulsory,
   events = {},  -- 这里是故意的，因为本来这个技能就没有实际效果
   can_trigger = function(self, event, target, player, data)
-    return target == player and player:hasSkill(self.name) and player.phase == Player.Start
+    return false
   end,
   on_use = function(self, event, target, player, data)
     local room = player.room
-    for _, p in ipairs(room:getOtherPlayers(player, true)) do
-      if not p:isAllNude() then
-        local id = room:askForCardChosen(p, p, "#kaiju-choose", self.name)  -- 他自己选一张牌
-        room:obtainCard(player, id, false, fk.ReasonPrey)  -- 我从他那里拿一张牌来
-        room:useVirtualCard("slash", nil, p, player, self.name, true)  -- 杀
-      end
-    end
   end,
 }
 
@@ -159,7 +173,16 @@ local kaiju = fk.CreateTriggerSkill{
     local room = player.room
     for _, p in ipairs(room:getOtherPlayers(player, true)) do
       if not p:isAllNude() then
-        local id = room:askForCardChosen(p, p, "#kaiju-choose", self.name)  -- 他自己选一张牌
+        local id = room:askForCardChosen(p, p, "he", "#kaiju-choose")  -- 他自己用框选一张自己的牌，不包括判定区
+        -- -- 下面这一堆是一起的，从贯石斧拿来的。
+        -- local pattern
+        -- if p:getEquipment(Card.SubtypeWeapon) then
+        --   pattern = ".|.|.|.|.|.|^"..tostring(p:getEquipment(Card.SubtypeWeapon))
+        -- else
+        --   pattern = "."
+        -- end
+        -- local id = room:askForDiscard(p, 2, 2, true, self.name, false, ".", nil, true, false)
+        -- -- 从贯石斧抄过来的
         room:obtainCard(player, id, false, fk.ReasonPrey)  -- 我从他那里拿一张牌来
         room:useVirtualCard("slash", nil, p, player, self.name, true)  -- 杀
       end
@@ -167,42 +190,35 @@ local kaiju = fk.CreateTriggerSkill{
   end,
 }
 
--- 这个版本可以用，但是是你从所有人那里抽一张
--- local kaiju = fk.CreateTriggerSkill{
---   name = "kaiju",  -- kaiju$是主公技
---   anim_type = "masochism",
---   frequency = Skill.Compulsory,
---   events = {fk.EventPhaseStart},
---   can_trigger = function(self, event, target, player, data)
---     return target == player and player:hasSkill(self.name) and player.phase == Player.Start
---   end,
---   on_use = function(self, event, target, player, data)
---     local room = player.room
---     for _, p in ipairs(room:getOtherPlayers(player, true)) do
---       if not p:isAllNude() then
---         local id = room:askForCardChosen(player, p, "hej", self.name)  -- 我选他一张牌
---         room:obtainCard(player, id, false, fk.ReasonPrey)  -- 我从他那里拿一张牌来
---         room:useVirtualCard("slash", nil, p, player, self.name, true)  -- 杀
---       end
---     end
---   end,
--- }
 
--- 主公技，锁定技，当你的回合开始时，所有其他有牌的武将需要交给你一张牌，并视为对你使用一张【杀】。
+-- local id = room:askForCardChosen(player, p, "hej", self.name)  -- 我选他一张牌
 
 -- room:useVirtualCard("slash", nil, player, table.map(self.cost_data, Util.Id2PlayerMapper), self.name, true)
 
 
+jianzihao:addSkill(zhuanhui)
+jianzihao:addSkill(kaiju)
 jianzihao:addSkill(hongwen)
 jianzihao:addSkill(zouwei)
 jianzihao:addSkill(shengnu)
-jianzihao:addSkill(zhuanhui)
 jianzihao:addSkill(xizao)
-jianzihao:addSkill(kaiju)
 
 
 Fk:loadTranslationTable{
   ["jianzihao"] = "简自豪",
+
+  ["zhuanhui"] = "转会",
+  [":zhuanhui"] = "<strong>这个武将由熊俊博设计！</strong>",
+  -- [":zhuanhui"] = "<del>当你的体力值减少时，你可以变更势力。你无法变更为已经成为过的势力。</del>",
+  ["$zhuanhui1"] = "被秀了，操。",
+
+  ["kaiju"] = "开局",
+  [":kaiju"] = "锁定技，当你的回合开始时，所有其他有牌的武将需要交给你一张牌，并视为对你使用一张【杀】。",
+  ["$kaiju1"] = "不是啊，我炸一对鬼的时候我在打什么，打一对10。一对10，他四个9炸我，我不输了吗？",
+  ["$kaiju2"] = "怎么赢啊？你别瞎说啊，兄弟们。",
+  ["$kaiju3"] = "打这牌怎么打？兄弟们快教我，我看着头晕！",
+  ["$kaiju4"] = "好亏呀，我每一波都。",
+  ["#kaiju-choose"] = "简自豪【开局】，交给他一张牌，并视为对他使用一张【杀】",
 
   ["hongwen"] = "红温",
   [":hongwen"] = "锁定技，你的♠牌视为<font color='red'>♥</font>牌，你的♣牌视为<font color='red'>♦</font>牌。",
@@ -221,21 +237,10 @@ Fk:loadTranslationTable{
   [":shengnu"] = "锁定技，当【诸葛连弩】移至弃牌堆或其他角色的装备区时，你获得此【诸葛连弩】。",
   ["$shengnu1"] = "哎兄弟们我这个牌不能拆吧？",
 
-  ["zhuanhui"] = "转会",
-  [":zhuanhui"] = "锁定技，这个技能没有什么屌用，但是能让你看起来有6个技能，很帅！<strong>这个武将由熊俊博设计！</strong>",
-  -- [":zhuanhui"] = "<del>当你的体力值减少时，你可以变更势力。你无法变更为已经成为过的势力。</del>",
-  ["$zhuanhui1"] = "被秀了，操。",
-
   ["xizao"] = "洗澡",
   [":xizao"] = "限定技，当你处于濒死状态时，你可以将体力恢复至1，摸三张牌，然后翻面。",
-  ["$xizao1"] = "怎么赢啊？你别瞎说啊，兄弟们。",
+  ["$xizao1"] = "哇袄！",
   ["$xizao2"] = "也不是稳赢吧，我觉得赢了！",
-
-  ["kaiju"] = "开局",
-  [":kaiju"] = "锁定技，当你的回合开始时，所有其他有牌的武将需要交给你一张牌，并视为对你使用一张【杀】。",
-  ["$kaiju1"] = "不是啊，我炸一对鬼的时候我在打什么，打一对10。一对十，他四个9炸我，我不输了吗？",
-  ["$kaiju2"] = "哇袄！！",
-  ["#kaiju-choose"] = "简自豪的【开局】：你选择一张牌交给他，然后视为你对他使用了一张【杀】。",
 
   ["~jianzihao"] = "好像又要倒下了……",
 }
