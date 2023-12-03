@@ -4,13 +4,13 @@ extension.extensionName = "jianyu"
 Fk:loadTranslationTable {
      ["jianyu_lpl"] = "<font color=\"red\"><strong>监狱-LPL</strong></font>",
      ["god"] = "神话再临·神",
-     ["first"] = "熊",
-     ["second"] = "冠军限定",
+     ["xjb"] = "熊",
+     ["tym"] = "唐",
 }
 
 
 -- 第一代简自豪 设计：熊俊博 实现：反赌专家
-local first__jianzihao = General(extension, "first__jianzihao", "qun", 3, 3, General.Male)
+local xjb__jianzihao = General(extension, "xjb__jianzihao", "qun", 3, 3, General.Male)
 
 -- 红温
 local hongwen = fk.CreateFilterSkill{
@@ -179,15 +179,15 @@ local kaiju = fk.CreateTriggerSkill{
 
 -- room:useVirtualCard("slash", nil, player, table.map(self.cost_data, Util.Id2PlayerMapper), self.name, true)
 
-first__jianzihao:addSkill(kaiju)
-first__jianzihao:addSkill(hongwen)
-first__jianzihao:addSkill(zouwei)
-first__jianzihao:addSkill(shengnu)
-first__jianzihao:addSkill(xizao)
--- first__jianzihao:addSkill(zhuanhui)
+xjb__jianzihao:addSkill(kaiju)
+xjb__jianzihao:addSkill(hongwen)
+xjb__jianzihao:addSkill(zouwei)
+xjb__jianzihao:addSkill(shengnu)
+xjb__jianzihao:addSkill(xizao)
+-- xjb__jianzihao:addSkill(zhuanhui)
 
 Fk:loadTranslationTable{
-  ["first__jianzihao"] = "简自豪",
+  ["xjb__jianzihao"] = "简自豪",
 
   ["zhuanhui"] = "转会",
   [":zhuanhui"] = [[锁定技，这个技能是为了告诉你下面这些提示。<br>
@@ -240,31 +240,25 @@ Fk:loadTranslationTable{
   ["$xizao1"] = "呃啊啊啊啊啊啊啊！！",
   ["$xizao2"] = "也不是稳赢吧，我觉得赢了！",
 
-  ["~first__jianzihao"] = "好像又要倒下了……",
+  ["~xjb__jianzihao"] = "好像又要倒下了……",
 }
 
 
 -- 侯国玉
-local houguoyu = General(extension, "houguoyu", "shu", 5, 10, General.Male)
-houguoyu.hidden = true
+local tym__houguoyu = General(extension, "tym__houguoyu", "qun", 4, 4, General.Male)
 
-local waao = fk.CreateTriggerSkill{
-  name = "waao",
-  frequency = Skill.Compulsory,
-  events = {},  -- 这是故意的，因为本来这个技能就没有实际效果
-}
-
-houguoyu:addSkill("paoxiao")
-houguoyu:addSkill("qianxun")
+tym__houguoyu:addSkill("paoxiao")
+tym__houguoyu:addSkill("yingzi")
+tym__houguoyu:addSkill("qianxun")
 
 Fk:loadTranslationTable {
+  ["tym__houguoyu"] = "侯国玉",
   ["houguoyu"] = "侯国玉",
 }
 
 
 -- 第二代简自豪
-local second__jianzihao = General(extension, "second__jianzihao", "qun", 3, 3, General.Male)
-second__jianzihao.hidden = true
+local tym__jianzihao = General(extension, "tym__jianzihao", "qun", 3, 3, General.Male)
 
 local sanjian = fk.CreateTriggerSkill{
   name = "sanjian",
@@ -389,19 +383,17 @@ local xizao_2 = fk.CreateTriggerSkill{
   end,
 }
 
-second__jianzihao:addSkill(kaiju_2)
-second__jianzihao:addSkill(sanjian)
--- second__jianzihao:addSkill("paoxiao")
-second__jianzihao:addSkill("hongyan")
--- second__jianzihao:addSkill("zouwei")
-second__jianzihao:addSkill(xizao_2)
-
+tym__jianzihao:addSkill(kaiju_2)
+tym__jianzihao:addSkill(sanjian)
+tym__jianzihao:addSkill("hongyan")
+tym__jianzihao:addSkill(xizao_2)
 
 Fk:loadTranslationTable{
-  ["second__jianzihao"] = "简自豪",
+  ["tym__jianzihao"] = "简自豪",
 
-  ["kaiju_2"] = "开局",
-  [":kaiju_2"] = "出牌阶段限一次，你选择若干名武将，视为你对他们使用【顺手牵羊】，然后被他们【火杀】。以此法使用的【顺手牵羊】无法被【无懈可击】响应；你不能选择带有【谦逊】（标准版）技能的武将为目标。",
+  ["kaiju_2"] = "夺冠",
+  [":kaiju_2"] = [[出牌阶段限一次，你选择若干名武将，视为你对他们使用【顺手牵羊】，然后被他们【火杀】。该【顺手牵羊】不能被【无懈可击】响应；你不能选择有【谦逊】（标准版）的武将为目标。
+  <br><font size="2"><i>“加入EDG，成为世界冠军！”</i></font>]],
   ["$kaiju_21"] = "不是啊，我炸一对鬼的时候我在打什么，打一对10。一对10，他四个9炸我，我不输了吗？",
   ["$kaiju_22"] = "怎么赢啊？你别瞎说啊！",
   ["$kaiju_23"] = "打这牌怎么打？兄弟们快教我，我看着头晕！",
@@ -409,7 +401,7 @@ Fk:loadTranslationTable{
   ["$kaiju_25"] = "被秀了，操。",
 
   ["sanjian"] = "三件",
-  [":sanjian"] = [[锁定技，出牌阶段开始时，如果你的装备区有且仅有3张牌，你视为使用一张【酒】、一张【无中生有】。<br>
+  [":sanjian"] = [[锁定技，出牌阶段开始时，如果你的装备区有且仅有3张牌，你视为使用一张【酒】和一张【无中生有】。<br>
   <font size="2"><i>“又陷入劣势了，等乌兹三件套吧！”——不知道哪个解说说的</i></font>]],
   ["$sanjian1"] = "也不是稳赢吧，我觉得赢了！",
 
@@ -418,7 +410,7 @@ Fk:loadTranslationTable{
   ["$xizao_21"] = "呃啊啊啊啊啊啊啊！！",
   ["$xizao_22"] = "也不是稳赢吧，我觉得赢了！",
 
-  ["~second__jianzihao"] = "好像又要倒下了……",
+  ["~tym__jianzihao"] = "好像又要倒下了……",
 }
 
 Fk:loadTranslationTable {
