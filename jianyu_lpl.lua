@@ -166,16 +166,8 @@ local kaiju = fk.CreateTriggerSkill{
     local room = player.room
     for _, p in ipairs(room:getOtherPlayers(player, true)) do
       if not p:isAllNude() then
+        -- 其实这里可以优化成贯石斧那种逻辑，也就是只在下面选择，但我不会
         local id = room:askForCardChosen(p, p, "he", "#kaiju-choose")  -- 他自己用框选一张自己的牌，不包括判定区
-        -- -- 下面这一堆是一起的，从贯石斧拿来的。
-        -- local pattern
-        -- if p:getEquipment(Card.SubtypeWeapon) then
-        --   pattern = ".|.|.|.|.|.|^"..tostring(p:getEquipment(Card.SubtypeWeapon))
-        -- else
-        --   pattern = "."
-        -- end
-        -- local id = room:askForDiscard(p, 2, 2, true, self.name, false, ".", nil, true, false)
-        -- -- 从贯石斧抄过来的
         room:obtainCard(player, id, false, fk.ReasonPrey)  -- 我从他那里拿一张牌来
         room:useVirtualCard("slash", nil, p, player, self.name, true)  -- 杀
       end
@@ -192,7 +184,7 @@ first__jianzihao:addSkill(hongwen)
 first__jianzihao:addSkill(zouwei)
 first__jianzihao:addSkill(shengnu)
 first__jianzihao:addSkill(xizao)
-first__jianzihao:addSkill(zhuanhui)
+-- first__jianzihao:addSkill(zhuanhui)
 
 Fk:loadTranslationTable{
   ["first__jianzihao"] = "简自豪",
@@ -253,7 +245,7 @@ Fk:loadTranslationTable{
 
 
 -- 侯国玉
-local houguoyu = General(extension, "houguoyu", "shu", 7, 14, General.Male)
+local houguoyu = General(extension, "houguoyu", "shu", 5, 10, General.Male)
 houguoyu.hidden = true
 
 local waao = fk.CreateTriggerSkill{
@@ -262,14 +254,11 @@ local waao = fk.CreateTriggerSkill{
   events = {},  -- 这是故意的，因为本来这个技能就没有实际效果
 }
 
-houguoyu:addSkill(waao)
+houguoyu:addSkill("paoxiao")
+houguoyu:addSkill("qianxun")
 
 Fk:loadTranslationTable {
   ["houguoyu"] = "侯国玉",
-
-  ["waao"] = "哇袄",
-  [":waao"] = "锁定技，除非被点将，这个武将不会出现在你的选将名单里。",
-  ["$waao1"] = "哇袄",
 }
 
 
@@ -284,36 +273,90 @@ local sanjian = fk.CreateTriggerSkill{
   events = {fk.EventPhaseStart},  -- 事件开始时
   can_trigger = function(self, event, target, player, data)
     return target == player and player:hasSkill(self.name)  -- 如果是我这个角色，如果是有这个技能的角色，如果是出牌阶段，如果这个角色的装备数是3
-      and player.phase == Player.Play and #player:getCardIds(Player.Equip) >= 3
+      and player.phase == Player.Play and #player:getCardIds(Player.Equip) == 3
   end,
   on_use = function(self, event, target, player, data)
     local room = player.room
-    if #player:getCardIds(Player.Equip) >= 3 then 
-      room:useVirtualCard("analeptic", nil, player, player, self.name, false)
-    elseif #player:getCardIds(Player.Equip) >= 4 then 
-      room:useVirtualCard("ex_nihilo", nil, player, player, self.name, false)
-    end
+    room:useVirtualCard("analeptic", nil, player, player, self.name, false)
+    -- room:useVirtualCard("peach", nil, player, player, self.name, false)
+    room:useVirtualCard("ex_nihilo", nil, player, player, self.name, false)
   end,
 }
 
-local kaiju_2 = fk.CreateTriggerSkill{
+-- local kaiju_2 = fk.CreateActiveSkill{
+--   name = "kaiju_2",
+--   anim_type = "offensive",
+--   can_use = function(self, player)
+--     return player:usedSkillTimes(self.name, Player.HistoryPhase) == 0
+--   end,
+--   card_filter = function(self, to_select, selected)
+--     return #selected == 0
+--   end,
+--   target_filter = function(self, to_select, selected)
+--     return #selected <= 3 and to_select ~= Self.id and
+--       not Fk:currentRoom():getPlayerById(to_select).isAllNude()  -- 选择三个目标，这三个不能是自己，也不能是裸装
+--   end,
+--   min_target_num = 1,
+--   min_card_num = 0,
+--   on_use = function(self, room, use)
+--     local player = room:getPlayerById(use.from)
+--     for p in use.tos do
+--       room:useVirtualCard("snatch", nil, player, p, self.name, true)  -- 顺
+--       room:useVirtualCard("fire__slash", nil, p, player, self.name, true)  -- 火杀
+--     end
+--   end,
+-- }
+
+local kaiju_2 = fk.CreateActiveSkill{
   name = "kaiju_2",
-  anim_type = "masochism",
-  frequency = Skill.Compulsory,
-  events = {fk.EventPhaseStart},
-  can_trigger = function(self, event, target, player, data)
-    return target == player and player:hasSkill(self.name) and player.phase == Player.Start
+  anim_type = "offensive",
+  can_use = function(self, player)
+    return player:usedSkillTimes(self.name, Player.HistoryPhase) == 0
   end,
-  on_use = function(self, event, target, player, data)
-    local room = player.room
-    for _, p in ipairs(room:getOtherPlayers(player, true)) do
-      if not p:isAllNude() then
-        choice = room:askForChoice(p, {"yes", "no"}, self.name, "#kaiju_2_choose", false, nil)
-        if choice == "yes" then
-          room:useVirtualCard("snatch", nil, player, p, self.name, true)  -- 顺
-          room:useVirtualCard("fire__slash", nil, p, player, self.name, true)  -- 杀
-        end
+  card_filter = function(self, card)
+    return false
+  end,
+  card_num = 0,
+  target_filter = function(self, to_select, selected)
+
+    -- 判断目标是否有谦逊
+    local is_qianxun = false
+    for _, s in ipairs(Fk:currentRoom():getPlayerById(to_select).player_skills) do
+      if s.name == "qianxun" then
+        is_qianxun = true
       end
+    end
+
+    -- 不会写这个，我想直接以顺手牵羊的形式判断能不能被顺
+    -- local player = Fk:currentRoom():getPlayerById(Self.id)
+    -- local snatch = Fk:cloneCard("snatch")
+    -- local is_qianxun = Fk:currentRoom():getPlayerById(to_select):isProhibited(player, snatch)
+    
+    -- print(Fk:currentRoom():getPlayerById(to_select).general.name, " 的is_qianxun的值为 ", is_qianxun)
+
+
+    return to_select ~= Self.id and not is_qianxun and -- 如果目标不是自己，而且没有谦逊
+      not Fk:currentRoom():getPlayerById(to_select):isAllNude()  -- 而且不是裸装。函数要用冒号
+  end,
+  min_target_num = 1,
+  on_use = function(self, room, use)
+    local player = room:getPlayerById(use.from)
+    for _, to in ipairs(use.tos) do
+      local p = room:getPlayerById(to)
+
+      -- room:useVirtualCard("snatch", nil, player, p, self.name, true)  -- 顺
+
+      local snatch = Fk:cloneCard("snatch")
+      snatch.skillName = self.name
+      local new_use = { ---@type CardUseStruct
+        from = use.from,  -- 应该是直接传id
+        tos = { { to } },
+        card = snatch,
+        prohibitedCardNames = { "nullification" },
+      }
+      room:useCard(new_use)
+
+      room:useVirtualCard("fire__slash", nil, p, player, self.name, true)  -- 火杀
     end
   end,
 }
@@ -324,7 +367,8 @@ local xizao_2 = fk.CreateTriggerSkill{
   frequency = Skill.Limited,
   events = {fk.AskForPeaches},
   can_trigger = function(self, event, target, player, data)
-    return target == player and player:hasSkill(self) and player.dying and player:usedSkillTimes(self.name, Player.HistoryGame) == 0
+    return target == player and player:hasSkill(self) and player.dying and 
+    player:usedSkillTimes(self.name, Player.HistoryGame) == 0 and #player:getCardIds(Player.Equip) ~= 0
   end,
   on_use = function(self, event, target, player, data)
     local room = player.room
@@ -339,37 +383,38 @@ local xizao_2 = fk.CreateTriggerSkill{
       recoverBy = player,
       skillName = self.name,
     })
-    player:throwAllCards("he")
+    equip_num = #player:getCardIds(Player.Equip)
+    player:throwAllCards("e")
+    player:drawCards(equip_num)
   end,
 }
 
-second__jianzihao:addSkill(sanjian)
 second__jianzihao:addSkill(kaiju_2)
-second__jianzihao:addSkill("paoxiao")
+second__jianzihao:addSkill(sanjian)
+-- second__jianzihao:addSkill("paoxiao")
 second__jianzihao:addSkill("hongyan")
 -- second__jianzihao:addSkill("zouwei")
--- second__jianzihao:addSkill(xizao_2)
+second__jianzihao:addSkill(xizao_2)
 
 
 Fk:loadTranslationTable{
   ["second__jianzihao"] = "简自豪",
 
-  ["kaiju_2"] = "行窃",
-  [":kaiju_2"] = [[锁定技，你的回合开始时，所有其他武将可以选择是否被你免费使用一张【顺手牵羊】。如果选择是，视为其对你使用一张【火杀】。<br>
-  <font size="2"><i>“偷我冠军奖杯可以，但你的狗命得留在我这！”——不知道谁说的</i></font>]],
+  ["kaiju_2"] = "开局",
+  [":kaiju_2"] = "出牌阶段限一次，你选择若干名武将，视为你对他们使用【顺手牵羊】，然后被他们【火杀】。以此法使用的【顺手牵羊】无法被【无懈可击】响应；你不能选择带有【谦逊】（标准版）技能的武将为目标。",
   ["$kaiju_21"] = "不是啊，我炸一对鬼的时候我在打什么，打一对10。一对10，他四个9炸我，我不输了吗？",
   ["$kaiju_22"] = "怎么赢啊？你别瞎说啊！",
   ["$kaiju_23"] = "打这牌怎么打？兄弟们快教我，我看着头晕！",
   ["$kaiju_24"] = "好亏呀，我每一波都。",
   ["$kaiju_25"] = "被秀了，操。",
-  ["#kaiju_2_choose"] = "是否让简自豪对你免费使用一次【顺手牵羊】，然后你对他免费使用一次【火杀】",
 
   ["sanjian"] = "三件",
-  [":sanjian"] = [[锁定技，出牌阶段开始时，如果你的装备区有至少3张牌，你视为使用了一张【酒】；如果你的装备区有至少4张牌，你视为使用了一张【无中生有】。<br>
+  [":sanjian"] = [[锁定技，出牌阶段开始时，如果你的装备区有且仅有3张牌，你视为使用一张【酒】、一张【无中生有】。<br>
   <font size="2"><i>“又陷入劣势了，等乌兹三件套吧！”——不知道哪个解说说的</i></font>]],
+  ["$sanjian1"] = "也不是稳赢吧，我觉得赢了！",
 
-  ["xizao_2"] = "喜澡",
-  [":xizao_2"] = "限定技，当你处于濒死状态时，你可以弃掉所有装备区的牌，然后将体力恢复至1。",
+  ["xizao_2"] = "洗澡",
+  [":xizao_2"] = "限定技，当你处于濒死状态且装备区有牌时，你可以弃掉所有装备区的牌、将体力恢复至1，然后每以此法弃掉一张牌，你摸一张牌。",
   ["$xizao_21"] = "呃啊啊啊啊啊啊啊！！",
   ["$xizao_22"] = "也不是稳赢吧，我觉得赢了！",
 
