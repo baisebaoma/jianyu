@@ -2,7 +2,7 @@ local extension = Package:new("jy_jianyu")
 extension.extensionName = "jianyu"
 
 Fk:loadTranslationTable {
-     ["jy_jianyu"] = "<font color=\"red\"><strong>监狱包</strong></font>",
+     ["jy_jianyu"] = "<font color=\"red\"><strong>监狱</strong></font>",
      ["god"] = "神话再临·神",
      ["xjb"] = "熊",
      ["tym"] = "唐",
