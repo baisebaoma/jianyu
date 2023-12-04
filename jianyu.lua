@@ -638,7 +638,8 @@ Fk:loadTranslationTable {
   ["skl__liyuanhao_xiao"] = "啸",
 
   ["jy_huxiao"] = "虎啸",
-  [":jy_huxiao"] = "当你失去一张【杀】时，你可以将牌顶一张牌置于武将牌上，称为【啸】。",
+  [":jy_huxiao"] = [[当你失去一张【杀】时，你可以将牌堆顶的一张牌置于武将牌上，称为【啸】。
+  <br><font size="2"><i>“我希望我的后辈们能够记住，在你踏上职业道路的这一刻开始，你的目标就只有，冠军。”——李元浩</i></font>]],
 
   ["jy_huxiao_jink"] = "虎闪",
   [":jy_huxiao_jink"] = "你可以将【啸】当作【闪】使用或打出。",
@@ -647,13 +648,13 @@ Fk:loadTranslationTable {
   [":jy_huxiao_analeptic"] = "你可以将【啸】当作【酒】使用或打出。",
 
   ["jy_erduanxiao"] = "二段",
-  [":jy_erduanxiao"] = "锁定技，当你的武将牌上拥有两张【啸】时，你选择失去一点体力或失去所有【啸】。",
+  [":jy_erduanxiao"] = "锁定技，当你的武将牌上有两张【啸】时，你选择失去一点体力或失去所有【啸】。",
   ["#jy_erduanxiao_trigger"] = "二段",
   ["#lose_xiao"] = "弃掉所有【啸】", 
   ["#lose_hp_1"] = "流失1点体力",
 
   ["jy_husanjian"] = "三件",
-  [":jy_husanjian"] = "锁定技，当你的装备区有且仅有防具和+1马时，你造成的伤害-1。",
+  [":jy_husanjian"] = "锁定技，当你的装备区有且仅有防具和防御马时，你造成的伤害-1。",
 }
 
 -- 阿伟罗
