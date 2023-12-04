@@ -406,13 +406,9 @@ local jy_huxiao = fk.CreateTriggerSkill{
   -- frequency = Skill.Compulsory,
   can_trigger = function(self, event, target, player, data)
     if player:hasSkill(self) and data.card.trueName == "slash" then
-      -- 使用【杀】
-      if event == fk.TargetSpecified then
+      -- 使用是TS，打出是CR
+      if event == fk.TargetSpecified or event == fk.CardResponding then
         return target == player
-      end
-      -- 打出【杀】
-      if event == fk.CardResponding then
-        return true
       end
     end
   end,
