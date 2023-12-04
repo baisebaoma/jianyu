@@ -1,5 +1,5 @@
 
-local jianyu_lpl = require "packages/jianyu/jianyu_lpl"
+local jianyu = require "packages/jianyu/jianyu"
 return {
-     jianyu_lpl,
+     jianyu,
 }
