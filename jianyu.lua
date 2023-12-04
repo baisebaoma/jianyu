@@ -507,9 +507,9 @@ local jy_erduanxiao_trigger = fk.CreateTriggerSkill{
     local choice = room:askForChoice(player, {"#lose_xiao", "#lose_hp_1"}, self.name)
     if choice == "#lose_xiao" then
       local xiaos = player:getPile("skl__liyuanhao_xiao")
-      room:throwCard(xiaos, self.name, player, player)  -- 全部扔掉
+      room:throwCard(xiaos, self.name, player, player)  -- 把啸全部扔掉
     elseif choice == "#lose_hp_1" then
-      room:loseHp(player, 1, self.name)
+      room:loseHp(player, 1, self.name) -- 失去一点体力
       player.is_xiao_changing = false
     end
   end,
@@ -540,8 +540,8 @@ local jy_husanjian = fk.CreateTriggerSkill{
   on_use = function(self, event, target, player, data)
     local room = player.room
     player:broadcastSkillInvoke(self.name)
-    room:notifySkillInvoked(player, self.name, "offensive")
-    data.damage = data.damage + 1
+    room:notifySkillInvoked(player, self.name, "masochism")  -- 如果这个技能改了，建议把这里的特效也改一下。
+    data.damage = data.damage - 1
   end,
 }
 
@@ -574,7 +574,7 @@ Fk:loadTranslationTable {
   ["#lose_hp_1"] = "失去1点体力",
 
   ["jy_husanjian"] = "三件",
-  [":jy_husanjian"] = [[锁定技，当你的装备区有且仅有防具和防御马时，你造成的伤害+1。
+  [":jy_husanjian"] = [[锁定技，当你的装备区有且仅有防具和防御马时，你造成的伤害-1。
   <br><font size="2"><i>虎三件，指【中娅沙漏】、【水银之靴】、【大天使之杖】、【永霜】、【兰德里的苦楚】里面的三件。不同的人有不同的观点，但【大天使之杖】定在其列。</i></font>]],
 }
 
