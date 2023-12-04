@@ -7,10 +7,11 @@ Fk:loadTranslationTable {
      ["xjb"] = "熊",
      ["tym"] = "唐",
      ["skl"] = "尚",
+     ["buffed"] = "加强",
 }
 
 
--- 第一代简自豪 设计：熊俊博 实现：反赌专家
+-- 熊简自豪
 local xjb__jianzihao = General(extension, "xjb__jianzihao", "qun", 3, 3, General.Male)
 
 -- 红温
@@ -212,7 +213,7 @@ Fk:loadTranslationTable{
 
   ["jy_kaiju"] = "开局",
   [":jy_kaiju"] = [[锁定技，当你的回合开始时，所有其他有牌的武将需要交给你一张牌，并视为对你使用一张【杀】。<br>
-  <font size="2"><i>“从未如此美妙的开局！”——简自豪</i></font>]],
+  <font size="1"><i>“从未如此美妙的开局！”——简自豪</i></font>]],
   ["$jy_kaiju1"] = "不是啊，我炸一对鬼的时候我在打什么，打一对10。一对10，他四个9炸我，我不输了吗？",
   ["$jy_kaiju2"] = "怎么赢啊？你别瞎说啊！",
   ["$jy_kaiju3"] = "打这牌怎么打？兄弟们快教我，我看着头晕！",
@@ -354,15 +355,16 @@ local jy_xizao_2 = fk.CreateTriggerSkill{
 
 tym__jianzihao:addSkill(jy_kaiju_2)
 tym__jianzihao:addSkill(jy_sanjian)
--- tym__jianzihao:addSkill("hongyan") -- 为了平衡而做出的决定。这样八卦阵和藤甲都是可以的。
+tym__jianzihao:addSkill("hongyan")
+tym__jianzihao:addSkill("jy_zouwei")
 tym__jianzihao:addSkill(jy_xizao_2)
 
 Fk:loadTranslationTable{
-  ["tym__jianzihao"] = "简自豪",
+  ["tym__jianzihao"] = "界简自豪",
 
   ["jy_kaiju_2"] = "夺冠",
   [":jy_kaiju_2"] = [[出牌阶段限一次，你选择若干名武将。你对他们【顺手牵羊】，然后被他们【杀】。
-  <br><font size="2"><i>“加入EDG，成为世界冠军！”</i></font>]],
+  <br><font size="1"><i>“加入EDG，成为世界冠军！”</i></font>]],
   ["$jy_kaiju_21"] = "不是啊，我炸一对鬼的时候我在打什么，打一对10。一对10，他四个9炸我，我不输了吗？",
   ["$jy_kaiju_22"] = "怎么赢啊？你别瞎说啊！",
   ["$jy_kaiju_23"] = "打这牌怎么打？兄弟们快教我，我看着头晕！",
@@ -371,7 +373,7 @@ Fk:loadTranslationTable{
 
   ["jy_sanjian"] = "三件",
   [":jy_sanjian"] = [[锁定技，出牌阶段开始时，如果你的装备区有且仅有3张牌，你视为使用一张【酒】、一张【桃】和一张【无中生有】。<br>
-  <font size="2"><i>“又陷入劣势了，等乌兹三件套吧！”——不知道哪个解说说的</i></font>]],
+  <font size="1"><i>“又陷入劣势了，等乌兹三件套吧！”——不知道哪个解说说的</i></font>]],
   ["$jy_sanjian1"] = "也不是稳赢吧，我觉得赢了！",
 
   ["jy_xizao_2"] = "洗澡",
@@ -394,7 +396,7 @@ Fk:loadTranslationTable {
   ["houguoyu"] = "侯国玉",
 }
 
--- 李元浩
+-- 尚李元浩
 local skl__liyuanhao = General(extension, "skl__liyuanhao", "qun", 3, 3, General.Male)
 
 -- 虎啸
@@ -557,36 +559,152 @@ Fk:loadTranslationTable {
 
   ["jy_huxiao"] = "虎啸",
   [":jy_huxiao"] = [[当你使用或打出一张【杀】时，你可以将牌堆顶的一张牌置于你的武将牌上，称为【啸】。
-  <br><font size="2"><i>“我希望我的后辈们能够记住，在你踏上职业道路的这一刻开始，你的目标就只有，冠军。”——李元浩</i></font>]],
+  <br><font size="1"><i>“我希望我的后辈们能够记住，在你踏上职业道路的这一刻开始，你的目标就只有，冠军。”——李元浩</i></font>]],
 
   ["jy_huxiao_jink"] = "横刀",
   [":jy_huxiao_jink"] = [[你可以将【啸】当作【闪】使用或打出。
-  <br><font size="2"><i>“谁敢横刀立马……”——钱晨</i></font>]],
+  <br><font size="1"><i>“谁敢横刀立马……”——钱晨</i></font>]],
 
   ["jy_huxiao_analeptic"] = "立马",
   [":jy_huxiao_analeptic"] = [[你可以将【啸】当作【酒】使用或打出。
-  <br><font size="2"><i>“……唯我虎大将军！”——钱晨</i></font>]],
+  <br><font size="1"><i>“……唯我虎大将军！”——钱晨</i></font>]],
 
   ["jy_erduanxiao"] = "二段",
-  [":jy_erduanxiao"] = "锁定技，当你的武将牌上有两张【啸】时，你选择失去一点体力或失去所有【啸】。",
+  [":jy_erduanxiao"] = "锁定技，当你的武将牌上有且仅有两张【啸】时，你选择失去一点体力或失去所有【啸】。",
   ["#jy_erduanxiao_trigger"] = "二段",
   ["#lose_xiao"] = "失去所有【啸】", 
   ["#lose_hp_1"] = "失去1点体力",
 
   ["jy_husanjian"] = "三件",
   [":jy_husanjian"] = [[锁定技，当你的装备区有且仅有防具和防御马时，你造成的伤害-1。
-  <br><font size="2"><i>虎三件，指【中娅沙漏】、【水银之靴】、【大天使之杖】、【永霜】、【兰德里的苦楚】里面的三件。不同的人有不同的观点，但【大天使之杖】定在其列。</i></font>]],
+  <br><font size="1"><i>虎三件，指【中娅沙漏】、【水银之靴】、【大天使之杖】、【永霜】、【兰德里的苦楚】里面的三件。不同的人有不同的观点，但【大天使之杖】定在其列。</i></font>]],
+}
+
+-- 唐李元浩
+local tym__liyuanhao = General(extension, "tym__liyuanhao", "qun", 3, 3, General.Male)
+
+
+-- 二段
+-- 首先BeforeCardsMove判断一次是否有牌进/出你的特殊区，然后如果有，
+-- 再在AfterCardsMove里判断是否这张牌是啸，而且导致啸的数量变成了2。
+-- 天才！
+-- 参考自周泰，界周泰
+local jy_erduanxiao_2 = fk.CreateTriggerSkill{
+  name = "jy_erduanxiao_2",
+  anim_type = "offensive",
+  events = {fk.BeforeCardsMove},  -- 理论上来说每次牌的移动只有同一个方向的
+  frequency = Skill.Compulsory,
+  mute = true,
+
+  can_trigger = function(self, event, target, player, data)
+    -- 只判断是否有牌进出了你的特殊区，而不判断它是否是啸（因为比较复杂，等确定有可能了之后再判断，节省资源）
+    local xiaos = player:getPile("skl__liyuanhao_xiao")
+    player.is_xiao_changing = false -- 默认这次没有变化
+    if player:hasSkill(self) and -- 如果是有二段啸的武将
+      #xiaos == 1 or #xiaos == 3 then  -- 如果啸是1和3
+      for _, move in ipairs(data) do  -- 如果有一张牌是进入或者离开我的特殊区，那么这个函数可以触发
+        return (move.to == player.id and move.toArea == Card.PlayerSpecial) or
+          (move.from == player.id and move.fromArea == Card.PlayerSpecial)
+      end
+    end
+  end,
+  on_use = function(self, event, target, player, data)
+    -- 触发之后，设置变量，告诉下一个函数有没有可能在发生变化
+    player.is_xiao_changing = true
+    -- print("jy_erduanxiao 已触发，现在player.is_xiao_changing的值是", player.is_xiao_changing)
+  end,
+}
+
+local jy_erduanxiao_trigger_2 = fk.CreateTriggerSkill{
+  name = "#jy_erduanxiao_trigger_2",
+  events = {fk.AfterCardsMove},
+  frequency = Skill.Compulsory,
+  can_trigger = function(self, event, target, player, data)
+    return player:hasSkill(self) and -- 如果是有二段啸的武将
+      #player:getPile("skl__liyuanhao_xiao") == 2 and  -- 如果啸为2
+      player.is_xiao_changing  -- 如果啸有可能在变化
+  end,
+  on_use = function(self, event, target, player, data)
+    -- print("jy_erduanxiao_trigger 已触发，现在player.is_xiao_changing的值是", player.is_xiao_changing)
+    local room = player.room
+    local choice = room:askForChoice(player, {"#lose_xiao", "#lose_hp_1"}, self.name)
+    if choice == "#lose_xiao" then
+      player:drawcard(2)  -- 把啸全部扔掉
+    elseif choice == "#lose_hp_1" then
+      room:recover({
+        who = player,
+        num = 1,
+        recoverBy = player,
+        skillName = self.name,
+      })
+      player.is_xiao_changing = false
+    end
+  end,
+}
+jy_erduanxiao_2:addRelatedSkill(jy_erduanxiao_trigger_2)
+
+-- 三件 已完成 测试通过
+local jy_husanjian_2 = fk.CreateTriggerSkill{
+  name = "jy_husanjian_2",
+  frequency = Skill.Compulsory,
+  anim_type = "offensive",
+  events = {fk.DamageCaused},
+  can_trigger = function(self, event, target, player, data)
+    if not (target == player and player:hasSkill(self)) then return false end
+    -- 现在 target 已经是 player，并且 player 拥有这个技能了。这个时候再来看他的装备区
+    local weapon = Fk:getCardById(player:getEquipment(Card.SubtypeWeapon))
+    local armor = Fk:getCardById(player:getEquipment(Card.SubtypeArmor))
+    local defensive_ride = Fk:getCardById(player:getEquipment(Card.SubtypeDefensiveRide))
+    local offensive_ride = Fk:getCardById(player:getEquipment(Card.SubtypeOffensiveRide))
+    local treasure = Fk:getCardById(player:getEquipment(Card.Treasure))
+    return not weapon and 
+           armor and
+           defensive_ride and 
+           not offensive_ride and
+           not treasure
+           -- 有且只有防具和+1马
+  end,
+  on_use = function(self, event, target, player, data)
+    local room = player.room
+    player:broadcastSkillInvoke(self.name)
+    room:notifySkillInvoked(player, self.name, "masochism")
+    data.damage = data.damage + 1
+  end,
+}
+
+tym__liyuanhao:addSkill("jy_huxiao")
+tym__liyuanhao:addSkill("jy_huxiao_jink")
+tym__liyuanhao:addSkill("jy_huxiao_analeptic")
+
+tym__liyuanhao:addSkill(jy_erduanxiao_2)
+tym__liyuanhao:addSkill(jy_husanjian_2)
+
+
+
+Fk:loadTranslationTable {
+  ["tym__liyuanhao"] = "界李元浩",
+  ["skl__liyuanhao_xiao"] = "啸",
+
+  ["jy_erduanxiao_2"] = "二段",
+  [":jy_erduanxiao_2"] = "锁定技，当你的武将牌上有且仅有两张【啸】时，你选择恢复一点体力或摸两张牌。",
+  ["#jy_erduanxiao_trigger_2"] = "二段",
+  ["#lose_xiao_2"] = "摸两张牌", 
+  ["#lose_hp_1_2"] = "恢复1点体力",
+
+  ["jy_husanjian_2"] = "三件",
+  [":jy_husanjian_2"] = [[锁定技，当你的装备区有且仅有防具和防御马时，你造成的伤害+1。
+  <br><font size="1"><i>虎三件，指【中娅沙漏】、【水银之靴】、【大天使之杖】、【永霜】、【兰德里的苦楚】里面的三件。不同的人有不同的观点，但【大天使之杖】定在其列。</i></font>]],
 }
 
 -- 阿伟罗
-local xjb__aweiluo = General(extension, "xjb__aweiluo", "qun", 3, 3, General.Male)
+-- local xjb__aweiluo = General(extension, "xjb__aweiluo", "qun", 3, 3, General.Male)
 
-xjb__aweiluo:addSkill("luanji")
-xjb__aweiluo:addSkill("luanwu")
+-- xjb__aweiluo:addSkill("luanji")
+-- xjb__aweiluo:addSkill("luanwu")
 
-Fk:loadTranslationTable {
-  ["xjb__aweiluo"] = "阿伟罗",
-}
+-- Fk:loadTranslationTable {
+--   ["xjb__aweiluo"] = "阿伟罗",
+-- }
 
 -- 高天亮
 
