@@ -824,11 +824,13 @@ local jy_erduanxiao_trigger_2 = fk.CreateTriggerSkill{
   end,
 
   on_use = function(self, event, target, player, data)
+    local xiaos = player:getPile("tym__liyuanhao_xiao")
     if self.choice == "#lose_xiao_2" then
       -- 将所有【啸】纳入自己的手牌
-      local xiaos = player:getPile("tym__liyuanhao_xiao")
       player.room:moveCardTo(xiaos, Card.PlayerHand, player, fk.ReasonJustMove, self.name, "tym__liyuanhao_xiao", true, player.id)
     elseif self.choice == "#lose_hp_1_2" then
+      -- 弃掉所有【啸】
+      room:throwCard(xiaos, self.name, player, player)  -- 把啸全部扔掉
       -- 回复1点体力
       player.room:recover({
         who = player,
@@ -895,14 +897,10 @@ Fk:loadTranslationTable {
   <br><font size="1"><i>“……唯我虎大将军！”——钱晨</i></font>]],
 
   ["jy_erduanxiao_2"] = "二段",
-  [":jy_erduanxiao_2"] = "锁定技，当你的角色牌上有且仅有两张【啸】时，你选择恢复一点体力或将所有【啸】纳入手牌。",
+  [":jy_erduanxiao_2"] = "锁定技，当你的角色牌上有且仅有两张【啸】时，你选择：弃掉所有【啸】并恢复一点体力，或将所有【啸】纳入手牌。",
   ["#jy_erduanxiao_trigger_2"] = "二段",
   ["#lose_xiao_2"] = "将所有【啸】纳入手牌", 
-  ["#lose_hp_1_2"] = "恢复一点体力",
-
-  ["jy_husanjian_2"] = "三件",
-  [":jy_husanjian_2"] = [[锁定技，当你的装备区有且仅有武器和进攻马时，你造成的所有伤害+1。
-  <br><font size="1"><i>虎三件，有时也可以指【卢登的激荡】、【虚空之杖】和【灭世者的死亡之帽】。</i></font>]],
+  ["#lose_hp_1_2"] = "弃掉所有【啸】并恢复一点体力",
 }
 
 
@@ -926,6 +924,10 @@ tym__houguoyu:addSkill(jy_husanjian_2)
 Fk:loadTranslationTable {
   ["tym__houguoyu"] = "侯国玉",
   ["houguoyu"] = "侯国玉",
+  
+  ["jy_husanjian_2"] = "三件",
+  [":jy_husanjian_2"] = [[锁定技，当你的装备区有且仅有武器和进攻马时，你造成的伤害+1。
+  <br><font size="1"><i>虎三件，有时也可以指【卢登的激荡】、【虚空之杖】和【灭世者的死亡之帽】。</i></font>]],
 }
 
 
