@@ -10,6 +10,7 @@ Fk:loadTranslationTable {
      ["buffed"] = "加强",
 }
 
+-- TODO: 加入你这个包之后，测试时如果烧条偶尔会变得CPU占用率很高。只有标包没有这个问题。
 
 -- 熊简自豪
 local xjb__jianzihao = General(extension, "xjb__jianzihao", "qun", 3, 3, General.Male)
@@ -46,45 +47,47 @@ local jy_zouwei = fk.CreateDistanceSkill{
     return 0
   end,
 }
--- 参考自孙尚香
-local jy_zouwei_audio = fk.CreateTriggerSkill{
-  name = "#jy_zouwei_audio",
+-- TODO: 没写好之前先禁用
+-- -- 参考自孙尚香，formation君刘备
+-- local jy_zouwei_audio = fk.CreateTriggerSkill{
+--   name = "#jy_zouwei_audio",
 
-  refresh_events = {fk.AfterCardsMove},
-  -- 这个函数只有在装备区牌量变动时才检测
-  can_refresh = function(self, event, target, player, data)
-    if not player:hasSkill(self.name) then return end
-    for _, move in ipairs(data) do
-      if move.from == player.id or move.to == player.id then
-        for _, info in ipairs(move.moveInfo) do
-          if info.fromArea == Card.PlayerEquip or info.toArea == Card.PlayerEquip then
-            -- 当装备等于0或1的时候触发
-            -- standard_cards/init.lua, line 1080: local handcards = player:getCardIds(Player.Hand)，我也不知道为啥用的是Player.Hand而不是player.hand，写就对了
-            -- 因为Player.Hand是一个int参数，这样传进去用的
-            if #player:getCardIds(Player.Equip) == 1 and info.toArea == Card.PlayerEquip then
-              return true
-            elseif #player:getCardIds(Player.Equip) == 0 and info.fromArea == Card.PlayerEquip then
-              return true
-            end
-          end
-        end
-      end
-    end
-  end,
-  on_refresh = function(self, event, target, player, data)
-    local room = player.room
-    -- 有装备时，-1马
-    if #player:getCardIds(player.Equip) ~= 0 then
-      room:notifySkillInvoked(player, "jy_zouwei", "offensive")
-      player:broadcastSkillInvoke("jy_zouwei", 1)
-    -- 无装备时，+1马
-    elseif #player:getCardIds(player.Equip) == 0 then
-      room:notifySkillInvoked(player, "jy_zouwei", "defensive")
-      player:broadcastSkillInvoke("jy_zouwei", 2)
-    end
-  end,
-}
-jy_zouwei:addRelatedSkill(jy_zouwei_audio)
+--   refresh_events = {fk.AfterCardsMove},
+--   -- 这个函数只有在装备区牌量变动时才检测
+--   can_refresh = function(self, event, target, player, data)
+--     if not player:hasSkill(self.name) then return end
+--     for _, move in ipairs(data) do  -- 对着抄的，开始第一个循环
+--       if move.from == player.id or move.to == player.id then  -- 这行对着抄的，判断是否是自己家
+--         for _, info in ipairs(move.moveInfo) do  -- 对着抄的，第二个循环
+--           if info.fromArea == Card.PlayerEquip or info.toArea == Card.PlayerEquip then  -- 对着抄的，在这里判断是去哪个区的
+--             -- 不知道为啥用不了
+--             if #player:getCardIds(Player.Equip) > 0  then  -- 他进了你的装备区之后，你的装备数量为1
+--               print("检测到装备不等于0")
+--               return true
+--             end
+--             -- 下面这个可以运行
+--             if #player:getCardIds(Player.Equip) == 0 and info.fromArea == Card.PlayerEquip then  -- 他出了你的装备区之后，你的装备数量为0
+--               return true
+--             end
+--           end
+--         end
+--       end
+--     end
+--   end,
+--   on_refresh = function(self, event, target, player, data)
+--     local room = player.room
+--     -- 有装备时，-1马
+--     if #player:getCardIds(player.Equip) > 0 then
+--       room:notifySkillInvoked(player, "jy_zouwei", "offensive")
+--       player:broadcastSkillInvoke("jy_zouwei", 1)
+--     -- 无装备时，+1马
+--     elseif #player:getCardIds(player.Equip) == 0 then
+--       room:notifySkillInvoked(player, "jy_zouwei", "defensive")
+--       player:broadcastSkillInvoke("jy_zouwei", 2)
+--     end
+--   end,
+-- }
+-- jy_zouwei:addRelatedSkill(jy_zouwei_audio)
 
 -- 圣弩
 -- 参考自formation包的君刘备
@@ -122,13 +125,6 @@ local jy_shengnu = fk.CreateTriggerSkill{
   end,
 }
 
-
--- 转会
-local jy_zhuanhui = fk.CreateTriggerSkill{
-  name = "jy_zhuanhui",  -- jy_kaiju$是主公技
-  frequency = Skill.Compulsory,
-  events = {},  -- 这是故意的，因为本来这个技能就没有实际效果
-}
 
 -- 洗澡
 local jy_xizao = fk.CreateTriggerSkill{
@@ -195,24 +191,6 @@ xjb__jianzihao:addSkill(jy_xizao)
 
 Fk:loadTranslationTable{
   ["xjb__jianzihao"] = "简自豪",
-
-  ["jy_zhuanhui"] = "转会",
-  [":jy_zhuanhui"] = [[锁定技，这个技能是为了告诉你下面这些提示。<br>
-  <font size="1"><strong>这个角色由熊俊博于2023年12月1日设计！</strong><br>
-  经过12月2日群友们的测试，感觉更多是一个娱乐角色。如果你一定要玩，请参考下面的：
-  <strong>玩法提示</strong><br>
-  活过第一轮！<br>
-  如果有防具，你就能安全、强大地偷牌。<br>
-  你很脆，你也不强，但你可以恶心场上所有的人。<br>
-  <strong>队友提示</strong><br>
-  优先将防具、【闪】、【桃】、【酒】交给他。<br>
-  <strong>敌方提示</strong><br>
-  使用能增强【杀】的技能和武器，如【无双】、【青釭剑】。<br>
-  优先拆除防具。<br>
-  谨慎对待摸到的【诸葛连弩】。<br></font>
-
-  ]],
-  -- [":jy_zhuanhui"] = "<del>当你的体力值减少时，你可以变更势力。你无法变更为已经成为过的势力。</del>",
 
   ["jy_kaiju"] = "开局",
   [":jy_kaiju"] = [[锁定技，当你的回合开始时，所有其他有牌的角色需要交给你一张牌，并视为对你使用一张【杀】。<br>
@@ -366,9 +344,8 @@ tym__jianzihao:addSkill(jy_xizao_2)
 Fk:loadTranslationTable{
   ["tym__jianzihao"] = "界简自豪",
 
-  ["jy_kaiju_2"] = "夺冠",
-  [":jy_kaiju_2"] = [[出牌阶段限一次，你选择若干名角色。你对他们【顺手牵羊】，然后被他们【杀】。
-  <br><font size="1"><i>“加入EDG，成为世界冠军！”</i></font>]],
+  ["jy_kaiju_2"] = "开局",
+  [":jy_kaiju_2"] = "出牌阶段限一次，你选择若干名角色。你对他们【顺手牵羊】，然后被他们【杀】。",
   ["$jy_kaiju_21"] = "不是啊，我炸一对鬼的时候我在打什么，打一对10。一对10，他四个9炸我，我不输了吗？",
   ["$jy_kaiju_22"] = "怎么赢啊？你别瞎说啊！",
   ["$jy_kaiju_23"] = "打这牌怎么打？兄弟们快教我，我看着头晕！",
@@ -1013,7 +990,7 @@ Fk:loadTranslationTable {
 
   ["jy_yuyu"] = "玉玉",
   [":jy_yuyu"] = [[锁定技，当你被没有【敌人】标记的角色使用【杀】造成了伤害时，你令其获得【敌人】标记。
-  受到来自没有【敌人】标记的角色和因本次伤害而获得【敌人】标记的角色造成的伤害时，你可以摸三张牌，然后翻面。]],
+  受到来自没有【敌人】标记的角色或因本次伤害而获得【敌人】标记的角色造成的伤害时，你可以摸三张牌，然后翻面。]],
   ["@jy_gaotianliang_enemy"] = "敌人",
 }
 
