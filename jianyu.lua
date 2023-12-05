@@ -195,8 +195,8 @@ Fk:loadTranslationTable{
 
   ["jy_zhuanhui"] = "转会",
   [":jy_zhuanhui"] = [[锁定技，这个技能是为了告诉你下面这些提示。<br>
-  <font size="1"><strong>这个武将由熊俊博于2023年12月1日设计！</strong><br>
-  经过12月2日群友们的测试，感觉更多是一个娱乐武将。如果你一定要玩，请参考下面的：
+  <font size="1"><strong>这个角色由熊俊博于2023年12月1日设计！</strong><br>
+  经过12月2日群友们的测试，感觉更多是一个娱乐角色。如果你一定要玩，请参考下面的：
   <strong>玩法提示</strong><br>
   活过第一轮！<br>
   如果有防具，你就能安全、强大地偷牌。<br>
@@ -212,7 +212,7 @@ Fk:loadTranslationTable{
   -- [":jy_zhuanhui"] = "<del>当你的体力值减少时，你可以变更势力。你无法变更为已经成为过的势力。</del>",
 
   ["jy_kaiju"] = "开局",
-  [":jy_kaiju"] = [[锁定技，当你的回合开始时，所有其他有牌的武将需要交给你一张牌，并视为对你使用一张【杀】。<br>
+  [":jy_kaiju"] = [[锁定技，当你的回合开始时，所有其他有牌的角色需要交给你一张牌，并视为对你使用一张【杀】。<br>
   <font size="1"><i>“从未如此美妙的开局！”——简自豪</i></font>]],
   ["$jy_kaiju1"] = "不是啊，我炸一对鬼的时候我在打什么，打一对10。一对10，他四个9炸我，我不输了吗？",
   ["$jy_kaiju2"] = "怎么赢啊？你别瞎说啊！",
@@ -357,13 +357,14 @@ tym__jianzihao:addSkill(jy_kaiju_2)
 tym__jianzihao:addSkill(jy_sanjian)
 tym__jianzihao:addSkill("hongyan")
 tym__jianzihao:addSkill("jy_zouwei")
+tym__jianzihao:addSkill("jy_shengnu")
 tym__jianzihao:addSkill(jy_xizao_2)
 
 Fk:loadTranslationTable{
   ["tym__jianzihao"] = "界简自豪",
 
   ["jy_kaiju_2"] = "夺冠",
-  [":jy_kaiju_2"] = [[出牌阶段限一次，你选择若干名武将。你对他们【顺手牵羊】，然后被他们【杀】。
+  [":jy_kaiju_2"] = [[出牌阶段限一次，你选择若干名角色。你对他们【顺手牵羊】，然后被他们【杀】。
   <br><font size="1"><i>“加入EDG，成为世界冠军！”</i></font>]],
   ["$jy_kaiju_21"] = "不是啊，我炸一对鬼的时候我在打什么，打一对10。一对10，他四个9炸我，我不输了吗？",
   ["$jy_kaiju_22"] = "怎么赢啊？你别瞎说啊！",
@@ -473,7 +474,7 @@ local jy_erduanxiao = fk.CreateTriggerSkill{
 
   -- can_trigger = function(self, event, target, player, data)
   --   -- 只判断是否有牌进出了你的特殊区，而不判断它是否是啸（因为比较复杂，等确定有可能了之后再判断，节省资源）
-  --   if player:hasSkill(self) then -- 如果是有二段啸的武将
+  --   if player:hasSkill(self) then -- 如果是有二段啸的角色
   --     local xiaos = player:getPile("skl__liyuanhao_xiao")
   --     player.is_xiao_changing = false -- 默认这次没有变化
   --     if #xiaos == 1 or #xiaos == 3 then  -- 如果啸是1或3
@@ -658,7 +659,7 @@ Fk:loadTranslationTable {
   ["skl__liyuanhao_xiao"] = "啸",
 
   ["jy_huxiao"] = "虎啸",
-  [":jy_huxiao"] = [[当你使用或打出一张【杀】时，你可以将牌堆顶的一张牌置于你的武将牌上，称为【啸】。
+  [":jy_huxiao"] = [[当你使用或打出一张【杀】时，你可以将牌堆顶的一张牌置于你的角色牌上，称为【啸】。
   <br><font size="1"><i>“我希望我的后辈们能够记住，在你踏上职业道路的这一刻开始，你的目标就只有，冠军。”——李元浩</i></font>]],
 
   ["jy_huxiao_analeptic"] = "横刀",
@@ -670,7 +671,7 @@ Fk:loadTranslationTable {
   <br><font size="1"><i>“……唯我虎大将军！”——钱晨</i></font>]],
 
   ["jy_erduanxiao"] = "二段",
-  [":jy_erduanxiao"] = "锁定技，当你的武将牌上有且仅有两张【啸】时，你选择失去一点体力或失去所有【啸】。",
+  [":jy_erduanxiao"] = "锁定技，当你的角色牌上有且仅有两张【啸】时，你选择失去一点体力或失去所有【啸】。",
   ["#jy_erduanxiao_trigger"] = "二段",
   ["#lose_xiao"] = "失去所有【啸】", 
   ["#lose_hp_1"] = "失去一点体力",
@@ -823,7 +824,7 @@ local jy_erduanxiao_trigger_2 = fk.CreateTriggerSkill{
   events = {fk.AfterCardsMove},
   frequency = Skill.Compulsory,
   can_trigger = function(self, event, target, player, data)
-    return player:hasSkill(self) and -- 如果是有二段啸的武将
+    return player:hasSkill(self) and -- 如果是有二段啸的角色
       #player:getPile("tym__liyuanhao_xiao") == 2 and  -- 如果啸为2
       player.is_xiao_changing  -- 如果啸有可能在变化
   end,
@@ -888,7 +889,7 @@ local jy_husanjian_2 = fk.CreateTriggerSkill{
 }
 -- TODO: 加一个触发效果器
 
--- 因为是两个不同的武将，两个武将的特殊区是不能通用的，所以必须分开写代码。
+-- 因为是两个不同的角色，两个角色的特殊区是不能通用的，所以必须分开写代码。
 tym__liyuanhao:addSkill(jy_huxiao_2)
 tym__liyuanhao:addSkill(jy_huxiao_analeptic_2)
 tym__liyuanhao:addSkill(jy_huxiao_jink_2)
@@ -900,7 +901,7 @@ Fk:loadTranslationTable {
   ["tym__liyuanhao_xiao"] = "<font color=\"gold\">啸</font>",
 
   ["jy_huxiao_2"] = "虎啸",
-  [":jy_huxiao_2"] = [[当你使用或打出一张【杀】时，你可以将牌堆顶的一张牌置于你的武将牌上，称为【啸】。
+  [":jy_huxiao_2"] = [[当你使用或打出一张【杀】时，你可以将牌堆顶的一张牌置于你的角色牌上，称为【啸】。
   <br><font size="1"><i>“我希望我的后辈们能够记住，在你踏上职业道路的这一刻开始，你的目标就只有，冠军。”——李元浩</i></font>]],
 
   ["jy_huxiao_analeptic_2"] = "横刀",
@@ -912,7 +913,7 @@ Fk:loadTranslationTable {
   <br><font size="1"><i>“……唯我虎大将军！”——钱晨</i></font>]],
 
   ["jy_erduanxiao_2"] = "二段",
-  [":jy_erduanxiao_2"] = "锁定技，当你的武将牌上有且仅有两张【啸】时，你选择恢复一点体力或将所有【啸】纳入手牌。",
+  [":jy_erduanxiao_2"] = "锁定技，当你的角色牌上有且仅有两张【啸】时，你选择恢复一点体力或将所有【啸】纳入手牌。",
   ["#jy_erduanxiao_trigger_2"] = "二段",
   ["#lose_xiao_2"] = "将所有【啸】纳入手牌", 
   ["#lose_hp_1_2"] = "恢复一点体力",
@@ -948,33 +949,59 @@ Fk:loadTranslationTable {
 
 -- 高天亮
 
--- 可能有bug:不是一次伤害，而是一滴伤害
-local xjb__gaotianliang = General(extension, "xjb__gaotianliang", "qun", 3, 3, General.Male)
+local xjb__gaotianliang = General(extension, "xjb__gaotianliang", "qun", 4, 4, General.Male)
+
+-- local jy_yuyu = fk.CreateTriggerSkill{
+--   name = "jy_yuyu",
+--   anim_type = "masochism",
+--   events = {fk.Damaged},
+--   on_trigger = function(self, event, target, player, data)
+--     self:doCost(event, target, player, data)  -- 每次受到伤害只结算1次
+--   end,
+--   on_cost = function(self, event, target, player, data)
+--     local room = player.room
+--     if room:askForSkillInvoke(player, self.name, data) then
+--       return true
+--     end
+--     self.cancel_cost = true
+--   end,
+--   on_use = function(self, event, target, player, data)
+--     local room = player.room
+--     player:drawCards(3)
+--     player:turnOver()
+--   end,
+-- }
 
 local jy_yuyu = fk.CreateTriggerSkill{
   name = "jy_yuyu",
   anim_type = "masochism",
   events = {fk.Damaged},
+  -- 遗计就是没有can_trigger的，遗计也不用判断player.hasSkill(self)，也不用判断伤害目标是自己。这是为什么
   on_trigger = function(self, event, target, player, data)
-    self.cancel_cost = false
-    for i = 1, data.damage do
-      if self.cancel_cost then break end
+    local room = player.room
+    self.this_time_slash = false
+    if data.card and data.from and data.card.trueName == "slash" then  -- 如果是杀
+      if not data.from:hasMark("@jy_gaotianliang_enemy") then 
+        self.this_time_slash = true  -- 如果他是因为这次伤害变成了天敌，那么写在this_time_slash里
+        room:setPlayerMark(data.from, "@jy_gaotianliang_enemy", "")  -- 空字符串也是true
+      end
+    end
+    if self.this_time_slash or not data.from:hasMark("@jy_gaotianliang_enemy") then  -- 如果他不是敌人
       self:doCost(event, target, player, data)
     end
   end,
   on_cost = function(self, event, target, player, data)
-    local room = player.room
-    if room:askForSkillInvoke(player, self.name, data) then
+    if player.room:askForSkillInvoke(player, self.name, data) then  -- 那么问是否要发动
       return true
     end
-    self.cancel_cost = true
   end,
   on_use = function(self, event, target, player, data)
-    local room = player.room
     player:drawCards(3)
     player:turnOver()
+    self.this_time_slash = false
   end,
 }
+
 
 xjb__gaotianliang:addSkill(jy_yuyu)
 
@@ -982,12 +1009,9 @@ Fk:loadTranslationTable {
   ["xjb__gaotianliang"] = "高天亮",
 
   ["jy_yuyu"] = "玉玉",
-  [":jy_yuyu"] = "当你受到伤害时，你可以摸三张牌，然后翻面。"
-
-  -- ["jy_renyou"] = "认友",
-  -- [":jy_renyou"] = "锁定技，你的回合开始时，你标记一名不是【队友】的武将为你的【队友】。",
-  -- ["jy_yuyu"] = "玉玉",
-  -- [":jy_yuyu"] = "当你受到来自【队友】的伤害时，你可以摸三张牌，然后翻面。"
+  [":jy_yuyu"] = [[锁定技，当你被没有【敌人】标记的角色使用【杀】造成了伤害时，你令其获得【敌人】标记。
+  受到来自没有【敌人】标记的角色和因本次伤害而获得【敌人】标记的角色造成的伤害时，你可以摸三张牌，然后翻面。]],
+  ["@jy_gaotianliang_enemy"] = "敌人",
 }
 
 Fk:loadTranslationTable {
