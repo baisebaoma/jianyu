@@ -55,12 +55,15 @@ local jy_zouwei_audio = fk.CreateTriggerSkill{
   can_refresh = function(self, event, target, player, data)
     if not player:hasSkill(self.name) then return end
     for _, move in ipairs(data) do
-      if move.from == player.id then
+      if move.from == player.id or move.to == player.id then
         for _, info in ipairs(move.moveInfo) do
           if info.fromArea == Card.PlayerEquip or info.toArea == Card.PlayerEquip then
             -- 当装备等于0或1的时候触发
             -- standard_cards/init.lua, line 1080: local handcards = player:getCardIds(Player.Hand)，我也不知道为啥用的是Player.Hand而不是player.hand，写就对了
-            if #player:getCardIds(Player.Equip) <= 1 then
+            -- 因为Player.Hand是一个int参数，这样传进去用的
+            if #player:getCardIds(Player.Equip) == 1 and info.toArea == Card.PlayerEquip then
+              return true
+            elseif #player:getCardIds(Player.Equip) == 0 and info.fromArea == Card.PlayerEquip then
               return true
             end
           end
