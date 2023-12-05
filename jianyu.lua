@@ -166,7 +166,7 @@ local jy_kaiju = fk.CreateTriggerSkill{
   on_use = function(self, event, target, player, data)
     local room = player.room
     for _, p in ipairs(room:getOtherPlayers(player, true)) do
-      if not p:isAllNude() then
+      if not p:isAllNude() and not player.dead then  -- 如果我自己死了，那就不要继续了
         -- local id = room:askForCardChosen(p, p, "he", "#jy_kaiju-choose")
         -- 只能和
         -- room:obtainCard(player, id, false, fk.ReasonPrey)
@@ -288,20 +288,22 @@ local jy_kaiju_2 = fk.CreateActiveSkill{
     for _, to in ipairs(use.tos) do
       local p = room:getPlayerById(to)
 
-      room:useVirtualCard("snatch", nil, player, p, self.name, true)  -- 顺
-      
-      -- 顺手牵羊，但不能被无懈可击响应（那我为啥不直接顺？）
-      -- local snatch = Fk:cloneCard("snatch")
-      -- snatch.skillName = self.name
-      -- local new_use = { ---@type CardUseStruct
-      --   from = use.from,  -- 应该是直接传id
-      --   tos = { { to } },
-      --   card = snatch,
-      --   prohibitedCardNames = { "nullification" },
-      -- }
-      -- room:useCard(new_use)
+      if not player.dead then
+        room:useVirtualCard("snatch", nil, player, p, self.name, true)  -- 顺
+        
+        -- 顺手牵羊，但不能被无懈可击响应（那我为啥不直接顺？）
+        -- local snatch = Fk:cloneCard("snatch")
+        -- snatch.skillName = self.name
+        -- local new_use = { ---@type CardUseStruct
+        --   from = use.from,  -- 应该是直接传id
+        --   tos = { { to } },
+        --   card = snatch,
+        --   prohibitedCardNames = { "nullification" },
+        -- }
+        -- room:useCard(new_use)
 
-      room:useVirtualCard("slash", nil, p, player, self.name, true)  -- 杀
+        room:useVirtualCard("slash", nil, p, player, self.name, true)  -- 杀
+      end
     end
   end,
 }
@@ -874,7 +876,7 @@ tym__liyuanhao:addSkill(jy_huxiao_2)
 tym__liyuanhao:addSkill(jy_huxiao_analeptic_2)
 tym__liyuanhao:addSkill(jy_huxiao_jink_2)
 tym__liyuanhao:addSkill(jy_erduanxiao_2)
-tym__liyuanhao:addSkill(jy_husanjian_2)
+-- tym__liyuanhao:addSkill(jy_husanjian_2)
 
 Fk:loadTranslationTable {
   ["tym__liyuanhao"] = "界李元浩",
@@ -899,7 +901,7 @@ Fk:loadTranslationTable {
   ["#lose_hp_1_2"] = "恢复一点体力",
 
   ["jy_husanjian_2"] = "三件",
-  [":jy_husanjian_2"] = [[锁定技，当你的装备区有且仅有武器和进攻马时，你造成的伤害+1。
+  [":jy_husanjian_2"] = [[锁定技，当你的装备区有且仅有武器和进攻马时，你造成的所有伤害+1。
   <br><font size="1"><i>虎三件，有时也可以指【卢登的激荡】、【虚空之杖】和【灭世者的死亡之帽】。</i></font>]],
 }
 
@@ -916,15 +918,15 @@ Fk:loadTranslationTable {
 
 
 -- -- 侯国玉
--- local tym__houguoyu = General(extension, "tym__houguoyu", "qun", 4, 4, General.Male)
+local tym__houguoyu = General(extension, "tym__houguoyu", "qun", 5, 5, General.Male)
 
--- tym__houguoyu:addSkill("guose")
+tym__houguoyu:addSkill(jy_husanjian_2)
 -- tym__houguoyu:addSkill("biyue")
 
--- Fk:loadTranslationTable {
---   ["tym__houguoyu"] = "侯国玉",
---   ["houguoyu"] = "侯国玉",
--- }
+Fk:loadTranslationTable {
+  ["tym__houguoyu"] = "侯国玉",
+  ["houguoyu"] = "侯国玉",
+}
 
 
 -- 高天亮
