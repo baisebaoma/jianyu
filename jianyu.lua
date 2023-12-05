@@ -983,6 +983,11 @@ Fk:loadTranslationTable {
 
   ["jy_yuyu"] = "玉玉",
   [":jy_yuyu"] = "当你受到伤害时，你可以摸三张牌，然后翻面。"
+
+  -- ["jy_renyou"] = "认友",
+  -- [":jy_renyou"] = "锁定技，你的回合开始时，你标记一名不是【队友】的武将为你的【队友】。",
+  -- ["jy_yuyu"] = "玉玉",
+  -- [":jy_yuyu"] = "当你受到来自【队友】的伤害时，你可以摸三张牌，然后翻面。"
 }
 
 Fk:loadTranslationTable {
