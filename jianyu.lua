@@ -384,18 +384,6 @@ Fk:loadTranslationTable{
   ["~tym__jianzihao"] = "好像又要倒下了……",
 }
 
--- 侯国玉
-local tym__houguoyu = General(extension, "tym__houguoyu", "qun", 4, 4, General.Male)
-
-tym__houguoyu:addSkill("guose")
-tym__houguoyu:addSkill("qianxun")
-tym__houguoyu:addSkill("biyue")
-
-Fk:loadTranslationTable {
-  ["tym__houguoyu"] = "侯国玉",
-  ["houguoyu"] = "侯国玉",
-}
-
 -- 尚李元浩
 local skl__liyuanhao = General(extension, "skl__liyuanhao", "qun", 3, 3, General.Male)
 
@@ -422,6 +410,33 @@ local jy_huxiao = fk.CreateTriggerSkill{
   end,
 }
 
+-- 啸酒
+-- 注释里是为了测试改成无中生有。保留在这里以防你后面还需要测试。
+local jy_huxiao_analeptic = fk.CreateViewAsSkill{
+  name = "jy_huxiao_analeptic",
+  anim_type = "defensive",
+  pattern = "analeptic",
+  -- pattern = "ex_nihilo",
+  expand_pile = "skl__liyuanhao_xiao",
+  card_filter = function(self, to_select, selected)
+    if #selected == 1 then return false end
+    local xiaos = Self:getPile("skl__liyuanhao_xiao")
+    if #xiaos == 0 then return false end
+    return Self:getPileNameOfId(to_select) == "skl__liyuanhao_xiao"
+  end,
+  view_as = function(self, cards)
+    if #cards ~= 1 then
+      return nil
+    end
+    local c = Fk:cloneCard("analeptic")
+    -- local c = Fk:cloneCard("ex_nihilo")
+    c.skillName = self.name
+    -- print("克隆的牌c的参数：c.name ", c.name, " c.trueName ", c.trueName)
+    c:addSubcard(cards[1])
+    return c
+  end,
+}
+
 -- 啸闪
 local jy_huxiao_jink = fk.CreateViewAsSkill{
   name = "jy_huxiao_jink",
@@ -429,7 +444,10 @@ local jy_huxiao_jink = fk.CreateViewAsSkill{
   pattern = "jink",
   expand_pile = "skl__liyuanhao_xiao",
   card_filter = function(self, to_select, selected)
-    return #selected == 0 and Self:getPileNameOfId(to_select) == "skl__liyuanhao_xiao"
+    if #selected == 1 then return false end
+    local xiaos = Self:getPile("skl__liyuanhao_xiao")
+    if #xiaos == 0 then return false end
+    return Self:getPileNameOfId(to_select) == "skl__liyuanhao_xiao"
   end,
   view_as = function(self, cards)
     if #cards ~= 1 then
@@ -442,69 +460,150 @@ local jy_huxiao_jink = fk.CreateViewAsSkill{
   end,
 }
 
--- 啸酒
-local jy_huxiao_analeptic = fk.CreateViewAsSkill{
-  name = "jy_huxiao_analeptic",
-  anim_type = "defensive",
-  pattern = "analeptic",
-  expand_pile = "skl__liyuanhao_xiao",
-  card_filter = function(self, to_select, selected)
-    return #selected == 0 and Self:getPileNameOfId(to_select) == "skl__liyuanhao_xiao"
-  end,
-  view_as = function(self, cards)
-    if #cards ~= 1 then
-      return nil
-    end
-    local c = Fk:cloneCard("analeptic")
-    c.skillName = self.name
-    -- print("克隆的牌c的参数：c.name ", c.name, " c.trueName ", c.trueName)
-    c:addSubcard(cards[1])
-    return c
-  end,
-}
-
 -- 二段
 -- 首先BeforeCardsMove判断一次是否有牌进/出你的特殊区，然后如果有，
--- 再在AfterCardsMove里判断是否这张牌是啸，而且导致啸的数量变成了2。
--- 天才！
--- 参考自周泰，界周泰
+-- 再在AfterCardsMove里判断是否这张牌是啸，而且啸的数量变成了2。
+-- 参考自周泰，界周泰，国战formation守成
 local jy_erduanxiao = fk.CreateTriggerSkill{
   name = "jy_erduanxiao",
   anim_type = "negative",
   events = {fk.BeforeCardsMove},  -- 理论上来说每次牌的移动只有同一个方向的
-  frequency = Skill.Compulsory,
+  -- frequency = Skill.Compulsory,
   mute = true,
 
+  -- can_trigger = function(self, event, target, player, data)
+  --   -- 只判断是否有牌进出了你的特殊区，而不判断它是否是啸（因为比较复杂，等确定有可能了之后再判断，节省资源）
+  --   if player:hasSkill(self) then -- 如果是有二段啸的武将
+  --     local xiaos = player:getPile("skl__liyuanhao_xiao")
+  --     player.is_xiao_changing = false -- 默认这次没有变化
+  --     if #xiaos == 1 or #xiaos == 3 then  -- 如果啸是1或3
+  --       -- 1是可以触发的，3不知道为啥触发不了。难道viewas不会移动牌吗？
+  --       -- 我觉得有可能是这个原因。明天可以改成“用完牌之后”之类的。
+  --       if #xiaos == 3 then print("二段笑（一段）已经检测到#xiaos为", #xiaos) end
+  --       for _, move in ipairs(data) do  -- 如果有一张牌是进入或者离开我的特殊区，那么这个函数可以触发
+  --         if (move.to == player.id and move.toArea == Card.PlayerSpecial) or
+  --           (move.from == player.id and move.fromArea == Card.PlayerSpecial) then
+  --           -- 去找一段代码，检测自己特殊区的牌离开的
+  --           print("二段笑（一段）已经检测有牌从特殊区变动", #xiaos)
+  --           -- 检测不到离开
+  --           if move.to == player.id and move.toArea == Card.PlayerSpecial then
+  --             print("二段笑（一段）已经检测有牌来到特殊区", #xiaos)
+  --           end
+  --           if move.from == player.id and move.fromArea == Card.PlayerSpecial then
+  --             print("二段笑（一段）已经检测有牌从特殊区离开", #xiaos)
+  --           end
+  --           return true
+  --         end
+  --       end
+  --     end
+  --   end
+  -- end,
+
+  -- -- 根据守成改的版本，现在可以3-2了，但是不能1-2
+  -- -- 我真的不知道为什么了。这样吧，把两个版本综合一下，写到下一个里面，这个就算完成了。以后再改。
+  -- can_trigger = function(self, event, target, player, data)
+  --   if not player:hasSkill(self) then return end  -- 如果我自己没有这个技能，那就算了
+  --   local xiaos = player:getPile("skl__liyuanhao_xiao")
+  --   player.is_xiao_changing = false
+  --   for _, move in ipairs(data) do  -- 第一层循环，不知道为啥
+  --     if move.from then  -- 照着抄的，牌离开
+  --       print("有牌正打算离开")
+  --       if move.from == player.id then
+  --         print("有牌正打算从你家离开")
+  --         if #xiaos == 3 then
+  --           print("啸是3")
+  --           for _, info in ipairs(move.moveInfo) do  -- 还有第二层循环。我自己的代码里没有第二层
+  --             if info.fromArea == Card.PlayerSpecial then
+  --               print("有牌正打算从你家特殊区离开")
+  --               return true
+  --             end
+  --           end
+  --         end
+  --       end
+  --     elseif move.to then  -- 照着抄的，牌离开
+  --       print("有牌正打算来")
+  --       if move.to == player.id then
+  --         print("有牌正打算来你家")
+  --         if #xiaos == 1 then
+  --           print("啸是1")
+  --           for _, info in ipairs(move.moveInfo) do  -- 还有第二层循环。我自己的代码里没有第二层
+  --             if info.toArea == Card.PlayerSpecial then
+  --               print("有牌正打算来你家特殊区")
+  --               return true
+  --             end
+  --           end
+  --         end
+  --       end
+  --     end
+  --   end
+  -- end,  -- 每个参数的结尾都要逗号。can_trigger是一个参数
+
+
+
+  -- 测试通过。1-2，3-2都可以顺利触发。
+  -- 我猜想原因是1-2的时候可能有多张牌进出，而3-2的时候只会有一张牌出去。但我搞不懂这个数据结构，
+  -- 不知道为什么有一个是两层循环，有一个是一层循环。
   can_trigger = function(self, event, target, player, data)
-    -- 只判断是否有牌进出了你的特殊区，而不判断它是否是啸（因为比较复杂，等确定有可能了之后再判断，节省资源）
+    if not player:hasSkill(self) then return end  -- 如果我自己没有这个技能，那就算了
+
     local xiaos = player:getPile("skl__liyuanhao_xiao")
-    player.is_xiao_changing = false -- 默认这次没有变化
-    if player:hasSkill(self) and -- 如果是有二段啸的武将
-      #xiaos == 1 or #xiaos == 3 then  -- 如果啸是1和3
-      for _, move in ipairs(data) do  -- 如果有一张牌是进入或者离开我的特殊区，那么这个函数可以触发
-        return (move.to == player.id and move.toArea == Card.PlayerSpecial) or
-          (move.from == player.id and move.fromArea == Card.PlayerSpecial)
+    player.is_xiao_changing = false
+
+    -- 判断是否有牌出去
+    for _, move in ipairs(data) do  -- 第一层循环，不知道为啥
+      if move.from then  -- 照着抄的，牌离开
+        -- print("有牌正打算离开")
+        if move.from == player.id then
+          -- print("有牌正打算从你家离开")
+          if #xiaos == 3 then
+            -- print("啸是3")
+            for _, info in ipairs(move.moveInfo) do  -- 还有第二层循环。我自己的代码里没有第二层
+              if info.fromArea == Card.PlayerSpecial then
+                -- print("有牌正打算从你家特殊区离开")
+                return true
+              end
+            end
+          end
+        end
       end
     end
-  end,
-  on_use = function(self, event, target, player, data)
+    
+    -- 判断是否有牌进来
+    if #xiaos == 1 then  -- 如果啸是1
+      for _, move in ipairs(data) do  -- 如果有一张牌是进入或者离开我的特殊区，那么这个函数可以触发
+        if (move.to == player.id and move.toArea == Card.PlayerSpecial) or
+          (move.from == player.id and move.fromArea == Card.PlayerSpecial) then
+          -- 去找一段代码，检测自己特殊区的牌离开的
+          -- print("二段笑（一段）已经检测有牌从特殊区变动", #xiaos)
+          -- 检测不到离开
+          -- if move.to == player.id and move.toArea == Card.PlayerSpecial then
+          --   print("二段笑（一段）已经检测有牌来到特殊区", #xiaos)
+          -- end
+          return true
+        end
+      end
+    end
+  end,  -- 每个参数的结尾都要逗号。can_trigger是一个参数
+
+  on_trigger = function(self, event, target, player, data)
     -- 触发之后，设置变量，告诉下一个函数有没有可能在发生变化
     player.is_xiao_changing = true
-    -- print("jy_erduanxiao 已触发，现在player.is_xiao_changing的值是", player.is_xiao_changing)
+    -- print("二段笑（第一段） on_trigger已触发，现在是", player.is_xiao_changing, #player:getPile("skl__liyuanhao_xiao"))
   end,
 }
 
 local jy_erduanxiao_trigger = fk.CreateTriggerSkill{
   name = "#jy_erduanxiao_trigger",
   events = {fk.AfterCardsMove},
+  anim_type = "masochism",
   frequency = Skill.Compulsory,
   can_trigger = function(self, event, target, player, data)
-    return player:hasSkill(self) and -- 如果是有二段啸的武将
-      #player:getPile("skl__liyuanhao_xiao") == 2 and  -- 如果啸为2
+    if not player:hasSkill(self) then return false end
+    return #player:getPile("skl__liyuanhao_xiao") == 2 and  -- 如果啸为2
       player.is_xiao_changing  -- 如果啸有可能在变化
   end,
-  on_use = function(self, event, target, player, data)
-    -- print("jy_erduanxiao_trigger 已触发，现在player.is_xiao_changing的值是", player.is_xiao_changing)
+  on_trigger = function(self, event, target, player, data)
+    -- print("二段笑（第二段）已触发，", player.is_xiao_changing, #player:getPile("skl__liyuanhao_xiao"))
     local room = player.room
     local choice = room:askForChoice(player, {"#lose_xiao", "#lose_hp_1"}, self.name)
     if choice == "#lose_xiao" then
@@ -546,10 +645,11 @@ local jy_husanjian = fk.CreateTriggerSkill{
     data.damage = data.damage - 1
   end,
 }
+-- TODO: 加一个触发效果器
 
 skl__liyuanhao:addSkill(jy_huxiao)
-skl__liyuanhao:addSkill(jy_huxiao_jink)
 skl__liyuanhao:addSkill(jy_huxiao_analeptic)
+skl__liyuanhao:addSkill(jy_huxiao_jink)
 skl__liyuanhao:addSkill(jy_erduanxiao)
 skl__liyuanhao:addSkill(jy_husanjian)
 
@@ -561,57 +661,160 @@ Fk:loadTranslationTable {
   [":jy_huxiao"] = [[当你使用或打出一张【杀】时，你可以将牌堆顶的一张牌置于你的武将牌上，称为【啸】。
   <br><font size="1"><i>“我希望我的后辈们能够记住，在你踏上职业道路的这一刻开始，你的目标就只有，冠军。”——李元浩</i></font>]],
 
-  ["jy_huxiao_jink"] = "横刀",
-  [":jy_huxiao_jink"] = [[你可以将【啸】当作【闪】使用或打出。
+  ["jy_huxiao_analeptic"] = "横刀",
+  [":jy_huxiao_analeptic"] = [[你可以将【啸】当作【酒】使用或打出。
   <br><font size="1"><i>“谁敢横刀立马……”——钱晨</i></font>]],
 
-  ["jy_huxiao_analeptic"] = "立马",
-  [":jy_huxiao_analeptic"] = [[你可以将【啸】当作【酒】使用或打出。
+  ["jy_huxiao_jink"] = "立马",
+  [":jy_huxiao_jink"] = [[你可以将【啸】当作【闪】使用或打出。
   <br><font size="1"><i>“……唯我虎大将军！”——钱晨</i></font>]],
 
   ["jy_erduanxiao"] = "二段",
   [":jy_erduanxiao"] = "锁定技，当你的武将牌上有且仅有两张【啸】时，你选择失去一点体力或失去所有【啸】。",
   ["#jy_erduanxiao_trigger"] = "二段",
   ["#lose_xiao"] = "失去所有【啸】", 
-  ["#lose_hp_1"] = "失去1点体力",
+  ["#lose_hp_1"] = "失去一点体力",
 
   ["jy_husanjian"] = "三件",
   [":jy_husanjian"] = [[锁定技，当你的装备区有且仅有防具和防御马时，你造成的伤害-1。
-  <br><font size="1"><i>虎三件，指【中娅沙漏】、【水银之靴】、【大天使之杖】、【永霜】、【兰德里的苦楚】里面的三件。不同的人有不同的观点，但【大天使之杖】定在其列。</i></font>]],
+  <br><font size="1"><i>虎三件，指【中娅沙漏】、【水银之靴】、【大天使之杖】。一些人持不同的观点，但【大天使之杖】没有什么争议。</i></font>]],
 }
 
 -- 唐李元浩
 local tym__liyuanhao = General(extension, "tym__liyuanhao", "qun", 3, 3, General.Male)
 
-
--- 二段
--- 首先BeforeCardsMove判断一次是否有牌进/出你的特殊区，然后如果有，
--- 再在AfterCardsMove里判断是否这张牌是啸，而且导致啸的数量变成了2。
--- 天才！
--- 参考自周泰，界周泰
-local jy_erduanxiao_2 = fk.CreateTriggerSkill{
-  name = "jy_erduanxiao_2",
-  anim_type = "offensive",
-  events = {fk.BeforeCardsMove},  -- 理论上来说每次牌的移动只有同一个方向的
-  frequency = Skill.Compulsory,
-  mute = true,
-
+-- 界虎啸
+-- 参考自铁骑，屯田，脑洞包明哲，克己（原来克己已经监视了使用和打出了，不用写那么复杂）
+local jy_huxiao_2 = fk.CreateTriggerSkill{
+  name = "jy_huxiao_2",
+  anim_type = "special",
+  events = {fk.CardResponding, fk.TargetSpecified},  -- 包括了使用和打出
+  -- frequency = Skill.Compulsory,
   can_trigger = function(self, event, target, player, data)
-    -- 只判断是否有牌进出了你的特殊区，而不判断它是否是啸（因为比较复杂，等确定有可能了之后再判断，节省资源）
-    local xiaos = player:getPile("skl__liyuanhao_xiao")
-    player.is_xiao_changing = false -- 默认这次没有变化
-    if player:hasSkill(self) and -- 如果是有二段啸的武将
-      #xiaos == 1 or #xiaos == 3 then  -- 如果啸是1和3
-      for _, move in ipairs(data) do  -- 如果有一张牌是进入或者离开我的特殊区，那么这个函数可以触发
-        return (move.to == player.id and move.toArea == Card.PlayerSpecial) or
-          (move.from == player.id and move.fromArea == Card.PlayerSpecial)
+    if player:hasSkill(self) and data.card.trueName == "slash" then
+      -- 使用是TS，打出是CR
+      if event == fk.TargetSpecified or event == fk.CardResponding then
+        return target == player
       end
     end
   end,
   on_use = function(self, event, target, player, data)
+    local room = player.room
+    local dummy = Fk:cloneCard("dilu")
+    dummy:addSubcards(room:getNCards(1))
+    player:addToPile("tym__liyuanhao_xiao", dummy, true, self.name)
+  end,
+}
+
+-- 界啸酒
+-- 注释里是为了测试改成无中生有。保留在这里以防你后面还需要测试。
+local jy_huxiao_analeptic_2 = fk.CreateViewAsSkill{
+  name = "jy_huxiao_analeptic_2",
+  anim_type = "defensive",
+  pattern = "analeptic",
+  -- pattern = "ex_nihilo",
+  expand_pile = "tym__liyuanhao_xiao",
+  card_filter = function(self, to_select, selected)
+    if #selected == 1 then return false end
+    local xiaos = Self:getPile("tym__liyuanhao_xiao")
+    if #xiaos == 0 then return false end
+    return Self:getPileNameOfId(to_select) == "tym__liyuanhao_xiao"
+  end,
+  view_as = function(self, cards)
+    if #cards ~= 1 then
+      return nil
+    end
+    local c = Fk:cloneCard("analeptic")
+    -- local c = Fk:cloneCard("ex_nihilo")
+    c.skillName = self.name
+    -- print("克隆的牌c的参数：c.name ", c.name, " c.trueName ", c.trueName)
+    c:addSubcard(cards[1])
+    return c
+  end,
+}
+
+-- 界啸闪
+local jy_huxiao_jink_2 = fk.CreateViewAsSkill{
+  name = "jy_huxiao_jink_2",
+  anim_type = "defensive",
+  pattern = "jink",
+  expand_pile = "tym__liyuanhao_xiao",
+  card_filter = function(self, to_select, selected)
+    if #selected == 1 then return false end
+    local xiaos = Self:getPile("tym__liyuanhao_xiao")
+    if #xiaos == 0 then return false end
+    return Self:getPileNameOfId(to_select) == "tym__liyuanhao_xiao"
+  end,
+  view_as = function(self, cards)
+    if #cards ~= 1 then
+      return nil
+    end
+    local c = Fk:cloneCard("jink")
+    c.skillName = self.name
+    c:addSubcard(cards[1])
+    return c
+  end,
+}
+
+
+-- 界二段
+-- 这里的jy_erduanxiao_2全部都是抄上面普通李元浩的，因为只有数值差异。如果上面的改了，这里也得改
+local jy_erduanxiao_2 = fk.CreateTriggerSkill{
+  name = "jy_erduanxiao_2",
+  anim_type = "negative",
+  events = {fk.BeforeCardsMove},  -- 理论上来说每次牌的移动只有同一个方向的
+  -- frequency = Skill.Compulsory,
+  mute = true,
+
+  -- 测试通过。1-2，3-2都可以顺利触发。
+  -- 我猜想原因是1-2的时候可能有多张牌进出，而3-2的时候只会有一张牌出去。但我搞不懂这个数据结构，
+  -- 不知道为什么有一个是两层循环，有一个是一层循环。
+  can_trigger = function(self, event, target, player, data)
+    if not player:hasSkill(self) then return end  -- 如果我自己没有这个技能，那就算了
+
+    local xiaos = player:getPile("tym__liyuanhao_xiao")
+    player.is_xiao_changing = false
+
+    -- 判断是否有牌出去
+    for _, move in ipairs(data) do  -- 第一层循环，不知道为啥
+      if move.from then  -- 照着抄的，牌离开
+        -- print("有牌正打算离开")
+        if move.from == player.id then
+          -- print("有牌正打算从你家离开")
+          if #xiaos == 3 then
+            -- print("啸是3")
+            for _, info in ipairs(move.moveInfo) do  -- 还有第二层循环。我自己的代码里没有第二层
+              if info.fromArea == Card.PlayerSpecial then
+                -- print("有牌正打算从你家特殊区离开")
+                return true
+              end
+            end
+          end
+        end
+      end
+    end
+    
+    -- 判断是否有牌进来
+    if #xiaos == 1 then  -- 如果啸是1
+      for _, move in ipairs(data) do  -- 如果有一张牌是进入或者离开我的特殊区，那么这个函数可以触发
+        if (move.to == player.id and move.toArea == Card.PlayerSpecial) or
+          (move.from == player.id and move.fromArea == Card.PlayerSpecial) then
+          -- 去找一段代码，检测自己特殊区的牌离开的
+          -- print("二段笑（一段）已经检测有牌从特殊区变动", #xiaos)
+          -- 检测不到离开
+          -- if move.to == player.id and move.toArea == Card.PlayerSpecial then
+          --   print("二段笑（一段）已经检测有牌来到特殊区", #xiaos)
+          -- end
+          return true
+        end
+      end
+    end
+  end,  -- 每个参数的结尾都要逗号。can_trigger是一个参数
+
+  on_trigger = function(self, event, target, player, data)
     -- 触发之后，设置变量，告诉下一个函数有没有可能在发生变化
     player.is_xiao_changing = true
-    -- print("jy_erduanxiao 已触发，现在player.is_xiao_changing的值是", player.is_xiao_changing)
+    -- print("二段笑（第一段） on_trigger已触发，现在是", player.is_xiao_changing, #player:getPile("tym__liyuanhao_xiao"))
   end,
 }
 
@@ -621,29 +824,41 @@ local jy_erduanxiao_trigger_2 = fk.CreateTriggerSkill{
   frequency = Skill.Compulsory,
   can_trigger = function(self, event, target, player, data)
     return player:hasSkill(self) and -- 如果是有二段啸的武将
-      #player:getPile("skl__liyuanhao_xiao") == 2 and  -- 如果啸为2
+      #player:getPile("tym__liyuanhao_xiao") == 2 and  -- 如果啸为2
       player.is_xiao_changing  -- 如果啸有可能在变化
   end,
-  on_use = function(self, event, target, player, data)
+
+  on_cost = function(self, event, target, player, data)
     -- print("jy_erduanxiao_trigger 已触发，现在player.is_xiao_changing的值是", player.is_xiao_changing)
     local room = player.room
-    local choice = room:askForChoice(player, {"#lose_xiao", "#lose_hp_1"}, self.name)
-    if choice == "#lose_xiao" then
-      player:drawcard(2)  -- 把啸全部扔掉
-    elseif choice == "#lose_hp_1" then
-      room:recover({
+    -- 如果体力不是满的，两个选项都有；如果是满的，就黑掉【恢复体力】那个按钮。这个改动不需要改到标李元浩那边去，因为标李元浩是掉血。
+    if player.hp ~= player.maxHp then
+      self.choice = room:askForChoice(player, {"#lose_xiao_2", "#lose_hp_1_2"}, self.name)
+    else
+      self.choice = room:askForChoice(player, {"#lose_xiao_2"}, self.name, nil, nil, {"#lose_xiao_2", "#lose_hp_1_2"})
+    end
+    return true
+  end,
+
+  on_use = function(self, event, target, player, data)
+    if self.choice == "#lose_xiao_2" then
+      -- 将所有【啸】纳入自己的手牌
+      local xiaos = player:getPile("tym__liyuanhao_xiao")
+      player.room:moveCardTo(xiaos, Card.PlayerHand, player, fk.ReasonJustMove, self.name, "tym__liyuanhao_xiao", true, player.id)
+    elseif self.choice == "#lose_hp_1_2" then
+      -- 回复1点体力
+      player.room:recover({
         who = player,
         num = 1,
         recoverBy = player,
         skillName = self.name,
       })
-      player.is_xiao_changing = false
     end
   end,
 }
 jy_erduanxiao_2:addRelatedSkill(jy_erduanxiao_trigger_2)
 
--- 三件 已完成 测试通过
+-- 界三件 已完成 测试通过
 local jy_husanjian_2 = fk.CreateTriggerSkill{
   name = "jy_husanjian_2",
   frequency = Skill.Compulsory,
@@ -657,44 +872,56 @@ local jy_husanjian_2 = fk.CreateTriggerSkill{
     local defensive_ride = Fk:getCardById(player:getEquipment(Card.SubtypeDefensiveRide))
     local offensive_ride = Fk:getCardById(player:getEquipment(Card.SubtypeOffensiveRide))
     local treasure = Fk:getCardById(player:getEquipment(Card.Treasure))
-    return not weapon and 
-           armor and
-           defensive_ride and 
-           not offensive_ride and
+    return weapon and 
+           not armor and
+           not defensive_ride and 
+           offensive_ride and
            not treasure
-           -- 有且只有防具和+1马
+           -- 有且只有武器和-1马
   end,
   on_use = function(self, event, target, player, data)
     local room = player.room
     player:broadcastSkillInvoke(self.name)
-    room:notifySkillInvoked(player, self.name, "masochism")
+    room:notifySkillInvoked(player, self.name, "offensive")
     data.damage = data.damage + 1
   end,
 }
+-- TODO: 加一个触发效果器
 
-tym__liyuanhao:addSkill("jy_huxiao")
-tym__liyuanhao:addSkill("jy_huxiao_jink")
-tym__liyuanhao:addSkill("jy_huxiao_analeptic")
-
+-- 因为是两个不同的武将，两个武将的特殊区是不能通用的，所以必须分开写代码。
+tym__liyuanhao:addSkill(jy_huxiao_2)
+tym__liyuanhao:addSkill(jy_huxiao_analeptic_2)
+tym__liyuanhao:addSkill(jy_huxiao_jink_2)
 tym__liyuanhao:addSkill(jy_erduanxiao_2)
 tym__liyuanhao:addSkill(jy_husanjian_2)
 
-
-
 Fk:loadTranslationTable {
   ["tym__liyuanhao"] = "界李元浩",
-  ["skl__liyuanhao_xiao"] = "啸",
+  ["tym__liyuanhao_xiao"] = "<font color=\"gold\">啸</font>",
+
+  ["jy_huxiao_2"] = "虎啸",
+  [":jy_huxiao_2"] = [[当你使用或打出一张【杀】时，你可以将牌堆顶的一张牌置于你的武将牌上，称为【啸】。
+  <br><font size="1"><i>“我希望我的后辈们能够记住，在你踏上职业道路的这一刻开始，你的目标就只有，冠军。”——李元浩</i></font>]],
+
+  ["jy_huxiao_analeptic_2"] = "横刀",
+  [":jy_huxiao_analeptic_2"] = [[你可以将【啸】当作【酒】使用或打出。
+  <br><font size="1"><i>“谁敢横刀立马……”——钱晨</i></font>]],
+
+  ["jy_huxiao_jink_2"] = "立马",
+  [":jy_huxiao_jink_2"] = [[你可以将【啸】当作【闪】使用或打出。
+  <br><font size="1"><i>“……唯我虎大将军！”——钱晨</i></font>]],
 
   ["jy_erduanxiao_2"] = "二段",
-  [":jy_erduanxiao_2"] = "锁定技，当你的武将牌上有且仅有两张【啸】时，你选择恢复一点体力或摸两张牌。",
+  [":jy_erduanxiao_2"] = "锁定技，当你的武将牌上有且仅有两张【啸】时，你选择恢复一点体力或将所有【啸】纳入手牌。",
   ["#jy_erduanxiao_trigger_2"] = "二段",
-  ["#lose_xiao_2"] = "摸两张牌", 
-  ["#lose_hp_1_2"] = "恢复1点体力",
+  ["#lose_xiao_2"] = "将所有【啸】纳入手牌", 
+  ["#lose_hp_1_2"] = "恢复一点体力",
 
   ["jy_husanjian_2"] = "三件",
-  [":jy_husanjian_2"] = [[锁定技，当你的装备区有且仅有防具和防御马时，你造成的伤害+1。
-  <br><font size="1"><i>虎三件，指【中娅沙漏】、【水银之靴】、【大天使之杖】、【永霜】、【兰德里的苦楚】里面的三件。不同的人有不同的观点，但【大天使之杖】定在其列。</i></font>]],
+  [":jy_husanjian_2"] = [[锁定技，当你的装备区有且仅有武器和进攻马时，你造成的伤害+1。
+  <br><font size="1"><i>虎三件，有时也可以指【卢登的激荡】、【虚空之杖】和【灭世者的死亡之帽】。</i></font>]],
 }
+
 
 -- 阿伟罗
 -- local xjb__aweiluo = General(extension, "xjb__aweiluo", "qun", 3, 3, General.Male)
@@ -705,6 +932,19 @@ Fk:loadTranslationTable {
 -- Fk:loadTranslationTable {
 --   ["xjb__aweiluo"] = "阿伟罗",
 -- }
+
+
+-- -- 侯国玉
+-- local tym__houguoyu = General(extension, "tym__houguoyu", "qun", 4, 4, General.Male)
+
+-- tym__houguoyu:addSkill("guose")
+-- tym__houguoyu:addSkill("biyue")
+
+-- Fk:loadTranslationTable {
+--   ["tym__houguoyu"] = "侯国玉",
+--   ["houguoyu"] = "侯国玉",
+-- }
+
 
 -- 高天亮
 
