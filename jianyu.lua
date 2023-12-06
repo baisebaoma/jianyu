@@ -901,17 +901,6 @@ Fk:loadTranslationTable {
 }
 
 
--- 阿伟罗
--- local xjb__aweiluo = General(extension, "xjb__aweiluo", "qun", 3, 3, General.Male)
-
--- xjb__aweiluo:addSkill("luanji")
--- xjb__aweiluo:addSkill("luanwu")
-
--- Fk:loadTranslationTable {
---   ["xjb__aweiluo"] = "阿伟罗",
--- }
-
-
 -- -- -- 侯国玉
 -- local tym__houguoyu = General(extension, "tym__houguoyu", "qun", 5, 5, General.Male)
 
@@ -1127,7 +1116,37 @@ Fk:loadTranslationTable {
   ["#jy_fumo-invoke"] = "附魔：%dest 受到无属性伤害，你可以弃置一张牌令伤害来源判定，改为属性伤害。",
   [":jy_fumo"] = [[当有角色使用【杀】造成无属性伤害时，你可以弃一张牌并令伤害来源进行一次判定，
      若结果为：红色，将此次伤害改为火属性；黑色，将此次伤害改为雷属性。]],
+}
 
+-- 阿伟罗
+local xjb__aweiluo = General(extension, "xjb__aweiluo", "qun", 3, 3, General.Male)
+
+local jy_youlong = fk.CreateTriggerSkill{
+  name = "jy_youlong",
+  anim_type = "offensive",
+  events = {fk.EventPhaseStart},
+  can_trigger = function(self, event, target, player, data)
+    return target == player and player:hasSkill(self.name) and player.phase == Player.Start
+  end,
+  on_use = function(self, event, target, player, data)
+    local room = player.room
+    for _, p in ipairs(room:getOtherPlayers(player, true)) do
+      if not p:isKongcheng() then  -- 如果他有手牌
+        local id = room:askForCard(p, 1, 1, true, self.name, false, nil, "#jy_youlong-choose")
+        room:moveCardTo(id, Card.PlayerHand, p.next, fk.ReasonJustMove, self.name, nil, false, player.id)
+      end
+    end
+  end,
+}
+
+xjb__aweiluo:addSkill(jy_youlong)
+
+-- 要不要试一下先写注释
+
+
+
+Fk:loadTranslationTable {
+  ["xjb__aweiluo"] = "阿伟罗",
 }
 
 Fk:loadTranslationTable {
