@@ -1149,7 +1149,7 @@ local jy_hebao = fk.CreateTriggerSkill{
   end,
   on_cost = function(self, event, target, player, data)
     local room = player.room
-    local id = room:askForCard(p, 1, 1, false, self.name, true, nil, "#jy_hebao-choose")
+    local id = room:askForCard(player, 1, 1, false, self.name, true, nil, "#jy_hebao-choose")
     player:addToPile("xjb__aweiluo_dian", id, true, self.name)
   end,
 }
