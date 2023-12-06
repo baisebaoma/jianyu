@@ -1120,7 +1120,6 @@ Fk:loadTranslationTable {
 }
 
 -- 阿伟罗
--- TODO: 为什么不显示basic_count?
 -- TODO：只剩罗绞了
 local xjb__aweiluo = General(extension, "xjb__aweiluo", "qun", 3, 3, General.Male)
 
@@ -1129,7 +1128,8 @@ local jy_youlong = fk.CreateTriggerSkill{
   anim_type = "support",
   events = {fk.EventPhaseStart},
   can_trigger = function(self, event, target, player, data)
-    return target == player and player:hasSkill(self.name) and player.phase == Player.Start
+    return target == player and player:hasSkill(self.name) 
+      and player.phase == Player.Start
   end,
   on_use = function(self, event, target, player, data)
     local room = player.room
@@ -1180,16 +1180,17 @@ local jy_yusu = fk.CreateTriggerSkill{
   events = {fk.CardUsing},
   can_trigger = function(self, event, target, player, data)
     if not player:hasSkill(self) then return false end
-    if player.phase ~= Player.NotActive and data.card and data.card.type == Card.TypeBasic then
+    if player.phase ~= Player.NotActive and data.card and 
+    data.card.type == Card.TypeBasic and target == player then  -- target == player：使用者是你自己
       return true
     end
   end,
   on_cost = function(self, event, target, player, data)
     local room = player.room
-    -- if not player:getMark("basic_count") then room:setPlayerMark(player, "basic_count", 0) print("basic_count被设置成0") end
-    room:addPlayerMark(player, "basic_count")
-    basic_count = player:getMark("basic_count")
-    print("basic_count现在是", basic_count)
+    -- if not player:getMark("@jy_yusu_basic_count") then room:setPlayerMark(player, "@jy_yusu_basic_count", 0) print("basic_count被设置成0") end
+    room:addPlayerMark(player, "@jy_yusu_basic_count")
+    basic_count = player:getMark("@jy_yusu_basic_count")
+    -- print("basic_count现在是", basic_count)
     if basic_count % 2 == 0 and basic_count ~= 0 then
       return room:askForSkillInvoke(player, self.name)
     end
@@ -1204,6 +1205,7 @@ local jy_yusu_set_0 = fk.CreateTriggerSkill{
   name = "#jy_yusu_start",
   mute = true,
   frequency = Skill.Compulsory,
+  visible = false,
   events = {fk.EventPhaseStart},  -- EventPhaseStart的意思是一个阶段的开始，并不是回合开始阶段
   can_trigger = function(self, event, target, player, data)
     return target == player and player:hasSkill(self.name)
@@ -1211,11 +1213,13 @@ local jy_yusu_set_0 = fk.CreateTriggerSkill{
   end,
   on_use = function(self, event, target, player, data)
     local room = player.room
-    room:setPlayerMark(player, "basic_count", 0)
-    print("你的回合已开始/结束，给你设成了0")
+    room:setPlayerMark(player, "@jy_yusu_basic_count", 0)
+    -- print("你的回合已开始/结束，给你设成了0")
   end,
 }
 jy_yusu:addRelatedSkill(jy_yusu_set_0)
+
+
 
 xjb__aweiluo:addSkill(jy_youlong)
 xjb__aweiluo:addSkill(jy_hebao)
@@ -1240,10 +1244,11 @@ Fk:loadTranslationTable {
   ["#jy_tiaoshui"] = "弃掉一张【点】",
 
   ["jy_luojiao"] = "罗绞",
-  [":jy_luojiao"] = "当你的【点】有4张时，视为使用一张【万箭齐发】；当你的【点】花色不同时，视为使用一张【南蛮入侵】。",
+  [":jy_luojiao"] = "当你的【点】有4张时，视为使用一张【万箭齐发】；当你的所有【点】花色均不同时，视为使用一张【南蛮入侵】。",
 
   ["jy_yusu"] = "玉玊",
   [":jy_yusu"] = "你的回合内每使用第二张基本牌时，你可以将其置于你的武将牌上，视为【点】。",
+  ["@jy_yusu_basic_count"] = "玉玊",
 
 }
 
