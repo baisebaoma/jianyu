@@ -244,9 +244,6 @@ local jy_sanjian = fk.CreateTriggerSkill{
   on_use = function(self, event, target, player, data)
     local room = player.room
     room:useVirtualCard("analeptic", nil, player, player, self.name, false)
-    if player.hp ~= player.maxHp then
-      room:useVirtualCard("peach", nil, player, player, self.name, false)
-    end
     room:useVirtualCard("ex_nihilo", nil, player, player, self.name, false)
   end,
 }
@@ -355,7 +352,7 @@ Fk:loadTranslationTable{
   ["$jy_kaiju_25"] = "被秀了，操。",
 
   ["jy_sanjian"] = "三件",
-  [":jy_sanjian"] = [[锁定技，出牌阶段开始时，如果你的装备区有且仅有3张牌，你视为使用一张【酒】、一张【桃】和一张【无中生有】。<br>
+  [":jy_sanjian"] = [[锁定技，出牌阶段开始时，如果你的装备区有且仅有3张牌，你视为使用一张【酒】和一张【无中生有】。<br>
   <font size="1"><i>“又陷入劣势了，等乌兹三件套吧！”——不知道哪个解说说的</i></font>]],
   ["$jy_sanjian1"] = "也不是稳赢吧，我觉得赢了！",
 
@@ -915,46 +912,25 @@ Fk:loadTranslationTable {
 -- }
 
 
--- -- 侯国玉
-local tym__houguoyu = General(extension, "tym__houguoyu", "qun", 5, 5, General.Male)
+-- -- -- 侯国玉
+-- local tym__houguoyu = General(extension, "tym__houguoyu", "qun", 5, 5, General.Male)
 
-tym__houguoyu:addSkill(jy_husanjian_2)
--- tym__houguoyu:addSkill("biyue")
+-- tym__houguoyu:addSkill(jy_husanjian_2)
+-- -- tym__houguoyu:addSkill("biyue")
 
-Fk:loadTranslationTable {
-  ["tym__houguoyu"] = "侯国玉",
-  ["houguoyu"] = "侯国玉",
+-- Fk:loadTranslationTable {
+--   ["tym__houguoyu"] = "侯国玉",
+--   ["houguoyu"] = "侯国玉",
   
-  ["jy_husanjian_2"] = "三件",
-  [":jy_husanjian_2"] = [[锁定技，当你的装备区有且仅有武器和进攻马时，你造成的伤害+1。
-  <br><font size="1"><i>虎三件，有时也可以指【卢登的激荡】、【虚空之杖】和【灭世者的死亡之帽】。</i></font>]],
-}
+--   ["jy_husanjian_2"] = "三件",
+--   [":jy_husanjian_2"] = [[锁定技，当你的装备区有且仅有武器和进攻马时，你造成的伤害+1。
+--   <br><font size="1"><i>虎三件，有时也可以指【卢登的激荡】、【虚空之杖】和【灭世者的死亡之帽】。</i></font>]],
+-- }
 
 
 -- 高天亮
 
 local xjb__gaotianliang = General(extension, "xjb__gaotianliang", "qun", 4, 4, General.Male)
-
--- local jy_yuyu = fk.CreateTriggerSkill{
---   name = "jy_yuyu",
---   anim_type = "masochism",
---   events = {fk.Damaged},
---   on_trigger = function(self, event, target, player, data)
---     self:doCost(event, target, player, data)  -- 每次受到伤害只结算1次
---   end,
---   on_cost = function(self, event, target, player, data)
---     local room = player.room
---     if room:askForSkillInvoke(player, self.name, data) then
---       return true
---     end
---     self.cancel_cost = true
---   end,
---   on_use = function(self, event, target, player, data)
---     local room = player.room
---     player:drawCards(3)
---     player:turnOver()
---   end,
--- }
 
 local jy_yuyu = fk.CreateTriggerSkill{
   name = "jy_yuyu",
@@ -986,17 +962,101 @@ local jy_yuyu = fk.CreateTriggerSkill{
   end,
 }
 
-
 xjb__gaotianliang:addSkill(jy_yuyu)
 
 Fk:loadTranslationTable {
   ["xjb__gaotianliang"] = "高天亮",
 
   ["jy_yuyu"] = "玉玉",
-  [":jy_yuyu"] = [[锁定技，当你被没有【敌人】标记的角色使用【杀】造成了伤害时，你令其获得【敌人】标记。
-  受到来自没有【敌人】标记的角色或因本次伤害而获得【敌人】标记的角色造成的伤害时，你可以摸三张牌，然后翻面。]],
-  ["@jy_gaotianliang_enemy"] = "敌人",
+  [":jy_yuyu"] = [[锁定技，当你被没有【高天亮之敌】标记的角色使用【杀】造成了伤害时，你令其获得【高天亮之敌】标记。
+  受到来自没有【高天亮之敌】标记的角色或因本次伤害而获得【高天亮之敌】标记的角色造成的伤害时，你可以摸三张牌，然后翻面。]],
+  ["@jy_gaotianliang_enemy"] = "高天亮之敌",
 }
+
+-- -- 赵乾熙
+local tym__zhaoqianxi = General(extension, "tym__zhaoqianxi", "qun", 4, 4, General.Male)
+
+-- 参考自藤甲。要把DamageInflicted改成DamageCaused，就是你对别人造成伤害的意思。
+-- 如果是DamageInflicted，就是别人对你造成伤害的意思。
+local jy_yuanshen = fk.CreateTriggerSkill{
+  name = "jy_yuanshen",
+  frequency = Skill.Compulsory,
+  anim_type = "offensive",
+  events = {fk.DamageCaused},
+  can_trigger = function(self, event, target, player, data)
+    if not (target == player and player:hasSkill(self)) then return false end
+    return data.damageType ~= fk.NormalDamage
+  end,
+  on_use = function(self, event, target, player, data)
+    data.damage = data.damage + 1
+  end,
+}
+
+local jy_huoji = fk.CreateViewAsSkill{
+  name = "jy_huoji",
+  anim_type = "offensive",
+  pattern = "fire__slash",
+  card_filter = function(self, to_select, selected)
+    return #selected == 0 and Fk:getCardById(to_select).suit == Card.Spade and Fk:currentRoom():getCardArea(to_select) ~= Player.Equip
+  end,
+  view_as = function(self, cards)
+    if #cards ~= 1 then return end
+    local card = Fk:cloneCard("fire__slash")
+    card.skillName = self.name
+    card:addSubcard(cards[1])
+    return card
+  end,
+}
+
+tym__zhaoqianxi:addSkill(jy_yuanshen)
+tym__zhaoqianxi:addSkill(jy_huoji)
+
+Fk:loadTranslationTable {
+  ["tym__zhaoqianxi"] = "赵乾熙",
+  
+  ["jy_yuanshen"] = "原神",
+  [":jy_yuanshen"] = [[锁定技，你<s>获得1所有元素伤害加成</s>造成的属性伤害+1。]],
+
+  ["jy_huoji"] = "帽猫",
+  [":jy_huoji"] = [[你可以将一张♠手牌当作【火杀】使用或打出。
+  <br /><font size="1"><i><s>因为Beryl抽满命林尼歪了六次，所以他决定在新月杀中重拾自己的火。</s></i></font>]],
+}
+
+-- 界赵乾熙
+-- local tym__zhaoqianxi_2 = General(extension, "tym__zhaoqianxi_2", "qun", 4, 4, General.Male)
+-- tym__zhaoqianxi_2.hidden = true
+
+-- local jy_yuanshen_2 = fk.CreateTriggerSkill{
+--   name = "jy_yuanshen_2",
+--   frequency = Skill.Compulsory,
+--   anim_type = "offensive",
+--   events = {},
+-- }
+
+-- local jy_fumo = fk.CreateTriggerSkill{
+--   name = "jy_fumo",
+--   frequency = Skill.Compulsory,
+--   anim_type = "offensive",
+--   events = {},
+-- }
+
+-- tym__zhaoqianxi_2:addSkill(jy_yuanshen_2)
+-- tym__zhaoqianxi_2:addSkill(jy_fumo)
+
+-- Fk:loadTranslationTable {
+--   ["tym__zhaoqianxi_2"] = "界赵乾熙",
+  
+--   ["jy_yuanshen_2"] = "原神",
+--   [":jy_yuanshen_2"] = [[锁定技，所有角色的雷属性伤害都会令目标进入【雷附着】状态；
+--   所有角色的火属性伤害都会令目标进入【火附着】状态。
+--   当一名【雷附着】状态的角色受到火属性伤害时，移除【雷附着】状态并使该伤害+1；
+--   当一名【火附着】状态的角色受到雷属性伤害时，移除【火附着】状态并弃一张牌。]],
+
+--   ["jy_fumo"] = "附魔",
+--   [":jy_fumo"] = [[你造成无属性伤害时可以进行一次判定。
+--   若结果为：红色，将此次伤害改为火属性；黑色，将此次伤害改为雷属性。]],
+
+-- }
 
 Fk:loadTranslationTable {
      ["jianzihao"] = "简自豪",
@@ -1004,6 +1064,7 @@ Fk:loadTranslationTable {
      ["liyuanhao"] = "李元浩",
      ["aweiluo"] = "阿伟罗",
      ["gaotianliang"] = "高天亮",
+     ["zhaoqianxi"] = "赵乾熙",
 }
 
 return extension
