@@ -1111,18 +1111,18 @@ Fk:loadTranslationTable {
   ["tym__zhaoqianxi_2"] = "界赵乾熙",
   
   ["jy_yuanshen_2"] = "原神",
-  [":jy_yuanshen_2"] = [[锁定技，所有角色的<font color="violet">雷属性伤害</font>都会令目标进入<font color="violet">【雷附着】</font>状态，
+  [":jy_yuanshen_2"] = [[锁定技，所有角色的<font color="purple">雷属性伤害</font>都会令目标进入<font color="purple">【雷附着】</font>状态，
   而<font color="red">火属性伤害</font>会令目标进入<font color="red">【火附着】</font>状态。
-  当一名<font color="violet">【雷附着】</font>状态的角色受到<font color="red">火属性伤害</font>时，
+  当一名<font color="purple">【雷附着】</font>状态的角色受到<font color="red">火属性伤害</font>时，
   本次伤害不会令目标进入<font color="red">【火附着】</font>状态，
-  而是移除<font color="violet">【雷附着】</font>状态并使该伤害+1；
-  当一名<font color="red">【火附着】</font>状态的角色受到<font color="violet">雷属性伤害</font>时，
-  本次伤害不会令目标进入<font color="violet">【雷附着】</font>状态，
+  而是移除<font color="purple">【雷附着】</font>状态并使该伤害+1；
+  当一名<font color="red">【火附着】</font>状态的角色受到<font color="purple">雷属性伤害</font>时，
+  本次伤害不会令目标进入<font color="purple">【雷附着】</font>状态，
   移除<font color="red">【火附着】</font>状态并弃两张牌。
   这个技能对每次伤害仅生效一次，不论场上是否有多个角色拥有这个技能。]],
 
   ["@jy_yuanshen_2_pyro"] = "<font color=\"red\">火附着</font>",
-  ["@jy_yuanshen_2_electro"] = "<font color=\"violet\">雷附着</font>",
+  ["@jy_yuanshen_2_electro"] = "<font color=\"purple\">雷附着</font>",
   ["#jy_yuanshen_2_overload_discard"] = "你在【雷附着】状态下受到了火属性伤害，需要弃置两张牌",
 
   ["jy_fumo"] = "附魔",
