@@ -1162,7 +1162,7 @@ Fk:loadTranslationTable {
   ["xjb__aweiluo"] = "阿伟罗",
 
   ["jy_youlong"] = "游龙",
-  ["#jy_youlong-choose"] = "游龙：你需要选择一张牌交给下家"
+  ["#jy_youlong-choose"] = "游龙：你需要选择一张牌交给下家",
   [":jy_youlong"] = "你的回合开始时，你可以让每一名玩家交一张手牌给其下家。",
 
   ["jy_hebao"] = "核爆",
