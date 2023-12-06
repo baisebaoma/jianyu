@@ -335,7 +335,7 @@ local jy_xizao_2 = fk.CreateTriggerSkill{
 
 tym__jianzihao:addSkill(jy_kaiju_2)
 tym__jianzihao:addSkill(jy_sanjian)
-tym__jianzihao:addSkill("hongyan")
+tym__jianzihao:addSkill("hongyan")  -- 这个技能要加风火林山包才能触发！
 tym__jianzihao:addSkill("jy_zouwei")
 tym__jianzihao:addSkill("jy_shengnu")
 tym__jianzihao:addSkill(jy_xizao_2)
@@ -1015,10 +1015,11 @@ Fk:loadTranslationTable {
 local tym__zhaoqianxi_2 = General(extension, "tym__zhaoqianxi_2", "qun", 4, 4, General.Male)
 -- tym__zhaoqianxi_2.hidden = true
 
+-- TODO：给触发了元素反应时写个提示，类似国战开始的时候的那种
 local jy_yuanshen_2 = fk.CreateTriggerSkill{
   name = "jy_yuanshen_2",
   frequency = Skill.Compulsory,
-  anim_type = "support",
+  anim_type = "offensive",
   events = {fk.DamageInflicted},
   can_trigger = function(self, event, target, player, data)  -- player是我自己，只能让我自己播放这个动画
     if not player:hasSkill(self) then return false end
@@ -1045,7 +1046,7 @@ local jy_yuanshen_2 = fk.CreateTriggerSkill{
             data.is_jy_yuanshen_2_triggered = true  -- 如果有多个拥有这个技能的人，告诉他不用再发动了
             return  -- 结束了，不用判断下一个了
           end
-          if not data.to:hasMark(element[2]) then   -- 如果目标没有A附着
+          if data.to:getMark(element[2]) == 0 then   -- 如果目标没有A附着
             room:setPlayerMark(data.to, element[2], 1)  -- 造成A附着
             return
           end
@@ -1119,6 +1120,8 @@ Fk:loadTranslationTable {
 }
 
 -- 阿伟罗
+-- TODO: 为什么不显示basic_count?
+-- TODO：只剩罗绞了
 local xjb__aweiluo = General(extension, "xjb__aweiluo", "qun", 3, 3, General.Male)
 
 local jy_youlong = fk.CreateTriggerSkill{
@@ -1154,12 +1157,75 @@ local jy_hebao = fk.CreateTriggerSkill{
   end,
 }
 
+-- 跳水
+local jy_tiaoshui = fk.CreateTriggerSkill{
+  name = "jy_tiaoshui",
+  anim_type = "special",
+  events = {fk.Damaged},
+  on_use = function(self, event, target, player, data)
+    local room = player.room
+    local dians = player:getPile("xjb__aweiluo_dian")
+    -- 以后“选择一张特殊区的牌并且弃掉”这个要求就这么写。
+    local id = room:askForCard(player, 1, 1, false, self.name, true, ".|.|.|xjb__aweiluo_dian|.|.|.", "#jy_tiaoshui", "xjb__aweiluo_dian", true)
+    room:throwCard(id, self.id, player, player)
+    -- askForDiscard 函数是不能对特殊区的牌生效的
+    -- local id = room:askForDiscard(player, 1, 1, false, self.name, true, ".|.|.|xjb__aweiluo_dian|.|.|.", "#jy_tiaoshui", false, true)
+  end,
+}
+
+-- 玉玊
+local jy_yusu = fk.CreateTriggerSkill{
+  name = "jy_yusu",
+  anim_type = "special",
+  events = {fk.CardUsing},
+  can_trigger = function(self, event, target, player, data)
+    if not player:hasSkill(self) then return false end
+    if player.phase ~= Player.NotActive and data.card and data.card.type == Card.TypeBasic then
+      return true
+    end
+  end,
+  on_cost = function(self, event, target, player, data)
+    local room = player.room
+    -- if not player:getMark("basic_count") then room:setPlayerMark(player, "basic_count", 0) print("basic_count被设置成0") end
+    room:addPlayerMark(player, "basic_count")
+    basic_count = player:getMark("basic_count")
+    print("basic_count现在是", basic_count)
+    if basic_count % 2 == 0 and basic_count ~= 0 then
+      return room:askForSkillInvoke(player, self.name)
+    end
+  end,
+  on_use = function(self, event, target, player, data)
+    local room = player.room
+    local id = data.card
+    player:addToPile("xjb__aweiluo_dian", id, true, self.name)
+  end,
+}
+local jy_yusu_set_0 = fk.CreateTriggerSkill{
+  name = "#jy_yusu_start",
+  mute = true,
+  frequency = Skill.Compulsory,
+  events = {fk.EventPhaseStart},  -- EventPhaseStart的意思是一个阶段的开始，并不是回合开始阶段
+  can_trigger = function(self, event, target, player, data)
+    return target == player and player:hasSkill(self.name)
+      and (player.phase == Player.Play or player.phase == Player.Finish)
+  end,
+  on_use = function(self, event, target, player, data)
+    local room = player.room
+    room:setPlayerMark(player, "basic_count", 0)
+    print("你的回合已开始/结束，给你设成了0")
+  end,
+}
+jy_yusu:addRelatedSkill(jy_yusu_set_0)
+
 xjb__aweiluo:addSkill(jy_youlong)
 xjb__aweiluo:addSkill(jy_hebao)
+xjb__aweiluo:addSkill(jy_tiaoshui)
+xjb__aweiluo:addSkill(jy_yusu)
 
 
 Fk:loadTranslationTable {
   ["xjb__aweiluo"] = "阿伟罗",
+  ["xjb__aweiluo_dian"] = "点",
 
   ["jy_youlong"] = "游龙",
   ["#jy_youlong-choose"] = "游龙：你需要选择一张牌交给下家",
@@ -1170,13 +1236,14 @@ Fk:loadTranslationTable {
   ["#jy_hebao-choose"] = "选择一张手牌成为【点】",
 
   ["jy_tiaoshui"] = "跳水",
-  [":jy_tiaoshui"] = "当你失去体力时，你可以移出一张【点】。",
+  [":jy_tiaoshui"] = "当你失去体力时，你可以弃掉一张【点】。",
+  ["#jy_tiaoshui"] = "弃掉一张【点】",
 
   ["jy_luojiao"] = "罗绞",
   [":jy_luojiao"] = "当你的【点】有4张时，视为使用一张【万箭齐发】；当你的【点】花色不同时，视为使用一张【南蛮入侵】。",
 
   ["jy_yusu"] = "玉玊",
-  [":jy_yusu"] = "你的回合内每使用第二张基本牌结算完成后，将其置于你的武将牌上，视为【点】。",
+  [":jy_yusu"] = "你的回合内每使用第二张基本牌时，你可以将其置于你的武将牌上，视为【点】。",
 
 }
 
