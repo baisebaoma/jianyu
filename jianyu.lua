@@ -1015,7 +1015,7 @@ Fk:loadTranslationTable {
   ["tym__zhaoqianxi"] = "赵乾熙",
   
   ["jy_yuanshen"] = "原神",
-  [":jy_yuanshen"] = [[锁定技，你<s>获得1所有元素伤害加成</s>造成的属性伤害+1。]],
+  [":jy_yuanshen"] = [[锁定技，你造成的属性伤害+1。]],
 
   ["jy_huoji"] = "帽猫",
   [":jy_huoji"] = [[你可以将一张♠手牌当作【火杀】使用或打出。
