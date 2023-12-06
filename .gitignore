@@ -42,3 +42,6 @@ luac.out
 # original images and losslesscut project files
 *.webp
 *.lls
+
+# macOS files
+.DS_Store

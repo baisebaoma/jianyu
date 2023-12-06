@@ -901,17 +901,6 @@ Fk:loadTranslationTable {
 }
 
 
--- 阿伟罗
--- local xjb__aweiluo = General(extension, "xjb__aweiluo", "qun", 3, 3, General.Male)
-
--- xjb__aweiluo:addSkill("luanji")
--- xjb__aweiluo:addSkill("luanwu")
-
--- Fk:loadTranslationTable {
---   ["xjb__aweiluo"] = "阿伟罗",
--- }
-
-
 -- -- -- 侯国玉
 -- local tym__houguoyu = General(extension, "tym__houguoyu", "qun", 5, 5, General.Male)
 
@@ -1029,11 +1018,11 @@ local tym__zhaoqianxi_2 = General(extension, "tym__zhaoqianxi_2", "qun", 4, 4, G
 local jy_yuanshen_2 = fk.CreateTriggerSkill{
   name = "jy_yuanshen_2",
   frequency = Skill.Compulsory,
-  anim_type = "offensive",
+  anim_type = "support",
   events = {fk.DamageInflicted},
   can_trigger = function(self, event, target, player, data)  -- player是我自己，只能让我自己播放这个动画
     if not player:hasSkill(self) then return false end
-    return data.damageType ~= fk.NormalDamage and not data.is_jy_yuanshen_2_triggered  -- 如果这次没有被其他的该技能相应
+    return data.damageType ~= fk.NormalDamage and not data.is_jy_yuanshen_2_triggered  -- 如果这次没有被其他的该技能响应
   end,
   on_use = function(self, event, target, player, data)
     local room = player.room
@@ -1046,7 +1035,7 @@ local jy_yuanshen_2 = fk.CreateTriggerSkill{
         { {fk.FireDamage, "@jy_yuanshen_2_pyro", "@jy_yuanshen_2_electro", 
           function(self, event, target, player, data) data.damage = data.damage + 1 end},
         {fk.ThunderDamage, "@jy_yuanshen_2_electro", "@jy_yuanshen_2_pyro", 
-          function(self, event, target, player, data) player.room:askForDiscard(data.to, 2, 2) end}, 
+          function(self, event, target, player, data) player.room:askForDiscard(data.to, 2, 2, true, self.name, false, nil, "#jy_yuanshen_2_overload_discard") end}, 
         }
       ) do
         if data.damageType == element[1] then  -- 如果是A属性伤害
@@ -1067,13 +1056,15 @@ local jy_yuanshen_2 = fk.CreateTriggerSkill{
 }
 
 -- 参考自悲歌
+-- 因为如果每个无属性伤害都触发这个技能的话会极大增加等待时间，所以我的建议是更改成悲歌，只响应【杀】
 local jy_fumo = fk.CreateTriggerSkill{
   name = "jy_fumo",
   anim_type = "masochism",
   events = {fk.DamageInflicted},
   can_trigger = function(self, event, target, player, data)
     return player:hasSkill(self) and 
-      data.damageType == fk.NormalDamage and not data.to.dead and not player:isNude()
+      data.damageType == fk.NormalDamage and data.card and 
+      data.card.trueName == "slash" and not data.to.dead and not player:isNude()
   end,
   on_cost = function(self, event, target, player, data)
     local room = player.room
@@ -1109,19 +1100,83 @@ Fk:loadTranslationTable {
   ["tym__zhaoqianxi_2"] = "界赵乾熙",
   
   ["jy_yuanshen_2"] = "原神",
-  [":jy_yuanshen_2"] = [[锁定技，所有角色的雷属性伤害都会令目标进入【雷附着】状态；
-  所有角色的火属性伤害都会令目标进入【火附着】状态。
-  当一名【雷附着】状态的角色受到火属性伤害时，移除【雷附着】状态并使该伤害+1；
-  当一名【火附着】状态的角色受到雷属性伤害时，移除【火附着】状态并弃两张牌。
-  这个技能只会触发一次，不论是否多个角色拥有这个技能。]],
+  [":jy_yuanshen_2"] = [[锁定技，所有角色的<font color="purple">雷属性伤害</font>都会令目标进入<font color="purple">【雷附着】</font>状态，
+  而<font color="red">火属性伤害</font>会令目标进入<font color="red">【火附着】</font>状态。
+  <br />当一名<font color="purple">【雷附着】</font>状态的角色受到<font color="red">火属性伤害</font>时，
+  本次伤害不会令目标进入<font color="red">【火附着】</font>状态，而是移除<font color="purple">【雷附着】</font>状态并使该伤害+1；
+  当一名<font color="red">【火附着】</font>状态的角色受到<font color="purple">雷属性伤害</font>时，
+  本次伤害不会令目标进入<font color="purple">【雷附着】</font>状态，而是移除<font color="red">【火附着】</font>状态并弃两张牌。
+  <br />这个技能对每次伤害仅生效一次，不论场上是否有多个角色拥有这个技能。]],
 
   ["@jy_yuanshen_2_pyro"] = "<font color=\"red\">火附着</font>",
-  ["@jy_yuanshen_2_electro"] = "<font color=\"violet\">雷附着</font>",
+  ["@jy_yuanshen_2_electro"] = "<font color=\"purple\">雷附着</font>",
+  ["#jy_yuanshen_2_overload_discard"] = "你在【雷附着】状态下受到了火属性伤害，需要弃置两张牌",
 
   ["jy_fumo"] = "附魔",
-  ["jy_fumo-invoke"] = "附魔：你可以弃一张手牌令伤害来源判定，如果为黑色则改为雷属性伤害，如果为红色则改为火属性伤害。"
-  [":jy_fumo"] = [[当有角色造成无属性伤害时，你可以弃一张牌并令伤害来源进行一次判定，
+  ["#jy_fumo-invoke"] = "附魔：%dest 受到无属性伤害，你可以弃置一张牌令伤害来源判定，改为属性伤害。",
+  [":jy_fumo"] = [[当有角色使用【杀】造成无属性伤害时，你可以弃一张牌并令伤害来源进行一次判定，
      若结果为：红色，将此次伤害改为火属性；黑色，将此次伤害改为雷属性。]],
+}
+
+-- 阿伟罗
+local xjb__aweiluo = General(extension, "xjb__aweiluo", "qun", 3, 3, General.Male)
+
+local jy_youlong = fk.CreateTriggerSkill{
+  name = "jy_youlong",
+  anim_type = "support",
+  events = {fk.EventPhaseStart},
+  can_trigger = function(self, event, target, player, data)
+    return target == player and player:hasSkill(self.name) and player.phase == Player.Start
+  end,
+  on_use = function(self, event, target, player, data)
+    local room = player.room
+    for _, p in ipairs(room:getAllPlayers(player, true)) do
+      if not p:isKongcheng() then  -- 如果他有手牌
+        local id = room:askForCard(p, 1, 1, true, self.name, false, nil, "#jy_youlong-choose")
+        room:moveCardTo(id, Card.PlayerHand, p.next, fk.ReasonJustMove, self.name, nil, false, player.id)
+      end
+    end
+  end,
+}
+
+-- 核爆
+local jy_hebao = fk.CreateTriggerSkill{
+  name = "jy_hebao",
+  anim_type = "special",
+  events = {fk.EventPhaseStart},
+  can_trigger = function(self, event, target, player, data)
+    return target == player and player:hasSkill(self.name) and player.phase == Player.Start
+  end,
+  on_cost = function(self, event, target, player, data)
+    local room = player.room
+    local id = room:askForCard(player, 1, 1, false, self.name, true, nil, "#jy_hebao-choose")
+    player:addToPile("xjb__aweiluo_dian", id, true, self.name)
+  end,
+}
+
+xjb__aweiluo:addSkill(jy_youlong)
+xjb__aweiluo:addSkill(jy_hebao)
+
+
+Fk:loadTranslationTable {
+  ["xjb__aweiluo"] = "阿伟罗",
+
+  ["jy_youlong"] = "游龙",
+  ["#jy_youlong-choose"] = "游龙：你需要选择一张牌交给下家",
+  [":jy_youlong"] = "你的回合开始时，你可以让每一名玩家交一张手牌给其下家。",
+
+  ["jy_hebao"] = "核爆",
+  [":jy_hebao"] = "你的回合开始时，你可以将一张手牌置于你的武将牌上，称为【点】。",
+  ["#jy_hebao-choose"] = "选择一张手牌成为【点】",
+
+  ["jy_tiaoshui"] = "跳水",
+  [":jy_tiaoshui"] = "当你失去体力时，你可以移出一张【点】。",
+
+  ["jy_luojiao"] = "罗绞",
+  [":jy_luojiao"] = "当你的【点】有4张时，视为使用一张【万箭齐发】；当你的【点】花色不同时，视为使用一张【南蛮入侵】。",
+
+  ["jy_yusu"] = "玉玊",
+  [":jy_yusu"] = "你的回合内每使用第二张基本牌结算完成后，将其置于你的武将牌上，视为【点】。",
 
 }
 
