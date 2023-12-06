@@ -1033,7 +1033,7 @@ local jy_yuanshen_2 = fk.CreateTriggerSkill{
   events = {fk.DamageInflicted},
   can_trigger = function(self, event, target, player, data)  -- player是我自己，只能让我自己播放这个动画
     if not player:hasSkill(self) then return false end
-    return data.damageType ~= fk.NormalDamage and not data.is_jy_yuanshen_2_triggered  -- 如果这次没有被其他的该技能相应
+    return data.damageType ~= fk.NormalDamage and not data.is_jy_yuanshen_2_triggered  -- 如果这次没有被其他的该技能响应
   end,
   on_use = function(self, event, target, player, data)
     local room = player.room
@@ -1046,7 +1046,7 @@ local jy_yuanshen_2 = fk.CreateTriggerSkill{
         { {fk.FireDamage, "@jy_yuanshen_2_pyro", "@jy_yuanshen_2_electro", 
           function(self, event, target, player, data) data.damage = data.damage + 1 end},
         {fk.ThunderDamage, "@jy_yuanshen_2_electro", "@jy_yuanshen_2_pyro", 
-          function(self, event, target, player, data) player.room:askForDiscard(data.to, 2, 2) end}, 
+          function(self, event, target, player, data) player.room:askForDiscard(data.to, 2, 2, true, self.name, false, nil, "#jy_yuanshen_2_overload_discard") end}, 
         }
       ) do
         if data.damageType == element[1] then  -- 如果是A属性伤害
@@ -1119,6 +1119,7 @@ Fk:loadTranslationTable {
 
   ["@jy_yuanshen_2_pyro"] = "<font color=\"red\">火附着</font>",
   ["@jy_yuanshen_2_electro"] = "<font color=\"violet\">雷附着</font>",
+  ["#jy_yuanshen_2_overload_discard"] = "你在【雷附着】状态下受到了火属性伤害，需要弃置两张牌"
 
   ["jy_fumo"] = "附魔",
   ["#jy_fumo-invoke"] = "附魔：%dest 受到无属性伤害，你可以弃置一张牌令伤害来源判定，改为属性伤害。",
