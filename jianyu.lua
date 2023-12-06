@@ -936,7 +936,7 @@ local jy_yuyu = fk.CreateTriggerSkill{
   name = "jy_yuyu",
   anim_type = "masochism",
   events = {fk.Damaged},
-  -- 遗计就是没有can_trigger的，遗计也不用判断player.hasSkill(self)，也不用判断伤害目标是自己。这是为什么
+  -- 遗计就是没有can_trigger的，遗计也不用判断player.hasSkill(self)，也不用判断伤害目标是自己，因为被省略了
   on_trigger = function(self, event, target, player, data)
     local room = player.room
     self.this_time_slash = false
@@ -1023,40 +1023,107 @@ Fk:loadTranslationTable {
 }
 
 -- 界赵乾熙
--- local tym__zhaoqianxi_2 = General(extension, "tym__zhaoqianxi_2", "qun", 4, 4, General.Male)
+local tym__zhaoqianxi_2 = General(extension, "tym__zhaoqianxi_2", "qun", 4, 4, General.Male)
 -- tym__zhaoqianxi_2.hidden = true
 
--- local jy_yuanshen_2 = fk.CreateTriggerSkill{
---   name = "jy_yuanshen_2",
---   frequency = Skill.Compulsory,
---   anim_type = "offensive",
---   events = {},
--- }
+local jy_yuanshen_2 = fk.CreateTriggerSkill{
+  name = "jy_yuanshen_2",
+  frequency = Skill.Compulsory,
+  anim_type = "offensive",
+  events = {fk.DamageInflicted},
+  can_trigger = function(self, event, target, player, data)  -- player是我自己，只能让我自己播放这个动画
+    if not player:hasSkill(self) then return false end
+    return data.damageType ~= fk.NormalDamage and not data.is_jy_yuanshen_2_triggered  -- 如果这次没有被其他的该技能相应
+  end,
+  on_use = function(self, event, target, player, data)
+    local room = player.room
+    if data.damageType then
+      -- 使用for循环以方便后面添加元素反应类型。每次只会有一种反应发生。
+      -- element[1]是A属性类型，element[2]是A对应的附着标记，
+      -- element[3]是A要反应的附着标记B，element[4]是要造成的效果
+      -- Lua 的数组从1开始
+      for _, element in ipairs(
+        { {fk.FireDamage, "@jy_yuanshen_2_pyro", "@jy_yuanshen_2_electro", 
+          function(self, event, target, player, data) data.damage = data.damage + 1 end},
+        {fk.ThunderDamage, "@jy_yuanshen_2_electro", "@jy_yuanshen_2_pyro", 
+          function(self, event, target, player, data) player.room:askForDiscard(data.to, 2, 2) end}, 
+        }
+      ) do
+        if data.damageType == element[1] then  -- 如果是A属性伤害
+          if data.to:getMark(element[3]) ~= 0 then  -- 如果目标有B附着
+            room:setPlayerMark(data.to, element[3], 0)  -- 将B附着解除
+            element[4](self, event, target, player, data)  -- 造成效果
+            data.is_jy_yuanshen_2_triggered = true  -- 如果有多个拥有这个技能的人，告诉他不用再发动了
+            return  -- 结束了，不用判断下一个了
+          end
+          if not data.to:hasMark(element[2]) then   -- 如果目标没有A附着
+            room:setPlayerMark(data.to, element[2], 1)  -- 造成A附着
+            return
+          end
+        end
+      end
+    end
+  end,
+}
 
--- local jy_fumo = fk.CreateTriggerSkill{
---   name = "jy_fumo",
---   frequency = Skill.Compulsory,
---   anim_type = "offensive",
---   events = {},
--- }
+-- 参考自悲歌
+local jy_fumo = fk.CreateTriggerSkill{
+  name = "jy_fumo",
+  anim_type = "masochism",
+  events = {fk.DamageInflicted},
+  can_trigger = function(self, event, target, player, data)
+    return player:hasSkill(self) and 
+      data.damageType == fk.NormalDamage and not data.to.dead and not player:isNude()
+  end,
+  on_cost = function(self, event, target, player, data)
+    local room = player.room
+    local card = room:askForDiscard(player, 1, 1, true, self.name, true, ".", "#jy_fumo-invoke::"..target.id, true)
+    if #card > 0 then
+      room:doIndicate(player.id, {target.id})
+      self.cost_data = card
+      return true
+    end
+  end,
+  on_use = function(self, event, target, player, data)
+    local room = player.room
+    room:throwCard(self.cost_data, self.name, player, player)
+    if target.dead then return false end
+    local judge = {
+      who = data.from,
+      reason = self.name,
+      pattern = ".",
+    }
+    room:judge(judge)
+    if judge.card.color == Card.Red then
+      data.damageType = fk.FireDamage
+    elseif judge.card.color == Card.Black then
+      data.damageType = fk.ThunderDamage
+    end
+  end,
+}
 
--- tym__zhaoqianxi_2:addSkill(jy_yuanshen_2)
--- tym__zhaoqianxi_2:addSkill(jy_fumo)
+tym__zhaoqianxi_2:addSkill(jy_yuanshen_2)
+tym__zhaoqianxi_2:addSkill(jy_fumo)
 
--- Fk:loadTranslationTable {
---   ["tym__zhaoqianxi_2"] = "界赵乾熙",
+Fk:loadTranslationTable {
+  ["tym__zhaoqianxi_2"] = "界赵乾熙",
   
---   ["jy_yuanshen_2"] = "原神",
---   [":jy_yuanshen_2"] = [[锁定技，所有角色的雷属性伤害都会令目标进入【雷附着】状态；
---   所有角色的火属性伤害都会令目标进入【火附着】状态。
---   当一名【雷附着】状态的角色受到火属性伤害时，移除【雷附着】状态并使该伤害+1；
---   当一名【火附着】状态的角色受到雷属性伤害时，移除【火附着】状态并弃一张牌。]],
+  ["jy_yuanshen_2"] = "原神",
+  [":jy_yuanshen_2"] = [[锁定技，所有角色的雷属性伤害都会令目标进入【雷附着】状态；
+  所有角色的火属性伤害都会令目标进入【火附着】状态。
+  当一名【雷附着】状态的角色受到火属性伤害时，移除【雷附着】状态并使该伤害+1；
+  当一名【火附着】状态的角色受到雷属性伤害时，移除【火附着】状态并弃两张牌。
+  这个技能只会触发一次，不论是否多个角色拥有这个技能。]],
 
---   ["jy_fumo"] = "附魔",
---   [":jy_fumo"] = [[你造成无属性伤害时可以进行一次判定。
---   若结果为：红色，将此次伤害改为火属性；黑色，将此次伤害改为雷属性。]],
+  ["@jy_yuanshen_2_pyro"] = "<font color=\"red\">火附着</font>",
+  ["@jy_yuanshen_2_electro"] = "<font color=\"violet\">雷附着</font>",
 
--- }
+  ["jy_fumo"] = "附魔",
+  ["jy_fumo-invoke"] = "附魔：你可以弃一张手牌令伤害来源判定，如果为黑色则改为雷属性伤害，如果为红色则改为火属性伤害。"
+  [":jy_fumo"] = [[当有角色造成无属性伤害时，你可以弃一张牌并令伤害来源进行一次判定，
+     若结果为：红色，将此次伤害改为火属性；黑色，将此次伤害改为雷属性。]],
+
+}
 
 Fk:loadTranslationTable {
      ["jianzihao"] = "简自豪",
