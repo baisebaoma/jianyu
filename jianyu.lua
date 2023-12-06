@@ -1018,7 +1018,7 @@ local tym__zhaoqianxi_2 = General(extension, "tym__zhaoqianxi_2", "qun", 4, 4, G
 local jy_yuanshen_2 = fk.CreateTriggerSkill{
   name = "jy_yuanshen_2",
   frequency = Skill.Compulsory,
-  anim_type = "offensive",
+  anim_type = "support",
   events = {fk.DamageInflicted},
   can_trigger = function(self, event, target, player, data)  -- player是我自己，只能让我自己播放这个动画
     if not player:hasSkill(self) then return false end
@@ -1123,14 +1123,14 @@ local xjb__aweiluo = General(extension, "xjb__aweiluo", "qun", 3, 3, General.Mal
 
 local jy_youlong = fk.CreateTriggerSkill{
   name = "jy_youlong",
-  anim_type = "offensive",
+  anim_type = "support",
   events = {fk.EventPhaseStart},
   can_trigger = function(self, event, target, player, data)
     return target == player and player:hasSkill(self.name) and player.phase == Player.Start
   end,
   on_use = function(self, event, target, player, data)
     local room = player.room
-    for _, p in ipairs(room:getOtherPlayers(player, true)) do
+    for _, p in ipairs(room:getAllPlayers(player, true)) do
       if not p:isKongcheng() then  -- 如果他有手牌
         local id = room:askForCard(p, 1, 1, true, self.name, false, nil, "#jy_youlong-choose")
         room:moveCardTo(id, Card.PlayerHand, p.next, fk.ReasonJustMove, self.name, nil, false, player.id)
@@ -1139,14 +1139,45 @@ local jy_youlong = fk.CreateTriggerSkill{
   end,
 }
 
+-- 核爆
+local jy_hebao = fk.CreateTriggerSkill{
+  name = "jy_hebao",
+  anim_type = "special",
+  events = {fk.EventPhaseStart},
+  can_trigger = function(self, event, target, player, data)
+    return target == player and player:hasSkill(self.name) and player.phase == Player.Start
+  end,
+  on_cost = function(self, event, target, player, data)
+    local room = player.room
+    local id = room:askForCard(p, 1, 1, false, self.name, true, nil, "#jy_hebao-choose")
+    player:addToPile("xjb__aweiluo_dian", id, true, self.name)
+  end,
+}
+
 xjb__aweiluo:addSkill(jy_youlong)
-
--- 要不要试一下先写注释
-
+xjb__aweiluo:addSkill(jy_hebao)
 
 
 Fk:loadTranslationTable {
   ["xjb__aweiluo"] = "阿伟罗",
+
+  ["jy_youlong"] = "游龙",
+  ["#jy_youlong-choose"] = "游龙：你需要选择一张牌交给下家"
+  [":jy_youlong"] = "你的回合开始时，你可以让每一名玩家交一张手牌给其下家。",
+
+  ["jy_hebao"] = "核爆",
+  [":jy_hebao"] = "你的回合开始时，你可以将一张手牌置于你的武将牌上，称为【点】。",
+  ["#jy_hebao-choose"] = "选择一张手牌成为【点】",
+
+  ["jy_tiaoshui"] = "跳水",
+  [":jy_tiaoshui"] = "当你失去体力时，你可以移出一张【点】。",
+
+  ["jy_luojiao"] = "罗绞",
+  [":jy_luojiao"] = "当你的【点】有4张时，视为使用一张【万箭齐发】；当你的【点】花色不同时，视为使用一张【南蛮入侵】。",
+
+  ["jy_yusu"] = "玉玊",
+  [":jy_yusu"] = "你的回合内每使用第二张基本牌结算完成后，将其置于你的武将牌上，视为【点】。",
+
 }
 
 Fk:loadTranslationTable {
