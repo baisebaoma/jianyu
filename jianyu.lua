@@ -1121,7 +1121,7 @@ Fk:loadTranslationTable {
   ["@jy_yuanshen_2_electro"] = "<font color=\"violet\">雷附着</font>",
 
   ["jy_fumo"] = "附魔",
-  ["jy_fumo-invoke::"] = "附魔：你可以弃置一张牌，将该次伤害改为属性伤害。",
+  ["#jy_fumo-invoke"] = "附魔：%dest 受到无属性伤害，你可以弃置一张牌令伤害来源判定，改为属性伤害。",
   [":jy_fumo"] = [[当有角色使用【杀】造成无属性伤害时，你可以弃一张牌并令伤害来源进行一次判定，
      若结果为：红色，将此次伤害改为火属性；黑色，将此次伤害改为雷属性。]],
 
