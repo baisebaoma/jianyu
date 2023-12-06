@@ -1147,7 +1147,7 @@ local jy_youlong = fk.CreateTriggerSkill{
 local jy_hebao = fk.CreateTriggerSkill{
   name = "jy_hebao",
   anim_type = "special",
-  events = {fk.EventPhaseStart},
+  events = {fk.EventPhaseEnd},
   can_trigger = function(self, event, target, player, data)
     return target == player and player:hasSkill(self.name) and player.phase == Player.Start
   end,
@@ -1350,7 +1350,7 @@ jy_yusu:addRelatedSkill(jy_yusu_set_0)
 xjb__aweiluo:addSkill(jy_youlong)
 xjb__aweiluo:addSkill(jy_hebao)
 xjb__aweiluo:addSkill(jy_tiaoshui)
-xjb__aweiluo:addSkill(jy_luojiao)
+-- xjb__aweiluo:addSkill(jy_luojiao)
 xjb__aweiluo:addSkill(jy_yusu)
 
 
