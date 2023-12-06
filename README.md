@@ -111,9 +111,9 @@
 
 ### 群·界赵乾熙 体力4
 
-> 该武将由我设计。
-
 ![群·赵乾熙（暂时用这张）](./image/generals/avatar/tym__zhaoqianxi.jpg "群·赵乾熙")
+
+> 该武将由我设计。
 
 原神：锁定技，所有角色的<font color="purple">雷属性伤害</font>都会令目标进入<font color="purple">【雷附着】</font>状态，而<font color="red">火属性伤害</font>会令目标进入<font color="red">【火附着】</font>状态。<br />当一名<font color="purple">【雷附着】</font>状态的角色受到<font color="red">火属性伤害</font>时，本次伤害不会令目标进入<font color="red">【火附着】</font>状态，而是移除<font color="purple">【雷附着】</font>状态并使该伤害+1；当一名<font color="red">【火附着】</font>状态的角色受到<font color="purple">雷属性伤害</font>时，本次伤害不会令目标进入<font color="purple">【雷附着】</font>状态，而是移除<font color="red">【火附着】</font>状态并弃两张牌。<br />这个技能对每次伤害仅生效一次，不论场上是否有多个角色拥有这个技能。
 
@@ -121,7 +121,7 @@
 
 ## 还没实现的武将
 
-### 群·阿伟罗 体力3
+### 群·阿威罗 体力3
 
 > 该武将由玩家“导演片子怎么样了”设计。
 
