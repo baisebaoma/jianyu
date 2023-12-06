@@ -1,8 +1,8 @@
 # 新月杀简浴包
 
-[新月杀（FreeKill）](https://github.com/Qsgs-Fans/FreeKill)是一款开源、支持自定义的三国杀联机软件。
+[新月杀（FreeKill）](https://gitee.com/notify-ctrl/FreeKill)是一款开源、支持自定义的三国杀联机软件。
 
-本仓库是新月杀的一个扩展包，其中包含我和我的好朋友们的原创武将！之所以叫作简浴包，是因为我们曾经踢足球时自称“简浴队”。所有设计均由我 [@baisebaoma（反赌专家）](https://github.com/baisebaoma) 实现。
+本仓库是新月杀的一个扩展包，其中包含我和我的好朋友们的原创武将！之所以叫作简浴包，是因为我们曾经踢足球时自称“简浴队”。所有设计均由我 [@baisebaoma（反赌专家）](https://gitee.com/baisebaoma) 实现。
 
 我们的关注点有：足球、英雄联盟等。
 
