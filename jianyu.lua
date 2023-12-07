@@ -53,7 +53,7 @@ local jy_zouwei = fk.CreateDistanceSkill{
 --   refresh_events = {fk.AfterCardsMove},
 --   -- 这个函数只有在装备区牌量变动时才检测
 --   can_refresh = function(self, event, target, player, data)
---     if not player:hasSkill(self.name) then return end
+--     if not player:hasSkill(self) then return end
 --     for _, move in ipairs(data) do  -- 对着抄的，开始第一个循环
 --       if move.from == player.id or move.to == player.id then  -- 这行对着抄的，判断是否是自己家
 --         for _, info in ipairs(move.moveInfo) do  -- 对着抄的，第二个循环
@@ -159,7 +159,7 @@ local jy_kaiju = fk.CreateTriggerSkill{
   frequency = Skill.Compulsory,
   events = {fk.EventPhaseStart},
   can_trigger = function(self, event, target, player, data)
-    return target == player and player:hasSkill(self.name) and player.phase == Player.Start
+    return target == player and player:hasSkill(self) and player.phase == Player.Start
   end,
   on_use = function(self, event, target, player, data)
     local room = player.room
@@ -241,7 +241,7 @@ local jy_sanjian = fk.CreateTriggerSkill{
   frequency = Skill.Compulsory,
   events = {fk.EventPhaseStart},  -- 事件开始时
   can_trigger = function(self, event, target, player, data)
-    return target == player and player:hasSkill(self.name)  -- 如果是我这个角色，如果是有这个技能的角色，如果是出牌阶段，如果这个角色的装备数是3
+    return target == player and player:hasSkill(self)  -- 如果是我这个角色，如果是有这个技能的角色，如果是出牌阶段，如果这个角色的装备数是3
       and player.phase == Player.Play and #player:getCardIds(Player.Equip) == 3
   end,
   on_use = function(self, event, target, player, data)
@@ -1174,7 +1174,7 @@ local jy_youlong = fk.CreateTriggerSkill{
   frequency = Skill.Compulsory,
   events = {fk.EventPhaseStart},
   can_trigger = function(self, event, target, player, data)
-    return target == player and player:hasSkill(self.name) 
+    return target == player and player:hasSkill(self) 
       and player.phase == Player.Start
   end,
   on_use = function(self, event, target, player, data)
@@ -1194,7 +1194,7 @@ local jy_hebao = fk.CreateTriggerSkill{
   anim_type = "special",
   events = {fk.EventPhaseEnd},
   can_trigger = function(self, event, target, player, data)
-    return target == player and player:hasSkill(self.name) and player.phase == Player.Start
+    return target == player and player:hasSkill(self) and player.phase == Player.Start
   end,
   on_cost = function(self, event, target, player, data)
     local room = player.room
@@ -1371,7 +1371,7 @@ local jy_yusu_set_0 = fk.CreateTriggerSkill{
   visible = false,
   events = {fk.EventPhaseStart},  -- EventPhaseStart的意思是一个阶段的开始，并不是回合开始阶段
   can_trigger = function(self, event, target, player, data)
-    return target == player and player:hasSkill(self.name)
+    return target == player and player:hasSkill(self)
       and (player.phase == Player.Play or player.phase == Player.Finish)
   end,
   on_use = function(self, event, target, player, data)
