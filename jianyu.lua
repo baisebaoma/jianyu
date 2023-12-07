@@ -1257,7 +1257,7 @@ local jy_luojiao = fk.CreateTriggerSkill{
     
     -- 判断是否有牌进来
     if #dians == 3 then  -- 如果点是3
-      print("点是3")
+      -- print("点是3")
       for _, move in ipairs(data) do  -- 如果有一张牌是进入我的特殊区，那么这个函数可以触发
         if move.to == player.id and move.toArea == Card.PlayerSpecial then
           -- print("有牌正打算来你家特殊区, return true")
