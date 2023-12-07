@@ -1165,9 +1165,11 @@ Fk:loadTranslationTable {
 }
 
 -- 阿伟罗
--- TODO：南蛮入侵可能会触发两次
+-- TODO：南蛮入侵可能会触发两次，应该解决了
 local xjb__aweiluo = General(extension, "xjb__aweiluo", "qun", 3, 3, General.Male)
 
+-- TODO:如果下家死了，不会再继续传了
+-- 只能传手牌
 local jy_youlong = fk.CreateTriggerSkill{
   name = "jy_youlong",
   anim_type = "support",
@@ -1179,10 +1181,14 @@ local jy_youlong = fk.CreateTriggerSkill{
   end,
   on_use = function(self, event, target, player, data)
     local room = player.room
-    for _, p in ipairs(room:getAllPlayers(player, true)) do
-      if not p:isKongcheng() and not p.next.dead then  -- 如果他有手牌，而且他下家没死
-        local id = room:askForCard(p, 1, 1, true, self.name, false, nil, "#jy_youlong-choose")
-        room:moveCardTo(id, Card.PlayerHand, p.next, fk.ReasonJustMove, self.name, nil, false, player.id)
+    for _, p in ipairs(room:getAlivePlayers(player, true)) do
+      if not p:isKongcheng() then  -- 如果他有手牌
+        local id = room:askForCard(p, 1, 1, false, self.name, false, nil, "#jy_youlong-choose")
+        local next = p.next  -- 下家
+        while next.dead do  -- 一直找，直到找到一个活的下家
+          next = next.next
+        end
+        room:moveCardTo(id, Card.PlayerHand, next, fk.ReasonJustMove, self.name, nil, false, player.id)
       end
     end
   end,
@@ -1234,7 +1240,9 @@ local jy_luojiao = fk.CreateTriggerSkill{
     local dians = player:getPile("xjb__aweiluo_dian")
     player.is_dian_changing = false
 
-    -- 判断是否能触发万箭齐发。南蛮入侵的让他自己判断
+    -- 判断是否有牌进出特殊区。这个函数得同时负责南蛮和万箭。
+    player.is_luojiao_archery_attack_may_triggering = false  -- 先清理自家变量
+    -- 为什么不用data传参数，因为这里是BeforeCardsMove，后面是AfterCardsMove，两个不是同一个事件。
 
     -- 判断是否有牌出去
     for _, move in ipairs(data) do
@@ -1242,13 +1250,12 @@ local jy_luojiao = fk.CreateTriggerSkill{
         -- print("有牌正打算离开")
         if move.from == player.id then
           -- print("有牌正打算从你家离开")
-          if #dians == 5 then
-            -- print("点是5")
-            for _, info in ipairs(move.moveInfo) do
-              if info.fromArea == Card.PlayerSpecial then
-                -- print("有牌正打算从你家特殊区离开")
-                return true
-              end
+          for _, info in ipairs(move.moveInfo) do
+            if info.fromArea == Card.PlayerSpecial then
+              -- print("有牌正打算从你家特殊区离开")
+              -- 如果点是5，那么有可能可以触发万箭齐发
+              if #dians == 5 then player.is_luojiao_archery_attack_may_triggering = true end
+              return true
             end
           end
         end
@@ -1256,13 +1263,12 @@ local jy_luojiao = fk.CreateTriggerSkill{
     end
     
     -- 判断是否有牌进来
-    if #dians == 3 then  -- 如果点是3
-      -- print("点是3")
-      for _, move in ipairs(data) do  -- 如果有一张牌是进入我的特殊区，那么这个函数可以触发
-        if move.to == player.id and move.toArea == Card.PlayerSpecial then
-          -- print("有牌正打算来你家特殊区, return true")
-          return true
-        end
+    for _, move in ipairs(data) do  -- 如果有一张牌是进入我的特殊区，那么这个函数可以触发
+      if move.to == player.id and move.toArea == Card.PlayerSpecial then
+        -- print("有牌正打算来你家特殊区, return true")
+        -- 如果点是3，那么有可能可以触发万箭齐发
+        if #dians == 3 then player.is_luojiao_archery_attack_may_triggering = true end
+        return true
       end
     end
   end,
@@ -1278,10 +1284,8 @@ local jy_luojiao_archery_attack = fk.CreateTriggerSkill{
   events = {fk.AfterCardsMove},
   can_trigger = function(self, event, target, player, data)
     if not player:hasSkill(self) then return false end
-    -- print("现在在万箭齐发里面")
-    -- print("dian", #player:getPile("xjb__aweiluo_dian"))
-    -- print("isdianchanging", player.is_dian_changing)
-    return #player:getPile("xjb__aweiluo_dian") == 4 and  -- 如果点为4
+    return player.is_luojiao_archery_attack_may_triggering == true and  -- 如果有可能触发万箭齐发
+      #player:getPile("xjb__aweiluo_dian") == 4 and  -- 如果点为4
       player.is_dian_changing  -- 如果点有可能在变化
   end,
 
@@ -1294,7 +1298,7 @@ local jy_luojiao_archery_attack = fk.CreateTriggerSkill{
 
   on_use = function(self, event, target, player, data)
     local room = player.room
-    room:useVirtualCard("archery_attack", nil, player, room:getOtherPlayers(player, true), self.name, true)
+    room:useVirtualCard("archery_attack", nil, player, room:getAlivePlayers(player, true), self.name, true)
   end
 }
 local jy_luojiao_savage_assault = fk.CreateTriggerSkill{
@@ -1302,7 +1306,6 @@ local jy_luojiao_savage_assault = fk.CreateTriggerSkill{
   events = {fk.AfterCardsMove},
   can_trigger = function(self, event, target, player, data)
     if not player:hasSkill(self) then return false end
-    -- print("现在在南蛮入侵里面")
     local dians = player:getPile("xjb__aweiluo_dian")
     -- 判断花色是否全部不同，触发南蛮入侵
     if #dians == 0 or #dians == 1 then return false end
@@ -1316,19 +1319,16 @@ local jy_luojiao_savage_assault = fk.CreateTriggerSkill{
         dict[suit] = true
       end
     end
-    -- print("所有花色都不同")
-    -- print("本轮南蛮入侵是否已使用过，如果是则不再触发：", player.is_jy_luojiao_archery_attack_used)
-    
-    return #player:getPile("xjb__aweiluo_dian") >= 2 and  -- 点不是0和1
-      not player.is_jy_luojiao_archery_attack_used  -- 本回合还没使用过
+    return player:usedSkillTimes(self.name, Player.HistoryPhase) == 0 and  -- 本回合还没使用过
+      player.is_dian_changing  -- 是否有新的点进出导致南蛮入侵
   end,
   on_cost = function(self, event, target, player, data)
     return player.room:askForSkillInvoke(player, self.name, nil, "#jy_luojiao_savage_assault_ask")
   end,
   on_use = function(self, event, target, player, data)
     local room = player.room
-    player.is_jy_luojiao_archery_attack_used = true
-    room:useVirtualCard("savage_assault", nil, player, room:getOtherPlayers(player, true), self.name, true)
+    -- player.is_jy_luojiao_archery_attack_used = true
+    room:useVirtualCard("savage_assault", nil, player, room:getAlivePlayers(player, true), self.name, true)
     player.is_dian_changing = false
   end
 }
@@ -1377,7 +1377,7 @@ local jy_yusu_set_0 = fk.CreateTriggerSkill{
   on_use = function(self, event, target, player, data)
     local room = player.room
     room:setPlayerMark(player, "@jy_yusu_basic_count", 0)
-    player.is_jy_luojiao_archery_attack_used = false
+    -- player.is_jy_luojiao_archery_attack_used = false
     -- print("你的回合已开始/结束，给你设成了0")
   end,
 }
@@ -1403,13 +1403,13 @@ Fk:loadTranslationTable {
 
   ["jy_hebao"] = "核爆",
   [":jy_hebao"] = "你的回合开始时，你可以将一张手牌置于你的武将牌上，称为【点】。",
-  ["#jy_hebao-choose"] = "选择一张手牌成为【点】",
-  ["$jy_hebao1"] = "速——",
+  ["#jy_hebao-choose"] = "选择一张手牌成为【点】，可取消",
+  ["$jy_hebao1"] = "Siu~",
 
   ["jy_tiaoshui"] = "跳水",
   [":jy_tiaoshui"] = "当你受到伤害时，你可以弃掉一张【点】。",
   ["#jy_tiaoshui"] = "弃掉一张【点】",
-  ["$jy_tiaoshui1"] = "速，哈哈！",
+  ["$jy_tiaoshui1"] = "Siu, hahahaha!",
 
   ["jy_luojiao"] = "罗绞",
   [":jy_luojiao"] = "当你的所有【点】花色均不同时，可以视为使用一张【南蛮入侵】，每回合限一次；当你的【点】有4张时，可以视为使用一张【万箭齐发】。",
@@ -1417,12 +1417,12 @@ Fk:loadTranslationTable {
   ["#jy_luojiao_savage_assault"] = "罗绞·南蛮入侵",
   ["#jy_luojiao_archery_attack_ask"] = "【点】数量为4，是否发动 罗绞·万箭齐发",
   ["#jy_luojiao_savage_assault_ask"] = "【点】花色不同，是否发动 罗绞·南蛮入侵，每回合限一次",
-  ["$jy_luojiao1"] = "（听不懂）",
+  ["$jy_luojiao1"] = "Muchas gracias afición, esto es para vosotros, Siuuu",
 
   ["jy_yusu"] = "玉玊",
   [":jy_yusu"] = "出牌阶段，你每使用第二张基本牌时，可以将其作为【点】置于你的武将牌上。",
   ["@jy_yusu_basic_count"] = "玉玊",
-  ["$jy_yusu1"] = "咻——",
+  ["$jy_yusu1"] = "Siu...",
 
   ["~xjb__aweiluo"] = "Cristiano is a sex offender!",
 
