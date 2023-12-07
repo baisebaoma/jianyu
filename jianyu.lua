@@ -996,7 +996,7 @@ local jy_yuanshen = fk.CreateTriggerSkill{
 local jy_huoji = fk.CreateViewAsSkill{
   name = "jy_huoji",
   anim_type = "offensive",
-  pattern = "fire__slash",
+  pattern = "slash",
   card_filter = function(self, to_select, selected)
     return #selected == 0 and Fk:getCardById(to_select).suit == Card.Spade and Fk:currentRoom():getCardArea(to_select) ~= Player.Equip
   end,
@@ -1012,7 +1012,7 @@ local jy_huoji = fk.CreateViewAsSkill{
 local jy_leiji = fk.CreateViewAsSkill{
   name = "jy_leiji",
   anim_type = "offensive",
-  pattern = "thunder__slash",
+  pattern = "slash",
   card_filter = function(self, to_select, selected)
     return #selected == 0 and Fk:getCardById(to_select).suit == Card.Club and Fk:currentRoom():getCardArea(to_select) ~= Player.Equip
   end,
