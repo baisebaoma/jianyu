@@ -1298,7 +1298,7 @@ local jy_luojiao_archery_attack = fk.CreateTriggerSkill{
 
   on_use = function(self, event, target, player, data)
     local room = player.room
-    room:useVirtualCard("archery_attack", nil, player, room:getAlivePlayers(player, true), self.name, true)
+    room:useVirtualCard("archery_attack", nil, player, room:getOtherPlayers(player, true), self.name, true)
   end
 }
 local jy_luojiao_savage_assault = fk.CreateTriggerSkill{
@@ -1308,7 +1308,7 @@ local jy_luojiao_savage_assault = fk.CreateTriggerSkill{
     if not player:hasSkill(self) then return false end
     local dians = player:getPile("xjb__aweiluo_dian")
     -- 判断花色是否全部不同，触发南蛮入侵
-    if #dians == 0 or #dians == 1 then return false end
+    if #dians == 0 then return false end  -- 熊俊博说1张也可以发动南蛮，那就把==1删掉
     dict = {}
     for _, c in ipairs(dians) do
       local suit = Fk:getCardById(c).suit
@@ -1328,7 +1328,7 @@ local jy_luojiao_savage_assault = fk.CreateTriggerSkill{
   on_use = function(self, event, target, player, data)
     local room = player.room
     -- player.is_jy_luojiao_archery_attack_used = true
-    room:useVirtualCard("savage_assault", nil, player, room:getAlivePlayers(player, true), self.name, true)
+    room:useVirtualCard("savage_assault", nil, player, room:getOtherPlayers(player, true), self.name, true)
     player.is_dian_changing = false
   end
 }
@@ -1412,7 +1412,7 @@ Fk:loadTranslationTable {
   ["$jy_tiaoshui1"] = "Siu, hahahaha!",
 
   ["jy_luojiao"] = "罗绞",
-  [":jy_luojiao"] = "当你的所有【点】花色均不同时，可以视为使用一张【南蛮入侵】，每回合限一次；当你的【点】有4张时，可以视为使用一张【万箭齐发】。",
+  [":jy_luojiao"] = "当你的所有【点】花色均不同时（只有1张【点】也可以），可以视为使用一张【南蛮入侵】，每回合限一次；当你的【点】有4张时，可以视为使用一张【万箭齐发】。",
   ["#jy_luojiao_archery_attack"] = "罗绞·万箭齐发",
   ["#jy_luojiao_savage_assault"] = "罗绞·南蛮入侵",
   ["#jy_luojiao_archery_attack_ask"] = "【点】数量为4，是否发动 罗绞·万箭齐发",
