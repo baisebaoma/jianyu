@@ -975,7 +975,7 @@ Fk:loadTranslationTable {
 }
 
 -- -- 赵乾熙
-local tym__zhaoqianxi = General(extension, "tym__zhaoqianxi", "qun", 4, 4, General.Male)
+local tym__zhaoqianxi = General(extension, "tym__zhaoqianxi", "qun", 3, 3, General.Male)
 
 -- 参考自藤甲。要把DamageInflicted改成DamageCaused，就是你对别人造成伤害的意思。
 -- 如果是DamageInflicted，就是别人对你造成伤害的意思。
@@ -1009,8 +1009,25 @@ local jy_huoji = fk.CreateViewAsSkill{
   end,
 }
 
+local jy_leiji = fk.CreateViewAsSkill{
+  name = "jy_leiji",
+  anim_type = "offensive",
+  pattern = "thunder__slash",
+  card_filter = function(self, to_select, selected)
+    return #selected == 0 and Fk:getCardById(to_select).suit == Card.Club and Fk:currentRoom():getCardArea(to_select) ~= Player.Equip
+  end,
+  view_as = function(self, cards)
+    if #cards ~= 1 then return end
+    local card = Fk:cloneCard("thunder__slash")
+    card.skillName = self.name
+    card:addSubcard(cards[1])
+    return card
+  end,
+}
+
 tym__zhaoqianxi:addSkill(jy_yuanshen)
 tym__zhaoqianxi:addSkill(jy_huoji)
+tym__zhaoqianxi:addSkill(jy_leiji)
 
 Fk:loadTranslationTable {
   ["tym__zhaoqianxi"] = "赵乾熙",
@@ -1019,7 +1036,10 @@ Fk:loadTranslationTable {
   [":jy_yuanshen"] = [[锁定技，你造成的属性伤害+1。]],
 
   ["jy_huoji"] = "帽猫",
-  [":jy_huoji"] = [[你可以将一张♠手牌当作【火杀】使用或打出。
+  [":jy_huoji"] = [[你可以将一张♠手牌当作【火杀】使用或打出。]],
+
+  ["jy_leiji"] = "猫帽",
+  [":jy_leiji"] = [[你可以将一张♣手牌当作【雷杀】使用或打出。
   <br /><font size="1"><i><s>因为Beryl抽满命林尼歪了六次，所以他决定在新月杀中重拾自己的火。</s></i></font>]],
 }
 
@@ -1027,7 +1047,9 @@ Fk:loadTranslationTable {
 local tym__zhaoqianxi_2 = General(extension, "tym__zhaoqianxi_2", "qun", 4, 4, General.Male)
 -- tym__zhaoqianxi_2.hidden = true
 
--- TODO：给触发了元素反应时写个提示，类似国战开始的时候的那种
+-- TODO：被铁索连环的目标如果因为这次伤害受到了元素反应，那么不会让其他被铁索连环的目标受到附着效果。
+-- 这是因为is_jy_yuanshen_2_triggered。目前已经删除了这个变量，以后再处理。但是这样的问题是：
+-- 如果场上有多个有这个技能的角色，那么既会附着又会负面效果
 local jy_yuanshen_2 = fk.CreateTriggerSkill{
   name = "jy_yuanshen_2",
   frequency = Skill.Compulsory,
@@ -1035,7 +1057,9 @@ local jy_yuanshen_2 = fk.CreateTriggerSkill{
   events = {fk.DamageInflicted},
   can_trigger = function(self, event, target, player, data)  -- player是我自己，只能让我自己播放这个动画
     if not player:hasSkill(self) then return false end
-    return data.damageType ~= fk.NormalDamage and not data.is_jy_yuanshen_2_triggered  -- 如果这次没有被其他的该技能响应
+    -- return data.damageType ~= fk.NormalDamage and not data.is_jy_yuanshen_2_triggered  -- 如果这次没有被其他的该技能响应
+    -- TODO记得调回来
+    return data.damageType ~= fk.NormalDamage
   end,
   on_use = function(self, event, target, player, data)
     local room = player.room
@@ -1043,20 +1067,28 @@ local jy_yuanshen_2 = fk.CreateTriggerSkill{
       -- 使用for循环以方便后面添加元素反应类型。每次只会有一种反应发生。
       -- element[1]是A属性类型，element[2]是A对应的附着标记，
       -- element[3]是A要反应的附着标记B，element[4]是要造成的效果
+      -- element[5]是这个反应需要造成的广播提示
       -- Lua 的数组从1开始
-      for _, element in ipairs(
-        { {fk.FireDamage, "@jy_yuanshen_2_pyro", "@jy_yuanshen_2_electro", 
-          function(self, event, target, player, data) data.damage = data.damage + 1 end},
+      for _, element in ipairs({ 
+        {fk.FireDamage, "@jy_yuanshen_2_pyro", "@jy_yuanshen_2_electro", 
+          function(self, event, target, player, data) data.damage = data.damage + 1 end,
+          "#jy_yuanshen_2_reaction_1",
+        },
         {fk.ThunderDamage, "@jy_yuanshen_2_electro", "@jy_yuanshen_2_pyro", 
-          function(self, event, target, player, data) player.room:askForDiscard(data.to, 2, 2, true, self.name, false, nil, "#jy_yuanshen_2_overload_discard") end}, 
-        }
-      ) do
+          function(self, event, target, player, data) 
+            player.room:askForDiscard(data.to, 2, 2, true, self.name, false, nil, "#jy_yuanshen_2_overload_discard") 
+          end,
+          "#jy_yuanshen_2_reaction_2",
+        }, 
+      }) do
         if data.damageType == element[1] then  -- 如果是A属性伤害
           if data.to:getMark(element[3]) ~= 0 then  -- 如果目标有B附着
             room:setPlayerMark(data.to, element[3], 0)  -- 将B附着解除
+            room:doBroadcastNotify("ShowToast", Fk:translate(element[5]))  -- 广播发生了元素反应。先广播再造成效果！
             element[4](self, event, target, player, data)  -- 造成效果
-            data.is_jy_yuanshen_2_triggered = true  -- 如果有多个拥有这个技能的人，告诉他不用再发动了
-            return  -- 结束了，不用判断下一个了
+            -- data.is_jy_yuanshen_2_triggered = true  -- 如果有多个拥有这个技能的人，告诉他不用再发动了
+            -- TODO 记得调回来
+            return  -- 结束了，不用判断下面的了
           end
           if data.to:getMark(element[2]) == 0 then   -- 如果目标没有A附着
             room:setPlayerMark(data.to, element[2], 1)  -- 造成A附着
@@ -1118,12 +1150,13 @@ Fk:loadTranslationTable {
   <br />当一名<font color="purple">【雷附着】</font>状态的角色受到<font color="red">火属性伤害</font>时，
   本次伤害不会令其进入<font color="red">【火附着】</font>状态，而是移除<font color="purple">【雷附着】</font>状态并使该伤害+1；
   当一名<font color="red">【火附着】</font>状态的角色受到<font color="purple">雷属性伤害</font>时，
-  本次伤害不会令其进入<font color="purple">【雷附着】</font>状态，而是移除<font color="red">【火附着】</font>状态并弃两张牌。
-  <br />这个技能对每次伤害仅生效一次，不论场上是否有多个角色拥有这个技能。]],
+  本次伤害不会令其进入<font color="purple">【雷附着】</font>状态，而是移除<font color="red">【火附着】</font>状态并弃两张牌。]],
+  ["#jy_yuanshen_2_reaction_1"] = [[<font color="red">火属性伤害</font>遭遇<font color="purple">【雷附着】</font>发生反应，伤害+1]],
+  ["#jy_yuanshen_2_reaction_2"] = [[<font color="purple">雷属性伤害</font>遭遇<font color="red">【火附着】</font>发生反应，弃两张牌]],
 
-  ["@jy_yuanshen_2_pyro"] = "<font color=\"red\">火附着</font>",
-  ["@jy_yuanshen_2_electro"] = "<font color=\"purple\">雷附着</font>",
-  ["#jy_yuanshen_2_overload_discard"] = "你在【雷附着】状态下受到了火属性伤害，需要弃置两张牌",
+  ["@jy_yuanshen_2_pyro"] = [[<font color="red">火附着</font>]],
+  ["@jy_yuanshen_2_electro"] = [[<font color="purple">雷附着</font>]],
+  ["#jy_yuanshen_2_overload_discard"] = [[你在<font color="purple">【雷附着】</font>状态下受到了<font color="red">火属性伤害</font>，需要弃置两张牌]],
 
   ["jy_fumo"] = "附魔",
   ["#jy_fumo-invoke"] = "附魔：%dest 受到无属性伤害，你可以弃置一张牌令伤害来源判定，改为属性伤害。",
