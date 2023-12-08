@@ -1079,7 +1079,7 @@ local jy_yuanshen_2 = fk.CreateTriggerSkill{
         {fk.ThunderDamage, "@jy_yuanshen_2_electro", "@jy_yuanshen_2_pyro", 
           function(self, event, target, player, data) 
             -- player.room:askForDiscard(data.to, 2, 2, true, self.name, false, nil, "#jy_yuanshen_2_overload_discard") 
-            player:turnOver()  -- 改成翻面了
+            data.to:turnOver()  -- 受到伤害的人翻面
           end,
           "#jy_yuanshen_2_reaction_2",
         }, 
@@ -1117,15 +1117,16 @@ local jy_fumo = fk.CreateTriggerSkill{
     local room = player.room
     local card = room:askForDiscard(player, 1, 1, true, self.name, true, ".", "#jy_fumo-invoke::"..target.id, true)
     if #card > 0 then
-      room:doIndicate(player.id, {target.id})
+      room:doIndicate(player.id, {target.id})  -- 播放指示线
       self.cost_data = card
       return true
     end
   end,
   on_use = function(self, event, target, player, data)
     local room = player.room
-    local card = room:throwCard(self.cost_data, self.name, player, player)
+    room:throwCard(self.cost_data, self.name, player, player)
     if target.dead then return false end
+    card = Fk:getCardById(self.cost_data[1])  -- 这张被弃掉的牌是通过self.cost_data传过来的，是一个int table，你得转化成一张card
     if card.color == Card.Red then
       data.damageType = fk.FireDamage
     elseif card.color == Card.Black then
@@ -1148,7 +1149,7 @@ Fk:loadTranslationTable {
   当一名<font color="red">【火附着】</font>状态的角色受到<font color="purple">雷属性伤害</font>时，
   本次伤害不会令其进入<font color="purple">【雷附着】</font>状态，而是移除<font color="red">【火附着】</font>状态并令其翻面。]],
   ["#jy_yuanshen_2_reaction_1"] = [[<font color="red">火属性伤害</font>遭遇<font color="purple">【雷附着】</font>发生反应，伤害+1]],
-  ["#jy_yuanshen_2_reaction_2"] = [[<font color="purple">雷属性伤害</font>遭遇<font color="red">【火附着】</font>发生反应，弃两张牌]],
+  ["#jy_yuanshen_2_reaction_2"] = [[<font color="purple">雷属性伤害</font>遭遇<font color="red">【火附着】</font>发生反应，目标翻面]],
 
   ["@jy_yuanshen_2_pyro"] = [[<font color="red">火附着</font>]],
   ["@jy_yuanshen_2_electro"] = [[<font color="purple">雷附着</font>]],
