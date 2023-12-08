@@ -109,7 +109,7 @@
 
 ### 群·界赵乾熙 体力4
 
-![群·赵乾熙（暂时用这张）](./image/generals/avatar/tym__zhaoqianxi.jpg "群·赵乾熙")
+![群·界赵乾熙](./image/generals/avatar/tym__zhaoqianxi_2.jpg "群·界赵乾熙")
 
 > 该武将由我设计。
 
