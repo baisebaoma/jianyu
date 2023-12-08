@@ -1159,7 +1159,10 @@ Fk:loadTranslationTable {
 
   ["jy_fumo"] = "附魔",
   ["#jy_fumo-invoke"] = "附魔：%dest 受到伤害，你可以弃置一张牌，改为属性伤害",
-  [":jy_fumo"] = [[当有角色使用【杀】造成无属性伤害时，你可以弃一张牌。若你弃的牌为：红色，将此次伤害改为<font color="red">火属性</font>；黑色，改为<font color="purple">雷属性</font>]],
+  [":jy_fumo"] = [[当有角色使用【杀】造成无属性伤害时，
+  你可以弃一张牌。若你弃的牌为：
+  红色，将此次伤害改为<font color="red">火属性</font>；
+  黑色，改为<font color="purple">雷属性</font>。]],
 }
 
 -- 阿伟罗
