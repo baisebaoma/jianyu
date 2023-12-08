@@ -1148,7 +1148,7 @@ Fk:loadTranslationTable {
   本次伤害不会令其进入<font color="red">【火焰】</font>状态，而是移除<font color="purple">【雷电】</font>状态并使该伤害+1；
   当一名<font color="red">【火焰】</font>状态的角色受到<font color="purple">雷电伤害</font>时，
   本次伤害不会令其进入<font color="purple">【雷电】</font>状态，而是移除<font color="red">【火焰】</font>状态并令其翻面。-->
-  锁定技，当其他角色受到<font color="red">火焰</font>或<font color="purple">雷电</font>伤害时，若其：1. 没有标记，令其获得对应属性标记；
+  锁定技，当有角色受到<font color="red">火焰</font>或<font color="purple">雷电</font>伤害时，若其：1. 没有标记，令其获得对应属性标记；
   2. 拥有标记且与此次伤害属性不同，则移除此标记并执行对应效果：<font color="purple">【雷电】</font>其翻面；<font color="red">【火焰】</font>伤害+1。]],
   ["#jy_yuanshen_2_reaction_1"] = [[<font color="red">火焰伤害</font>与<font color="purple">【雷电】</font>发生反应，伤害+1]],
   ["#jy_yuanshen_2_reaction_2"] = [[<font color="purple">雷电伤害</font>与<font color="red">【火焰】</font>发生反应，目标翻面]],
