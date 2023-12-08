@@ -1052,7 +1052,7 @@ local tym__zhaoqianxi_2 = General(extension, "tym__zhaoqianxi_2", "qun", 4, 4, G
 
 -- TODO：被铁索连环的目标如果因为这次伤害受到了元素反应，那么不会让其他被铁索连环的目标受到附着效果。
 -- 这是因为is_jy_yuanshen_2_triggered。目前已经删除了这个变量，以后再处理。但是这样的问题是：
--- 如果场上有多个有这个技能的角色，那么既会附着又会负面效果
+-- 如果场上有多个有这个技能的角色，那么既会附着又会负面效果；铁索连环的副目标会受到2点额外伤害
 local jy_yuanshen_2 = fk.CreateTriggerSkill{
   name = "jy_yuanshen_2",
   frequency = Skill.Compulsory,
@@ -1061,7 +1061,6 @@ local jy_yuanshen_2 = fk.CreateTriggerSkill{
   can_trigger = function(self, event, target, player, data)  -- player是我自己，只能让我自己播放这个动画
     if not player:hasSkill(self) then return false end
     -- return data.damageType ~= fk.NormalDamage and not data.is_jy_yuanshen_2_triggered  -- 如果这次没有被其他的该技能响应
-    -- TODO: 感觉得控制强度，建议用上面这个版本，铁索连环别太变态了
     return data.damageType ~= fk.NormalDamage
   end,
   on_use = function(self, event, target, player, data)
@@ -1091,7 +1090,6 @@ local jy_yuanshen_2 = fk.CreateTriggerSkill{
             room:doBroadcastNotify("ShowToast", Fk:translate(element[5]))  -- 广播发生了元素反应。先广播再造成效果！
             element[4](self, event, target, player, data)  -- 造成效果
             -- data.is_jy_yuanshen_2_triggered = true  -- 如果有多个拥有这个技能的人，告诉他不用再发动了
-            -- TODO 记得调回来
             return  -- 结束了，不用判断下面的了
           end
           if data.to:getMark(element[2]) == 0 then   -- 如果目标没有A附着
@@ -1413,13 +1411,14 @@ Fk:loadTranslationTable {
   ["jy_luojiao"] = "罗绞",
   [":jy_luojiao"] = [[当你的所有【点】花色均不同时（只有1张【点】也可以），可以视为使用一张【南蛮入侵】，每回合限一次；
   当你的【点】有4张时，可以视为使用一张【万箭齐发】。
-  <br>（已知问题：如果你的【点】有且仅有四张且花色都不同，
-  那么【南蛮入侵】【万箭齐发】只能触发一个。这个问题将在后续修复。）]],
+  <br><font size="1">已知问题：如果你的【点】有且仅有四张且花色都不同，
+  那么【南蛮入侵】【万箭齐发】只能触发一个。这个问题将在后续修复。</font>]],
   ["#jy_luojiao_archery_attack"] = "罗绞·万箭齐发",
   ["#jy_luojiao_savage_assault"] = "罗绞·南蛮入侵",
   ["#jy_luojiao_archery_attack_ask"] = "【点】数量为4，是否发动 罗绞·万箭齐发",
   ["#jy_luojiao_savage_assault_ask"] = "【点】花色不同，是否发动 罗绞·南蛮入侵，每回合限一次",
   ["$jy_luojiao1"] = "Muchas gracias afición, esto es para vosotros, Siuuu",
+  -- TODO: 不会触发这条语音，但我暂时懒得改了
 
   ["jy_yusu"] = "玉玊",
   [":jy_yusu"] = "出牌阶段，你每使用第二张基本牌时，可以将其作为【点】置于你的武将牌上。",
