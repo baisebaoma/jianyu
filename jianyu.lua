@@ -1034,11 +1034,9 @@ Fk:loadTranslationTable {
   
   ["jy_yuanshen"] = "原神",
   [":jy_yuanshen"] = [[锁定技，你造成的属性伤害+1。
-  <br>（特别提示：当你对被横置的角色造成属性伤害时，
-  所有其他被横置的角色会受到的伤害+2。
-  这是因为你对主目标造成X点属性伤害时触发了【原神】，伤害+1，
-  保存该结果为Y=X+1，然后你再对所有其他被连环的角色再造成一次Y点的属性伤害，
-  再次触发【原神】，伤害+1，所以是X+2点伤害。）]],
+  <font size="1"><br>特别提示：当你对被横置的角色造成属性伤害时，所有其他被横置的角色会受到的伤害+2。
+  <br>这是因为你对主目标触发了【原神】，伤害+1，保存该值，然后你再对所有其他被连环的角色造成一次该值的属性伤害，
+  再次触发【原神】，伤害+1。为了平衡这个，所以他虽然体力值仅为3，但只有一个技能。</font>]],
 
   ["jy_huoji"] = "帽猫",
   [":jy_huoji"] = [[你可以将一张♠手牌当作【火杀】使用或打出。]],
@@ -1063,7 +1061,7 @@ local jy_yuanshen_2 = fk.CreateTriggerSkill{
   can_trigger = function(self, event, target, player, data)  -- player是我自己，只能让我自己播放这个动画
     if not player:hasSkill(self) then return false end
     -- return data.damageType ~= fk.NormalDamage and not data.is_jy_yuanshen_2_triggered  -- 如果这次没有被其他的该技能响应
-    -- TODO记得调回来
+    -- TODO: 感觉得控制强度，建议用上面这个版本，铁索连环别太变态了
     return data.damageType ~= fk.NormalDamage
   end,
   on_use = function(self, event, target, player, data)
@@ -1081,7 +1079,8 @@ local jy_yuanshen_2 = fk.CreateTriggerSkill{
         },
         {fk.ThunderDamage, "@jy_yuanshen_2_electro", "@jy_yuanshen_2_pyro", 
           function(self, event, target, player, data) 
-            player.room:askForDiscard(data.to, 2, 2, true, self.name, false, nil, "#jy_yuanshen_2_overload_discard") 
+            -- player.room:askForDiscard(data.to, 2, 2, true, self.name, false, nil, "#jy_yuanshen_2_overload_discard") 
+            player:turnOver()  -- 改成翻面了
           end,
           "#jy_yuanshen_2_reaction_2",
         }, 
@@ -1129,9 +1128,9 @@ local jy_fumo = fk.CreateTriggerSkill{
     local room = player.room
     local card = room:throwCard(self.cost_data, self.name, player, player)
     if target.dead then return false end
-    if card.card.color == Card.Red then
+    if card.color == Card.Red then
       data.damageType = fk.FireDamage
-    elseif card.card.color == Card.Black then
+    elseif card.color == Card.Black then
       data.damageType = fk.ThunderDamage
     end
   end,
@@ -1149,13 +1148,14 @@ Fk:loadTranslationTable {
   <br />当一名<font color="purple">【雷附着】</font>状态的角色受到<font color="red">火属性伤害</font>时，
   本次伤害不会令其进入<font color="red">【火附着】</font>状态，而是移除<font color="purple">【雷附着】</font>状态并使该伤害+1；
   当一名<font color="red">【火附着】</font>状态的角色受到<font color="purple">雷属性伤害</font>时，
-  本次伤害不会令其进入<font color="purple">【雷附着】</font>状态，而是移除<font color="red">【火附着】</font>状态并弃两张牌。]],
+  本次伤害不会令其进入<font color="purple">【雷附着】</font>状态，而是移除<font color="red">【火附着】</font>状态并令其翻面。]],
   ["#jy_yuanshen_2_reaction_1"] = [[<font color="red">火属性伤害</font>遭遇<font color="purple">【雷附着】</font>发生反应，伤害+1]],
   ["#jy_yuanshen_2_reaction_2"] = [[<font color="purple">雷属性伤害</font>遭遇<font color="red">【火附着】</font>发生反应，弃两张牌]],
 
   ["@jy_yuanshen_2_pyro"] = [[<font color="red">火附着</font>]],
   ["@jy_yuanshen_2_electro"] = [[<font color="purple">雷附着</font>]],
-  ["#jy_yuanshen_2_overload_discard"] = [[你在<font color="purple">【雷附着】</font>状态下受到了<font color="red">火属性伤害</font>，需要弃置两张牌]],
+  ["#jy_yuanshen_2_overload_discard"] = [[你在<font color="purple">【雷附着】</font>状态下受到了<font color="red">火属性伤害</font>，
+  需要弃置两张牌]],
 
   ["jy_fumo"] = "附魔",
   ["#jy_fumo-invoke"] = "附魔：%dest 受到伤害，你可以弃置一张牌，改为属性伤害",
