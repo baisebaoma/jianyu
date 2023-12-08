@@ -1026,14 +1026,19 @@ local jy_leiji = fk.CreateViewAsSkill{
 }
 
 tym__zhaoqianxi:addSkill(jy_yuanshen)
-tym__zhaoqianxi:addSkill(jy_huoji)
-tym__zhaoqianxi:addSkill(jy_leiji)
+-- tym__zhaoqianxi:addSkill(jy_huoji)  -- 已经够厉害了，不能再加技能了。
+-- tym__zhaoqianxi:addSkill(jy_leiji)
 
 Fk:loadTranslationTable {
   ["tym__zhaoqianxi"] = "赵乾熙",
   
   ["jy_yuanshen"] = "原神",
-  [":jy_yuanshen"] = [[锁定技，你造成的属性伤害+1。]],
+  [":jy_yuanshen"] = [[锁定技，你造成的属性伤害+1。
+  <br>（特别提示：当你对被横置的角色造成属性伤害时，
+  所有其他被横置的角色会受到的伤害+2。
+  这是因为你对主目标造成X点属性伤害时触发了【原神】，伤害+1，
+  保存该结果为Y=X+1，然后你再对所有其他被连环的角色再造成一次Y点的属性伤害，
+  再次触发【原神】，伤害+1，所以是X+2点伤害。）]],
 
   ["jy_huoji"] = "帽猫",
   [":jy_huoji"] = [[你可以将一张♠手牌当作【火杀】使用或打出。]],
@@ -1122,17 +1127,11 @@ local jy_fumo = fk.CreateTriggerSkill{
   end,
   on_use = function(self, event, target, player, data)
     local room = player.room
-    room:throwCard(self.cost_data, self.name, player, player)
+    local card = room:throwCard(self.cost_data, self.name, player, player)
     if target.dead then return false end
-    local judge = {
-      who = data.from,
-      reason = self.name,
-      pattern = ".",
-    }
-    room:judge(judge)
-    if judge.card.color == Card.Red then
+    if card.card.color == Card.Red then
       data.damageType = fk.FireDamage
-    elseif judge.card.color == Card.Black then
+    elseif card.card.color == Card.Black then
       data.damageType = fk.ThunderDamage
     end
   end,
@@ -1159,16 +1158,13 @@ Fk:loadTranslationTable {
   ["#jy_yuanshen_2_overload_discard"] = [[你在<font color="purple">【雷附着】</font>状态下受到了<font color="red">火属性伤害</font>，需要弃置两张牌]],
 
   ["jy_fumo"] = "附魔",
-  ["#jy_fumo-invoke"] = "附魔：%dest 受到无属性伤害，你可以弃置一张牌令伤害来源判定，改为属性伤害。",
-  [":jy_fumo"] = [[当有角色使用【杀】造成无属性伤害时，你可以弃一张牌并令伤害来源进行一次判定，
-     若结果为：红色，将此次伤害改为火属性；黑色，将此次伤害改为雷属性。]],
+  ["#jy_fumo-invoke"] = "附魔：%dest 受到伤害，你可以弃置一张牌，改为属性伤害",
+  [":jy_fumo"] = [[当有角色使用【杀】造成无属性伤害时，你可以弃一张牌。若你弃的牌为：红色，将此次伤害改为<font color="red">火属性</font>；黑色，改为<font color="purple">雷属性</font>]],
 }
 
 -- 阿伟罗
--- TODO：南蛮入侵可能会触发两次，应该解决了
 local xjb__aweiluo = General(extension, "xjb__aweiluo", "qun", 3, 3, General.Male)
 
--- TODO:如果下家死了，不会再继续传了
 -- 只能传手牌
 local jy_youlong = fk.CreateTriggerSkill{
   name = "jy_youlong",
@@ -1412,7 +1408,10 @@ Fk:loadTranslationTable {
   ["$jy_tiaoshui1"] = "Siu, hahahaha!",
 
   ["jy_luojiao"] = "罗绞",
-  [":jy_luojiao"] = "当你的所有【点】花色均不同时（只有1张【点】也可以），可以视为使用一张【南蛮入侵】，每回合限一次；当你的【点】有4张时，可以视为使用一张【万箭齐发】。",
+  [":jy_luojiao"] = [[当你的所有【点】花色均不同时（只有1张【点】也可以），可以视为使用一张【南蛮入侵】，每回合限一次；
+  当你的【点】有4张时，可以视为使用一张【万箭齐发】。
+  （已知问题：如果你的【点】有且仅有四张且花色都不同，
+  那么【南蛮入侵】【万箭齐发】只能触发一个。这个问题将在后续修复。）]],
   ["#jy_luojiao_archery_attack"] = "罗绞·万箭齐发",
   ["#jy_luojiao_savage_assault"] = "罗绞·南蛮入侵",
   ["#jy_luojiao_archery_attack_ask"] = "【点】数量为4，是否发动 罗绞·万箭齐发",
