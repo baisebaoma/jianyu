@@ -1142,26 +1142,28 @@ Fk:loadTranslationTable {
   ["tym__zhaoqianxi_2"] = "界赵乾熙",
   
   ["jy_yuanshen_2"] = "原神",
-  [":jy_yuanshen_2"] = [[锁定技，所有<font color="purple">雷属性伤害</font>都会令目标进入<font color="purple">【雷附着】</font>状态，
-  而<font color="red">火属性伤害</font>会令目标进入<font color="red">【火附着】</font>状态。
-  <br />当一名<font color="purple">【雷附着】</font>状态的角色受到<font color="red">火属性伤害</font>时，
-  本次伤害不会令其进入<font color="red">【火附着】</font>状态，而是移除<font color="purple">【雷附着】</font>状态并使该伤害+1；
-  当一名<font color="red">【火附着】</font>状态的角色受到<font color="purple">雷属性伤害</font>时，
-  本次伤害不会令其进入<font color="purple">【雷附着】</font>状态，而是移除<font color="red">【火附着】</font>状态并令其翻面。]],
-  ["#jy_yuanshen_2_reaction_1"] = [[<font color="red">火属性伤害</font>遭遇<font color="purple">【雷附着】</font>发生反应，伤害+1]],
-  ["#jy_yuanshen_2_reaction_2"] = [[<font color="purple">雷属性伤害</font>遭遇<font color="red">【火附着】</font>发生反应，目标翻面]],
+  [":jy_yuanshen_2"] = [[<!-- 锁定技，所有<font color="purple">雷电伤害</font>都会令目标进入<font color="purple">【雷电】</font>状态，
+  而<font color="red">火焰伤害</font>会令目标进入<font color="red">【火焰】</font>状态。
+  <br />当一名<font color="purple">【雷电】</font>状态的角色受到<font color="red">火焰伤害</font>时，
+  本次伤害不会令其进入<font color="red">【火焰】</font>状态，而是移除<font color="purple">【雷电】</font>状态并使该伤害+1；
+  当一名<font color="red">【火焰】</font>状态的角色受到<font color="purple">雷电伤害</font>时，
+  本次伤害不会令其进入<font color="purple">【雷电】</font>状态，而是移除<font color="red">【火焰】</font>状态并令其翻面。-->
+  锁定技，当其他角色受到<font color="red">火焰</font>或<font color="purple">雷电</font>伤害时，若其：1. 没有标记，令其获得对应属性标记；
+  2. 拥有标记且与此次伤害属性不同，则移除此标记并执行对应效果：<font color="purple">【雷电】</font>其翻面；<font color="red">【火焰】</font>伤害+1。]],
+  ["#jy_yuanshen_2_reaction_1"] = [[<font color="red">火焰伤害</font>与<font color="purple">【雷电】</font>发生反应，伤害+1]],
+  ["#jy_yuanshen_2_reaction_2"] = [[<font color="purple">雷电伤害</font>与<font color="red">【火焰】</font>发生反应，目标翻面]],
 
-  ["@jy_yuanshen_2_pyro"] = [[<font color="red">火附着</font>]],
-  ["@jy_yuanshen_2_electro"] = [[<font color="purple">雷附着</font>]],
-  ["#jy_yuanshen_2_overload_discard"] = [[你在<font color="purple">【雷附着】</font>状态下受到了<font color="red">火属性伤害</font>，
+  ["@jy_yuanshen_2_pyro"] = [[<font color="red">火焰</font>]],
+  ["@jy_yuanshen_2_electro"] = [[<font color="purple">雷电</font>]],
+  ["#jy_yuanshen_2_overload_discard"] = [[你在<font color="purple">【雷电】</font>状态下受到了<font color="red">火焰伤害</font>，
   需要弃置两张牌]],
 
   ["jy_fumo"] = "附魔",
   ["#jy_fumo-invoke"] = "附魔：%dest 受到伤害，你可以弃置一张牌，改为属性伤害",
   [":jy_fumo"] = [[当有角色使用【杀】造成无属性伤害时，
   你可以弃一张牌。若你弃的牌为：
-  红色，将此次伤害改为<font color="red">火属性</font>；
-  黑色，改为<font color="purple">雷属性</font>。]],
+  红色，将此次伤害改为<font color="red">火焰</font>；
+  黑色，改为<font color="purple">雷电</font>。]],
 }
 
 -- 阿伟罗

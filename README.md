@@ -113,14 +113,15 @@
 
 > 该武将由我设计。
 
-原神：锁定技，所有<font color="purple">雷属性伤害</font>都会令目标进入<font color="purple">【雷附着】</font>状态，
-  而<font color="red">火属性伤害</font>会令目标进入<font color="red">【火附着】</font>状态。
-  <br />当一名<font color="purple">【雷附着】</font>状态的角色受到<font color="red">火属性伤害</font>时，
-  本次伤害不会令其进入<font color="red">【火附着】</font>状态，而是移除<font color="purple">【雷附着】</font>状态并使该伤害+1；
-  当一名<font color="red">【火附着】</font>状态的角色受到<font color="purple">雷属性伤害</font>时，
-  本次伤害不会令其进入<font color="purple">【雷附着】</font>状态，而是移除<font color="red">【火附着】</font>状态并令其翻面。
+新月杀群群友“小嘤嘤”帮助我写了下面这一版描述，感谢！
 
-附魔：当有角色使用【杀】造成无属性伤害时，你可以弃一张牌。若你弃的牌为：红色，将此次伤害改为<font color="red">火属性</font>；黑色，改为<font color="purple">雷属性</font>。
+原神：锁定技，当其他角色受到<font color="red">火焰</font>或<font color="purple">雷电</font>伤害时，若其：1. 没有标记，令其获得对应属性标记；
+  2. 拥有标记且与此次伤害属性不同，则移除此标记并执行对应效果：<font color="purple">【雷电】</font>其翻面；<font color="red">【火焰】</font>伤害+1。
+
+附魔：当有角色使用【杀】造成无属性伤害时，
+  你可以弃一张牌。若你弃的牌为：
+  红色，将此次伤害改为<font color="red">火焰</font>；
+  黑色，改为<font color="purple">雷电</font>。
 
 ### 群·阿威罗 体力3
 
