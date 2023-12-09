@@ -1035,9 +1035,7 @@ Fk:loadTranslationTable {
   ["jy_yuanshen"] = "原神",
   [":jy_yuanshen"] = [[锁定技，你造成的属性伤害+1。
   <font size="1"><br>特别提示：当你对被横置的角色造成属性伤害时，所有其他被横置的角色会受到的伤害+2。
-  这是因为【铁锁连环】的效果是将你对主目标的伤害值记录，然后令你对其他所有被横置的角色也造成一次这个值的伤害。
-  结算过程如下：你对主目标触发了【原神】，伤害+1，记录该值，然后你再对所有其他被连环的角色造成一次该值的属性伤害，
-  再次触发【原神】，伤害+1。为了平衡这个问题，他虽然体力值仅为3，但是只有一个技能。</font>]],
+  这是因为【铁锁连环】的效果是将你对主目标的伤害值记录，然后令你对其他所有被横置的角色也造成一次这个值的伤害。</font>]],
 
   ["jy_huoji"] = "帽猫",
   [":jy_huoji"] = [[你可以将一张♠手牌当作【火杀】使用或打出。]],
@@ -1051,8 +1049,8 @@ Fk:loadTranslationTable {
 local tym__zhaoqianxi_2 = General(extension, "tym__zhaoqianxi_2", "qun", 4, 4, General.Male)
 -- tym__zhaoqianxi_2.hidden = true
 
--- TODO：被铁索连环的目标如果因为这次伤害受到了元素反应，那么不会让其他被铁索连环的目标受到附着效果。
--- 这是因为is_jy_yuanshen_2_triggered。目前已经删除了这个变量，以后再处理。但是这样的问题是：
+-- TODO：被铁索连环的目标如果因为这次伤害受到了元素反应，那么不会让其他被铁索连环的目标受到附着效果。（已修复）
+-- 这是因为is_jy_yuanshen_2_triggered。目前已经删除了这个变量，但是这样的问题是：
 -- 如果场上有多个有这个技能的角色，那么既会附着又会负面效果；铁索连环的副目标会受到2点额外伤害
 local jy_yuanshen_2 = fk.CreateTriggerSkill{
   name = "jy_yuanshen_2",
@@ -1143,14 +1141,8 @@ Fk:loadTranslationTable {
   ["tym__zhaoqianxi_2"] = "界赵乾熙",
   
   ["jy_yuanshen_2"] = "原神",
-  [":jy_yuanshen_2"] = [[<!-- 锁定技，所有<font color="purple">雷电伤害</font>都会令目标进入<font color="purple">【雷电】</font>状态，
-  而<font color="red">火焰伤害</font>会令目标进入<font color="red">【火焰】</font>状态。
-  <br />当一名<font color="purple">【雷电】</font>状态的角色受到<font color="red">火焰伤害</font>时，
-  本次伤害不会令其进入<font color="red">【火焰】</font>状态，而是移除<font color="purple">【雷电】</font>状态并使该伤害+1；
-  当一名<font color="red">【火焰】</font>状态的角色受到<font color="purple">雷电伤害</font>时，
-  本次伤害不会令其进入<font color="purple">【雷电】</font>状态，而是移除<font color="red">【火焰】</font>状态并令其翻面。-->
-  锁定技，当有角色受到<font color="red">火焰</font>或<font color="purple">雷电</font>伤害时，若其：1. 没有标记，令其获得对应属性标记；
-  2. 拥有标记且与此次伤害属性不同，则移除此标记并执行对应效果：<font color="purple">【雷电】</font>其翻面；<font color="red">【火焰】</font>伤害+1。]],
+  [":jy_yuanshen_2"] = [[锁定技，当有角色受到<font color="red">火焰</font>或<font color="purple">雷电</font>伤害时，若其没有标记，令其获得对应属性标记；
+  若其拥有标记且与此次伤害属性不同，则移除此标记并执行对应效果：<font color="purple">【雷电】</font>其翻面；<font color="red">【火焰】</font>伤害+1。]],
   ["#jy_yuanshen_2_reaction_1"] = [[<font color="red">火焰伤害</font>与<font color="purple">【雷电】</font>发生反应，伤害+1]],
   ["#jy_yuanshen_2_reaction_2"] = [[<font color="purple">雷电伤害</font>与<font color="red">【火焰】</font>发生反应，目标翻面]],
 
@@ -1307,6 +1299,8 @@ local jy_luojiao_savage_assault = fk.CreateTriggerSkill{
   events = {fk.AfterCardsMove},
   can_trigger = function(self, event, target, player, data)
     if not player:hasSkill(self) then return false end
+    if player:usedSkillTimes(self.name, Player.HistoryPhase) ~= 0 then return false end  -- 这个条件必须放在这里，提高效率，也可以一定程度上防止因别的特殊区牌量变动而多次触发
+    -- TODO：如果有其他的牌进出你的特殊区，即使不是点，也会触发这个技能
     local dians = player:getPile("xjb__aweiluo_dian")
     -- 判断花色是否全部不同，触发南蛮入侵
     if #dians == 0 then return false end  -- 熊俊博说1张也可以发动南蛮，那就把==1删掉
@@ -1320,8 +1314,7 @@ local jy_luojiao_savage_assault = fk.CreateTriggerSkill{
         dict[suit] = true
       end
     end
-    return player:usedSkillTimes(self.name, Player.HistoryPhase) == 0 and  -- 本回合还没使用过
-      player.is_dian_changing  -- 是否有新的点进出导致南蛮入侵
+    return player.is_dian_changing  -- 是否有新的点进出导致南蛮入侵
   end,
   on_cost = function(self, event, target, player, data)
     return player.room:askForSkillInvoke(player, self.name, nil, "#jy_luojiao_savage_assault_ask")
@@ -1378,6 +1371,7 @@ local jy_yusu_set_0 = fk.CreateTriggerSkill{
   on_use = function(self, event, target, player, data)
     local room = player.room
     room:setPlayerMark(player, "@jy_yusu_basic_count", 0)
+    -- TODO：做一个南蛮入侵已触发的标志，也在这里清除
     -- player.is_jy_luojiao_archery_attack_used = false
     -- print("你的回合已开始/结束，给你设成了0")
   end,
