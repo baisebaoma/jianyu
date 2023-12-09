@@ -834,7 +834,7 @@ local jy_erduanxiao_trigger_2 = fk.CreateTriggerSkill{
       player.room:moveCardTo(xiaos, Card.PlayerHand, player, fk.ReasonJustMove, self.name, "tym__liyuanhao_xiao", true, player.id)
     elseif self.choice == "#lose_hp_1_2" then
       -- 弃掉所有【啸】
-      room:throwCard(xiaos, self.name, player, player)  -- 把啸全部扔掉
+      player.room:throwCard(xiaos, self.name, player, player)  -- 把啸全部扔掉
       -- 回复1点体力
       player.room:recover({
         who = player,
