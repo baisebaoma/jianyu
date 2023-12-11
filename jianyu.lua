@@ -1107,8 +1107,9 @@ local jy_fumo = fk.CreateTriggerSkill{
   events = {fk.DamageInflicted},
   can_trigger = function(self, event, target, player, data)
     return player:hasSkill(self) and 
-      data.damageType == fk.NormalDamage and data.card and 
-      data.card.trueName == "slash" and not data.to.dead and not player:isNude()
+      data.damageType == fk.NormalDamage and not data.to.dead and not player:isNude()
+      -- data.damageType == fk.NormalDamage and data.card and 
+      -- data.card.trueName == "slash" and not data.to.dead and not player:isNude()
   end,
   on_cost = function(self, event, target, player, data)
     local room = player.room
@@ -1139,8 +1140,8 @@ Fk:loadTranslationTable {
   ["tym__zhaoqianxi_2"] = "界赵乾熙",
   
   ["jy_yuanshen_2"] = "原神",
-  [":jy_yuanshen_2"] = [[锁定技，当有角色受到<font color="red">火焰</font>或<font color="purple">雷电</font>伤害时，若其没有属性标记，令其获得对应属性标记；
-  若其拥有属性标记且与此次伤害属性不同，则移除该标记并造成对应效果：<font color="purple">【雷电】</font>其翻面；<font color="red">【火焰】</font>伤害+1。]],
+  [":jy_yuanshen_2"] = [[锁定技，当有角色受到<font color="red">火焰</font>或<font color="purple">雷电</font>伤害时，若其没有该技能造成的属性标记，令其获得对应属性标记；
+  若其拥有属性标记且与此次伤害属性不同，则依据伤害属性造成对应效果并移除标记：<font color="purple">雷电伤害</font>其翻面；<font color="red">火焰伤害</font>该伤害+1。]],
   ["#jy_yuanshen_2_reaction_1"] = [[<font color="red">火焰伤害</font>与<font color="purple">【雷电】</font>发生反应，伤害+1]],
   ["#jy_yuanshen_2_reaction_2"] = [[<font color="purple">雷电伤害</font>与<font color="red">【火焰】</font>发生反应，目标翻面]],
 
@@ -1149,7 +1150,7 @@ Fk:loadTranslationTable {
 
   ["jy_fumo"] = "附魔",
   ["#jy_fumo-invoke"] = "附魔：%dest 受到伤害，你可以弃置一张牌，改为属性伤害",
-  [":jy_fumo"] = [[当有角色使用【杀】造成无属性伤害时，
+  [":jy_fumo"] = [[当有角色造成无属性伤害时，
   你可以弃一张牌。若你弃的牌为：
   红色，将此次伤害改为<font color="red">火焰</font>；
   黑色，改为<font color="purple">雷电</font>。]],
