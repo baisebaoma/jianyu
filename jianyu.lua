@@ -2,11 +2,11 @@ local extension = Package:new("jy_jianyu")
 extension.extensionName = "jianyu"
 
 Fk:loadTranslationTable {
-     ["jy_jianyu"] = "<font color=\"red\"><strong>监狱</strong></font>",
+     ["jy_jianyu"] = "简浴",
      ["god"] = "神话再临·神",
-     ["xjb"] = "熊",
-     ["tym"] = "唐",
-     ["skl"] = "尚",
+     ["xjb"] = "导演设计",
+     ["tym"] = "反赌专家设计",
+     ["skl"] = "拂却心尘设计",
      ["buffed"] = "加强",
 }
 
@@ -1030,8 +1030,8 @@ Fk:loadTranslationTable {
   
   ["jy_yuanshen"] = "原神",
   [":jy_yuanshen"] = [[锁定技，你造成的属性伤害+1。
-  <font size="1"><br>特别提示：当你对被横置的角色造成属性伤害时，所有其他被横置的角色会受到的伤害+2。
-  这是因为【铁锁连环】的效果是将你对主目标的伤害值记录，然后令你对其他所有被横置的角色也造成一次这个值的伤害。<br>
+  <font size="1"><br><br>特别提示：当你对被横置的角色造成属性伤害时，所有其他被横置的角色会受到的伤害+2。
+  这是因为【铁锁连环】的效果是将你对主目标的伤害值记录，然后令你对其他所有被横置的角色也造成一次这个值的伤害。<br><br>
   特别提示：当你是双将且另一个武将是界赵乾熙、你发动了【附魔】造成属性伤害时，不会触发这个技能（因为这两个技能是在同一个时机修改伤害参数）。我觉得这还挺平衡的。</font>]],
 
   ["jy_huoji"] = "帽猫",
@@ -1385,7 +1385,7 @@ xjb__aweiluo:addSkill(jy_yusu)
 
 
 Fk:loadTranslationTable {
-  ["xjb__aweiluo"] = "阿伟罗",
+  ["xjb__aweiluo"] = "阿威罗",
   ["xjb__aweiluo_dian"] = "点",
 
   ["jy_youlong"] = "游龙",
@@ -1406,7 +1406,7 @@ Fk:loadTranslationTable {
   ["jy_luojiao"] = "罗绞",
   [":jy_luojiao"] = [[当你的所有【点】花色均不同时（只有1张【点】也可以），可以视为使用一张【南蛮入侵】，每回合限一次；
   当你的【点】有4张时，可以视为使用一张【万箭齐发】。
-  <br><font size="1">已知问题：如果你的【点】有且仅有四张且花色都不同，
+  <br><br><font size="1">已知问题：如果你的【点】有且仅有四张且花色都不同，
   那么【南蛮入侵】【万箭齐发】只能触发一个。这个问题将在后续修复。</font>]],
   ["#jy_luojiao_archery_attack"] = "罗绞·万箭齐发",
   ["#jy_luojiao_savage_assault"] = "罗绞·南蛮入侵",
@@ -1420,7 +1420,7 @@ Fk:loadTranslationTable {
   ["@jy_yusu_basic_count"] = "玉玊",
   ["$jy_yusu1"] = "Siu...",
 
-  ["~xjb__aweiluo"] = "Cristiano is a sex offender!",
+  ["~xjb__aweiluo"] = "（观众声）",
 
 }
 
@@ -1428,7 +1428,7 @@ Fk:loadTranslationTable {
      ["jianzihao"] = "简自豪",
      ["houguoyu"] = "侯国玉",
      ["liyuanhao"] = "李元浩",
-     ["aweiluo"] = "阿伟罗",
+     ["aweiluo"] = "阿威罗",
      ["gaotianliang"] = "高天亮",
      ["zhaoqianxi"] = "赵乾熙",
 }
