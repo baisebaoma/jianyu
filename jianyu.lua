@@ -1296,7 +1296,7 @@ local jy_luojiao_savage_assault = fk.CreateTriggerSkill{
   events = {fk.AfterCardsMove},
   can_trigger = function(self, event, target, player, data)
     if not player:hasSkill(self) then return false end
-    if player:usedSkillTimes(self.name, Player.HistoryPhase) ~= 0 then return false end  -- 这个条件必须放在这里，提高效率，也可以一定程度上防止因别的特殊区牌量变动而多次触发
+    if player:usedSkillTimes(self.name) ~= 0 then return false end  -- 这个条件必须放在这里，提高效率，也可以一定程度上防止因别的特殊区牌量变动而多次触发
     -- TODO：如果有其他的牌进出你的特殊区，即使不是点，也会触发这个技能
     local dians = player:getPile("xjb__aweiluo_dian")
     -- 判断花色是否全部不同，触发南蛮入侵
