@@ -1286,6 +1286,8 @@ local jy_luojiao_archery_attack = fk.CreateTriggerSkill{
   end,
   on_use = function(self, event, target, player, data)
     local room = player.room
+    player:broadcastSkillInvoke("jy_luojiao", 1)  -- 只播放语音，不宣布触发（因为已经宣布了触发罗绞·万箭齐发）
+    -- room:notifySkillInvoked(player, "jy_luojiao", "offensive")
     room:useVirtualCard("archery_attack", nil, player, room:getOtherPlayers(player, true), self.name, true)
   end
 }
@@ -1317,7 +1319,9 @@ local jy_luojiao_savage_assault = fk.CreateTriggerSkill{
   end,
   on_use = function(self, event, target, player, data)
     local room = player.room
+    player:broadcastSkillInvoke("jy_luojiao", 1)  -- 只播放语音，不宣布触发（因为已经宣布了触发罗绞·南蛮入侵）
     room:setPlayerMark(player, "@jy_is_luojiao_savage_assault_used", "#used")
+    -- room:notifySkillInvoked(player, "jy_luojiao", "offensive")
     room:useVirtualCard("savage_assault", nil, player, room:getOtherPlayers(player, true), self.name, true)
     -- player.is_dian_may_changing = false
   end
