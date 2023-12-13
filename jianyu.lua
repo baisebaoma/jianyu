@@ -190,7 +190,7 @@ Fk:loadTranslationTable{
 
   ["jy_kaiju"] = "开局",
   [":jy_kaiju"] = [[锁定技，当你的回合开始时，所有其他有牌的角色需要交给你一张牌，并视为对你使用一张【杀】。<br>
-  <font size="1"><i>“从未如此美妙的开局！”——简自豪</i></font>]],
+  <font size="1"><i>“从未如此美妙的开局！”</i></font>]],
   ["$jy_kaiju1"] = "不是啊，我炸一对鬼的时候我在打什么，打一对10。一对10，他四个9炸我，我不输了吗？",
   ["$jy_kaiju2"] = "怎么赢啊？你别瞎说啊！",
   ["$jy_kaiju3"] = "打这牌怎么打？兄弟们快教我，我看着头晕！",
@@ -359,7 +359,7 @@ Fk:loadTranslationTable{
   ["$jy_sanjian1"] = "也不是稳赢吧，我觉得赢了！",
 
   ["jy_xizao_2"] = "洗澡",
-  [":jy_xizao_2"] = "限定技，当你处于濒死状态且装备区有牌时，你可以弃掉所有装备区的牌、将体力恢复至1，然后每以此法弃掉一张牌，你摸一张牌。",
+  [":jy_xizao_2"] = "限定技，当你处于濒死状态且装备区有牌时，你可以弃置所有装备区的牌、将体力恢复至1，然后每以此法弃置一张牌，你摸一张牌。",
   ["$jy_xizao_21"] = "呃啊啊啊啊啊啊啊！！",
   ["$jy_xizao_22"] = "也不是稳赢吧，我觉得赢了！",
   ["$jy_xizao_23"] = "真的我是真玩不了，这跟变态没关系，我好他妈的气！",
@@ -758,7 +758,7 @@ local jy_erduanxiao_trigger_2 = fk.CreateTriggerSkill{
       -- 将所有【啸】纳入自己的手牌
       room:moveCardTo(xiaos, Card.PlayerHand, player, fk.ReasonJustMove, self.name, "tym__liyuanhao_xiao", true, player.id)
     elseif self.choice == "#lose_hp_1_2" then
-      -- 弃掉所有【啸】
+      -- 弃置所有【啸】
       room:throwCard(xiaos, self.name, player, player)  -- 把啸全部扔掉
       -- 回复1点体力
       room:recover({
@@ -826,10 +826,10 @@ Fk:loadTranslationTable {
   <br><font size="1"><i>“……唯我虎大将军！”——钱晨</i></font>]],
 
   ["jy_erduanxiao_2"] = "二段",
-  [":jy_erduanxiao_2"] = "锁定技，当你的角色牌上有且仅有两张【啸】时，你选择：弃掉所有【啸】并恢复一点体力，或将所有【啸】纳入手牌。",
+  [":jy_erduanxiao_2"] = "锁定技，当你的角色牌上有且仅有两张【啸】时，你选择：弃置所有【啸】并恢复一点体力，或将所有【啸】纳入手牌。",
   ["#jy_erduanxiao_trigger_2"] = "二段",
   ["#lose_xiao_2"] = "将所有【啸】纳入手牌", 
-  ["#lose_hp_1_2"] = "弃掉所有【啸】并恢复一点体力",
+  ["#lose_hp_1_2"] = "弃置所有【啸】并恢复一点体力",
 }
 
 
@@ -888,12 +888,12 @@ Fk:loadTranslationTable {
   ["xjb__gaotianliang"] = "高天亮",
 
   ["jy_yuyu"] = "玉玉",
-  [":jy_yuyu"] = [[锁定技，当你被没有【高天亮之敌】标记的角色使用【杀】造成了伤害时，你令其获得【高天亮之敌】标记。
-  受到没有【高天亮之敌】标记的角色或因本次伤害而获得【高天亮之敌】标记的角色造成的伤害时，你可以摸三张牌，然后翻面。]],
+  [":jy_yuyu"] = [[1. 锁定技，当有角色对你使用【杀】造成了伤害时，你令其获得【高天亮之敌】标记；<br>
+  2. 受到没有【高天亮之敌】标记的角色或因本次伤害而获得【高天亮之敌】标记的角色造成的伤害时，你可以摸三张牌，然后翻面。]],
   ["@jy_gaotianliang_enemy"] = "高天亮之敌",
   ["$jy_yuyu1"] = "我……我真的很想听到你们说话……",
   ["$jy_yuyu2"] = "我天天被队霸欺负，他们天天骂我。",
-  ["$jy_yuyu3"] = "（听不清）",
+  ["$jy_yuyu3"] = "有什么话是真的不能讲的……为什么一定……每次都是……一个人在讲……",
 
   ["~xjb__gaotianliang"] = "顶不住啦！我每天都活在水深火热里面。",
 }
@@ -907,12 +907,12 @@ local jy_yuanshen = fk.CreateTriggerSkill{
   name = "jy_yuanshen",
   frequency = Skill.Compulsory,
   anim_type = "offensive",
-  events = {fk.DamageCaused},
-  can_trigger = function(self, event, target, player, data)
+  refresh_events = {fk.DamageCaused},
+  can_refresh = function(self, event, target, player, data)
     if not (target == player and player:hasSkill(self)) then return false end
     return data.damageType ~= fk.NormalDamage
   end,
-  on_use = function(self, event, target, player, data)
+  on_refresh = function(self, event, target, player, data)
     data.damage = data.damage + 1
   end,
 }
@@ -938,7 +938,7 @@ local jy_leiji = fk.CreateViewAsSkill{
   anim_type = "offensive",
   pattern = "slash",
   card_filter = function(self, to_select, selected)
-    return #selected == 0 and Fk:getCardById(to_select).suit == Card.Club and Fk:currentRoom():getCardArea(to_select) ~= Player.Equip
+    return #selected == 0 and Fk:getCardById(to_select).suit == Card.Spade and Fk:currentRoom():getCardArea(to_select) ~= Player.Equip
   end,
   view_as = function(self, cards)
     if #cards ~= 1 then return end
@@ -950,23 +950,25 @@ local jy_leiji = fk.CreateViewAsSkill{
 }
 
 tym__zhaoqianxi:addSkill(jy_yuanshen)
--- tym__zhaoqianxi:addSkill(jy_huoji)  -- 已经够厉害了，不能再加技能了。
--- tym__zhaoqianxi:addSkill(jy_leiji)
+tym__zhaoqianxi:addSkill(jy_huoji)
+tym__zhaoqianxi:addSkill(jy_leiji)
 
 Fk:loadTranslationTable {
   ["tym__zhaoqianxi"] = "赵乾熙",
   
   ["jy_yuanshen"] = "原神",
   [":jy_yuanshen"] = [[锁定技，你造成的属性伤害+1。
-  <font size="1"><br>特别提示：当你对被横置的角色造成属性伤害时，所有其他被横置的角色会受到的伤害+2。
-  这是因为【铁锁连环】的效果是将你对主目标的伤害值记录，然后令你对其他所有被横置的角色也造成一次这个值的伤害。<br><br>
-  特别提示：当你是双将且另一个武将是界赵乾熙、你发动了【附魔】造成属性伤害时，不会触发这个技能（因为这两个技能是在同一个时机修改伤害参数）。我觉得这还挺平衡的。</font>]],
+  <font size="1"><br>提示：<br>
+  1. 当你对被横置的角色造成属性伤害时，所有其他被横置的角色会受到的伤害+2，
+  因为【铁锁连环】的效果是将你对主目标的伤害值记录，然后令你对其他所有被横置的角色也造成一次这个值的伤害。<br>
+  2. 当你是双将且另一个武将是界赵乾熙、你发动了【附魔】造成属性伤害时，
+  不会触发这个技能，因为这两个技能是在同一个时机修改伤害参数。</font>]],
 
   ["jy_huoji"] = "帽猫",
   [":jy_huoji"] = [[你可以将一张♠手牌当作【火杀】使用或打出。]],
 
   ["jy_leiji"] = "猫帽",
-  [":jy_leiji"] = [[你可以将一张♣手牌当作【雷杀】使用或打出。
+  [":jy_leiji"] = [[你可以将一张♠手牌当作【雷杀】使用或打出。
   <br /><font size="1"><i><s>因为Beryl抽满命林尼歪了六次，所以他决定在新月杀中重拾自己的火。</s></i></font>]],
 }
 
@@ -1017,7 +1019,7 @@ local jy_yuanshen_2 = fk.CreateTriggerSkill{
             return  -- 结束了，不用判断下面的了
           end
           if data.to:getMark(element[2]) == 0 then   -- 如果目标没有A附着
-            room:setPlayerMark(data.to, element[2], 1)  -- 造成A附着
+            room:setPlayerMark(data.to, element[2], "")  -- 造成A附着
             return
           end
         end
@@ -1052,7 +1054,7 @@ local jy_fumo = fk.CreateTriggerSkill{
     local room = player.room
     room:throwCard(self.cost_data, self.name, player, player)
     if target.dead then return false end
-    card = Fk:getCardById(self.cost_data[1])  -- 这张被弃掉的牌是通过self.cost_data传过来的，是一个int table，你得转化成一张card
+    card = Fk:getCardById(self.cost_data[1])  -- 这张被弃置的牌是通过self.cost_data传过来的，是一个int table，你得转化成一张card
     if card.color == Card.Red then
       data.damageType = fk.FireDamage
     elseif card.color == Card.Black then
@@ -1116,7 +1118,7 @@ local jy_youlong = fk.CreateTriggerSkill{
 local jy_hebao = fk.CreateTriggerSkill{
   name = "jy_hebao",
   anim_type = "special",
-  events = {fk.EventPhaseEnd},
+  events = {fk.EventPhaseProceeding},
   can_trigger = function(self, event, target, player, data)
     return target == player and player:hasSkill(self) and player.phase == Player.Start
   end,
@@ -1135,7 +1137,7 @@ local jy_tiaoshui = fk.CreateTriggerSkill{
   on_use = function(self, event, target, player, data)
     local room = player.room
     local dians = player:getPile("xjb__aweiluo_dian")
-    -- 以后“选择一张特殊区的牌并且弃掉”这个要求就这么写。
+    -- 以后“选择一张特殊区的牌并且弃置”这个要求就这么写。
     local id = room:askForCard(player, 1, 1, false, self.name, true, ".|.|.|xjb__aweiluo_dian|.|.|.", "#jy_tiaoshui", "xjb__aweiluo_dian", true)
     room:throwCard(id, self.id, player, player)
     -- askForDiscard 函数是不能对特殊区的牌生效的
@@ -1381,22 +1383,24 @@ Fk:loadTranslationTable {
 
   ["jy_youlong"] = "游龙",
   ["#jy_youlong-choose"] = "游龙：选择一张牌交给下家",
-  [":jy_youlong"] = "锁定技，你的回合开始时，从你开始每名角色选择一张手牌交给下家（没有则不交）。",
+  [":jy_youlong"] = "锁定技，你的回合开始时，从你开始，每名有手牌的角色选择一张手牌交给下家。",
   ["$jy_youlong1"] = "翩若惊鸿！婉若游龙！",
 
   ["jy_hebao"] = "核爆",
   [":jy_hebao"] = "你的回合开始时，你可以将一张手牌置于你的武将牌上，称为【点】。",
-  ["#jy_hebao-choose"] = "选择一张手牌成为【点】，可取消",
+  ["#jy_hebao-choose"] = "核爆：选择一张手牌成为【点】",
   ["$jy_hebao1"] = "Siu~",
 
   ["jy_tiaoshui"] = "跳水",
-  [":jy_tiaoshui"] = "当你受到伤害时，你可以弃掉一张【点】。",
-  ["#jy_tiaoshui"] = "弃掉一张【点】",
+  [":jy_tiaoshui"] = "当你受到伤害时，你可以弃置一张【点】。",
+  ["#jy_tiaoshui"] = "弃置一张【点】",
   ["$jy_tiaoshui1"] = "Siu, hahahaha!",
 
   ["jy_luojiao"] = "罗绞",
-  [":jy_luojiao"] = [[当你没有2张相同花色的【点】时，可以视为使用一张【南蛮入侵】，每回合限一次；
-  当你的【点】有4张时，可以视为使用一张【万箭齐发】。]],
+  [":jy_luojiao"] = [[当你的【点】的数量变化后：<br>
+  1. 若你没有两张及以上相同花色的【点】，可以视为立即使用一张【南蛮入侵】，每回合限一次；<br>
+  2. 若你有4张【点】，可以视为立即使用一张【万箭齐发】。]],
+  -- TODO: 好像luojiao2的语音不显示
   ["$jy_luojiao1"] = "Muchas gracias afición, esto es para vosotros, Siuuu",
   ["$jy_luojiao2"] = "（观众声）",
   ["#jy_luojiao_after"] = "罗绞",
