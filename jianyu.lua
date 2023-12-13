@@ -1228,6 +1228,7 @@ local jy_luojiao = fk.CreateTriggerSkill{
     if not player:hasSkill(self) then return end
 
     local dians = player:getPile("xjb__aweiluo_dian")
+    print("又到这里来了！再判断一次是否是移动前，并将is_dian_may_changing设为false！")
     player.is_dian_may_changing = false
 
     -- 判断是否有牌进出特殊区
@@ -1300,8 +1301,8 @@ local jy_luojiao_savage_assault = fk.CreateTriggerSkill{
     if not player.is_dian_may_changing then return false end
     -- TODO：如果有其他的牌进出你的特殊区，即使不是点，也会触发这个技能
     local dians = player:getPile("xjb__aweiluo_dian")
-    -- 判断花色是否全部不同，触发南蛮入侵
-    if #dians == 0 then return false end  -- 熊俊博说1张也可以发动南蛮，那就把==1删掉
+    -- 判断花色是否全部不同，触发**入侵
+    if #dians == 0 then return false end  -- 熊俊博说1张也可以发动**，那就把==1删掉
     dict = {}
     for _, c in ipairs(dians) do
       local suit = Fk:getCardById(c).suit
@@ -1312,14 +1313,14 @@ local jy_luojiao_savage_assault = fk.CreateTriggerSkill{
         dict[suit] = true
       end
     end
-    return true  -- 是否有新的点进出导致南蛮入侵
+    return true  -- 是否有新的点进出导致**入侵
   end,
   on_cost = function(self, event, target, player, data)
     return player.room:askForSkillInvoke(player, self.name, nil, "#jy_luojiao_savage_assault_ask")
   end,
   on_use = function(self, event, target, player, data)
     local room = player.room
-    player:broadcastSkillInvoke("jy_luojiao", 1)  -- 只播放语音，不宣布触发（因为已经宣布了触发罗绞·南蛮入侵）
+    player:broadcastSkillInvoke("jy_luojiao", 1)  -- 只播放语音，不宣布触发（因为已经宣布了触发罗绞·**入侵）
     room:setPlayerMark(player, "@jy_is_luojiao_savage_assault_used", "#used")
     -- room:notifySkillInvoked(player, "jy_luojiao", "offensive")
     room:useVirtualCard("savage_assault", nil, player, room:getOtherPlayers(player, true), self.name, true)
@@ -1338,7 +1339,7 @@ local jy_luojiao_set_0 = fk.CreateTriggerSkill{
   end,
   on_use = function(self, event, target, player, data)
     local room = player.room
-    room:setPlayerMark(player, "@jy_is_luojiao_savage_assault_used", 0)  -- 将罗绞南蛮发动过的次数标记设为0
+    room:setPlayerMark(player, "@jy_is_luojiao_savage_assault_used", 0)  -- 将罗绞**发动过的标记设为0（也就是取消显示）
   end,
 }
 jy_luojiao:addRelatedSkill(jy_luojiao_archery_attack)
@@ -1419,16 +1420,16 @@ Fk:loadTranslationTable {
   ["$jy_tiaoshui1"] = "Siu, hahahaha!",
 
   ["jy_luojiao"] = "罗绞",
-  [":jy_luojiao"] = [[当你的所有【点】花色均不同时（只有1张【点】也可以），可以视为使用一张【南蛮入侵】，每回合限一次；
+  [":jy_luojiao"] = [[当你的所有【点】花色均不同时（只有1张【点】也可以），可以视为使用一张【**入侵】，每回合限一次；
   当你的【点】有4张时，可以视为使用一张【万箭齐发】。
   <br><font size="1">已知问题：如果你的【点】有且仅有四张且花色都不同，
-  那么【南蛮入侵】【万箭齐发】只能触发一个。这个问题将在后续修复。</font>]],
+  那么【**入侵】【万箭齐发】只能触发一个。这个问题将在后续修复。</font>]],
   ["#jy_luojiao_archery_attack"] = "罗绞·万箭齐发",
-  ["#jy_luojiao_savage_assault"] = "罗绞·南蛮入侵",
-  ["#jy_luojiao_archery_attack_ask"] = "【点】数量为4，是否发动 罗绞·万箭齐发",
-  ["#jy_luojiao_savage_assault_ask"] = "【点】花色不同，是否发动 罗绞·南蛮入侵，每回合限一次",
+  ["#jy_luojiao_savage_assault"] = "罗绞·**入侵",
+  ["#jy_luojiao_archery_attack_ask"] = "【点】数量为4，是否发动 罗绞",
+  ["#jy_luojiao_savage_assault_ask"] = "【点】花色不同，是否发动 罗绞，每回合限一次",
   ["$jy_luojiao1"] = "Muchas gracias afición, esto es para vosotros, Siuuu",
-  ["@jy_is_luojiao_savage_assault_used"] = "罗绞·南蛮",
+  ["@jy_is_luojiao_savage_assault_used"] = "罗绞",
   ["#used"] = "发动过",
   -- TODO: 不会触发这条语音，但我暂时懒得改了
 
