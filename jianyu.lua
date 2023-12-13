@@ -1134,6 +1134,10 @@ local jy_tiaoshui = fk.CreateTriggerSkill{
   name = "jy_tiaoshui",
   anim_type = "special",
   events = {fk.Damaged},
+  can_trigger = function(self, event, target, player, data)
+    local dians = player:getPile("xjb__aweiluo_dian")
+    return #dians ~= 0
+  end
   on_use = function(self, event, target, player, data)
     local room = player.room
     local dians = player:getPile("xjb__aweiluo_dian")
@@ -1146,9 +1150,7 @@ local jy_tiaoshui = fk.CreateTriggerSkill{
 }
 
 -- 罗绞
--- 抄自上面的jy_erduanxiao_2
--- 罗绞主技能只判断是否有牌进出特殊区，它的触发不保证罗绞真的触发。罗绞是否触发在后面的关联函数里面判断。
--- 为了让群友理解这个函数，写了很多注释
+-- 罗绞主技能只判断是否有牌进出特殊区，它的触发不保证罗绞真的触发。罗绞是否触发在后面的关联函数里面判断
 local jy_luojiao = fk.CreateTriggerSkill{
   name = "jy_luojiao",
   anim_type = "offensive",
@@ -1202,15 +1204,17 @@ local jy_luojiao = fk.CreateTriggerSkill{
 }
 -- 修改：使用同一个函数来判断是否触发了南蛮和万箭。
 local jy_luojiao_after = fk.CreateTriggerSkill{
-  name = "#jy_luojiao_after",
-  events = {fk.AfterCardsMove},
+  name = "#jy_luojiao_after",  -- 这个技能的名字
+  events = {fk.AfterCardsMove},  -- 卡牌移动之后，如果can_trigger返回真，那就可以发动这个技能
+
+  -- can_trigger是用来判断是否能触发这个技能的，返回真就能触发，返回假就不能触发
   can_trigger = function(self, event, target, player, data)
     if not player:hasSkill(self) then return false end
-    if not player.is_dian_may_changing then return false end  -- 如果点有可能在变化
+    if not player.is_dian_may_changing then return false end  -- 如果【点】有可能在变化
 
     local dians = player:getPile("xjb__aweiluo_dian")
 
-    -- 判断花色是否全部不同
+    -- 判断是否有两张同样花色的【点】，若有返回false，若没有返回true
     if #dians == 0 then return false end  -- 设计者说1张也可以发动南蛮
     dict = {}
     local is_luojiao_suit_satisfied = true
@@ -1229,36 +1233,43 @@ local jy_luojiao_after = fk.CreateTriggerSkill{
     player.is_archery_attack = 
       player.is_luojiao_archery_attack_may_be_triggered and
       #player:getPile("xjb__aweiluo_dian") == 4
+
     -- 南蛮需要满足的条件：花色全部不同，且本回合未使用过
     player.is_savage_assault = is_luojiao_suit_satisfied and
       player:usedSkillTimes(self.name) == 0
 
+    -- 万箭或南蛮满足，返回真
     return player.is_archery_attack or player.is_savage_assault
   end,
+
+  -- on_cost代表执行该技能时要做什么事情
   on_cost = function(self, event, target, player, data)
     local room = player.room
-    self.first = nil
+    self.first = nil  -- 如果两个条件都满足，这个变量存储谁是第一个使用的牌
 
-    -- 如果同时触发
+    -- 如果两个条件都满足
     if player.is_archery_attack and player.is_savage_assault then
-      if room:askForSkillInvoke(player, self.name, nil, "#jy_luojiao_both_ask") then  -- 都触发了，询问是否要使用这个技能
+      if room:askForSkillInvoke(player, self.name, nil, "#jy_luojiao_both_ask") then  -- 都触发了，询问是否要使用罗绞
         local choices = {"archery_attack", "savage_assault"} 
-        self.first = room:askForChoice(player, choices, self.name, "#jy_luojiao_ask_which")  -- 如果确定使用，询问先发动谁
+        self.first = room:askForChoice(player, choices, self.name, "#jy_luojiao_ask_which")  -- 如果玩家确定使用，询问先用哪张牌
+        return true
+      end
+    end
+
+    -- 因为南蛮触发的比万箭多，所以把南蛮放到前面提高效率
+
+    -- 如果南蛮的条件满足
+    if player.is_savage_assault then 
+      if room:askForSkillInvoke(player, self.name, nil, "#jy_luojiao_savage_assault_ask") then  -- 那么问是否要发动
+        self.do_savage_assault = true
         return true
       end
     end
     
-    -- 如果有可能触发万箭
+    -- 如果万箭的条件满足
     if player.is_archery_attack then
       if room:askForSkillInvoke(player, self.name, nil, "#jy_luojiao_archery_attack_ask") then  -- 那么问是否要发动
         self.do_archery_attack = true
-        return true
-      end
-    end
-
-    if player.is_savage_assault then 
-      if room:askForSkillInvoke(player, self.name, nil, "#jy_luojiao_savage_assault_ask") then
-        self.do_savage_assault = true
         return true
       end
     end
@@ -1266,19 +1277,19 @@ local jy_luojiao_after = fk.CreateTriggerSkill{
   on_use = function(self, event, target, player, data)
     local room = player.room
 
-    if self.first then  -- 如果同时触发
-      -- 判断到底第一个触发谁
+    if self.first then  -- 如果self.first这个值有，那就代表两个条件同时满足
       local cards
       local skills
-      -- 总之，像这样写方便以后扩展，也可以更好地移植到别的代码里去（
-      if self.first == "archery_attack" then
+      -- 这样写方便以后扩展，也可以更好地移植到别的代码里去
+      if self.first == "archery_attack" then  -- 如果玩家选择先用万箭
         cards = {      "archery_attack",              "savage_assault"}
         skill_names = {"#jy_luojiao_archery_attack", "#jy_luojiao_savage_assault"}
       else
         cards = {      "savage_assault",              "archery_attack"}
         skill_names = {"#jy_luojiao_savage_assault", "#jy_luojiao_archery_attack"}
       end
-      -- assert(#cards == #skill_names) 如果以后想使用这段代码，需要确保上面的两个变量的长度相等
+      -- assert(#cards == #skill_names)
+      -- 对于
       for i = 1, #cards do
         if room:askForSkillInvoke(player, skill_names[i]) then  -- 如果同意发动这个技能
           room:notifySkillInvoked(player, skill_names[i], "offensive")  -- 在武将上显示这个技能的名字
@@ -1286,14 +1297,14 @@ local jy_luojiao_after = fk.CreateTriggerSkill{
           room:useVirtualCard(cards[i], nil, player, room:getOtherPlayers(player, true), self.name, true)
         end
       end
-    else  -- 如果没有同时触发，那就自己算自己的
-      -- 万箭
+    else  -- 如果没有两个条件同时满足，那满足谁就执行谁
+      -- 满足万箭，执行万箭
       if self.do_archery_attack then
         room:notifySkillInvoked(player, "jy_luojiao", "offensive")
         player:broadcastSkillInvoke("jy_luojiao")
         room:useVirtualCard("archery_attack", nil, player, room:getOtherPlayers(player, true), self.name, true)
       end
-      -- 南蛮
+      -- 满足南蛮，执行南蛮
       if self.do_savage_assault then
         room:notifySkillInvoked(player, "jy_luojiao", "offensive")
         player:broadcastSkillInvoke("jy_luojiao")
@@ -1318,7 +1329,8 @@ local jy_luojiao_set_0 = fk.CreateTriggerSkill{
   can_refresh = function(self, event, target, player, data)
     -- 任何一个人回合都要发动
     return player:hasSkill(self)
-      and target.phase == Player.Finish
+      and target.phase == Player.Finish and  -- 如果是这个人的回合结束阶段
+      player:getMark("@jy_is_luojiao_savage_assault_used") ~= 0
   end,
   on_refresh = function(self, event, target, player, data)
     player.room:setPlayerMark(player, "@jy_is_luojiao_savage_assault_used", 0)  -- 将罗绞南蛮发动过的标记设为0（也就是取消显示）
@@ -1400,7 +1412,6 @@ Fk:loadTranslationTable {
   [":jy_luojiao"] = [[当你的【点】的数量变化后：<br>
   1. 若你没有两张及以上相同花色的【点】，可以视为立即使用一张【南蛮入侵】，每回合限一次；<br>
   2. 若你有4张【点】，可以视为立即使用一张【万箭齐发】。]],
-  -- TODO: 好像luojiao2的语音不显示
   ["$jy_luojiao1"] = "Muchas gracias afición, esto es para vosotros, Siuuu",
   ["$jy_luojiao2"] = "（观众声）",
   ["#jy_luojiao_after"] = "罗绞",
