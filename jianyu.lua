@@ -1085,7 +1085,7 @@ local jy_tiaoshui = fk.CreateTriggerSkill{
 -- 罗绞
 -- 罗绞主技能只判断是否有牌进出特殊区，它的触发不保证罗绞真的触发。罗绞是否触发在后面的关联函数里面判断
 
--- TODO：别人往我特殊区里加牌时也会触发这个
+-- TODO：别人往我特殊区里加牌时也会触发这个。去看移动事件里怎么处理这个的。
 local jy_luojiao = fk.CreateTriggerSkill{
   name = "jy_luojiao",
   anim_type = "offensive",
