@@ -3,6 +3,8 @@ extension.extensionName = "jianyu"
 
 -- DIY真诚意见：所有你这个包的东西都加一个你自己的开头，这样防止和别人的重名。比如我的"huxiao"一开始就和别人重名了。
 
+-- TODO：牌移出特殊区的时候也需要监视，不然别人帮你移出别的区的时候也会触发
+
 Fk:loadTranslationTable {
      ["jy_jianyu"] = "简浴",
      ["xjb"] = "导演",
@@ -408,7 +410,7 @@ local jy_erduanxiao = fk.CreateTriggerSkill{
           if #xiaos == 3 then
             -- print("啸是3")
             for _, info in ipairs(move.moveInfo) do  -- 还有第二层循环。我自己的代码里没有第二层
-              if info.fromArea == Card.PlayerSpecial then
+              if info.fromArea == Card.PlayerSpecial and info.specialName == "skl__liyuanhao_xiao" then
                 -- print("有牌正打算从你家特殊区离开")
                 return true
               end
@@ -421,14 +423,8 @@ local jy_erduanxiao = fk.CreateTriggerSkill{
     -- 判断是否有牌进来
     if #xiaos == 1 then  -- 如果啸是1
       for _, move in ipairs(data) do  -- 如果有一张牌是进入或者离开我的特殊区，那么这个函数可以触发
-        if (move.to == player.id and move.toArea == Card.PlayerSpecial) or
-          (move.from == player.id and move.fromArea == Card.PlayerSpecial) then
-          -- 去找一段代码，检测自己特殊区的牌离开的
-          -- print("二段笑（一段）已经检测有牌从特殊区变动", #xiaos)
-          -- 检测不到离开
-          -- if move.to == player.id and move.toArea == Card.PlayerSpecial then
-          --   print("二段笑（一段）已经检测有牌来到特殊区", #xiaos)
-          -- end
+        if move.to == player.id and move.toArea == Card.PlayerSpecial and
+          move.specialName == "skl__liyuanhao_xiao" then
           return true
         end
       end
@@ -630,7 +626,7 @@ local jy_erduanxiao_2 = fk.CreateTriggerSkill{
           if #xiaos == 3 then
             -- print("啸是3")
             for _, info in ipairs(move.moveInfo) do  -- 还有第二层循环。我自己的代码里没有第二层
-              if info.fromArea == Card.PlayerSpecial then
+              if info.fromArea == Card.PlayerSpecial then  -- 出去的时候不需要判断specialName，因为去的是弃牌堆
                 -- print("有牌正打算从你家特殊区离开")
                 return true
               end
@@ -642,9 +638,9 @@ local jy_erduanxiao_2 = fk.CreateTriggerSkill{
     
     -- 判断是否有牌进来
     if #xiaos == 1 then  -- 如果啸是1
-      for _, move in ipairs(data) do  -- 如果有一张牌是进入或者离开我的特殊区，那么这个函数可以触发
-        if (move.to == player.id and move.toArea == Card.PlayerSpecial) or
-          (move.from == player.id and move.fromArea == Card.PlayerSpecial) then
+      for _, move in ipairs(data) do
+        if move.to == player.id and move.toArea == Card.PlayerSpecial and
+          move.specialName == "tym__liyuanhao_xiao" then
           -- 去找一段代码，检测自己特殊区的牌离开的
           -- print("二段笑（一段）已经检测有牌从特殊区变动", #xiaos)
           -- 检测不到离开
@@ -1108,8 +1104,7 @@ local jy_luojiao = fk.CreateTriggerSkill{
       if move.from then
         if move.from == player.id then
           for _, info in ipairs(move.moveInfo) do
-            if info.fromArea == Card.PlayerSpecial then
-              -- print("有牌正打算从你家特殊区离开")
+            if info.fromArea == Card.PlayerSpecial then  -- 出去的时候不需要判断，因为去的是弃牌堆
               -- 如果点是5，那么有可能可以触发万箭齐发
               if #dians == 5 then player.is_luojiao_archery_attack_may_be_triggered = true end
               is_special_changing = true
@@ -1121,7 +1116,7 @@ local jy_luojiao = fk.CreateTriggerSkill{
     
     -- 判断是否有牌进来
     for _, move in ipairs(data) do
-      if move.to == player.id and move.toArea == Card.PlayerSpecial then
+      if move.to == player.id and move.toArea == Card.PlayerSpecial and move.specialName == "xjb__aweiluo_dian" then
         -- 如果点是3，那么有可能可以触发万箭齐发
         if #dians == 3 then player.is_luojiao_archery_attack_may_be_triggered = true end
         is_special_changing = true
