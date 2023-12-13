@@ -43,47 +43,6 @@ local jy_zouwei = fk.CreateDistanceSkill{
     return 0
   end,
 }
--- TODO: 没写好之前先禁用
--- -- 参考自孙尚香，formation君刘备
--- local jy_zouwei_audio = fk.CreateTriggerSkill{
---   name = "#jy_zouwei_audio",
-
---   refresh_events = {fk.AfterCardsMove},
---   -- 这个函数只有在装备区牌量变动时才检测
---   can_refresh = function(self, event, target, player, data)
---     if not player:hasSkill(self) then return end
---     for _, move in ipairs(data) do  -- 对着抄的，开始第一个循环
---       if move.from == player.id or move.to == player.id then  -- 这行对着抄的，判断是否是自己家
---         for _, info in ipairs(move.moveInfo) do  -- 对着抄的，第二个循环
---           if info.fromArea == Card.PlayerEquip or info.toArea == Card.PlayerEquip then  -- 对着抄的，在这里判断是去哪个区的
---             -- 不知道为啥用不了
---             if #player:getCardIds(Player.Equip) > 0  then  -- 他进了你的装备区之后，你的装备数量为1
---               print("检测到装备不等于0")
---               return true
---             end
---             -- 下面这个可以运行
---             if #player:getCardIds(Player.Equip) == 0 and info.fromArea == Card.PlayerEquip then  -- 他出了你的装备区之后，你的装备数量为0
---               return true
---             end
---           end
---         end
---       end
---     end
---   end,
---   on_refresh = function(self, event, target, player, data)
---     local room = player.room
---     -- 有装备时，-1马
---     if #player:getCardIds(player.Equip) > 0 then
---       room:notifySkillInvoked(player, "jy_zouwei", "offensive")
---       player:broadcastSkillInvoke("jy_zouwei", 1)
---     -- 无装备时，+1马
---     elseif #player:getCardIds(player.Equip) == 0 then
---       room:notifySkillInvoked(player, "jy_zouwei", "defensive")
---       player:broadcastSkillInvoke("jy_zouwei", 2)
---     end
---   end,
--- }
--- jy_zouwei:addRelatedSkill(jy_zouwei_audio)
 
 -- 圣弩
 -- 参考自formation包的君刘备
@@ -262,18 +221,11 @@ local jy_kaiju_2 = fk.CreateActiveSkill{
   target_filter = function(self, to_select, selected)
 
     -- 判断目标是否有谦逊
-    for _, s in ipairs(Fk:currentRoom():getPlayerById(to_select).player_skills) do
+    for _, s in ipairs(to:getAllSkills()) do
       if s.name == "qianxun" then
         return
       end
     end
-
-    -- 下面这段是杀里面的藤甲判定抄来的，感觉可以用。上面那个可能效率更高？
-    -- for _, s in ipairs(to:getAllSkills()) do
-    --   if s.name == "qianxun" then
-    --     return
-    --   end
-    -- end
 
     return to_select ~= Self.id and -- 如果目标不是自己，而且没有谦逊
       not Fk:currentRoom():getPlayerById(to_select):isAllNude()  -- 而且不是啥也没有。
@@ -286,18 +238,6 @@ local jy_kaiju_2 = fk.CreateActiveSkill{
 
       if not player.dead then
         room:useVirtualCard("snatch", nil, player, p, self.name, true)  -- 顺
-        
-        -- 顺手牵羊，但不能被无懈可击响应（那我为啥不直接顺？）
-        -- local snatch = Fk:cloneCard("snatch")
-        -- snatch.skillName = self.name
-        -- local new_use = { ---@type CardUseStruct
-        --   from = use.from,  -- 应该是直接传id
-        --   tos = { { to } },
-        --   card = snatch,
-        --   prohibitedCardNames = { "nullification" },
-        -- }
-        -- room:useCard(new_use)
-
         room:useVirtualCard("slash", nil, p, player, self.name, true)  -- 杀
       end
     end
@@ -319,7 +259,7 @@ local jy_xizao_2 = fk.CreateTriggerSkill{
     -- player:reset()
     player:drawCards(3, self.name)
     if player.dead or not player:isWounded() then return end
-    -- 将体力回复至3点
+    -- 将体力回复至1点
     room:recover({
       who = player,
       num = math.min(1, player.maxHp) - player.hp,
@@ -392,12 +332,10 @@ local jy_huxiao = fk.CreateTriggerSkill{
 }
 
 -- 啸酒
--- 注释里是为了测试改成无中生有。保留在这里以防你后面还需要测试。
 local jy_huxiao_analeptic = fk.CreateViewAsSkill{
   name = "jy_huxiao_analeptic",
   anim_type = "defensive",
   pattern = "analeptic",
-  -- pattern = "ex_nihilo",
   expand_pile = "skl__liyuanhao_xiao",
   card_filter = function(self, to_select, selected)
     if #selected == 1 then return false end
@@ -557,7 +495,6 @@ local jy_husanjian = fk.CreateTriggerSkill{
     data.damage = data.damage - 1
   end,
 }
--- TODO: 加一个触发效果器
 
 skl__liyuanhao:addSkill(jy_huxiao)
 skl__liyuanhao:addSkill(jy_huxiao_analeptic)
@@ -618,12 +555,10 @@ local jy_huxiao_2 = fk.CreateTriggerSkill{
 }
 
 -- 界啸酒
--- 注释里是为了测试改成无中生有。保留在这里以防你后面还需要测试。
 local jy_huxiao_analeptic_2 = fk.CreateViewAsSkill{
   name = "jy_huxiao_analeptic_2",
   anim_type = "defensive",
   pattern = "analeptic",
-  -- pattern = "ex_nihilo",
   expand_pile = "tym__liyuanhao_xiao",
   card_filter = function(self, to_select, selected)
     if #selected == 1 then return false end
@@ -720,12 +655,11 @@ local jy_erduanxiao_2 = fk.CreateTriggerSkill{
         end
       end
     end
-  end,  -- 每个参数的结尾都要逗号。can_trigger是一个参数
+  end,
 
   on_trigger = function(self, event, target, player, data)
     -- 触发之后，设置变量，告诉下一个函数有没有可能在发生变化
     player.is_xiao_changing = true
-    -- print("二段笑（第一段） on_trigger已触发，现在是", player.is_xiao_changing, #player:getPile("tym__liyuanhao_xiao"))
   end,
 }
 
@@ -1029,8 +963,6 @@ local jy_yuanshen_2 = fk.CreateTriggerSkill{
 }
 
 -- 参考自悲歌
--- 因为如果每个无属性伤害都触发这个技能的话会极大增加等待时间，所以我的建议是更改成悲歌，只响应【杀】
--- TODO：建议把这个技能改成类似朱雀羽扇，在杀之前就转换伤害，这样方便在伤害计算后触发别的。建议直接改成选择是否要转化，免费判定。
 local jy_fumo = fk.CreateTriggerSkill{
   name = "jy_fumo",
   anim_type = "masochism",
@@ -1081,8 +1013,8 @@ Fk:loadTranslationTable {
   ["jy_fumo"] = "附魔",
   ["#jy_fumo-invoke"] = "附魔：%dest 受到伤害，你可以弃置一张牌，改为属性伤害",
   [":jy_fumo"] = [[当有角色造成无属性伤害时，
-  你可以弃一张牌。若你弃的牌为：
-  红色，将此次伤害改为<font color="red">火焰</font>；
+  你可以弃一张牌，根据该牌颜色变更伤害的属性：
+  红色，改为<font color="red">火焰</font>；
   黑色，改为<font color="purple">雷电</font>。]],
 }
 
@@ -1136,7 +1068,8 @@ local jy_tiaoshui = fk.CreateTriggerSkill{
   events = {fk.Damaged},
   can_trigger = function(self, event, target, player, data)
     local dians = player:getPile("xjb__aweiluo_dian")
-    return #dians ~= 0
+    return target == player and target:hasSkill(self.name) and 
+      #dians ~= 0
   end,
   on_use = function(self, event, target, player, data)
     local room = player.room
@@ -1386,8 +1319,8 @@ jy_yusu:addRelatedSkill(jy_yusu_set_0)
 xjb__aweiluo:addSkill(jy_youlong)
 xjb__aweiluo:addSkill(jy_hebao)
 xjb__aweiluo:addSkill(jy_tiaoshui)
-xjb__aweiluo:addSkill(jy_luojiao)
 xjb__aweiluo:addSkill(jy_yusu)
+xjb__aweiluo:addSkill(jy_luojiao)
 
 Fk:loadTranslationTable {
   ["xjb__aweiluo"] = "阿威罗",
@@ -1395,7 +1328,7 @@ Fk:loadTranslationTable {
 
   ["jy_youlong"] = "游龙",
   ["#jy_youlong-choose"] = "游龙：选择一张牌交给下家",
-  [":jy_youlong"] = "锁定技，你的回合开始时，从你开始，每名有手牌的角色选择一张手牌交给下家。",
+  [":jy_youlong"] = "锁定技，你的回合开始时，每名有手牌的角色将一张手牌交给下家。",
   ["$jy_youlong1"] = "翩若惊鸿！婉若游龙！",
 
   ["jy_hebao"] = "核爆",
