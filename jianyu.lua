@@ -1,6 +1,8 @@
 local extension = Package:new("jy_jianyu")
 extension.extensionName = "jianyu"
 
+-- DIY真诚意见：所有你这个包的东西都加一个你自己的开头，这样防止和别人的重名。比如我的"huxiao"一开始就和别人重名了。
+
 Fk:loadTranslationTable {
      ["jy_jianyu"] = "简浴",
      ["xjb"] = "导演",
@@ -341,7 +343,7 @@ Fk:loadTranslationTable{
   ["tym__jianzihao"] = "界简自豪",
 
   ["jy_kaiju_2"] = "开局",
-  [":jy_kaiju_2"] = "出牌阶段限一次，你选择若干名角色。你对他们【顺手牵羊】，然后被他们【杀】。",
+  [":jy_kaiju_2"] = "出牌阶段限一次，你选择若干名角色，视为你对他们【顺手牵羊】，然后被他们【杀】，依次结算。",
   ["$jy_kaiju_21"] = "不是啊，我炸一对鬼的时候我在打什么，打一对10。一对10，他四个9炸我，我不输了吗？",
   ["$jy_kaiju_22"] = "怎么赢啊？你别瞎说啊！",
   ["$jy_kaiju_23"] = "打这牌怎么打？兄弟们快教我，我看着头晕！",
@@ -353,7 +355,7 @@ Fk:loadTranslationTable{
 
   ["jy_sanjian"] = "三件",
   [":jy_sanjian"] = [[锁定技，出牌阶段开始时，如果你的装备区有且仅有3张牌，你视为使用一张【酒】和一张【无中生有】。<br>
-  <font size="1"><i>“又陷入劣势了，等乌兹三件套吧！”——不知道哪个解说说的</i></font>]],
+  <font size="1"><i>“等乌兹三件套！”</i></font>]],
   ["$jy_sanjian1"] = "也不是稳赢吧，我觉得赢了！",
 
   ["jy_xizao_2"] = "洗澡",
@@ -378,9 +380,7 @@ local jy_huxiao = fk.CreateTriggerSkill{
   can_trigger = function(self, event, target, player, data)
     if player:hasSkill(self) and data.card.trueName == "slash" then
       -- 使用是TS，打出是CR
-      if event == fk.TargetSpecified or event == fk.CardResponding then
-        return target == player
-      end
+      return target == player
     end
   end,
   on_use = function(self, event, target, player, data)
@@ -451,75 +451,6 @@ local jy_erduanxiao = fk.CreateTriggerSkill{
   events = {fk.BeforeCardsMove},  -- 理论上来说每次牌的移动只有同一个方向的
   -- frequency = Skill.Compulsory,
   mute = true,
-
-  -- can_trigger = function(self, event, target, player, data)
-  --   -- 只判断是否有牌进出了你的特殊区，而不判断它是否是啸（因为比较复杂，等确定有可能了之后再判断，节省资源）
-  --   if player:hasSkill(self) then -- 如果是有二段啸的角色
-  --     local xiaos = player:getPile("skl__liyuanhao_xiao")
-  --     player.is_xiao_changing = false -- 默认这次没有变化
-  --     if #xiaos == 1 or #xiaos == 3 then  -- 如果啸是1或3
-  --       -- 1是可以触发的，3不知道为啥触发不了。难道viewas不会移动牌吗？
-  --       -- 我觉得有可能是这个原因。明天可以改成“用完牌之后”之类的。
-  --       if #xiaos == 3 then print("二段笑（一段）已经检测到#xiaos为", #xiaos) end
-  --       for _, move in ipairs(data) do  -- 如果有一张牌是进入或者离开我的特殊区，那么这个函数可以触发
-  --         if (move.to == player.id and move.toArea == Card.PlayerSpecial) or
-  --           (move.from == player.id and move.fromArea == Card.PlayerSpecial) then
-  --           -- 去找一段代码，检测自己特殊区的牌离开的
-  --           print("二段笑（一段）已经检测有牌从特殊区变动", #xiaos)
-  --           -- 检测不到离开
-  --           if move.to == player.id and move.toArea == Card.PlayerSpecial then
-  --             print("二段笑（一段）已经检测有牌来到特殊区", #xiaos)
-  --           end
-  --           if move.from == player.id and move.fromArea == Card.PlayerSpecial then
-  --             print("二段笑（一段）已经检测有牌从特殊区离开", #xiaos)
-  --           end
-  --           return true
-  --         end
-  --       end
-  --     end
-  --   end
-  -- end,
-
-  -- -- 根据守成改的版本，现在可以3-2了，但是不能1-2
-  -- -- 我真的不知道为什么了。这样吧，把两个版本综合一下，写到下一个里面，这个就算完成了。以后再改。
-  -- can_trigger = function(self, event, target, player, data)
-  --   if not player:hasSkill(self) then return end  -- 如果我自己没有这个技能，那就算了
-  --   local xiaos = player:getPile("skl__liyuanhao_xiao")
-  --   player.is_xiao_changing = false
-  --   for _, move in ipairs(data) do  -- 第一层循环，不知道为啥
-  --     if move.from then  -- 照着抄的，牌离开
-  --       print("有牌正打算离开")
-  --       if move.from == player.id then
-  --         print("有牌正打算从你家离开")
-  --         if #xiaos == 3 then
-  --           print("啸是3")
-  --           for _, info in ipairs(move.moveInfo) do  -- 还有第二层循环。我自己的代码里没有第二层
-  --             if info.fromArea == Card.PlayerSpecial then
-  --               print("有牌正打算从你家特殊区离开")
-  --               return true
-  --             end
-  --           end
-  --         end
-  --       end
-  --     elseif move.to then  -- 照着抄的，牌离开
-  --       print("有牌正打算来")
-  --       if move.to == player.id then
-  --         print("有牌正打算来你家")
-  --         if #xiaos == 1 then
-  --           print("啸是1")
-  --           for _, info in ipairs(move.moveInfo) do  -- 还有第二层循环。我自己的代码里没有第二层
-  --             if info.toArea == Card.PlayerSpecial then
-  --               print("有牌正打算来你家特殊区")
-  --               return true
-  --             end
-  --           end
-  --         end
-  --       end
-  --     end
-  --   end
-  -- end,  -- 每个参数的结尾都要逗号。can_trigger是一个参数
-
-
 
   -- 测试通过。1-2，3-2都可以顺利触发。
   -- 我猜想原因是1-2的时候可能有多张牌进出，而3-2的时候只会有一张牌出去。但我搞不懂这个数据结构，
@@ -640,7 +571,7 @@ Fk:loadTranslationTable {
 
   ["jy_huxiao"] = "虎啸",
   [":jy_huxiao"] = [[当你使用或打出一张【杀】时，你可以将牌堆顶的一张牌置于你的角色牌上，称为【啸】。
-  <br><font size="1"><i>“我希望我的后辈们能够记住，在你踏上职业道路的这一刻开始，你的目标就只有，冠军。”——李元浩</i></font>]],
+  <br><font size="1"><i>“我希望我的后辈们能够记住，在你踏上职业道路的这一刻开始，你的目标就只有，冠军。”</i></font>]],
 
   ["jy_huxiao_analeptic"] = "横刀",
   [":jy_huxiao_analeptic"] = [[你可以将【啸】当作【酒】使用或打出。
@@ -675,9 +606,7 @@ local jy_huxiao_2 = fk.CreateTriggerSkill{
   can_trigger = function(self, event, target, player, data)
     if player:hasSkill(self) and data.card.trueName == "slash" then
       -- 使用是TS，打出是CR
-      if event == fk.TargetSpecified or event == fk.CardResponding then
-        return target == player
-      end
+      return target == player
     end
   end,
   on_use = function(self, event, target, player, data)
@@ -824,14 +753,15 @@ local jy_erduanxiao_trigger_2 = fk.CreateTriggerSkill{
 
   on_use = function(self, event, target, player, data)
     local xiaos = player:getPile("tym__liyuanhao_xiao")
+    local room = player.room
     if self.choice == "#lose_xiao_2" then
       -- 将所有【啸】纳入自己的手牌
-      player.room:moveCardTo(xiaos, Card.PlayerHand, player, fk.ReasonJustMove, self.name, "tym__liyuanhao_xiao", true, player.id)
+      room:moveCardTo(xiaos, Card.PlayerHand, player, fk.ReasonJustMove, self.name, "tym__liyuanhao_xiao", true, player.id)
     elseif self.choice == "#lose_hp_1_2" then
       -- 弃掉所有【啸】
-      player.room:throwCard(xiaos, self.name, player, player)  -- 把啸全部扔掉
+      room:throwCard(xiaos, self.name, player, player)  -- 把啸全部扔掉
       -- 回复1点体力
-      player.room:recover({
+      room:recover({
         who = player,
         num = 1,
         recoverBy = player,
@@ -885,7 +815,7 @@ Fk:loadTranslationTable {
 
   ["jy_huxiao_2"] = "虎啸",
   [":jy_huxiao_2"] = [[当你使用或打出一张【杀】时，你可以将牌堆顶的一张牌置于你的角色牌上，称为【啸】。
-  <br><font size="1"><i>“我希望我的后辈们能够记住，在你踏上职业道路的这一刻开始，你的目标就只有，冠军。”——李元浩</i></font>]],
+  <br><font size="1"><i>“我希望我的后辈们能够记住，在你踏上职业道路的这一刻开始，你的目标就只有，冠军。”</i></font>]],
 
   ["jy_huxiao_analeptic_2"] = "横刀",
   [":jy_huxiao_analeptic_2"] = [[你可以将【啸】当作【酒】使用或打出。
@@ -943,9 +873,7 @@ local jy_yuyu = fk.CreateTriggerSkill{
     end
   end,
   on_cost = function(self, event, target, player, data)
-    if player.room:askForSkillInvoke(player, self.name, data) then  -- 那么问是否要发动
-      return true
-    end
+    return player.room:askForSkillInvoke(player, self.name, data)  -- 那么问是否要发动
   end,
   on_use = function(self, event, target, player, data)
     player:drawCards(3)
@@ -1217,31 +1145,29 @@ local jy_tiaoshui = fk.CreateTriggerSkill{
 
 -- 罗绞
 -- 抄自上面的jy_erduanxiao_2
--- 罗绞主函数只给一个大致的判断，那么有可能是触发了的，但不保证真的触发。到底触发没有，在后面的关联函数里面判断。
+-- 罗绞主技能只判断是否有牌进出特殊区，它的触发不保证罗绞真的触发。罗绞是否触发在后面的关联函数里面判断。
+-- 为了让群友理解这个函数，写了很多注释
 local jy_luojiao = fk.CreateTriggerSkill{
   name = "jy_luojiao",
   anim_type = "offensive",
-  events = {fk.BeforeCardsMove},  -- 理论上来说每次牌的移动只有同一个方向的
-  mute = true,
+  refresh_events = {fk.BeforeCardsMove},  -- 在每次牌移动之前
+  mute = true,  -- 不声明使用了这个技能
 
-  can_trigger = function(self, event, target, player, data)
-    if not player:hasSkill(self) then return end
+  can_refresh = function(self, event, target, player, data)  -- 使用refresh而不是trigger，是因为这个技能不需要询问玩家是否触发
+    if not player:hasSkill(self) then return end  -- 如果我自己没有这个技能，那就不触发了
 
-    local dians = player:getPile("xjb__aweiluo_dian")
-    print("又到这里来了！再判断一次是否是移动前，并将is_dian_may_changing设为false！")
-    player.is_dian_may_changing = false
+    local dians = player:getPile("xjb__aweiluo_dian")  -- dians是【点】的牌
+    player.is_dian_may_changing = false  -- 点是否有可能变化
 
     -- 判断是否有牌进出特殊区
     player.is_luojiao_archery_attack_may_be_triggered = false  -- 先清理自家变量
-    -- 为什么不用data传参数，因为这里是BeforeCardsMove，后面是AfterCardsMove，两个不是同一个事件。
+    -- 为什么不用data传参数，因为这里是BeforeCardsMove，后面是AfterCardsMove，两个不是同一个事件，data不一样。用player
     local is_special_changing = false  -- 判断是否有牌进出特殊区。该函数最后返回的是这个值。
 
     -- 判断是否有牌出去
     for _, move in ipairs(data) do
-      if move.from then  -- 照着抄的，牌离开
-        -- print("有牌正打算离开")
+      if move.from then
         if move.from == player.id then
-          -- print("有牌正打算从你家离开")
           for _, info in ipairs(move.moveInfo) do
             if info.fromArea == Card.PlayerSpecial then
               -- print("有牌正打算从你家特殊区离开")
@@ -1255,7 +1181,7 @@ local jy_luojiao = fk.CreateTriggerSkill{
     end
     
     -- 判断是否有牌进来
-    for _, move in ipairs(data) do  -- 如果有一张牌是进入我的特殊区，那么这个函数可以触发
+    for _, move in ipairs(data) do
       if move.to == player.id and move.toArea == Card.PlayerSpecial then
         -- 如果点是3，那么有可能可以触发万箭齐发
         if #dians == 3 then player.is_luojiao_archery_attack_may_be_triggered = true end
@@ -1266,65 +1192,119 @@ local jy_luojiao = fk.CreateTriggerSkill{
     return is_special_changing
   end,
 
-  on_trigger = function(self, event, target, player, data)
+  on_refresh = function(self, event, target, player, data)
     -- 触发之后，设置变量，告诉下一个函数有没有可能在发生变化
     player.is_dian_may_changing = true
+    -- 必须使用player来储存该变量，因为后面的事件使用的是另一个函数jy_luojiao_after，如果你用self，那个函数是看不到的
   end,
 }
-local jy_luojiao_archery_attack = fk.CreateTriggerSkill{
-  name = "#jy_luojiao_archery_attack",
+-- 修改：使用同一个函数来判断是否触发了南蛮和万箭。
+local jy_luojiao_after = fk.CreateTriggerSkill{
+  name = "#jy_luojiao_after",
   events = {fk.AfterCardsMove},
   can_trigger = function(self, event, target, player, data)
     if not player:hasSkill(self) then return false end
     if not player.is_dian_may_changing then return false end  -- 如果点有可能在变化
-    return player.is_luojiao_archery_attack_may_be_triggered == true and  -- 如果有可能触发万箭齐发
-      #player:getPile("xjb__aweiluo_dian") == 4  -- 如果点为4
-  end,
-  on_cost = function(self, event, target, player, data)
-    if player.room:askForSkillInvoke(player, self.name, nil, "#jy_luojiao_archery_attack_ask") then  -- 那么问是否要发动
-      return true
-    end
-  end,
-  on_use = function(self, event, target, player, data)
-    local room = player.room
-    player:broadcastSkillInvoke("jy_luojiao", 1)  -- 只播放语音，不宣布触发（因为已经宣布了触发罗绞·万箭齐发）
-    -- room:notifySkillInvoked(player, "jy_luojiao", "offensive")
-    room:useVirtualCard("archery_attack", nil, player, room:getOtherPlayers(player, true), self.name, true)
-  end
-}
-local jy_luojiao_savage_assault = fk.CreateTriggerSkill{
-  name = "#jy_luojiao_savage_assault",
-  events = {fk.AfterCardsMove},
-  can_trigger = function(self, event, target, player, data)
-    if not player:hasSkill(self) then return false end
-    if player:usedSkillTimes(self.name) ~= 0 then return false end  -- 这个条件必须放在这里，提高效率，也可以一定程度上防止因别的特殊区牌量变动而多次触发
-    if not player.is_dian_may_changing then return false end
-    -- TODO：如果有其他的牌进出你的特殊区，即使不是点，也会触发这个技能
+
     local dians = player:getPile("xjb__aweiluo_dian")
-    -- 判断花色是否全部不同，触发**入侵
-    if #dians == 0 then return false end  -- 熊俊博说1张也可以发动**，那就把==1删掉
+
+    -- 判断花色是否全部不同
+    if #dians == 0 then return false end  -- 设计者说1张也可以发动南蛮
     dict = {}
+    local is_luojiao_suit_satisfied = true
     for _, c in ipairs(dians) do
       local suit = Fk:getCardById(c).suit
       if dict[suit] then
-        -- print("有相同的花色，不执行")
-        return false
+        -- 有相同的花色，不执行
+        is_luojiao_suit_satisfied = false
+        break
       else
         dict[suit] = true
       end
     end
-    return true  -- 是否有新的点进出导致**入侵
+
+    -- 万箭需要满足的条件：点数为4，且之前已经告诉我有可能触发
+    player.is_archery_attack = 
+      player.is_luojiao_archery_attack_may_be_triggered and
+      #player:getPile("xjb__aweiluo_dian") == 4
+    -- 南蛮需要满足的条件：花色全部不同，且本回合未使用过
+    player.is_savage_assault = is_luojiao_suit_satisfied and
+      player:usedSkillTimes(self.name) == 0
+
+    return player.is_archery_attack or player.is_savage_assault
   end,
   on_cost = function(self, event, target, player, data)
-    return player.room:askForSkillInvoke(player, self.name, nil, "#jy_luojiao_savage_assault_ask")
+    local room = player.room
+    self.first = nil
+
+    -- 如果同时触发
+    if player.is_archery_attack and player.is_savage_assault then
+      if room:askForSkillInvoke(player, self.name, nil, "#jy_luojiao_both_ask") then  -- 都触发了，询问是否要使用这个技能
+        local choices = {"archery_attack", "savage_assault"} 
+        self.first = room:askForChoice(player, choices, self.name, "#jy_luojiao_ask_which")  -- 如果确定使用，询问先发动谁
+        return true
+      end
+    end
+    
+    -- 如果有可能触发万箭
+    if player.is_archery_attack then
+      if room:askForSkillInvoke(player, self.name, nil, "#jy_luojiao_archery_attack_ask") then  -- 那么问是否要发动
+        self.do_archery_attack = true
+        return true
+      end
+    end
+
+    if player.is_savage_assault then 
+      if room:askForSkillInvoke(player, self.name, nil, "#jy_luojiao_savage_assault_ask") then
+        self.do_savage_assault = true
+        return true
+      end
+    end
   end,
   on_use = function(self, event, target, player, data)
     local room = player.room
-    player:broadcastSkillInvoke("jy_luojiao", 1)  -- 只播放语音，不宣布触发（因为已经宣布了触发罗绞·**入侵）
-    room:setPlayerMark(player, "@jy_is_luojiao_savage_assault_used", "#used")
-    -- room:notifySkillInvoked(player, "jy_luojiao", "offensive")
-    room:useVirtualCard("savage_assault", nil, player, room:getOtherPlayers(player, true), self.name, true)
-    -- player.is_dian_may_changing = false
+
+    if self.first then  -- 如果同时触发
+      -- 判断到底第一个触发谁
+      local cards
+      local skills
+      -- 总之，像这样写方便以后扩展，也可以更好地移植到别的代码里去（
+      if self.first == "archery_attack" then
+        cards = {      "archery_attack",              "savage_assault"}
+        skill_names = {"#jy_luojiao_archery_attack", "#jy_luojiao_savage_assault"}
+      else
+        cards = {      "savage_assault",              "archery_attack"}
+        skill_names = {"#jy_luojiao_savage_assault", "#jy_luojiao_archery_attack"}
+      end
+      -- assert(#cards == #skill_names) 如果以后想使用这段代码，需要确保上面的两个变量的长度相等
+      for i = 1, #cards do
+        if room:askForSkillInvoke(player, skill_names[i]) then  -- 如果同意发动这个技能
+          room:notifySkillInvoked(player, skill_names[i], "offensive")  -- 在武将上显示这个技能的名字
+          player:broadcastSkillInvoke("jy_luojiao")  -- 播放这个技能的语音
+          room:useVirtualCard(cards[i], nil, player, room:getOtherPlayers(player, true), self.name, true)
+        end
+      end
+    else  -- 如果没有同时触发，那就自己算自己的
+      -- 万箭
+      if self.do_archery_attack then
+        room:notifySkillInvoked(player, "jy_luojiao", "offensive")
+        player:broadcastSkillInvoke("jy_luojiao")
+        room:useVirtualCard("archery_attack", nil, player, room:getOtherPlayers(player, true), self.name, true)
+      end
+      -- 南蛮
+      if self.do_savage_assault then
+        room:notifySkillInvoked(player, "jy_luojiao", "offensive")
+        player:broadcastSkillInvoke("jy_luojiao")
+        room:setPlayerMark(player, "@jy_is_luojiao_savage_assault_used", "#jy_luojiao_used")
+        room:useVirtualCard("savage_assault", nil, player, room:getOtherPlayers(player, true), self.name, true)
+      end
+    end
+    -- 一次【点】的变化结算完成，把所有变量都设为初始
+    self.do_archery_attack = false
+    self.do_savage_assault = false
+    player.is_dian_may_changing = false
+    player.is_archery_attack = false
+    player.is_savage_assault = false
   end
 }
 local jy_luojiao_set_0 = fk.CreateTriggerSkill{
@@ -1332,20 +1312,18 @@ local jy_luojiao_set_0 = fk.CreateTriggerSkill{
   mute = true,
   frequency = Skill.Compulsory,
   visible = false,
-  events = {fk.EventPhaseStart},  -- EventPhaseStart的意思是一个阶段的开始，并不是回合开始阶段
-  can_trigger = function(self, event, target, player, data)
-    return target == player and player:hasSkill(self)
-      and player.phase == Player.Finish
+  refresh_events = {fk.EventPhaseEnd},
+  can_refresh = function(self, event, target, player, data)
+    -- 任何一个人回合都要发动
+    return player:hasSkill(self)
+      and target.phase == Player.Finish
   end,
-  on_use = function(self, event, target, player, data)
-    local room = player.room
-    room:setPlayerMark(player, "@jy_is_luojiao_savage_assault_used", 0)  -- 将罗绞**发动过的标记设为0（也就是取消显示）
+  on_refresh = function(self, event, target, player, data)
+    player.room:setPlayerMark(player, "@jy_is_luojiao_savage_assault_used", 0)  -- 将罗绞南蛮发动过的标记设为0（也就是取消显示）
   end,
 }
-jy_luojiao:addRelatedSkill(jy_luojiao_archery_attack)
-jy_luojiao:addRelatedSkill(jy_luojiao_savage_assault)
+jy_luojiao:addRelatedSkill(jy_luojiao_after)
 jy_luojiao:addRelatedSkill(jy_luojiao_set_0)
-
 
 -- 玉玊
 local jy_yusu = fk.CreateTriggerSkill{
@@ -1363,8 +1341,8 @@ local jy_yusu = fk.CreateTriggerSkill{
     local room = player.room
     room:addPlayerMark(player, "@jy_yusu_basic_count")
     basic_count = player:getMark("@jy_yusu_basic_count")
-    -- if basic_count % 2 == 0 and basic_count ~= 0 then
-    if basic_count % 1 == 0 and basic_count ~= 0 then  -- TODO：为了测试改成1，记得改回来
+    if basic_count % 2 == 0 and basic_count ~= 0 then
+    -- if basic_count % 1 == 0 and basic_count ~= 0 then  -- TODO：为了测试改成1，记得改回来
       return room:askForSkillInvoke(player, self.name)
     end
   end,
@@ -1379,19 +1357,17 @@ local jy_yusu_set_0 = fk.CreateTriggerSkill{
   mute = true,
   frequency = Skill.Compulsory,
   visible = false,
-  events = {fk.EventPhaseStart},  -- EventPhaseStart的意思是一个阶段的开始，并不是回合开始阶段
-  can_trigger = function(self, event, target, player, data)
+  refresh_events = {fk.EventPhaseEnd},
+  can_refresh = function(self, event, target, player, data)
     return target == player and player:hasSkill(self)
-      and (player.phase == Player.Play or player.phase == Player.Finish)
+      and (player.phase == Player.Play or player.phase == Player.Play)
   end,
-  on_use = function(self, event, target, player, data)
+  on_refresh = function(self, event, target, player, data)
     local room = player.room
     room:setPlayerMark(player, "@jy_yusu_basic_count", 0)
   end,
 }
 jy_yusu:addRelatedSkill(jy_yusu_set_0)
-
-
 
 xjb__aweiluo:addSkill(jy_youlong)
 xjb__aweiluo:addSkill(jy_hebao)
@@ -1399,14 +1375,13 @@ xjb__aweiluo:addSkill(jy_tiaoshui)
 xjb__aweiluo:addSkill(jy_luojiao)
 xjb__aweiluo:addSkill(jy_yusu)
 
-
 Fk:loadTranslationTable {
   ["xjb__aweiluo"] = "阿威罗",
   ["xjb__aweiluo_dian"] = "点",
 
   ["jy_youlong"] = "游龙",
-  ["#jy_youlong-choose"] = "游龙：你需要选择一张牌交给下家",
-  [":jy_youlong"] = "锁定技，你的回合开始时，从你开始，每名玩家选择一张手牌交给下家。",
+  ["#jy_youlong-choose"] = "游龙：选择一张牌交给下家",
+  [":jy_youlong"] = "锁定技，你的回合开始时，从你开始每名角色选择一张手牌交给下家（没有则不交）。",
   ["$jy_youlong1"] = "翩若惊鸿！婉若游龙！",
 
   ["jy_hebao"] = "核爆",
@@ -1420,18 +1395,19 @@ Fk:loadTranslationTable {
   ["$jy_tiaoshui1"] = "Siu, hahahaha!",
 
   ["jy_luojiao"] = "罗绞",
-  [":jy_luojiao"] = [[当你的所有【点】花色均不同时（只有1张【点】也可以），可以视为使用一张【**入侵】，每回合限一次；
-  当你的【点】有4张时，可以视为使用一张【万箭齐发】。
-  <br><font size="1">已知问题：如果你的【点】有且仅有四张且花色都不同，
-  那么【**入侵】【万箭齐发】只能触发一个。这个问题将在后续修复。</font>]],
-  ["#jy_luojiao_archery_attack"] = "罗绞·万箭齐发",
-  ["#jy_luojiao_savage_assault"] = "罗绞·**入侵",
-  ["#jy_luojiao_archery_attack_ask"] = "【点】数量为4，是否发动 罗绞",
-  ["#jy_luojiao_savage_assault_ask"] = "【点】花色不同，是否发动 罗绞，每回合限一次",
+  [":jy_luojiao"] = [[当你的所有【点】花色均不同时（【点】数量为1也算），可以视为使用一张【南蛮入侵】，每回合限一次；
+  当你的【点】有4张时，可以视为使用一张【万箭齐发】。]],
   ["$jy_luojiao1"] = "Muchas gracias afición, esto es para vosotros, Siuuu",
+  ["$jy_luojiao2"] = "（观众声）",
+  ["#jy_luojiao_after"] = "罗绞",
+  ["#jy_luojiao_archery_attack"] = "罗绞·万箭",
+  ["#jy_luojiao_savage_assault"] = "罗绞·南蛮",
+  ["#jy_luojiao_archery_attack_ask"] = "【点】数量为4，是否发动 罗绞·万箭",
+  ["#jy_luojiao_savage_assault_ask"] = "【点】花色不同，是否发动 罗绞·南蛮，每回合限一次",
   ["@jy_is_luojiao_savage_assault_used"] = "罗绞",
-  ["#used"] = "发动过",
-  -- TODO: 不会触发这条语音，但我暂时懒得改了
+  ["#jy_luojiao_both_ask"] = "罗绞 两个条件同时达成，是否发动该技能",
+  ["#jy_luojiao_ask_which"] = "罗绞 两个条件同时达成并发动，请选择要先视为使用的卡牌",
+  ["#jy_luojiao_used"] = "已发动",
 
   ["jy_yusu"] = "玉玊",
   [":jy_yusu"] = "出牌阶段，你每使用第二张基本牌时，可以将其作为【点】置于你的武将牌上。",
