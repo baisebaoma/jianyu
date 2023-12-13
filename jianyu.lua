@@ -1395,7 +1395,7 @@ Fk:loadTranslationTable {
   ["$jy_tiaoshui1"] = "Siu, hahahaha!",
 
   ["jy_luojiao"] = "罗绞",
-  [":jy_luojiao"] = [[当你的所有【点】花色均不同时（【点】数量为1也算），可以视为使用一张【南蛮入侵】，每回合限一次；
+  [":jy_luojiao"] = [[当你没有2张相同花色的【点】时，可以视为使用一张【南蛮入侵】，每回合限一次；
   当你的【点】有4张时，可以视为使用一张【万箭齐发】。]],
   ["$jy_luojiao1"] = "Muchas gracias afición, esto es para vosotros, Siuuu",
   ["$jy_luojiao2"] = "（观众声）",
