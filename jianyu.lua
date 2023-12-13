@@ -1137,7 +1137,7 @@ local jy_tiaoshui = fk.CreateTriggerSkill{
   can_trigger = function(self, event, target, player, data)
     local dians = player:getPile("xjb__aweiluo_dian")
     return #dians ~= 0
-  end
+  end,
   on_use = function(self, event, target, player, data)
     local room = player.room
     local dians = player:getPile("xjb__aweiluo_dian")
