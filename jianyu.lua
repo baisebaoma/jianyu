@@ -3,8 +3,6 @@ extension.extensionName = "jianyu"
 
 -- DIY真诚意见：所有你这个包的东西都加一个你自己的开头，这样防止和别人的重名。比如我的"huxiao"一开始就和别人重名了。
 
--- TODO：牌移出特殊区的时候也需要监视，不然别人帮你移出别的区的时候也会触发
-
 Fk:loadTranslationTable {
      ["jy_jianyu"] = "简浴",
      ["xjb"] = "导演",
@@ -98,7 +96,6 @@ local jy_xizao = fk.CreateTriggerSkill{
     -- player:reset()
     player:drawCards(3, self.name)
     if player.dead or not player:isWounded() then return end
-    -- 将体力回复至1点
     room:recover({
       who = player,
       num = math.min(1, player.maxHp) - player.hp,
@@ -144,7 +141,6 @@ xjb__jianzihao:addSkill(jy_hongwen)
 xjb__jianzihao:addSkill(jy_zouwei)
 xjb__jianzihao:addSkill(jy_shengnu)
 xjb__jianzihao:addSkill(jy_xizao)
--- xjb__jianzihao:addSkill(jy_zhuanhui)
 
 Fk:loadTranslationTable{
   ["xjb__jianzihao"] = "简自豪",
@@ -176,7 +172,7 @@ Fk:loadTranslationTable{
   ["$jy_zouwei2"] = "完了呀！",
 
   ["jy_shengnu"] = "圣弩",
-  [":jy_shengnu"] = "当【诸葛连弩】移至弃牌堆或其他角色的装备区时，你可以获得此【诸葛连弩】。",
+  [":jy_shengnu"] = "当【诸葛连弩】移至弃牌堆或其他角色的装备区时，你可以获得之。",
   ["$jy_shengnu1"] = "哎兄弟们我这个牌不能拆吧？",
   ["$jy_shengnu2"] = "补刀瞬间回来了！",
   ["$jy_shengnu3"] = "恶心我，我也恶心你啊，互恶心呗！",
@@ -723,7 +719,6 @@ local jy_husanjian_2 = fk.CreateTriggerSkill{
     data.damage = data.damage + 1
   end,
 }
--- TODO: 加一个触发效果器
 
 -- 因为是两个不同的角色，两个角色的特殊区是不能通用的，所以必须分开写代码。
 tym__liyuanhao:addSkill(jy_huxiao_2)
