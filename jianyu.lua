@@ -223,9 +223,9 @@ local jy_kaiju_2 = fk.CreateActiveSkill{
   target_filter = function(self, to_select, selected)
 
     -- 判断目标是否有谦逊
-    for _, s in ipairs(to:getAllSkills()) do
+    for _, s in ipairs(to_select:getAllSkills()) do
       if s.name == "qianxun" then
-        return
+        return false
       end
     end
 
