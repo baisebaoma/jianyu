@@ -222,16 +222,15 @@ local jy_kaiju_2 = fk.CreateActiveSkill{
   card_num = 0,
   target_filter = function(self, to_select, selected)
 
-    -- 判断目标是否有谦逊
-    -- 迭代器只能这么写，因为to_select是一个int
-    for _, s in ipairs(Fk:currentRoom():getPlayerById(to_select).player_skills) do
-      if s.name == "qianxun" then
-        return false
-      end
+    -- 判断目标是否不能成为【顺手牵羊】的目标
+    s = Fk:currentRoom():getPlayerById(to_select)
+    local snatch = Fk:cloneCard("snatch")
+    if Self:isProhibited(s, snatch) then  -- 前面的是自己，后面的是别人！
+      return false
     end
 
-    return to_select ~= Self.id and -- 如果目标不是自己，而且没有谦逊
-      not Fk:currentRoom():getPlayerById(to_select):isAllNude()  -- 而且不是啥也没有。
+    return to_select ~= Self.id and -- 如果目标不是自己
+      not s:isAllNude()  -- 而且不是啥也没有，那就可以对他用这个技能
   end,
   min_target_num = 1,
   on_use = function(self, room, use)
@@ -286,7 +285,7 @@ Fk:loadTranslationTable{
   ["tym__jianzihao"] = "界简自豪",
 
   ["jy_kaiju_2"] = "开局",
-  [":jy_kaiju_2"] = "出牌阶段限一次，你选择若干名角色，视为你对他们使用一张【顺手牵羊】，然后被他们使用一张【杀】，依次结算。",
+  [":jy_kaiju_2"] = "出牌阶段限一次，你可以选择若干名角色，视为你对他们使用一张【顺手牵羊】，然后被他们使用一张【杀】。",
   ["$jy_kaiju_21"] = "不是啊，我炸一对鬼的时候我在打什么，打一对10。一对10，他四个9炸我，我不输了吗？",
   ["$jy_kaiju_22"] = "怎么赢啊？你别瞎说啊！",
   ["$jy_kaiju_23"] = "打这牌怎么打？兄弟们快教我，我看着头晕！",
