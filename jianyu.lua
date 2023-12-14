@@ -297,7 +297,7 @@ Fk:loadTranslationTable{
   ["$jy_kaiju_28"] = "Oh my God，我要珍惜这段时光，我要好好地将它珍惜！",
 
   ["jy_sanjian"] = "三件",
-  [":jy_sanjian"] = [[锁定技，出牌阶段开始时，如果你的装备区有且仅有3张牌，你视为使用一张【酒】和一张【无中生有】。<br>
+  [":jy_sanjian"] = [[锁定技，出牌阶段开始时，若装备区有且仅有3张牌，你视为使用一张【酒】和一张【无中生有】。<br>
   <font size="1"><i>“等乌兹三件套！”</i></font>]],
   ["$jy_sanjian1"] = "也不是稳赢吧，我觉得赢了！",
 
@@ -504,7 +504,7 @@ Fk:loadTranslationTable {
   ["skl__liyuanhao_xiao"] = "啸",
 
   ["jy_huxiao"] = "虎啸",
-  [":jy_huxiao"] = [[当你使用或打出一张【杀】时，你可以将牌堆顶的一张牌置于你的角色牌上，称为【啸】。
+  [":jy_huxiao"] = [[当你使用或打出一张【杀】时，可以将牌堆顶的一张牌置于角色牌上，称为【啸】。
   <br><font size="1"><i>“我希望我的后辈们能够记住，在你踏上职业道路的这一刻开始，你的目标就只有，冠军。”</i></font>]],
 
   ["jy_huxiao_analeptic"] = "横刀",
@@ -516,13 +516,13 @@ Fk:loadTranslationTable {
   <br><font size="1"><i>“……唯我虎大将军！”——钱晨</i></font>]],
 
   ["jy_erduanxiao"] = "二段",
-  [":jy_erduanxiao"] = "锁定技，当你的角色牌上有且仅有两张【啸】时，你选择失去一点体力或失去所有【啸】。",
+  [":jy_erduanxiao"] = "锁定技，当有且仅有两张【啸】时，你选择失去一点体力或失去所有【啸】。",
   ["#jy_erduanxiao_trigger"] = "二段",
   ["#lose_xiao"] = "失去所有【啸】", 
   ["#lose_hp_1"] = "失去一点体力",
 
   ["jy_husanjian"] = "三件",
-  [":jy_husanjian"] = [[锁定技，当你的装备区有且仅有防具和防御马时，你造成的伤害-1。
+  [":jy_husanjian"] = [[锁定技，当装备区有且仅有防具和防御马时，你造成的伤害-1。
   <br><font size="1"><i>虎三件，指【中娅沙漏】、【水银之靴】、【大天使之杖】。一些人持不同的观点，但【大天使之杖】没有什么争议。</i></font>]],
 }
 
@@ -738,22 +738,23 @@ Fk:loadTranslationTable {
   ["tym__liyuanhao_xiao"] = "<font color=\"gold\">啸</font>",
 
   ["jy_huxiao_2"] = "虎啸",
-  [":jy_huxiao_2"] = [[当你使用或打出一张【杀】时，你可以将牌堆顶的一张牌置于你的角色牌上，称为【啸】。
+  [":jy_huxiao_2"] = [[当你使用或打出一张【杀】时，可以将牌堆顶的一张牌置于角色牌上，称为<font color="gold">【啸】</font>。
   <br><font size="1"><i>“我希望我的后辈们能够记住，在你踏上职业道路的这一刻开始，你的目标就只有，冠军。”</i></font>]],
 
   ["jy_huxiao_analeptic_2"] = "横刀",
-  [":jy_huxiao_analeptic_2"] = [[你可以将【啸】当作【酒】使用或打出。
+  [":jy_huxiao_analeptic_2"] = [[你可以将<font color="gold">【啸】</font>当作【酒】使用或打出。
   <br><font size="1"><i>“谁敢横刀立马……”——钱晨</i></font>]],
 
   ["jy_huxiao_jink_2"] = "立马",
-  [":jy_huxiao_jink_2"] = [[你可以将【啸】当作【闪】使用或打出。
+  [":jy_huxiao_jink_2"] = [[你可以将<font color="gold">【啸】</font>当作【闪】使用或打出。
   <br><font size="1"><i>“……唯我虎大将军！”——钱晨</i></font>]],
 
   ["jy_erduanxiao_2"] = "二段",
-  [":jy_erduanxiao_2"] = "锁定技，当你的角色牌上有且仅有两张【啸】时，你选择：弃置所有【啸】并恢复一点体力，或将所有【啸】纳入手牌。",
+  [":jy_erduanxiao_2"] = [[锁定技，当有且仅有两张<font color="gold">【啸】</font>时，
+  你选择：弃置所有<font color="gold">【啸】</font>并恢复一点体力；将所有<font color="gold">【啸】</font>纳入手牌。]],
   ["#jy_erduanxiao_trigger_2"] = "二段",
-  ["#lose_xiao_2"] = "将所有【啸】纳入手牌", 
-  ["#lose_hp_1_2"] = "弃置所有【啸】并恢复一点体力",
+  ["#lose_xiao_2"] = [[将所有<font color="gold">【啸】</font>纳入手牌]], 
+  ["#lose_hp_1_2"] = [[弃置所有<font color="gold">【啸】</font>并恢复一点体力]],
 }
 
 
@@ -762,20 +763,17 @@ local tym__houguoyu = General(extension, "tym__houguoyu", "qun", 8, 8, General.M
 
 tym__houguoyu:addSkill(jy_husanjian_2)
 tym__houguoyu:addSkill("benghuai")
+tym__houguoyu:addSkill("baonve")
 
 Fk:loadTranslationTable {
   ["tym__houguoyu"] = "侯国玉",
   ["houguoyu"] = "侯国玉",
   
-  ["jy_husanjian_2"] = "两件",
-  [":jy_husanjian_2"] = [[锁定技，当你的装备区有且仅有武器和进攻马时，你造成的伤害+1。]],
+  ["jy_husanjian_2"] = "哇袄",
+  [":jy_husanjian_2"] = [[锁定技，当装备区有且仅有武器和进攻马时，你造成的伤害+1。]],
 }
 
--- <br><font size="1"><i>虎三件，有时也可以指【卢登的激荡】、【虚空之杖】和【灭世者的死亡之帽】。</i></font>
-
-
 -- 高天亮
-
 local xjb__gaotianliang = General(extension, "xjb__gaotianliang", "qun", 4, 4, General.Male)
 
 local jy_yuyu = fk.CreateTriggerSkill{
@@ -825,7 +823,7 @@ Fk:loadTranslationTable {
   [":jy_yuyu"] = [[1. 锁定技，当有角色对你使用【杀】造成了伤害时，其获得【高天亮之敌】标记；<br>
   2. 受到没有【高天亮之敌】标记的角色或因本次伤害而获得【高天亮之敌】标记的角色造成的伤害时，你可以选择一项：摸三张牌；摸四张牌并翻面。]],
   ["@jy_gaotianliang_enemy"] = "高天亮之敌",
-  ["#jy_yuyu_ask_which"] = "你发动了 玉玉，请选择你要触发的效果",
+  ["#jy_yuyu_ask_which"] = "玉玉：请选择你要触发的效果",
   ["#jy_yuyu_draw3"] = "摸三张牌",
   ["#jy_yuyu_draw4turnover"] = "摸四张牌并翻面",
   ["$jy_yuyu1"] = "我……我真的很想听到你们说话……",
@@ -913,7 +911,7 @@ Fk:loadTranslationTable {
 local tym__zhaoqianxi_2 = General(extension, "tym__zhaoqianxi_2", "qun", 4, 4, General.Male)
 -- tym__zhaoqianxi_2.hidden = true
 
--- TODO：被铁索连环的目标如果因为这次伤害受到了元素反应，那么不会让其他被铁索连环的目标受到附着效果。（已修复）
+-- TODO：被铁锁连环的目标如果因为这次伤害受到了元素反应，那么不会让其他被铁锁连环的目标受到附着效果。（已修复）
 -- 这是因为is_jy_yuanshen_2_triggered。目前已经删除了这个变量，但是这样的问题是：
 -- 如果场上有多个有这个技能的角色，那么既会附着又会负面效果；铁索连环的副目标会受到2点额外伤害
 local jy_yuanshen_2 = fk.CreateTriggerSkill{
@@ -1019,7 +1017,7 @@ Fk:loadTranslationTable {
   黑色，改为<font color="Fuchsia">雷电</font>。]],
 }
 
--- 阿伟罗
+-- 阿威罗
 local xjb__aweiluo = General(extension, "xjb__aweiluo", "qun", 3, 3, General.Male)
 
 -- 游龙
@@ -1351,7 +1349,7 @@ Fk:loadTranslationTable {
   [":jy_luojiao"] = [[当【点】的数量变化后：<br>
   1. 若你没有两张及以上相同花色的【点】，可以视为立即使用一张【南蛮入侵】，每回合限一次；<br>
   2. 若你有4张【点】，可以视为立即使用一张【万箭齐发】。]],
-  ["$jy_luojiao1"] = "Muchas gracias afición, esto es para vosotros, Siuuu",
+  ["$jy_luojiao1"] = "Muchas gracias afición, esto es para vosotros, Siuuu!!",
   ["#jy_luojiao_after"] = "罗绞",
   ["#jy_luojiao_archery_attack"] = "罗绞·万箭",
   ["#jy_luojiao_savage_assault"] = "罗绞·南蛮",
