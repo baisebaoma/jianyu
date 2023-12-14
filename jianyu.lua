@@ -286,7 +286,7 @@ Fk:loadTranslationTable{
   ["tym__jianzihao"] = "界简自豪",
 
   ["jy_kaiju_2"] = "开局",
-  [":jy_kaiju_2"] = "出牌阶段限一次，你选择若干名角色，视为你对他们【顺手牵羊】，然后被他们【杀】，依次结算。",
+  [":jy_kaiju_2"] = "出牌阶段限一次，你选择若干名角色，视为你对他们使用一张【顺手牵羊】，然后被他们使用一张【杀】，依次结算。",
   ["$jy_kaiju_21"] = "不是啊，我炸一对鬼的时候我在打什么，打一对10。一对10，他四个9炸我，我不输了吗？",
   ["$jy_kaiju_22"] = "怎么赢啊？你别瞎说啊！",
   ["$jy_kaiju_23"] = "打这牌怎么打？兄弟们快教我，我看着头晕！",
@@ -319,10 +319,8 @@ local jy_huxiao = fk.CreateTriggerSkill{
   name = "jy_huxiao",
   anim_type = "special",
   events = {fk.CardResponding, fk.TargetSpecified},  -- 包括了使用和打出
-  -- frequency = Skill.Compulsory,
   can_trigger = function(self, event, target, player, data)
-    if player:hasSkill(self) and data.card.trueName == "slash" then
-      -- 使用是TS，打出是CR
+    if player:hasSkill(self) and data.card and data.card.trueName == "slash" then
       return target == player
     end
   end,
@@ -411,7 +409,7 @@ local jy_erduanxiao = fk.CreateTriggerSkill{
           if #xiaos == 3 then
             -- print("啸是3")
             for _, info in ipairs(move.moveInfo) do  -- 还有第二层循环。我自己的代码里没有第二层
-              if info.fromArea == Card.PlayerSpecial and info.specialName == "skl__liyuanhao_xiao" then
+              if info.fromArea == Card.PlayerSpecial then
                 -- print("有牌正打算从你家特殊区离开")
                 return true
               end
@@ -436,7 +434,6 @@ local jy_erduanxiao = fk.CreateTriggerSkill{
     -- 触发之后，设置变量，告诉下一个函数有没有可能在发生变化
     local xiaos = player:getPile("skl__liyuanhao_xiao")
     player.is_xiao_changing = #xiaos
-    -- print("二段笑（第一段） on_trigger已触发，现在是", player.is_xiao_changing, #player:getPile("skl__liyuanhao_xiao"))
   end,
 }
 
@@ -446,11 +443,12 @@ local jy_erduanxiao_trigger = fk.CreateTriggerSkill{
   anim_type = "masochism",
   frequency = Skill.Compulsory,
   can_trigger = function(self, event, target, player, data)
+    local xiaos = player:getPile("skl__liyuanhao_xiao")
     -- 如果卡牌移动前和移动后【点】相同，那就证明是其他的特殊区的牌，直接return
     if player.is_xiao_changing == #xiaos then return false end
 
     if not player:hasSkill(self) then return false end
-    return #player:getPile("skl__liyuanhao_xiao") == 2  -- 如果啸为2
+    return #xiaos == 2  -- 如果啸为2
   end,
   on_trigger = function(self, event, target, player, data)
     local room = player.room
@@ -538,10 +536,8 @@ local jy_huxiao_2 = fk.CreateTriggerSkill{
   name = "jy_huxiao_2",
   anim_type = "special",
   events = {fk.CardResponding, fk.TargetSpecified},  -- 包括了使用和打出
-  -- frequency = Skill.Compulsory,
   can_trigger = function(self, event, target, player, data)
-    if player:hasSkill(self) and data.card.trueName == "slash" then
-      -- 使用是TS，打出是CR
+    if player:hasSkill(self) and data.card and data.card.trueName == "slash" then
       return target == player
     end
   end,
@@ -762,16 +758,16 @@ Fk:loadTranslationTable {
 
 
 -- -- 侯国玉
-local tym__houguoyu = General(extension, "tym__houguoyu", "qun", 5, 10, General.Male)
+local tym__houguoyu = General(extension, "tym__houguoyu", "qun", 8, 8, General.Male)
 
 tym__houguoyu:addSkill(jy_husanjian_2)
-tym__houguoyu:addSkill("biyue")
+tym__houguoyu:addSkill("benghuai")
 
 Fk:loadTranslationTable {
   ["tym__houguoyu"] = "侯国玉",
   ["houguoyu"] = "侯国玉",
   
-  ["jy_husanjian_2"] = "三件",
+  ["jy_husanjian_2"] = "两件",
   [":jy_husanjian_2"] = [[锁定技，当你的装备区有且仅有武器和进攻马时，你造成的伤害+1。]],
 }
 
@@ -826,10 +822,10 @@ Fk:loadTranslationTable {
   ["xjb__gaotianliang"] = "高天亮",
 
   ["jy_yuyu"] = "玉玉",
-  [":jy_yuyu"] = [[1. 锁定技，当有角色对你使用【杀】造成了伤害时，你令其获得【高天亮之敌】标记；<br>
+  [":jy_yuyu"] = [[1. 锁定技，当有角色对你使用【杀】造成了伤害时，其获得【高天亮之敌】标记；<br>
   2. 受到没有【高天亮之敌】标记的角色或因本次伤害而获得【高天亮之敌】标记的角色造成的伤害时，你可以选择一项：摸三张牌；摸四张牌并翻面。]],
   ["@jy_gaotianliang_enemy"] = "高天亮之敌",
-  ["#jy_yuyu_ask_which"] = "你发动了【玉玉】，请选择你要触发的效果",
+  ["#jy_yuyu_ask_which"] = "你发动了 玉玉，请选择你要触发的效果",
   ["#jy_yuyu_draw3"] = "摸三张牌",
   ["#jy_yuyu_draw4turnover"] = "摸四张牌并翻面",
   ["$jy_yuyu1"] = "我……我真的很想听到你们说话……",
@@ -858,8 +854,8 @@ local jy_yuanshen = fk.CreateTriggerSkill{
   end,
 }
 
-local jy_huoji = fk.CreateViewAsSkill{
-  name = "jy_huoji",
+local jy_cathat = fk.CreateViewAsSkill{
+  name = "jy_cathat",
   anim_type = "offensive",
   pattern = "slash",
   card_filter = function(self, to_select, selected)
@@ -874,8 +870,8 @@ local jy_huoji = fk.CreateViewAsSkill{
   end,
 }
 
-local jy_leiji = fk.CreateViewAsSkill{
-  name = "jy_leiji",
+local jy_hatcat = fk.CreateViewAsSkill{
+  name = "jy_hatcat",
   anim_type = "offensive",
   pattern = "slash",
   card_filter = function(self, to_select, selected)
@@ -891,8 +887,8 @@ local jy_leiji = fk.CreateViewAsSkill{
 }
 
 tym__zhaoqianxi:addSkill(jy_yuanshen)
-tym__zhaoqianxi:addSkill(jy_huoji)
-tym__zhaoqianxi:addSkill(jy_leiji)
+tym__zhaoqianxi:addSkill(jy_cathat)
+tym__zhaoqianxi:addSkill(jy_hatcat)
 
 Fk:loadTranslationTable {
   ["tym__zhaoqianxi"] = "赵乾熙",
@@ -901,15 +897,15 @@ Fk:loadTranslationTable {
   [":jy_yuanshen"] = [[锁定技，你造成的属性伤害+1。
   <font size="1"><br>提示：<br>
   1. 当你对被横置的角色造成属性伤害时，所有其他被横置的角色会受到的伤害+2，
-  因为【铁锁连环】的效果是将你对主目标的伤害值记录，然后令你对其他所有被横置的角色也造成一次这个值的伤害。<br>
+  因为【铁锁连环】的效果是将你对主目标造成的伤害值（触发【原神】，+1）记录，然后令你对其他所有被横置的角色也造成一次这个值的伤害（再次触发【原神】，+1）。<br>
   2. 当你是双将且另一个武将是界赵乾熙、你发动了【附魔】造成属性伤害时，
   不会触发这个技能，因为这两个技能是在同一个时机修改伤害参数。</font>]],
 
-  ["jy_huoji"] = "帽猫",
-  [":jy_huoji"] = [[你可以将一张♠手牌当作【火杀】使用或打出。]],
+  ["jy_cathat"] = "猫帽",
+  [":jy_cathat"] = [[你可以将一张♠手牌当作【火杀】使用或打出。]],
 
-  ["jy_leiji"] = "猫帽",
-  [":jy_leiji"] = [[你可以将一张♠手牌当作【雷杀】使用或打出。
+  ["jy_hatcat"] = "帽猫",
+  [":jy_hatcat"] = [[你可以将一张♠手牌当作【雷杀】使用或打出。
   <br /><font size="1"><i><s>因为Beryl抽满命林尼歪了六次，所以他决定在新月杀中重拾自己的火。</s></i></font>]],
 }
 
@@ -977,8 +973,6 @@ local jy_fumo = fk.CreateTriggerSkill{
   can_trigger = function(self, event, target, player, data)
     return player:hasSkill(self) and 
       data.damageType == fk.NormalDamage and not data.to.dead and not player:isNude()
-      -- data.damageType == fk.NormalDamage and data.card and 
-      -- data.card.trueName == "slash" and not data.to.dead and not player:isNude()
   end,
   on_cost = function(self, event, target, player, data)
     local room = player.room
@@ -1009,26 +1003,26 @@ Fk:loadTranslationTable {
   ["tym__zhaoqianxi_2"] = "界赵乾熙",
   
   ["jy_yuanshen_2"] = "原神",
-  [":jy_yuanshen_2"] = [[锁定技，当有角色受到<font color="red">火焰</font>或<font color="purple">雷电</font>伤害时，若其没有该技能造成的属性标记，令其获得对应属性标记；
-  若其拥有属性标记且与此次伤害属性不同，则依据伤害属性造成对应效果并移除标记：<font color="purple">雷电伤害</font>其翻面；<font color="red">火焰伤害</font>该伤害+1。]],
-  ["#jy_yuanshen_2_reaction_1"] = [[<font color="red">火焰伤害</font>与<font color="purple">【雷电】</font>发生反应，伤害+1]],
-  ["#jy_yuanshen_2_reaction_2"] = [[<font color="purple">雷电伤害</font>与<font color="red">【火焰】</font>发生反应，目标翻面]],
+  [":jy_yuanshen_2"] = [[锁定技，当有角色受到<font color="red">火焰</font>或<font color="Fuchsia">雷电</font>伤害时，若其没有该技能造成的属性标记，令其获得对应属性标记；
+  若其拥有该技能造成的属性标记且与此次伤害属性不同，则依据伤害属性造成对应效果并移除标记：<font color="Fuchsia">雷电伤害</font>其翻面；<font color="red">火焰伤害</font>该伤害+1。]],
+  ["#jy_yuanshen_2_reaction_1"] = [[<font color="red">火焰伤害</font>与<font color="Fuchsia">【雷电】</font>发生反应，伤害+1]],
+  ["#jy_yuanshen_2_reaction_2"] = [[<font color="Fuchsia">雷电伤害</font>与<font color="red">【火焰】</font>发生反应，目标翻面]],
 
   ["@jy_yuanshen_2_pyro"] = [[<font color="red">火焰</font>]],
-  ["@jy_yuanshen_2_electro"] = [[<font color="purple">雷电</font>]],
+  ["@jy_yuanshen_2_electro"] = [[<font color="Fuchsia">雷电</font>]],
 
   ["jy_fumo"] = "附魔",
   ["#jy_fumo-invoke"] = "附魔：%dest 受到伤害，你可以弃置一张牌，改为属性伤害",
-  [":jy_fumo"] = [[当有角色造成无属性伤害时，
-  你可以弃一张牌，根据该牌颜色变更伤害的属性：
-  红色，改为<font color="red">火焰</font>；
-  黑色，改为<font color="purple">雷电</font>。]],
+  [":jy_fumo"] = [[当有角色受到无属性伤害时，
+  你可以弃一张牌，根据颜色变更伤害属性：
+  <font color="red">红色</font>，改为<font color="red">火焰</font>；
+  黑色，改为<font color="Fuchsia">雷电</font>。]],
 }
 
 -- 阿伟罗
 local xjb__aweiluo = General(extension, "xjb__aweiluo", "qun", 3, 3, General.Male)
 
--- 只能传手牌
+-- 游龙
 local jy_youlong = fk.CreateTriggerSkill{
   name = "jy_youlong",
   anim_type = "support",
@@ -1090,7 +1084,14 @@ local jy_tiaoshui = fk.CreateTriggerSkill{
 }
 
 -- 罗绞
--- 罗绞主技能只判断是否有牌进出特殊区，它的触发不保证罗绞真的触发。罗绞是否触发在后面的关联函数里面判断
+-- 这个技能难以实现。目前好像还没看到其他的武将是“特殊区牌量变化时立即执行效果”的，一般都是某个特定的时机触发，
+-- 如邓艾，在回合开始阶段才判断有几张。所以我注释写详细一点，方便其他开发者参考。
+-- 其实前面的两个李元浩也是这样。不过这个技能比那两个更复杂，解释这个会比较好。
+-- 
+-- 新月杀现有的函数无法判断一张牌移动时，如果是离开特殊区，离开的是否是某特定的特殊区（在这个技能里，是【点】）。我们作如下设计：
+-- 罗绞主技能监视“卡牌移动前”事件，将卡牌移动前的【点】数量记录，并传给另一个关联技能，其监视“卡牌移动后”事件，也记录一次移动后【点】的数量。
+-- 如果卡牌移动之后【点】数没有变化，那么不要触发。
+-- 这样就能防止当其他人给我挂上或丢掉其他特殊区的牌时，也触发我们的技能。
 local jy_luojiao = fk.CreateTriggerSkill{
   name = "jy_luojiao",
   anim_type = "offensive",
@@ -1101,7 +1102,6 @@ local jy_luojiao = fk.CreateTriggerSkill{
     if not player:hasSkill(self) then return end  -- 如果我自己没有这个技能，那就不触发了
 
     local dians = player:getPile("xjb__aweiluo_dian")  -- dians是【点】的牌
-    player.is_dian_may_changing = nil  -- 点是否有可能变化
 
     -- 判断是否有牌进出特殊区
     player.is_luojiao_archery_attack_may_be_triggered = false  -- 先清理自家变量
@@ -1139,7 +1139,7 @@ local jy_luojiao = fk.CreateTriggerSkill{
     -- 必须使用player来储存该变量，因为后面的事件使用的是另一个函数jy_luojiao_after，如果你用self，那个函数是看不到的
   end,
 }
--- 修改：使用同一个函数来判断是否触发了南蛮和万箭。
+-- 使用同一个函数来判断是否触发了南蛮和万箭
 local jy_luojiao_after = fk.CreateTriggerSkill{
   name = "#jy_luojiao_after",  -- 这个技能的名字
   events = {fk.AfterCardsMove},  -- 卡牌移动之后，如果can_trigger返回真，那就可以发动这个技能
@@ -1150,7 +1150,6 @@ local jy_luojiao_after = fk.CreateTriggerSkill{
     if not player.is_dian_may_changing then return false end  -- 如果【点】有可能在变化
 
     local dians = player:getPile("xjb__aweiluo_dian")
-
     -- 如果卡牌移动前和移动后【点】相同，那就证明是其他的特殊区的牌，直接return
     if player.is_dian_may_changing == #dians then return false end
 
@@ -1255,6 +1254,7 @@ local jy_luojiao_after = fk.CreateTriggerSkill{
     -- 一次【点】的变化结算完成，把所有变量都设为初始
     self.do_archery_attack = false
     self.do_savage_assault = false
+    self.first = nil
     player.is_dian_may_changing = false
     player.is_archery_attack = false
     player.is_savage_assault = false
@@ -1295,8 +1295,7 @@ local jy_yusu = fk.CreateTriggerSkill{
     local room = player.room
     room:addPlayerMark(player, "@jy_yusu_basic_count")
     basic_count = player:getMark("@jy_yusu_basic_count")
-    if basic_count % 2 == 0 and basic_count ~= 0 then
-    -- if basic_count % 1 == 0 and basic_count ~= 0 then  -- TODO：为了测试改成1，记得改回来
+    if basic_count % 2 == 0 and basic_count ~= 0 then  -- 每第二张基本牌
       return room:askForSkillInvoke(player, self.name)
     end
   end,
@@ -1335,41 +1334,40 @@ Fk:loadTranslationTable {
 
   ["jy_youlong"] = "游龙",
   ["#jy_youlong-choose"] = "游龙：选择一张牌交给下家",
-  [":jy_youlong"] = "锁定技，你的回合开始时，有手牌的角色依次将一张手牌交给下家。",
+  [":jy_youlong"] = "锁定技，回合开始时，有手牌的角色依次将一张手牌交给下家。",
   ["$jy_youlong1"] = "翩若惊鸿！婉若游龙！",
 
   ["jy_hebao"] = "核爆",
-  [":jy_hebao"] = "你的回合开始时，你可以将一张手牌置于你的武将牌上，称为【点】。",
+  [":jy_hebao"] = "回合开始时，你可以将一张手牌置于武将牌上，称为【点】。",
   ["#jy_hebao-choose"] = "核爆：选择一张手牌成为【点】",
   ["$jy_hebao1"] = "Siu~",
 
   ["jy_tiaoshui"] = "跳水",
-  [":jy_tiaoshui"] = "当你受到伤害时，你可以弃置一张【点】。",
+  [":jy_tiaoshui"] = "当你受到伤害时，可以弃置一张【点】。",
   ["#jy_tiaoshui"] = "弃置一张【点】",
   ["$jy_tiaoshui1"] = "Siu, hahahaha!",
 
   ["jy_luojiao"] = "罗绞",
-  [":jy_luojiao"] = [[当你的【点】的数量变化后：<br>
+  [":jy_luojiao"] = [[当【点】的数量变化后：<br>
   1. 若你没有两张及以上相同花色的【点】，可以视为立即使用一张【南蛮入侵】，每回合限一次；<br>
   2. 若你有4张【点】，可以视为立即使用一张【万箭齐发】。]],
   ["$jy_luojiao1"] = "Muchas gracias afición, esto es para vosotros, Siuuu",
-  -- ["$jy_luojiao2"] = "（观众声）",  -- 设计者说不要用这条语音
   ["#jy_luojiao_after"] = "罗绞",
   ["#jy_luojiao_archery_attack"] = "罗绞·万箭",
   ["#jy_luojiao_savage_assault"] = "罗绞·南蛮",
   ["#jy_luojiao_archery_attack_ask"] = "【点】数量为4，是否发动 罗绞·万箭",
   ["#jy_luojiao_savage_assault_ask"] = "【点】花色不同，是否发动 罗绞·南蛮，每回合限一次",
   ["@jy_is_luojiao_savage_assault_used"] = "罗绞",
-  ["#jy_luojiao_both_ask"] = "罗绞 两个条件同时达成，是否发动该技能",
+  ["#jy_luojiao_both_ask"] = "罗绞 两个条件同时达成，是否发动",
   ["#jy_luojiao_ask_which"] = "罗绞 两个条件同时达成并发动，请选择要先视为使用的卡牌",
   ["#jy_luojiao_used"] = "已发动",
 
   ["jy_yusu"] = "玉玊",
-  [":jy_yusu"] = "出牌阶段，你每使用第二张基本牌时，可以将其作为【点】置于你的武将牌上。",
+  [":jy_yusu"] = "出牌阶段，你每使用第二张基本牌时，可以将其作为【点】置于武将牌上。",
   ["@jy_yusu_basic_count"] = "玉玊",
   ["$jy_yusu1"] = "Siu...",
 
-  ["~xjb__aweiluo"] = "（观众声）",
+  ["~xjb__aweiluo"] = "Messi, Messi, Messi, Messi...",
 
 }
 
