@@ -146,7 +146,7 @@ Fk:loadTranslationTable{
   ["xjb__jianzihao"] = "简自豪",
 
   ["jy_kaiju"] = "开局",
-  [":jy_kaiju"] = [[锁定技，当你的回合开始时，所有其他有牌的角色需要交给你一张牌，并视为对你使用一张【杀】。<br>
+  [":jy_kaiju"] = [[锁定技，回合开始时，所有其他有牌的角色需要交给你一张牌，并视为对你使用一张【杀】。<br>
   <font size="1"><i>“从未如此美妙的开局！”</i></font>]],
   ["$jy_kaiju1"] = "不是啊，我炸一对鬼的时候我在打什么，打一对10。一对10，他四个9炸我，我不输了吗？",
   ["$jy_kaiju2"] = "怎么赢啊？你别瞎说啊！",
@@ -167,7 +167,7 @@ Fk:loadTranslationTable{
   ["$jy_hongwen5"] = "那他咋想的呀？",
 
   ["jy_zouwei"] = "走位",
-  [":jy_zouwei"] = "锁定技，当你的装备区没有牌时，其他角色计算与你的距离时，始终+1；当你的装备区有牌时，你计算与其他角色的距离时，始终-1。",
+  [":jy_zouwei"] = "锁定技，当装备区没有牌时，其他角色计算与你的距离时，始终+1；当装备区有牌时，你计算与其他角色的距离时，始终-1。",
   ["$jy_zouwei1"] = "玩一下，不然我是不是一张牌没有出啊兄弟？",
   ["$jy_zouwei2"] = "完了呀！",
 
@@ -178,7 +178,7 @@ Fk:loadTranslationTable{
   ["$jy_shengnu3"] = "恶心我，我也恶心你啊，互恶心呗！",
 
   ["jy_xizao"] = "洗澡",
-  [":jy_xizao"] = "限定技，当你处于濒死状态时，你可以将体力恢复至1，摸三张牌，然后翻面。",
+  [":jy_xizao"] = "限定技，处于濒死状态时，你可以将体力恢复至1，摸三张牌，然后翻面。",
   ["$jy_xizao1"] = "呃啊啊啊啊啊啊啊！！",
   ["$jy_xizao2"] = "也不是稳赢吧，我觉得赢了！",
   ["$jy_xizao3"] = "真的我是真玩不了，这跟变态没关系，我好他妈的气！",
@@ -281,7 +281,7 @@ Fk:loadTranslationTable{
   ["tym__jianzihao"] = "界简自豪",
 
   ["jy_kaiju_2"] = "开局",
-  [":jy_kaiju_2"] = "出牌阶段限一次，你可以选择若干名角色，视为你对他们使用一张【顺手牵羊】，然后被他们使用一张【杀】。",
+  [":jy_kaiju_2"] = "出牌阶段限一次，你选择若干名角色。按照你选择的顺序，视为你对他们各使用一张【顺手牵羊】，然后被他们各使用一张【杀】。",
   ["$jy_kaiju_21"] = "不是啊，我炸一对鬼的时候我在打什么，打一对10。一对10，他四个9炸我，我不输了吗？",
   ["$jy_kaiju_22"] = "怎么赢啊？你别瞎说啊！",
   ["$jy_kaiju_23"] = "打这牌怎么打？兄弟们快教我，我看着头晕！",
@@ -292,12 +292,11 @@ Fk:loadTranslationTable{
   ["$jy_kaiju_28"] = "Oh my God，我要珍惜这段时光，我要好好地将它珍惜！",
 
   ["jy_sanjian"] = "三件",
-  [":jy_sanjian"] = [[锁定技，出牌阶段开始时，若装备区有且仅有3张牌，你视为使用一张【酒】和一张【无中生有】。<br>
-  <font size="1"><i>“等乌兹三件套！”</i></font>]],
+  [":jy_sanjian"] = [[锁定技，出牌阶段开始时，若装备区有且仅有3张牌，你视为使用一张【酒】和一张【无中生有】。]],
   ["$jy_sanjian1"] = "也不是稳赢吧，我觉得赢了！",
 
   ["jy_xizao_2"] = "洗澡",
-  [":jy_xizao_2"] = "限定技，当你处于濒死状态且装备区有牌时，你可以弃置所有装备区的牌、将体力恢复至1，然后每以此法弃置一张牌，你摸一张牌。",
+  [":jy_xizao_2"] = "限定技，处于濒死状态且装备区有牌时，你可以弃置所有装备区的牌、将体力恢复至1，然后每以此法弃置一张牌，你摸一张牌。",
   ["$jy_xizao_21"] = "呃啊啊啊啊啊啊啊！！",
   ["$jy_xizao_22"] = "也不是稳赢吧，我觉得赢了！",
   ["$jy_xizao_23"] = "真的我是真玩不了，这跟变态没关系，我好他妈的气！",
@@ -499,7 +498,7 @@ Fk:loadTranslationTable {
   ["skl__liyuanhao_xiao"] = "啸",
 
   ["jy_huxiao"] = "虎啸",
-  [":jy_huxiao"] = [[当你使用或打出一张【杀】时，可以将牌堆顶的一张牌置于角色牌上，称为【啸】。
+  [":jy_huxiao"] = [[当你使用或打出一张【杀】时，可以将牌堆顶的一张牌置于武将牌上，称为【啸】。
   <br><font size="1"><i>“我希望我的后辈们能够记住，在你踏上职业道路的这一刻开始，你的目标就只有，冠军。”</i></font>]],
 
   ["jy_huxiao_analeptic"] = "横刀",
@@ -511,7 +510,7 @@ Fk:loadTranslationTable {
   <br><font size="1"><i>“……唯我虎大将军！”——钱晨</i></font>]],
 
   ["jy_erduanxiao"] = "二段",
-  [":jy_erduanxiao"] = "锁定技，当有且仅有两张【啸】时，你选择失去一点体力或失去所有【啸】。",
+  [":jy_erduanxiao"] = "锁定技，有且仅有两张【啸】时，你选择失去一点体力或失去所有【啸】。",
   ["#jy_erduanxiao_trigger"] = "二段",
   ["#lose_xiao"] = "失去所有【啸】", 
   ["#lose_hp_1"] = "失去一点体力",
@@ -691,9 +690,43 @@ local jy_erduanxiao_trigger_2 = fk.CreateTriggerSkill{
 }
 jy_erduanxiao_2:addRelatedSkill(jy_erduanxiao_trigger_2)
 
+-- 因为是两个不同的角色，两个角色的特殊区是不能通用的，所以必须分开写代码。
+tym__liyuanhao:addSkill(jy_huxiao_2)
+tym__liyuanhao:addSkill(jy_huxiao_analeptic_2)
+tym__liyuanhao:addSkill(jy_huxiao_jink_2)
+tym__liyuanhao:addSkill(jy_erduanxiao_2)
+
+Fk:loadTranslationTable {
+  ["tym__liyuanhao"] = "界李元浩",
+  ["tym__liyuanhao_xiao"] = "<font color=\"gold\">啸</font>",
+
+  ["jy_huxiao_2"] = "虎啸",
+  [":jy_huxiao_2"] = [[当你使用或打出一张【杀】时，可以将牌堆顶的一张牌置于武将牌上，称为<font color="gold">【啸】</font>。
+  <br><font size="1"><i>“我希望我的后辈们能够记住，在你踏上职业道路的这一刻开始，你的目标就只有，冠军。”</i></font>]],
+
+  ["jy_huxiao_analeptic_2"] = "横刀",
+  [":jy_huxiao_analeptic_2"] = [[你可以将<font color="gold">【啸】</font>当作【酒】使用或打出。
+  <br><font size="1"><i>“谁敢横刀立马……”——钱晨</i></font>]],
+
+  ["jy_huxiao_jink_2"] = "立马",
+  [":jy_huxiao_jink_2"] = [[你可以将<font color="gold">【啸】</font>当作【闪】使用或打出。
+  <br><font size="1"><i>“……唯我虎大将军！”——钱晨</i></font>]],
+
+  ["jy_erduanxiao_2"] = "二段",
+  [":jy_erduanxiao_2"] = [[锁定技，有且仅有两张<font color="gold">【啸】</font>时，
+  选择：弃置所有<font color="gold">【啸】</font>并恢复一点体力；将所有<font color="gold">【啸】</font>纳入手牌。]],
+  ["#jy_erduanxiao_trigger_2"] = "二段",
+  ["#lose_xiao_2"] = [[将所有<font color="gold">【啸】</font>纳入手牌]], 
+  ["#lose_hp_1_2"] = [[弃置所有<font color="gold">【啸】</font>并恢复一点体力]],
+}
+
+
+-- -- 侯国玉
+local tym__houguoyu = General(extension, "tym__houguoyu", "qun", 8, 8, General.Male)
+
 -- 界三件 已完成 测试通过
-local jy_husanjian_2 = fk.CreateTriggerSkill{
-  name = "jy_husanjian_2",
+local jy_waao = fk.CreateTriggerSkill{
+  name = "jy_waao",
   frequency = Skill.Compulsory,
   anim_type = "offensive",
   events = {fk.DamageCaused},
@@ -720,42 +753,8 @@ local jy_husanjian_2 = fk.CreateTriggerSkill{
   end,
 }
 
--- 因为是两个不同的角色，两个角色的特殊区是不能通用的，所以必须分开写代码。
-tym__liyuanhao:addSkill(jy_huxiao_2)
-tym__liyuanhao:addSkill(jy_huxiao_analeptic_2)
-tym__liyuanhao:addSkill(jy_huxiao_jink_2)
-tym__liyuanhao:addSkill(jy_erduanxiao_2)
--- tym__liyuanhao:addSkill(jy_husanjian_2)
-
-Fk:loadTranslationTable {
-  ["tym__liyuanhao"] = "界李元浩",
-  ["tym__liyuanhao_xiao"] = "<font color=\"gold\">啸</font>",
-
-  ["jy_huxiao_2"] = "虎啸",
-  [":jy_huxiao_2"] = [[当你使用或打出一张【杀】时，可以将牌堆顶的一张牌置于角色牌上，称为<font color="gold">【啸】</font>。
-  <br><font size="1"><i>“我希望我的后辈们能够记住，在你踏上职业道路的这一刻开始，你的目标就只有，冠军。”</i></font>]],
-
-  ["jy_huxiao_analeptic_2"] = "横刀",
-  [":jy_huxiao_analeptic_2"] = [[你可以将<font color="gold">【啸】</font>当作【酒】使用或打出。
-  <br><font size="1"><i>“谁敢横刀立马……”——钱晨</i></font>]],
-
-  ["jy_huxiao_jink_2"] = "立马",
-  [":jy_huxiao_jink_2"] = [[你可以将<font color="gold">【啸】</font>当作【闪】使用或打出。
-  <br><font size="1"><i>“……唯我虎大将军！”——钱晨</i></font>]],
-
-  ["jy_erduanxiao_2"] = "二段",
-  [":jy_erduanxiao_2"] = [[锁定技，当有且仅有两张<font color="gold">【啸】</font>时，
-  你选择：弃置所有<font color="gold">【啸】</font>并恢复一点体力；将所有<font color="gold">【啸】</font>纳入手牌。]],
-  ["#jy_erduanxiao_trigger_2"] = "二段",
-  ["#lose_xiao_2"] = [[将所有<font color="gold">【啸】</font>纳入手牌]], 
-  ["#lose_hp_1_2"] = [[弃置所有<font color="gold">【啸】</font>并恢复一点体力]],
-}
-
-
--- -- 侯国玉
-local tym__houguoyu = General(extension, "tym__houguoyu", "qun", 8, 8, General.Male)
-
-tym__houguoyu:addSkill(jy_husanjian_2)
+tym__houguoyu:addSkill(jy_waao)
+tym__houguoyu:addSkill("zhiheng")
 tym__houguoyu:addSkill("benghuai")
 tym__houguoyu:addSkill("baonve")
 
@@ -763,8 +762,8 @@ Fk:loadTranslationTable {
   ["tym__houguoyu"] = "侯国玉",
   ["houguoyu"] = "侯国玉",
   
-  ["jy_husanjian_2"] = "哇袄",
-  [":jy_husanjian_2"] = [[锁定技，当装备区有且仅有武器和进攻马时，你造成的伤害+1。]],
+  ["jy_waao"] = "哇袄",
+  [":jy_waao"] = [[锁定技，装备区有且仅有武器和进攻马时，你造成的伤害+1。]],
 }
 
 -- 高天亮
@@ -890,15 +889,15 @@ Fk:loadTranslationTable {
   <font size="1"><br>提示：<br>
   1. 当你对被横置的角色造成属性伤害时，所有其他被横置的角色会受到的伤害+2，
   因为【铁锁连环】的效果是将你对主目标造成的伤害值（触发【原神】，+1）记录，然后令你对其他所有被横置的角色也造成一次这个值的伤害（再次触发【原神】，+1）。<br>
-  2. 当你是双将且另一个武将是界赵乾熙、你发动了【附魔】造成属性伤害时，
-  不会触发这个技能，因为这两个技能是在同一个时机修改伤害参数。</font>]],
+  2. 当你是双将且另一个武将是界赵乾熙、你发动了【附魔】转化成属性伤害时，
+  不会触发这个技能。</font>]],
 
   ["jy_cathat"] = "猫帽",
   [":jy_cathat"] = [[你可以将一张♠手牌当作【火杀】使用或打出。]],
 
   ["jy_hatcat"] = "帽猫",
   [":jy_hatcat"] = [[你可以将一张♠手牌当作【雷杀】使用或打出。
-  <br /><font size="1"><i><s>因为Beryl抽满命林尼歪了六次，所以他决定在新月杀中重拾自己的火。</s></i></font>]],
+  <br /><font size="1"><i><s>因为Beryl抽满命林尼歪了六次，所以他决定在新月杀中为自己设计一套林尼的技能。</s></i></font>]],
 }
 
 -- 界赵乾熙
@@ -933,7 +932,6 @@ local jy_yuanshen_2 = fk.CreateTriggerSkill{
         },
         {fk.ThunderDamage, "@jy_yuanshen_2_electro", "@jy_yuanshen_2_pyro", 
           function(self, event, target, player, data) 
-            -- player.room:askForDiscard(data.to, 2, 2, true, self.name, false, nil, "#jy_yuanshen_2_overload_discard") 
             data.to:turnOver()  -- 受到伤害的人翻面
           end,
           "#jy_yuanshen_2_reaction_2",
@@ -1006,7 +1004,7 @@ Fk:loadTranslationTable {
   ["jy_fumo"] = "附魔",
   ["#jy_fumo-invoke"] = "附魔：%dest 受到伤害，你可以弃置一张牌，改为属性伤害",
   [":jy_fumo"] = [[当有角色受到无属性伤害时，
-  你可以弃一张牌，根据颜色变更伤害属性：
+  你可以弃置一张牌，根据颜色变更伤害属性：
   <font color="red">红色</font>，改为<font color="red">火焰</font>；
   黑色，改为<font color="Fuchsia">雷电</font>。]],
 }
@@ -1330,12 +1328,12 @@ Fk:loadTranslationTable {
   ["$jy_youlong1"] = "翩若惊鸿！婉若游龙！",
 
   ["jy_hebao"] = "核爆",
-  [":jy_hebao"] = "回合开始时，你可以将一张手牌置于武将牌上，称为【点】。",
+  [":jy_hebao"] = "回合开始时，可以将一张手牌置于武将牌上，称为【点】。",
   ["#jy_hebao-choose"] = "核爆：选择一张手牌成为【点】",
   ["$jy_hebao1"] = "Siu~",
 
   ["jy_tiaoshui"] = "跳水",
-  [":jy_tiaoshui"] = "当你受到伤害时，可以弃置一张【点】。",
+  [":jy_tiaoshui"] = "受到伤害时，可以弃置一张【点】。",
   ["#jy_tiaoshui"] = "弃置一张【点】",
   ["$jy_tiaoshui1"] = "Siu, hahahaha!",
 
@@ -1355,7 +1353,7 @@ Fk:loadTranslationTable {
   ["#jy_luojiao_used"] = "已发动",
 
   ["jy_yusu"] = "玉玊",
-  [":jy_yusu"] = "出牌阶段，你每使用第二张基本牌时，可以将其作为【点】置于武将牌上。",
+  [":jy_yusu"] = "出牌阶段，每使用第二张基本牌时，可以将其作为【点】置于武将牌上。",
   ["@jy_yusu_basic_count"] = "玉玊",
   ["$jy_yusu1"] = "Siu...",
 
