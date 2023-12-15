@@ -8,6 +8,7 @@ Fk:loadTranslationTable {
      ["xjb"] = "导演",
      ["tym"] = "反赌专家",
      ["skl"] = "拂却心尘",
+     ["zer"] = "敏敏伊人",
 }
 
 -- 熊简自豪
@@ -1359,6 +1360,58 @@ Fk:loadTranslationTable {
 
   ["~xjb__aweiluo"] = "Messi, Messi, Messi, Messi...",
 
+}
+
+-- 水晶哥
+
+local zer__yangfan = General(extension, "zer__yangfan", "qun", 3, 3, General.Male)
+
+-- ol_sp1 sheyan
+-- 这技能是不是也太垃圾了？
+local jy_huapen = fk.CreateTriggerSkill{
+  name = "jy_huapen",
+  anim_type = "control",
+  events = {fk.TargetConfirming},
+  frequency = Skill.Compulsory,
+  can_trigger = function(self, event, target, player, data)
+    if player:hasSkill(self) and data.from ~= player.id and data.card and data.card.suit == Card.Club and 
+      (data.card:isCommonTrick() or data.card.type == Card.TypeBasic) then
+      local previous_targets = AimGroup:getAllTargets(data.tos)
+      -- 如果目标里面已经有我自己了，那就不要判定了
+      for _, v in pairs(previous_targets) do
+        if v == player.id then
+          return false
+        end
+      end
+      return true
+    end
+  end,
+  on_use = function(self, event, target, player, data)
+    local room = player.room
+    local targets = {}
+    local previous_targets = AimGroup:getAllTargets(data.tos)
+
+    local judge = {
+      who = player,
+      reason = self.name,
+      pattern = ".|.|heart",
+    }
+    room:judge(judge)
+    if judge.card.suit == Card.Heart then
+      room:doIndicate(data.from, {player.id})  -- 播放指示线
+      if #AimGroup:getAllTargets(data.tos) == 1 then
+        table.insertTable(targets, AimGroup:getAllTargets(data.tos))
+      end
+      TargetGroup:pushTargets(data.targetGroup, player.id)
+    end
+  end,
+}
+zer__yangfan:addSkill(jy_huapen)
+
+Fk:loadTranslationTable {
+  ["zer__yangfan"] = "杨藩",
+  ["jy_huapen"] = "花盆",
+  [":jy_huapen"] = [[锁定技，当其他角色使用♣非延时锦囊牌或基本牌指定了有且仅有一个不为你的目标时，你判定，若为<font color="red">♥</font>，额外指定你为目标。]],
 }
 
 Fk:loadTranslationTable {
