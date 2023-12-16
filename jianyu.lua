@@ -3,6 +3,8 @@ extension.extensionName = "jianyu"
 
 -- DIY真诚意见：所有你这个包的东西都加一个你自己的开头，这样防止和别人的重名。比如我的"huxiao"一开始就和别人重名了。
 
+local U = require "packages/utility/utility"
+
 Fk:loadTranslationTable {
      ["jy_jianyu"] = "简浴",
      ["xjb"] = "导演",
@@ -1370,8 +1372,26 @@ Fk:loadTranslationTable {
 -- 没有次数距离限制：星火燎原刘焉
 -- 无法被响应：tenyear_huicui1 #gonghu_delay
 
-local zer__yangfan = General(extension, "zer__yangfan", "qun", 3, 3, General.Male)
+local zer__yangfan = General(extension, "zer__yangfan", "qun", 4, 4, General.Male)
 
+-- 四吃的选牌规则
+-- TODO：写成zer那样的
+Fk:addPoxiMethod{
+  name = "jy_sichi_count",
+  card_filter = function(to_select, selected)
+    local n = Fk:getCardById(to_select).number
+    for _, id in ipairs(selected) do
+      n = n + Fk:getCardById(id).number
+    end
+    return n <= 28
+  end,
+  feasible = function(selected)
+    return #selected > 0
+  end,
+  prompt = function ()
+    return Fk:translate("#chengxiang-choose")
+  end
+}
 -- 四吃
 local jy_sichi = fk.CreateTriggerSkill{
   name = "jy_sichi",
@@ -1400,12 +1420,12 @@ local jy_sichi = fk.CreateTriggerSkill{
         suit_count = suit_count + 1
       end
     end
-    local s = "有" .. suit_count .. "个花色"
+    local s = "有" .. suit_count .. "种花色"
     room:doBroadcastNotify("ShowToast", Fk:translate(s))
 
     assert(suit_count <= 4 and suit_count >= 1)
 
-    suit_count = 3  -- 测试用的
+    -- suit_count = 2  -- 测试用的
 
     -- 一种花色：全部给一个人，测试通过
     if suit_count == 1 then
@@ -1414,13 +1434,14 @@ local jy_sichi = fk.CreateTriggerSkill{
         return true end), Util.IdMapper)
       local result = room:askForChoosePlayers(player, targets, 1, 1, "#jy_sichi_1", self.name)  -- 这玩意返回的是id列表
       room:moveCardTo(cards, Player.Hand, room:getPlayerById(result[1]), fk.ReasonGive, self.name, nil, false, player.id)
+
     -- 两种花色：判断是否有可以使用的牌。如果有，要求使用其中一张牌，如果没有，弃置一张牌
     elseif suit_count == 2 then
       -- TODO
     -- 3种花色：选牌，然后所有人各摸一张
     elseif suit_count == 3 then
       -- TODO: 三张同类型的牌或其中两张不同类型的牌
-      local get = room:askForPoxi(player, "chengxiang_count", {
+      local get = room:askForPoxi(player, "jy_sichi_count", {
         { self.name, cards },
       }, nil, true)
       if #get > 0 then
@@ -1432,6 +1453,7 @@ local jy_sichi = fk.CreateTriggerSkill{
       for _, p in ipairs(room:getOtherPlayers(player)) do
         p:drawCards(1, self.name)
       end
+
     -- 4种花色：选择至多3个角色，你和他们各失去一点体力
     elseif suit_count == 4 then
       -- 业炎
@@ -1465,7 +1487,8 @@ local jy_huapen = fk.CreateTriggerSkill{
   events = {fk.TargetConfirming},
   frequency = Skill.Compulsory,
   can_trigger = function(self, event, target, player, data)
-    if player:hasSkill(self) and data.from ~= player.id and data.card and data.card.suit == Card.Club and 
+    if player:hasSkill(self) and data.from ~= player.id and data.card and 
+      data.card.suit == Card.Club and
       (data.card:isCommonTrick() or data.card.type == Card.TypeBasic) then
       local previous_targets = AimGroup:getAllTargets(data.tos)
       -- 如果目标里面已经有我自己了，那就不要判定了
@@ -1508,7 +1531,7 @@ local jy_boshi = fk.CreateTriggerSkill{
       player.phase == Player.Start
   end,
   can_wake = function(self, event, target, player, data)
-    return #player:getPile("zer__yangfan_judge") >= 10
+    return player:getMark("@jy_boshi_judge_count") >= 10
   end,
   on_use = function(self, event, target, player, data)
     local room = player.room
@@ -1521,9 +1544,26 @@ local jy_boshi = fk.CreateTriggerSkill{
     })
     player:drawCards(3, self.name)
     room:handleAddLoseSkills(player, "-jy_huapen", nil, true, true)
+
+    room:handleAddLoseSkills(player, "jy_boshi_count", nil, true, true)  -- 不用再看判定了多少次了
+    room:setPlayerMark(player, "@jy_boshi_judge_count", 0)
+
     room:handleAddLoseSkills(player, "jy_jiangbei", nil, true, true)
   end,
 }
+local jy_boshi_count = fk.CreateTriggerSkill{
+  name = "#jy_boshi_count",
+  mute = true,
+  refresh_events = {fk.AskForRetrial},
+  can_refresh = function(self, event, target, player, data)
+    return target == player and player:hasSkill(self)
+  end,
+  on_refresh = function(self, event, target, player, data)
+    local room = player.room
+    room:addPlayerMark(player, "@jy_boshi_judge_count")
+  end,
+}
+jy_boshi:addRelatedSkill(jy_boshi_count)
 
 -- 测了一遍，没什么问题
 local jy_jiangbei = fk.CreateTriggerSkill{
@@ -1540,9 +1580,7 @@ local jy_jiangbei_heart = fk.CreateTriggerSkill{
   can_trigger = function(self, event, target, player, data)
     if not player:hasSkill(self) then return false end
     if target == player and data.card.suit == Card.Heart then
-      if event == fk.CardUsing then
-        return data.card.type == Card.TypeBasic or data.card.type == Card.TypeTrick
-      end
+      return data.card.type == Card.TypeBasic or data.card.type == Card.TypeTrick
     end
   end,
   on_use = function(self, event, target, player, data)
@@ -1568,8 +1606,9 @@ local jy_jiangbei_club_2 = fk.CreateTriggerSkill{
   events = { fk.TargetSpecified },
   can_trigger = function(self, event, target, player, data)
     if not player:hasSkill(self) then return false end
-    return target == player and
-      data.card.suit == Card.Club and data.card
+    if target == player and data.card and data.card.suit == Card.Club then
+      return data.card.type == Card.TypeBasic or data.card.type == Card.TypeTrick
+    end
   end,
   on_use = function(self, event, target, player, data)
     local room = player.room
@@ -1585,21 +1624,18 @@ local jy_jiangbei_club_2 = fk.CreateTriggerSkill{
 jy_jiangbei:addRelatedSkill(jy_jiangbei_heart)
 jy_jiangbei:addRelatedSkill(jy_jiangbei_club)
 jy_jiangbei:addRelatedSkill(jy_jiangbei_club_2)
--- 出牌阶段结束时摸牌
--- TODO
+-- TODO:出牌阶段结束时摸牌
 
 local jy_ceshi_des = fk.CreateTriggerSkill{
   name = "jy_ceshi_des",
-  frequency = Skill.Compulsory,
-  events = {},
 }
 zer__yangfan:addSkill(jy_ceshi_des)  -- 开发好之后，这一行是需要去掉的
 
 zer__yangfan:addSkill(jy_sichi)
 zer__yangfan:addSkill(jy_huapen)
--- zer__yangfan:addSkill(jy_boshi)  -- 开发好之后，这一行是需要加上的
-zer__yangfan:addSkill(jy_jiangbei)  -- 开发好之后，这一行是需要去掉的
--- zer__yangfan:addRelatedSkill(jy_jiangbei)  -- 开发好之后，这一行是需要加上的
+zer__yangfan:addSkill(jy_boshi)
+-- zer__yangfan:addSkill(jy_jiangbei)  -- 开发好之后，这一行是需要去掉的
+zer__yangfan:addRelatedSkill(jy_jiangbei)
 
 Fk:loadTranslationTable {
   ["zer__yangfan"] = "杨藩开发版",
@@ -1609,29 +1645,30 @@ Fk:loadTranslationTable {
   [":jy_ceshi_des"] = [[<strong>这个武将正在开发中，可能会有bug、和设计者描述的技能不一样，但基本上已经实现了现在描述的技能。如果游玩时发现bug请反馈给开发者。<\strong>]],
 
   ["jy_sichi"] = "四吃",
-  [":jy_sichi"] = [[受到伤害后，你可以亮出牌堆顶4张牌，根据花色数量触发效果：<br>
+  [":jy_sichi"] = [[受到伤害后，你可以展示牌堆顶的4张牌，根据花色数量触发效果：<br>
   1，将这些牌交给一名角色；<br>
   2，还没写，所以什么效果也没有；<br>
-  3，获得其中的任意张点数之和小于13的牌，其余角色各摸一张牌；<br>
+  3，获得其中的任意张点数之和小于28的牌，其余角色各摸一张牌；<br>
   4，选择至多3名角色，你与其各失去一点体力。<br>
-  随后，将未被获得的牌置入弃牌堆。]],
+  将未被获得的牌置入弃牌堆。]],
 
   ["#jy_sichi_1"] = "四吃：选择一个角色，将牌交给其",
   ["#jy_sichi_2"] = "四吃：没有效果",
-  ["#jy_sichi_3"] = "四吃：选择其中的任意张点数之和小于13的牌获得之，其余角色各摸一张牌",
+  ["#jy_sichi_3"] = "四吃：选择其中的任意张点数之和小于28的牌获得之，其余角色各摸一张牌",
   ["#jy_sichi_4"] = "四吃：选择至多3名角色，你和他们各失去一点体力",
 
   ["jy_boshi"] = "搏时",
-  [":jy_boshi"] = [[觉醒技，准备阶段开始时，当你的判定次数达到10次时，你增加一点体力上限，回复3点体力，摸3张牌，失去技能【花盆】，获得技能【奖杯】。]],
+  [":jy_boshi"] = [[觉醒技，准备阶段开始时，若你已判定过至少10次，你增加一点体力上限、回复3点体力、摸3张牌、失去技能【花盆】，然后获得技能【奖杯】。]],
+  ["@jy_boshi_judge_count"] = "搏时",
 
   ["jy_huapen"] = "花盆",
-  [":jy_huapen"] = [[锁定技，当其他角色使用♣非延时锦囊牌或基本牌指定了有且仅有一个不为你的目标时，你判定，若为<font color="red">♥</font>，额外指定你为目标。]],
+  [":jy_huapen"] = [[锁定技，其他角色使用♣非延时锦囊牌或基本牌、指定了有且仅有一个不为你的目标时，你进行一次判定，若为<font color="red">♥</font>，额外指定你为目标。]],
 
   ["jy_jiangbei"] = "奖杯",
-  [":jy_jiangbei"] = [[锁定技，你使用的基本牌和锦囊牌若为：♣，无视距离和防具、没有使用次数限制；<font color="red">♥</font>，无法被响应。]],
-  ["#jy_jiangbei_heart"] = "奖杯",
-  ["#jy_jiangbei_club"] = "奖杯",
-  ["#jy_jiangbei_club_2"] = "奖杯",
+  [":jy_jiangbei"] = [[锁定技，你使用基本牌和锦囊牌时，根据花色获得额外效果。♣：无视距离、防具和次数限制；<font color="red">♥</font>：无法被响应。]],
+  ["#jy_jiangbei_heart"] = "奖杯·红桃",
+  ["#jy_jiangbei_club"] = "奖杯·梅花",
+  ["#jy_jiangbei_club_2"] = "奖杯·梅花",
   -- TODO：改一下这里，按照sp公孙瓒义从改，只提示触发了义从。
 }
 
