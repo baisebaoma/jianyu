@@ -8,7 +8,7 @@ Fk:loadTranslationTable {
      ["xjb"] = "导演",
      ["tym"] = "反赌专家",
      ["skl"] = "拂却心尘",
-     ["zer"] = "敏敏伊人",
+     ["zer"] = "敏敏",
 }
 
 -- 熊简自豪
@@ -1364,10 +1364,107 @@ Fk:loadTranslationTable {
 
 -- 水晶哥
 
+-- 失去技能：原创之魂2017薛综
+-- 觉醒技：山包邓艾
+-- 受到伤害：一将2013曹冲
+-- 没有次数距离限制：星火燎原刘焉
+-- 无法被响应：tenyear_huicui1 #gonghu_delay
+
 local zer__yangfan = General(extension, "zer__yangfan", "qun", 3, 3, General.Male)
 
+-- 四吃
+local jy_sichi = fk.CreateTriggerSkill{
+  name = "jy_sichi",
+  anim_type = "masochism",
+  events = {fk.Damaged},
+  on_use = function(self, event, target, player, data)
+    local room = player.room
+
+    -- 亮出四张牌
+    local cards = room:getNCards(4)
+
+    -- 放到过程区
+    room:moveCards({
+      ids = cards,
+      toArea = Card.Processing,
+      moveReason = fk.ReasonPut,
+    })
+
+    -- 看花色有多少种，测试通过
+    dict = {false, false, false, false}
+    local suit_count = 0
+    for _, c in ipairs(cards) do
+      local suit = Fk:getCardById(c).suit
+      if not dict[suit] then 
+        dict[suit] = true
+        suit_count = suit_count + 1
+      end
+    end
+    local s = "有" .. suit_count .. "个花色"
+    room:doBroadcastNotify("ShowToast", Fk:translate(s))
+
+    assert(suit_count <= 4 and suit_count >= 1)
+
+    suit_count = 3  -- 测试用的
+
+    -- 一种花色：全部给一个人，测试通过
+    if suit_count == 1 then
+      -- 不能直接用room:getOtherPlayers(player)，因为这个函数返回的是player，而askForChoosePlayers需要的是id（integer）。
+      local targets = table.map(table.filter(room:getAlivePlayers(), function(p)
+        return true end), Util.IdMapper)
+      local result = room:askForChoosePlayers(player, targets, 1, 1, "#jy_sichi_1", self.name)  -- 这玩意返回的是id列表
+      room:moveCardTo(cards, Player.Hand, room:getPlayerById(result[1]), fk.ReasonGive, self.name, nil, false, player.id)
+    -- 两种花色：判断是否有可以使用的牌。如果有，要求使用其中一张牌，如果没有，弃置一张牌
+    elseif suit_count == 2 then
+      -- TODO
+      room:recover({
+        who = player,
+        num = 1,
+        recoverBy = player,
+        skillName = self.name,
+      })
+    -- 3种花色：选牌，然后所有人各摸一张
+    elseif suit_count == 3 then
+      -- TODO: 三张同类型的牌或其中两张不同类型的牌
+      local get = room:askForPoxi(player, "chengxiang_count", {
+        { self.name, cards },
+      }, nil, true)
+      if #get > 0 then
+        local dummy = Fk:cloneCard("dilu")
+        dummy:addSubcards(get)
+        room:obtainCard(player.id, dummy, true, fk.ReasonPrey)
+      end
+      -- 所有其他人各摸一张
+      for _, p in ipairs(room:getOtherPlayers(player)) do
+        p:drawCards(1, self.name)
+      end
+    -- 4种花色：选择至多3个角色，你和他们各失去一点体力
+    elseif suit_count == 4 then
+      -- 业炎
+      -- 这里只能选择除了自己以外的角色，因为自己肯定是要掉血的
+      local targets = table.map(table.filter(room:getOtherPlayers(player), function(p)
+        return true end), Util.IdMapper)
+      local result = room:askForChoosePlayers(player, targets, 0, 3, "#jy_sichi_4", self.name)  -- 这玩意返回的是id列表
+      room:loseHp(player, 1, self.name)
+      for _, p in ipairs(result) do
+        local p_player = room:getPlayerById(p)
+        if not p_player.dead then room:loseHp(p_player, 1, self.name) end
+      end
+    end
+
+    -- 移动到弃牌堆
+    cards = table.filter(cards, function(id) return room:getCardArea(id) == Card.Processing end)
+    if #cards > 0 then
+      room:moveCards({
+        ids = cards,
+        toArea = Card.DiscardPile,
+        moveReason = fk.ReasonPutIntoDiscardPile,
+      })
+    end
+  end,
+}
+
 -- ol_sp1 sheyan
--- 这技能是不是也太垃圾了？
 local jy_huapen = fk.CreateTriggerSkill{
   name = "jy_huapen",
   anim_type = "control",
@@ -1406,12 +1503,142 @@ local jy_huapen = fk.CreateTriggerSkill{
     end
   end,
 }
+
+local jy_boshi = fk.CreateTriggerSkill{
+  name = "jy_boshi",
+  frequency = Skill.Wake,
+  events = {fk.EventPhaseStart},
+  can_trigger = function(self, event, target, player, data)
+    return target == player and player:hasSkill(self) and
+      player:usedSkillTimes(self.name, Player.HistoryGame) == 0 and
+      player.phase == Player.Start
+  end,
+  can_wake = function(self, event, target, player, data)
+    return #player:getPile("zer__yangfan_judge") >= 10
+  end,
+  on_use = function(self, event, target, player, data)
+    local room = player.room
+    room:changeMaxHp(player, 1)
+    room:recover({
+      who = player,
+      num = 3,
+      recoverBy = player,
+      skillName = self.name,
+    })
+    player:drawCards(3, self.name)
+    room:handleAddLoseSkills(player, "-jy_huapen", nil, true, true)
+    room:handleAddLoseSkills(player, "jy_jiangbei", nil, true, true)
+  end,
+}
+
+-- 测了一遍，没什么问题
+local jy_jiangbei = fk.CreateTriggerSkill{
+  -- TODO 建议把这个技能写成记录用了多少张梅花和红桃牌
+  name = "jy_jiangbei",
+  frequency = Skill.Compulsory,
+  events = {},
+}
+-- ♥无法被响应
+local jy_jiangbei_heart = fk.CreateTriggerSkill{
+  name = "#jy_jiangbei_heart",
+  frequency = Skill.Compulsory,
+  events = {fk.CardUsing},
+  can_trigger = function(self, event, target, player, data)
+    if not player:hasSkill(self) then return false end
+    if target == player and data.card.suit == Card.Heart then
+      if event == fk.CardUsing then
+        return data.card.type == Card.TypeBasic or data.card.type == Card.TypeTrick
+      end
+    end
+  end,
+  on_use = function(self, event, target, player, data)
+    local room = player.room
+    player:broadcastSkillInvoke(jy_jiangbei.name)
+    data.disresponsiveList = table.map(room.alive_players, Util.IdMapper)
+  end,
+}
+-- ♣没有距离次数限制
+local jy_jiangbei_club = fk.CreateTargetModSkill{
+  name = "#jy_jiangbei_club",
+  bypass_times = function(self, player, skill, scope, card, to)
+    return player:hasSkill(self) and card.suit == Card.Club and to
+  end,
+  bypass_distances =  function(self, player, skill, card, to)
+    return player:hasSkill(self) and card.suit == Card.Club and to
+  end,
+}
+-- ♣无视防具
+local jy_jiangbei_club_2 = fk.CreateTriggerSkill{
+  name = "#jy_jiangbei_club_2",
+  frequency = Skill.Compulsory,
+  events = { fk.TargetSpecified },
+  can_trigger = function(self, event, target, player, data)
+    if not player:hasSkill(self) then return false end
+    return target == player and
+      data.card.suit == Card.Club and data.card
+  end,
+  on_use = function(self, event, target, player, data)
+    local room = player.room
+    local to = room:getPlayerById(data.to)
+    local use_event = room.logic:getCurrentEvent():findParent(GameEvent.UseCard, true)
+    if use_event == nil then return end
+    room:addPlayerMark(to, fk.MarkArmorNullified)
+    use_event:addCleaner(function()
+      room:removePlayerMark(to, fk.MarkArmorNullified)
+    end)
+  end,
+}
+jy_jiangbei:addRelatedSkill(jy_jiangbei_heart)
+jy_jiangbei:addRelatedSkill(jy_jiangbei_club)
+jy_jiangbei:addRelatedSkill(jy_jiangbei_club_2)
+-- 出牌阶段结束时摸牌
+-- TODO
+
+local jy_ceshi_des = fk.CreateTriggerSkill{
+  name = "jy_ceshi_des",
+  frequency = Skill.Compulsory,
+  events = {},
+}
+zer__yangfan:addSkill(jy_ceshi_des)  -- 开发好之后，这一行是需要去掉的
+
+zer__yangfan:addSkill(jy_sichi)
 zer__yangfan:addSkill(jy_huapen)
+-- zer__yangfan:addSkill(jy_boshi)  -- 开发好之后，这一行是需要加上的
+zer__yangfan:addSkill(jy_jiangbei)  -- 开发好之后，这一行是需要去掉的
+-- zer__yangfan:addRelatedSkill(jy_jiangbei)  -- 开发好之后，这一行是需要加上的
 
 Fk:loadTranslationTable {
-  ["zer__yangfan"] = "杨藩",
+  ["zer__yangfan"] = "杨藩开发版",
+  ["zer__yangfan_judge"] = "判定",
+
+  ["jy_ceshi_des"] = "测试",
+  [":jy_ceshi_des"] = [[<strong>这个武将正在开发中，可能会有bug、和设计者描述的技能不一样，但基本上已经实现了现在描述的技能。如果游玩时发现bug请反馈给开发者。<\strong>]],
+
+  ["jy_sichi"] = "四吃",
+  [":jy_sichi"] = [[受到伤害后，你可以亮出牌堆顶4张牌，根据花色数量触发效果：<br>
+  1，将这些牌交给一名角色；<br>
+  2，回复一点体力；<br>
+  3，获得其中点数不大于13的牌，其余角色各摸一张牌；<br>
+  4，选择至多3名角色，你与其各失去一点体力。<br>
+  随后，将未被获得的牌置入弃牌堆。]],
+
+  ["#jy_sichi_1"] = "四吃：选择一个角色，将牌交给其",
+  ["#jy_sichi_2"] = "四吃：不知道啥效果",
+  ["#jy_sichi_3"] = "四吃：选择其中点数不大于13的牌获得之，其余角色各摸一张牌",
+  ["#jy_sichi_4"] = "四吃：选择至多3名角色，你和他们各失去一点体力",
+
+  ["jy_boshi"] = "搏时",
+  [":jy_boshi"] = [[觉醒技，准备阶段开始时，当你的判定次数达到10次时，你增加一点体力上限，回复3点体力，摸3张牌，失去技能【花盆】，获得技能【奖杯】。]],
+
   ["jy_huapen"] = "花盆",
   [":jy_huapen"] = [[锁定技，当其他角色使用♣非延时锦囊牌或基本牌指定了有且仅有一个不为你的目标时，你判定，若为<font color="red">♥</font>，额外指定你为目标。]],
+
+  ["jy_jiangbei"] = "奖杯",
+  [":jy_jiangbei"] = [[锁定技，你使用的基本牌和锦囊牌若为：♣，无视距离和防具、没有使用次数限制；<font color="red">♥</font>，无法被响应。]],
+  ["#jy_jiangbei_heart"] = "奖杯",
+  ["#jy_jiangbei_club"] = "奖杯",
+  ["#jy_jiangbei_club_2"] = "奖杯",
+  -- TODO：改一下这里，按照sp公孙瓒义从改，只提示触发了义从。
 }
 
 Fk:loadTranslationTable {
