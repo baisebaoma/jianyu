@@ -10,8 +10,20 @@ Fk:loadTranslationTable {
      ["xjb"] = "导演",
      ["tym"] = "反赌专家",
      ["skl"] = "拂却心尘",
-     ["zer"] = "敏敏",
+     ["zer"] = "敏敏伊人",
 }
+
+local jy_ceshi_des = fk.CreateTriggerSkill{
+  name = "jy_ceshi_des",
+}
+
+Fk:loadTranslationTable {
+  ["jy_ceshi_des"] = "测试",
+  [":jy_ceshi_des"] = [[<strong>这个武将正在开发中，可能会有bug、
+  和设计者描述的技能不一样，但基本上已经实现了现在描述的技能。
+  如果游玩时发现bug，请反馈给开发者。<\strong>]],
+}
+
 
 -- 熊简自豪
 local xjb__jianzihao = General(extension, "xjb__jianzihao", "qun", 3, 3, General.Male)
@@ -1306,7 +1318,7 @@ local jy_yusu_set_0 = fk.CreateTriggerSkill{
   refresh_events = {fk.EventPhaseEnd},
   can_refresh = function(self, event, target, player, data)
     return target == player and player:hasSkill(self)
-      and (player.phase == Player.Play or player.phase == Player.Play)
+      and player.phase == Player.Play
   end,
   on_refresh = function(self, event, target, player, data)
     local room = player.room
@@ -1371,25 +1383,50 @@ Fk:loadTranslationTable {
 -- 受到伤害：一将2013曹冲
 -- 没有次数距离限制：星火燎原刘焉
 -- 无法被响应：tenyear_huicui1 #gonghu_delay
+-- 立即使用一张牌：诸葛恪，借刀
 
 local zer__yangfan = General(extension, "zer__yangfan", "qun", 4, 4, General.Male)
 
--- 四吃的选牌规则
--- TODO：写成zer那样的
+-- 四吃3的选牌规则
 Fk:addPoxiMethod{
-  name = "jy_sichi_count",
+  name = "jy_sichi_3",
   card_filter = function(to_select, selected)
-    local n = Fk:getCardById(to_select).number
-    for _, id in ipairs(selected) do
-      n = n + Fk:getCardById(id).number
+    -- 三张同类型的牌或两张不同类型的牌
+
+    -- 如果已选择卡牌数小于等于1，直接返回真，因为还不知道到底要选的是相同的还是不同的类型
+    if #selected <= 1 then return true end
+
+    -- 如果已选择卡牌数大于等于3，直接返回假，因为不可能再通过多选一张满足条件了
+    if #selected >= 3 then return false end
+    
+    -- 如果已选择卡牌数为2，检查它们的类型是否相同
+    if #selected == 2 then
+        local type = Fk:getCardById(to_select).type
+
+        local type1 = Fk:getCardById(selected[1]).type
+        local type2 = Fk:getCardById(selected[2]).type
+        
+        -- 如果两张卡牌类型相同，那么对和它们类型相同的牌返回真，因为只能这样满足条件了
+        if type1 == type2 then
+            return type == type1
+        -- 如果两张卡牌类型不同，那么已经满足要求了，返回假
+        else
+          return false
+        end
     end
-    return n <= 28
+    
+    -- 如果以上条件都不满足，返回真
+    return true
   end,
   feasible = function(selected)
-    return #selected > 0
+    if #selected <= 1 then return false
+    elseif #selected == 2 then return Fk:getCardById(selected[1]).type ~= Fk:getCardById(selected[2]).type
+    elseif #selected == 3 then return Fk:getCardById(selected[1]).type == Fk:getCardById(selected[2]).type and 
+      Fk:getCardById(selected[2]).type == Fk:getCardById(selected[3]).type
+    end
   end,
   prompt = function ()
-    return Fk:translate("#chengxiang-choose")
+    return Fk:translate("#jy_sichi_3")
   end
 }
 -- 四吃
@@ -1401,48 +1438,141 @@ local jy_sichi = fk.CreateTriggerSkill{
     local room = player.room
 
     -- 亮出四张牌
-    local cards = room:getNCards(4)
+    local card_ids = room:getNCards(4)
 
     -- 放到过程区
     room:moveCards({
-      ids = cards,
+      ids = card_ids,
       toArea = Card.Processing,
       moveReason = fk.ReasonPut,
     })
 
+    -- player:showCards(card_ids)  -- 这个和上面的是一个效果，区别在于这个可以在牌上显示是自己展示的
+
     -- 看花色有多少种，测试通过
     dict = {false, false, false, false}
     local suit_count = 0
-    for _, c in ipairs(cards) do
+    for _, c in ipairs(card_ids) do
       local suit = Fk:getCardById(c).suit
       if not dict[suit] then 
         dict[suit] = true
         suit_count = suit_count + 1
       end
     end
-    local s = "有" .. suit_count .. "种花色"
-    room:doBroadcastNotify("ShowToast", Fk:translate(s))
 
     assert(suit_count <= 4 and suit_count >= 1)
+    
+    local msg
+    if suit_count == 1 then
+      msg = "#jy_sichi_suits_1"
+    elseif suit_count == 2 then
+      msg = "#jy_sichi_suits_2"
+    elseif suit_count == 3 then
+      msg = "#jy_sichi_suits_3"
+    elseif suit_count == 4 then
+      msg = "#jy_sichi_suits_4"
+    end
+    room:doBroadcastNotify("ShowToast", Fk:translate(msg))
 
-    -- suit_count = 2  -- 测试用的
+    -- suit_count = 2  -- 测试用的，记得删掉
 
     -- 一种花色：全部给一个人，测试通过
     if suit_count == 1 then
       -- 不能直接用room:getOtherPlayers(player)，因为这个函数返回的是player，而askForChoosePlayers需要的是id（integer）。
+      -- 无法让这些展示的牌在结算完成之前保留在屏幕上，火攻也不行
       local targets = table.map(table.filter(room:getAlivePlayers(), function(p)
         return true end), Util.IdMapper)
-      local result = room:askForChoosePlayers(player, targets, 1, 1, "#jy_sichi_1", self.name)  -- 这玩意返回的是id列表
-      room:moveCardTo(cards, Player.Hand, room:getPlayerById(result[1]), fk.ReasonGive, self.name, nil, false, player.id)
+      local result = room:askForChoosePlayers(player, targets, 1, 1, "#jy_sichi_1", self.name, true, false)  -- 这玩意返回的是id列表
+      if #result ~= 0 then  -- 点击取消，就给自己
+        room:moveCardTo(card_ids, Player.Hand, room:getPlayerById(result[1]), fk.ReasonGive, self.name, nil, false, player.id)
+      else
+        room:moveCardTo(card_ids, Player.Hand, player, fk.ReasonGive, self.name, nil, false, player.id)
+      end
 
-    -- 两种花色：判断是否有可以使用的牌。如果有，要求使用其中一张牌，如果没有，弃置一张牌
+    -- 2种花色：判断是否有可以使用的牌。如果有，选择其中一张可以使用的牌，然后选择目标并使用，如果没有，弃置一张牌
+    -- 因为我们只选一张，所以用addSubcard就可以了。如果你要移植这个函数到别的地方去，那就记得改单复数（
     elseif suit_count == 2 then
-      -- TODO
+      -- 1. 先判断是否全都无法使用，如果全都无法使用，直接让他弃牌，把这几张牌都丢到弃牌堆去，结束这个技能
+      local is_any_card_usable = false
+      for _, c in ipairs(card_ids) do
+        if U.canUseCard(room, player, Fk:getCardById(c), false) then is_any_card_usable = true break end
+      end
+      if not is_any_card_usable then
+        room:askForDiscard(player, 1, 1, true, self.name, false, ".", "#jy_sichi_2_failed", true)
+        -- 在此处已经把垃圾丢完了，所以可以放心return（虽然没测试过）
+        room:moveCards({
+          ids = card_ids,
+          toArea = Card.DiscardPile,
+          moveReason = fk.ReasonPutIntoDiscardPile,
+        })
+        return false
+      end
+      
+      -- 2. 如果有可以使用的牌，用五谷丰登（神吕蒙）的方式把牌展示出来，其中不可使用的牌变灰，让他选择一张没有变灰的牌
+      table.forEach(room.players, function(p)
+        room:fillAG(p, card_ids)  -- 让每个人都能看到AG
+      end)
+
+      for i = 1, #card_ids do  -- 对于所有的牌
+        local id = card_ids[i]
+        if not U.canUseCard(room, player, Fk:getCardById(id), true) then  -- 如果这张牌无法使用
+          room:takeAG(player, id)  -- 把这张牌标记为被拿了（也就是变灰）
+          -- table.removeOne(card_ids, id)  -- 把这张牌从所有的牌中移除。此时不需要。
+        end
+      end
+      local card_id = room:askForAG(player, card_ids, false, self.name)  -- 要求你拿一张
+      room:takeAG(player, card_id)
+      table.removeOne(card_ids, card_id)  -- 将这张牌从card_ids移除，因为最后要把所有的card_ids都弃掉
+      room:closeAG()
+      -- card_id 即为被选的牌
+
+      local dummy = Fk:cloneCard("dilu")
+
+      -- 3. 选择完毕后，放入他的手牌，并要求他一定要指定目标
+      dummy:addSubcard(card_id)
+      room:obtainCard(player.id, dummy, true, fk.ReasonPrey)
+
+      local card = Fk:getCardById(card_id)
+
+      local number
+      local suit
+
+      if card.number == 11 then
+        number = "J"
+      elseif card.number == 12 then
+        number = "Q"
+      elseif card.number == 13 then
+        number = "K"
+      elseif card.number == 1 then
+        number = "A"
+      else
+        number = tostring(card.number)
+      end
+
+      if card.suit == Card.Spade then
+        suit = "spade"
+      elseif card.suit == Card.Heart then
+        suit = "heart"
+      elseif card.suit == Card.Club then
+        suit = "club"
+      elseif card.suit == Card.Diamond then
+        suit = "diamond"
+      end
+
+      -- 牌名|点数|花色  -- 这个exppattern.lua里用例子给的写法，可以匹配到
+      local pattern = card.name.."|"..number.."|"..suit
+      -- 牌名|花色|点数  -- 这个exppattern.lua用中文里给的写法，但是无法匹配到
+      -- local pattern = card.name.."|"..suit.."|"..number
+      -- exppattern.lua给的中文写错了！！
+      local use = room:askForUseCard(player, card.name, pattern, "#jy_sichi_2_use", false)  -- 这里填false也没用，反正是可以取消的
+      
+      -- useCard
+      if use then room:useCard(use) end
+
     -- 3种花色：选牌，然后所有人各摸一张
     elseif suit_count == 3 then
-      -- TODO: 三张同类型的牌或其中两张不同类型的牌
-      local get = room:askForPoxi(player, "jy_sichi_count", {
-        { self.name, cards },
+      local get = room:askForPoxi(player, "jy_sichi_3", {
+        { self.name, card_ids },
       }, nil, true)
       if #get > 0 then
         local dummy = Fk:cloneCard("dilu")
@@ -1468,11 +1598,11 @@ local jy_sichi = fk.CreateTriggerSkill{
       end
     end
 
-    -- 移动到弃牌堆
-    cards = table.filter(cards, function(id) return room:getCardArea(id) == Card.Processing end)
-    if #cards > 0 then
+    -- 移动到弃牌堆，最后一起丢，前面的不用丢
+    card_ids = table.filter(card_ids, function(id) return room:getCardArea(id) == Card.Processing end)
+    if #card_ids > 0 then
       room:moveCards({
-        ids = cards,
+        ids = card_ids,
         toArea = Card.DiscardPile,
         moveReason = fk.ReasonPutIntoDiscardPile,
       })
@@ -1543,10 +1673,11 @@ local jy_boshi = fk.CreateTriggerSkill{
       skillName = self.name,
     })
     player:drawCards(3, self.name)
-    room:handleAddLoseSkills(player, "-jy_huapen", nil, true, true)
 
-    room:handleAddLoseSkills(player, "jy_boshi_count", nil, true, true)  -- 不用再看判定了多少次了
+    room:handleAddLoseSkills(player, "-#jy_boshi_count", nil, true, true)  -- 不用再看判定了多少次了
     room:setPlayerMark(player, "@jy_boshi_judge_count", 0)
+
+    room:handleAddLoseSkills(player, "-jy_huapen", nil, true, true)
 
     room:handleAddLoseSkills(player, "jy_jiangbei", nil, true, true)
   end,
@@ -1566,11 +1697,10 @@ local jy_boshi_count = fk.CreateTriggerSkill{
 jy_boshi:addRelatedSkill(jy_boshi_count)
 
 -- 测了一遍，没什么问题
+
+-- 主函数啥也不做，只是为了承载下面的
 local jy_jiangbei = fk.CreateTriggerSkill{
-  -- TODO 建议把这个技能写成记录用了多少张梅花和红桃牌
   name = "jy_jiangbei",
-  frequency = Skill.Compulsory,
-  events = {},
 }
 -- ♥无法被响应
 local jy_jiangbei_heart = fk.CreateTriggerSkill{
@@ -1621,16 +1751,66 @@ local jy_jiangbei_club_2 = fk.CreateTriggerSkill{
     end)
   end,
 }
+-- 出牌阶段开始时把已使用打出的红桃梅花数设置成0
+local jy_jiangbei_set_0 = fk.CreateTriggerSkill{
+  name = "#jy_jiangbei_set_0",
+  mute = true,
+  frequency = Skill.Compulsory,
+  refresh_events = {fk.EventPhaseStart},
+  can_refresh = function(self, event, target, player, data)
+    return player:hasSkill(self) and target == player and
+      player.phase == Player.Play -- 在我的出牌阶段
+  end,
+  on_refresh = function(self, event, target, player, data)
+    player.room:setPlayerMark(player, "@jy_jiangbei_draw", 0)
+  end,
+}
+-- 计算出牌阶段使用打出了多少张红桃梅花
+local jy_jiangbei_draw_count = fk.CreateTriggerSkill{
+  name = "#jy_jiangbei_draw_count",
+  mute = true,
+  frequency = Skill.Compulsory,
+  refresh_events = {fk.CardResponding, fk.TargetSpecified},  -- 包括了使用和打出
+  can_refresh = function(self, event, target, player, data)
+    return player:hasSkill(self) and target == player and data.card and
+      player.phase == Player.Play -- 在我的出牌阶段
+  end,
+  on_refresh = function(self, event, target, player, data)
+    local room = player.room
+    -- 如果是红桃和梅花
+    if (data.card.suit == Card.Club or data.card.suit == Card.Heart) and
+      type(player:getMark("@jy_jiangbei_draw")) == "number" then  -- 并且没有使用打出过别的花色
+      room:addPlayerMark(player, "@jy_jiangbei_draw")
+    else
+      room:setPlayerMark(player, "@jy_jiangbei_draw", "#jy_jiangbei_no")  -- 如果设置成字符串了，代表不允许摸牌了
+    end
+  end,
+}
+-- 出牌阶段结束时摸等量的牌
+local jy_jiangbei_draw = fk.CreateTriggerSkill{
+  name = "#jy_jiangbei_draw",
+  anim_type = "special",
+  events = {fk.EventPhaseEnd},  -- 包括了使用和打出
+  can_trigger = function(self, event, target, player, data)
+    return target == player and player:hasSkill(self)
+      and player.phase == Player.Play
+  end,
+  on_cost = function(self, event, target, player, data)
+    local room = player.room
+    if type(player:getMark("@jy_jiangbei_draw")) == "number" then -- 只有是数字的时候，代表可以摸牌
+      player:drawCards(player:getMark("@jy_jiangbei_draw"), self.name)
+    end
+    room:setPlayerMark(player, "@jy_jiangbei_draw", 0)  -- 无论能不能摸牌，都要清理掉这个标记
+  end,
+}
 jy_jiangbei:addRelatedSkill(jy_jiangbei_heart)
 jy_jiangbei:addRelatedSkill(jy_jiangbei_club)
 jy_jiangbei:addRelatedSkill(jy_jiangbei_club_2)
--- TODO:出牌阶段结束时摸牌
+jy_jiangbei:addRelatedSkill(jy_jiangbei_set_0)
+jy_jiangbei:addRelatedSkill(jy_jiangbei_draw_count)
+jy_jiangbei:addRelatedSkill(jy_jiangbei_draw)
 
-local jy_ceshi_des = fk.CreateTriggerSkill{
-  name = "jy_ceshi_des",
-}
-zer__yangfan:addSkill(jy_ceshi_des)  -- 开发好之后，这一行是需要去掉的
-
+-- zer__yangfan:addSkill(jy_ceshi_des)  -- 开发好之后，这一行是需要去掉的
 zer__yangfan:addSkill(jy_sichi)
 zer__yangfan:addSkill(jy_huapen)
 zer__yangfan:addSkill(jy_boshi)
@@ -1638,37 +1818,46 @@ zer__yangfan:addSkill(jy_boshi)
 zer__yangfan:addRelatedSkill(jy_jiangbei)
 
 Fk:loadTranslationTable {
-  ["zer__yangfan"] = "杨藩开发版",
+  ["zer__yangfan"] = "杨藩",
   ["zer__yangfan_judge"] = "判定",
 
-  ["jy_ceshi_des"] = "测试",
-  [":jy_ceshi_des"] = [[<strong>这个武将正在开发中，可能会有bug、和设计者描述的技能不一样，但基本上已经实现了现在描述的技能。如果游玩时发现bug请反馈给开发者。<\strong>]],
-
   ["jy_sichi"] = "四吃",
-  [":jy_sichi"] = [[受到伤害后，你可以展示牌堆顶的4张牌，根据花色数量触发效果：<br>
-  1，将这些牌交给一名角色；<br>
-  2，还没写，所以什么效果也没有；<br>
-  3，获得其中的任意张点数之和小于28的牌，其余角色各摸一张牌；<br>
-  4，选择至多3名角色，你与其各失去一点体力。<br>
-  将未被获得的牌置入弃牌堆。]],
+  [":jy_sichi"] = [[受到伤害后，你可以展示牌堆顶的4张牌，根据花色数量触发效果。<br>
+  1种：将这些牌交给一名角色；<br>
+  2种：获得其中一张可以使用的牌并可以立即使用。若所有的牌都无法使用，弃一张牌；<br>
+  3种：获得其中3张同类型的牌或2张不同类型的牌、除你以外的其他角色各摸一张牌；<br>
+  4种：选择至多3名角色，你与其各失去一点体力。]],
 
-  ["#jy_sichi_1"] = "四吃：选择一个角色，将牌交给其",
-  ["#jy_sichi_2"] = "四吃：没有效果",
-  ["#jy_sichi_3"] = "四吃：选择其中的任意张点数之和小于28的牌获得之，其余角色各摸一张牌",
+  ["#jy_sichi_suits_1"] = "四吃：1种花色，选择一个角色获得所有牌",
+  ["#jy_sichi_suits_2"] = "四吃：2种花色，获得一张可使用的牌并可以立即使用，若没有则弃牌",
+  ["#jy_sichi_suits_3"] = "四吃：3种花色，获得其中一部分牌",
+  ["#jy_sichi_suits_4"] = "四吃：4种花色，选择角色和自己一起失去体力",
+
+  ["#jy_sichi_1"] = "四吃：选择一个角色获得所有牌，点击取消选择自己",
+  ["#jy_sichi_2"] = "四吃：选择其中一张牌并使用",
+  ["#jy_sichi_2_use"] = "四吃：你可以立即使用这张牌",
+  ["#jy_sichi_2_failed"] = "四吃：没有可使用的牌，你需要弃一张牌",
+  ["jy_sichi_3"] = "四吃",
+  ["#jy_sichi_3"] = "四吃：选择其中3张同类型的牌或2张不同类型的牌获得",
   ["#jy_sichi_4"] = "四吃：选择至多3名角色，你和他们各失去一点体力",
 
-  ["jy_boshi"] = "搏时",
-  [":jy_boshi"] = [[觉醒技，准备阶段开始时，若你已判定过至少10次，你增加一点体力上限、回复3点体力、摸3张牌、失去技能【花盆】，然后获得技能【奖杯】。]],
+  ["jy_boshi"] = "搏十",
+  [":jy_boshi"] = [[觉醒技，准备阶段开始时，若你已判定过至少10次，你增加一点体力上限、回复3点体力、
+  摸3张牌、失去技能【花盆】，然后获得技能【奖杯】。]],
   ["@jy_boshi_judge_count"] = "搏时",
 
   ["jy_huapen"] = "花盆",
-  [":jy_huapen"] = [[锁定技，其他角色使用♣非延时锦囊牌或基本牌、指定了有且仅有一个不为你的目标时，你进行一次判定，若为<font color="red">♥</font>，额外指定你为目标。]],
+  [":jy_huapen"] = [[锁定技，其他角色使用♣非延时锦囊牌或基本牌、指定了有且仅有一个不为你的目标时，
+  你进行一次判定，若为<font color="red">♥</font>，额外指定你为目标。]],
 
   ["jy_jiangbei"] = "奖杯",
-  [":jy_jiangbei"] = [[锁定技，你使用基本牌和锦囊牌时，根据花色获得额外效果。♣：无视距离、防具和次数限制；<font color="red">♥</font>：无法被响应。]],
+  [":jy_jiangbei"] = [[锁定技，出牌阶段结束时，若你出牌阶段只使用或打出过♣和<font color="red">♥</font>牌，摸等量的牌；
+  你使用基本牌和锦囊牌时，若花色为：♣，无视距离和防具，没有次数限制；<font color="red">♥</font>，不可被响应。]],
   ["#jy_jiangbei_heart"] = "奖杯·红桃",
-  ["#jy_jiangbei_club"] = "奖杯·梅花",
-  ["#jy_jiangbei_club_2"] = "奖杯·梅花",
+  ["#jy_jiangbei_club"] = "奖杯·梅花·无限",
+  ["#jy_jiangbei_club_2"] = "奖杯·梅花·无视防具",
+  ["@jy_jiangbei_draw"] = "奖杯",
+  ["#jy_jiangbei_no"] = "不可摸牌",
   -- TODO：改一下这里，按照sp公孙瓒义从改，只提示触发了义从。
 }
 
