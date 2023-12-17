@@ -1772,8 +1772,9 @@ local jy_jiangbei_draw_count = fk.CreateTriggerSkill{
   frequency = Skill.Compulsory,
   refresh_events = {fk.CardResponding, fk.TargetSpecified},  -- 包括了使用和打出
   can_refresh = function(self, event, target, player, data)
-    return player:hasSkill(self) and target == player and data.card and
-      player.phase == Player.Play and data.from == player -- 在我的出牌阶段，我使用或打出的牌
+    if player:hasSkill(self) and data.card and player.phase == Player.Play then
+      return target == player
+    end
   end,
   on_refresh = function(self, event, target, player, data)
     local room = player.room
