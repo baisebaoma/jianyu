@@ -1495,16 +1495,18 @@ local jy_sichi = fk.CreateTriggerSkill{
       -- 1. 先判断是否全都无法使用，如果全都无法使用，直接让他弃牌，把这几张牌都丢到弃牌堆去，结束这个技能
       local is_any_card_usable = false
       for _, c in ipairs(card_ids) do
-        if U.canUseCard(room, player, Fk:getCardById(c), false) then is_any_card_usable = true break end
+        if U.canUseCard(room, player, Fk:getCardById(c), true) then is_any_card_usable = true break end
       end
+      -- is_any_card_usable = false  -- TODO: 测试用的，记得改回来
       if not is_any_card_usable then
-        room:askForDiscard(player, 1, 1, true, self.name, false, ".", "#jy_sichi_2_failed", true)
-        -- 在此处已经把垃圾丢完了，所以可以放心return（虽然没测试过）
+        room:doBroadcastNotify("ShowToast", Fk:translate("#jy_sichi_2_failed_toast"))
+        room:askForDiscard(player, 1, 1, true, self.name, false, ".", "#jy_sichi_2_failed", false)
         room:moveCards({
           ids = card_ids,
           toArea = Card.DiscardPile,
           moveReason = fk.ReasonPutIntoDiscardPile,
         })
+        -- 在此处已经把垃圾丢完了，所以可以放心return
         return false
       end
       
@@ -1561,9 +1563,7 @@ local jy_sichi = fk.CreateTriggerSkill{
 
       -- 牌名|点数|花色  -- 这个exppattern.lua里用例子给的写法，可以匹配到
       local pattern = card.name.."|"..number.."|"..suit
-      -- 牌名|花色|点数  -- 这个exppattern.lua用中文里给的写法，但是无法匹配到
-      -- local pattern = card.name.."|"..suit.."|"..number
-      -- exppattern.lua给的中文写错了！！
+      -- TODO: 雷杀用不了
       local use = room:askForUseCard(player, card.name, pattern, "#jy_sichi_2_use", false)  -- 这里填false也没用，反正是可以取消的
       
       -- useCard
@@ -1661,8 +1661,8 @@ local jy_boshi = fk.CreateTriggerSkill{
       player.phase == Player.Start
   end,
   can_wake = function(self, event, target, player, data)
-    return player:getMark("@jy_boshi_judge_count") >= 1
-    -- TODO：记得删掉
+    return player:getMark("@jy_boshi_judge_count") >= 10
+    -- 10才是正确的数值
   end,
   on_use = function(self, event, target, player, data)
     local room = player.room
@@ -1842,6 +1842,7 @@ Fk:loadTranslationTable {
   ["#jy_sichi_1"] = "四吃：选择一个角色获得所有牌，点击取消选择自己",
   ["#jy_sichi_2"] = "四吃：选择其中一张牌并使用",
   ["#jy_sichi_2_use"] = "四吃：你可以立即使用这张牌",
+  ["#jy_sichi_2_failed_toast"] = "四吃：2种花色，但没有任何可以使用的牌，所以弃一张牌",
   ["#jy_sichi_2_failed"] = "四吃：没有可使用的牌，你需要弃一张牌",
   ["jy_sichi_3"] = "四吃",
   ["#jy_sichi_3"] = "四吃：选择其中3张同类型的牌或2张不同类型的牌获得",
