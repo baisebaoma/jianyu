@@ -1042,6 +1042,7 @@ local jy_youlong = fk.CreateTriggerSkill{
     for _, p in ipairs(room:getAlivePlayers(player, true)) do
       if not p:isKongcheng() then  -- 如果他有手牌
         local id = room:askForCard(p, 1, 1, false, self.name, false, nil, "#jy_youlong-choose")
+        assert(id)
         local next = p.next  -- 下家
         while next.dead do  -- 一直找，直到找到一个活的下家
           next = next.next
