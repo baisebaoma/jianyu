@@ -1611,6 +1611,7 @@ local jy_sichi = fk.CreateTriggerSkill{
 }
 
 -- ol_sp1 sheyan
+-- TODO：如果别人用♣借刀杀人指定了另外两个目标，并且判定为♥指定我为目标，借自己的刀杀自己，杀出不出去，只能给刀
 local jy_huapen = fk.CreateTriggerSkill{
   name = "jy_huapen",
   anim_type = "control",
@@ -1621,6 +1622,8 @@ local jy_huapen = fk.CreateTriggerSkill{
       data.card.suit == Card.Club and
       (data.card:isCommonTrick() or data.card.type == Card.TypeBasic) then
       local previous_targets = AimGroup:getAllTargets(data.tos)
+      if #AimGroup:getAllTargets(data.tos) ~= 1 then return false end  -- 如果目标不是一个，那就不用管了
+      -- 不知道借刀杀人什么target
       -- 如果目标里面已经有我自己了，那就不要判定了
       for _, v in pairs(previous_targets) do
         if v == player.id then
@@ -1643,7 +1646,7 @@ local jy_huapen = fk.CreateTriggerSkill{
     room:judge(judge)
     if judge.card.suit == Card.Heart then
       room:doIndicate(data.from, {player.id})  -- 播放指示线
-      if #AimGroup:getAllTargets(data.tos) == 1 then
+      if #AimGroup:getAllTargets(data.tos) == 1 then  -- 如果只有一个人，那么把我也加进去
         table.insertTable(targets, AimGroup:getAllTargets(data.tos))
       end
       TargetGroup:pushTargets(data.targetGroup, player.id)
@@ -1669,7 +1672,7 @@ local jy_boshi = fk.CreateTriggerSkill{
     room:changeMaxHp(player, 1)
     room:recover({
       who = player,
-      num = 3,
+      num = 1,
       recoverBy = player,
       skillName = self.name,
     })
@@ -1853,7 +1856,7 @@ Fk:loadTranslationTable {
   你进行一次判定，若为<font color="red">♥</font>，额外指定你为目标。]],
 
   ["jy_boshi"] = "搏十",
-  [":jy_boshi"] = [[觉醒技，准备阶段开始时，若你已判定过至少10次，你增加一点体力上限、回复3点体力、
+  [":jy_boshi"] = [[觉醒技，准备阶段开始时，若你已判定过至少10次，你增加一点体力上限、回复一点体力、
   摸3张牌、失去技能【花盆】，然后获得技能【奖杯】。]],
   ["@jy_boshi_judge_count"] = "搏十",
 
