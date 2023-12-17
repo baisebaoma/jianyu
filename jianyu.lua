@@ -1107,7 +1107,7 @@ local jy_luojiao = fk.CreateTriggerSkill{
 
     -- 先清理自家变量
     player.is_luojiao_archery_attack_may_be_triggered = false
-    player.is_dian_may_changing = nil  -- 双将一直触发南蛮应该是因为这个变量没有复原，而该触发南蛮的时候玩家没有按是。
+    player.is_dian_may_changing = nil
 
     local dians = player:getPile("xjb__aweiluo_dian")  -- dians是【点】的牌
 
@@ -1205,7 +1205,6 @@ local jy_luojiao_after = fk.CreateTriggerSkill{
     -- 因为南蛮触发的比万箭多，所以把南蛮放到前面提高效率
 
     -- 如果南蛮的条件满足
-    -- TODO:双将时会一直提示触发，单将没有这个问题
     if player.is_savage_assault then 
       if room:askForSkillInvoke(player, self.name, nil, "#jy_luojiao_savage_assault_ask") then  -- 那么问是否要发动
         self.do_savage_assault = true
@@ -1220,6 +1219,15 @@ local jy_luojiao_after = fk.CreateTriggerSkill{
         return true
       end
     end
+
+    -- 如果玩家选择不触发，那擦屁股，这次【点】结算完成了
+    self.do_archery_attack = false
+    self.do_savage_assault = false
+    self.first = nil
+    player.is_dian_may_changing = false
+    player.is_archery_attack = false
+    player.is_savage_assault = false
+    return false
   end,
   on_use = function(self, event, target, player, data)
     local room = player.room
