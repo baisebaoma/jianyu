@@ -917,7 +917,7 @@ Fk:loadTranslationTable {
 local tym__zhaoqianxi_2 = General(extension, "tym__zhaoqianxi_2", "qun", 4, 4, General.Male)
 -- tym__zhaoqianxi_2.hidden = true
 
--- TODO：被铁锁连环的目标如果因为这次伤害受到了元素反应，那么不会让其他被铁锁连环的目标受到附着效果。（已修复）
+-- 被铁锁连环的目标如果因为这次伤害受到了元素反应，那么不会让其他被铁锁连环的目标受到附着效果。（已修复）
 -- 这是因为is_jy_yuanshen_2_triggered。目前已经删除了这个变量，但是这样的问题是：
 -- 如果场上有多个有这个技能的角色，那么既会附着又会负面效果；铁索连环的副目标会受到2点额外伤害
 local jy_yuanshen_2 = fk.CreateTriggerSkill{
@@ -1496,7 +1496,7 @@ local jy_sichi = fk.CreateTriggerSkill{
       for _, c in ipairs(card_ids) do
         if U.canUseCard(room, player, Fk:getCardById(c), true) then is_any_card_usable = true break end
       end
-      -- is_any_card_usable = false  -- TODO: 测试用的，记得改回来
+      -- is_any_card_usable = false  -- 测试用的，记得改回来
       if not is_any_card_usable then
         room:doBroadcastNotify("ShowToast", Fk:translate("#jy_sichi_2_failed_toast"))
         room:askForDiscard(player, 1, 1, true, self.name, false, ".", "#jy_sichi_2_failed", false)
@@ -1535,6 +1535,7 @@ local jy_sichi = fk.CreateTriggerSkill{
 
       local card = Fk:getCardById(card_id)
 
+      local name = card.trueName
       local number
       local suit
 
@@ -1561,8 +1562,8 @@ local jy_sichi = fk.CreateTriggerSkill{
       end
 
       -- 牌名|点数|花色  -- 这个exppattern.lua里用例子给的写法，可以匹配到
-      local pattern = card.name.."|"..number.."|"..suit
-      -- TODO: 雷杀用不了
+      local pattern = name.."|"..number.."|"..suit
+      -- 雷杀火杀匹配不到，用truename即可，反正花色和点数会限制别的牌
       local use = room:askForUseCard(player, card.name, pattern, "#jy_sichi_2_use", false)  -- 这里填false也没用，反正是可以取消的
       
       -- useCard
