@@ -327,7 +327,7 @@ local skl__liyuanhao = General(extension, "skl__liyuanhao", "qun", 3, 3, General
 local jy_huxiao = fk.CreateTriggerSkill{
   name = "jy_huxiao",
   anim_type = "special",
-  events = {fk.CardResponding, fk.TargetSpecified},  -- 包括了使用和打出
+  events = {fk.CardResponding, fk.CardUsing},  -- 包括了使用和打出
   can_trigger = function(self, event, target, player, data)
     if player:hasSkill(self) and data.card and data.card.trueName == "slash" then
       return target == player
@@ -544,7 +544,7 @@ local tym__liyuanhao = General(extension, "tym__liyuanhao", "qun", 3, 3, General
 local jy_huxiao_2 = fk.CreateTriggerSkill{
   name = "jy_huxiao_2",
   anim_type = "special",
-  events = {fk.CardResponding, fk.TargetSpecified},  -- 包括了使用和打出
+  events = {fk.CardResponding, fk.CardUsing},  -- 包括了使用和打出
   can_trigger = function(self, event, target, player, data)
     if player:hasSkill(self) and data.card and data.card.trueName == "slash" then
       return target == player
@@ -1661,7 +1661,8 @@ local jy_boshi = fk.CreateTriggerSkill{
       player.phase == Player.Start
   end,
   can_wake = function(self, event, target, player, data)
-    return player:getMark("@jy_boshi_judge_count") >= 10
+    return player:getMark("@jy_boshi_judge_count") >= 1
+    -- TODO：记得删掉
   end,
   on_use = function(self, event, target, player, data)
     local room = player.room
@@ -1674,12 +1675,14 @@ local jy_boshi = fk.CreateTriggerSkill{
     })
     player:drawCards(3, self.name)
 
-    room:handleAddLoseSkills(player, "-#jy_boshi_count", jy_boshi, true, true)  -- 不用再看判定了多少次了
-    room:setPlayerMark(player, "@jy_boshi_judge_count", 0)
+    -- room:handleAddLoseSkills(player, "-jy_boshi_count", jy_boshi)  -- 这行没用
+    -- 因为这个是relatedSkill，估计是删不掉，还在这个技能里面。
+    -- room:handleAddLoseSkills(player, "-#jy_boshi_count", jy_boshi)  -- 不用再看判定了多少次了
+    room:setPlayerMark(player, "@jy_boshi_judge_count", 0)  -- 清空标记
 
-    room:handleAddLoseSkills(player, "-jy_huapen", nil, true, true)
+    room:handleAddLoseSkills(player, "-jy_huapen")
 
-    room:handleAddLoseSkills(player, "jy_jiangbei", nil, true, true)
+    room:handleAddLoseSkills(player, "jy_jiangbei")
   end,
 }
 local jy_boshi_count = fk.CreateTriggerSkill{
@@ -1687,7 +1690,8 @@ local jy_boshi_count = fk.CreateTriggerSkill{
   mute = true,
   refresh_events = {fk.AskForRetrial},
   can_refresh = function(self, event, target, player, data)
-    return target == player and player:hasSkill(self)
+    return target == player and player:hasSkill(self) and 
+      player:usedSkillTimes("jy_boshi", Player.HistoryGame) == 0  -- 如果觉醒技未发动过，可以更新数值（发动过了就不更新了）
   end,
   on_refresh = function(self, event, target, player, data)
     local room = player.room
@@ -1766,11 +1770,12 @@ local jy_jiangbei_set_0 = fk.CreateTriggerSkill{
   end,
 }
 -- 计算出牌阶段使用打出了多少张红桃梅花
+-- TargetSpecified对每个目标都会执行一次，所以改成CardUsing。前面的虎啸也一并改了已经。
 local jy_jiangbei_draw_count = fk.CreateTriggerSkill{
   name = "#jy_jiangbei_draw_count",
   mute = true,
   frequency = Skill.Compulsory,
-  refresh_events = {fk.CardResponding, fk.TargetSpecified},  -- 包括了使用和打出
+  refresh_events = {fk.CardResponding, fk.CardUsing},  -- 包括了使用和打出
   can_refresh = function(self, event, target, player, data)
     if player:hasSkill(self) and data.card and player.phase == Player.Play then
       return target == player
@@ -1831,7 +1836,7 @@ Fk:loadTranslationTable {
 
   ["#jy_sichi_suits_1"] = "四吃：1种花色，选择一个角色获得所有牌",
   ["#jy_sichi_suits_2"] = "四吃：2种花色，获得一张可使用的牌并可以立即使用，若没有则弃牌",
-  ["#jy_sichi_suits_3"] = "四吃：3种花色，获得其中一部分牌",
+  ["#jy_sichi_suits_3"] = "四吃：3种花色，获得其中一部分牌，然后其他角色各摸一张",
   ["#jy_sichi_suits_4"] = "四吃：4种花色，选择角色和自己一起失去体力",
 
   ["#jy_sichi_1"] = "四吃：选择一个角色获得所有牌，点击取消选择自己",
@@ -1842,21 +1847,21 @@ Fk:loadTranslationTable {
   ["#jy_sichi_3"] = "四吃：选择其中3张同类型的牌或2张不同类型的牌获得",
   ["#jy_sichi_4"] = "四吃：选择至多3名角色，你和他们各失去一点体力",
 
+  ["jy_huapen"] = "花盆",
+  [":jy_huapen"] = [[锁定技，其他角色使用♣非延时锦囊牌或基本牌、指定了有且仅有一个不为你的目标时，
+  你进行一次判定，若为<font color="red">♥</font>，额外指定你为目标。]],
+
   ["jy_boshi"] = "搏十",
   [":jy_boshi"] = [[觉醒技，准备阶段开始时，若你已判定过至少10次，你增加一点体力上限、回复3点体力、
   摸3张牌、失去技能【花盆】，然后获得技能【奖杯】。]],
   ["@jy_boshi_judge_count"] = "搏十",
 
-  ["jy_huapen"] = "花盆",
-  [":jy_huapen"] = [[锁定技，其他角色使用♣非延时锦囊牌或基本牌、指定了有且仅有一个不为你的目标时，
-  你进行一次判定，若为<font color="red">♥</font>，额外指定你为目标。]],
-
   ["jy_jiangbei"] = "奖杯",
   [":jy_jiangbei"] = [[锁定技，出牌阶段结束时，若你出牌阶段只使用或打出过♣和<font color="red">♥</font>牌，摸等量的牌；
-  你使用基本牌和锦囊牌时，若花色为：♣，无视距离和防具，没有次数限制；<font color="red">♥</font>，不可被响应。]],
-  ["#jy_jiangbei_heart"] = "奖杯·红桃",
-  ["#jy_jiangbei_club"] = "奖杯·梅花",
-  ["#jy_jiangbei_club_2"] = "奖杯·梅花",
+  你使用基本牌和锦囊牌时，若花色为♣，无视距离和防具、没有次数限制；若花色为<font color="red">♥</font>，不可被响应。]],
+  ["#jy_jiangbei_heart"] = "奖杯",
+  ["#jy_jiangbei_club"] = "奖杯",
+  ["#jy_jiangbei_club_2"] = "奖杯",
   ["@jy_jiangbei_draw"] = "奖杯",
   ["#jy_jiangbei_no"] = "不可摸牌",
   -- TODO：改一下这里，按照sp公孙瓒义从改，只提示触发了义从。
