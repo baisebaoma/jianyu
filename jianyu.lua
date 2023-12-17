@@ -1105,10 +1105,13 @@ local jy_luojiao = fk.CreateTriggerSkill{
   can_refresh = function(self, event, target, player, data)  -- 使用refresh而不是trigger，是因为这个技能不需要询问玩家是否触发
     if not player:hasSkill(self) then return end  -- 如果我自己没有这个技能，那就不触发了
 
+    -- 先清理自家变量
+    player.is_luojiao_archery_attack_may_be_triggered = false
+    player.is_dian_may_changing = nil  -- 双将一直触发南蛮应该是因为这个变量没有复原，而该触发南蛮的时候玩家没有按是。
+
     local dians = player:getPile("xjb__aweiluo_dian")  -- dians是【点】的牌
 
     -- 判断是否有牌进出特殊区
-    player.is_luojiao_archery_attack_may_be_triggered = false  -- 先清理自家变量
     -- 为什么不用data传参数，因为这里是BeforeCardsMove，后面是AfterCardsMove，两个不是同一个事件，data不一样。用player
 
     -- 判断是否有牌出去
@@ -1202,6 +1205,7 @@ local jy_luojiao_after = fk.CreateTriggerSkill{
     -- 因为南蛮触发的比万箭多，所以把南蛮放到前面提高效率
 
     -- 如果南蛮的条件满足
+    -- TODO:双将时会一直提示触发，单将没有这个问题
     if player.is_savage_assault then 
       if room:askForSkillInvoke(player, self.name, nil, "#jy_luojiao_savage_assault_ask") then  -- 那么问是否要发动
         self.do_savage_assault = true
@@ -1461,6 +1465,7 @@ local jy_sichi = fk.CreateTriggerSkill{
 
     assert(suit_count <= 4 and suit_count >= 1)
     
+    -- TODO:其实主要是担心如果用..它不会翻译成中文。有空可以试一下
     local msg
     if suit_count == 1 then
       msg = "#jy_sichi_suits_1"
@@ -1529,7 +1534,7 @@ local jy_sichi = fk.CreateTriggerSkill{
 
       local dummy = Fk:cloneCard("dilu")
 
-      -- 3. 选择完毕后，放入他的手牌，并要求他一定要指定目标
+      -- 3. 选择完毕后，放入他的手牌，并要求他为这张牌指定目标
       dummy:addSubcard(card_id)
       room:obtainCard(player.id, dummy, true, fk.ReasonPrey)
 
@@ -1623,7 +1628,7 @@ local jy_huapen = fk.CreateTriggerSkill{
       (data.card:isCommonTrick() or data.card.type == Card.TypeBasic) then
       local previous_targets = AimGroup:getAllTargets(data.tos)
       if #AimGroup:getAllTargets(data.tos) ~= 1 then return false end  -- 如果目标不是一个，那就不用管了
-      -- 不知道借刀杀人什么target
+      -- TODO: 借刀杀人也被判定为单体卡牌。也许本来就是？
       -- 如果目标里面已经有我自己了，那就不要判定了
       for _, v in pairs(previous_targets) do
         if v == player.id then
@@ -1678,9 +1683,6 @@ local jy_boshi = fk.CreateTriggerSkill{
     })
     player:drawCards(3, self.name)
 
-    -- room:handleAddLoseSkills(player, "-jy_boshi_count", jy_boshi)  -- 这行没用
-    -- 因为这个是relatedSkill，估计是删不掉，还在这个技能里面。
-    -- room:handleAddLoseSkills(player, "-#jy_boshi_count", jy_boshi)  -- 不用再看判定了多少次了
     room:setPlayerMark(player, "@jy_boshi_judge_count", 0)  -- 清空标记
 
     room:handleAddLoseSkills(player, "-jy_huapen")
@@ -1703,8 +1705,7 @@ local jy_boshi_count = fk.CreateTriggerSkill{
 }
 jy_boshi:addRelatedSkill(jy_boshi_count)
 
--- 测了一遍，没什么问题
-
+-- 测试通过
 -- 主函数啥也不做，只是为了承载下面的
 local jy_jiangbei = fk.CreateTriggerSkill{
   name = "jy_jiangbei",
