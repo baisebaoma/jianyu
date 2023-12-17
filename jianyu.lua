@@ -19,9 +19,8 @@ local jy_ceshi_des = fk.CreateTriggerSkill{
 
 Fk:loadTranslationTable {
   ["jy_ceshi_des"] = "测试",
-  [":jy_ceshi_des"] = [[<strong>这个武将正在开发中，可能会有bug、
-  和设计者描述的技能不一样，但基本上已经实现了现在描述的技能。
-  如果游玩时发现bug，请反馈给开发者。<\strong>]],
+  [":jy_ceshi_des"] = [[<strong>这个武将正在测试中，可能会有大量bug。
+  如果发现bug，请反馈给开发者。<\strong>]],
 }
 
 
@@ -296,7 +295,7 @@ Fk:loadTranslationTable{
   ["tym__jianzihao"] = "界简自豪",
 
   ["jy_kaiju_2"] = "开局",
-  [":jy_kaiju_2"] = "出牌阶段限一次，你选择若干名角色。按照你选择的顺序，视为你对他们各使用一张【顺手牵羊】，然后被他们各使用一张【杀】。",
+  [":jy_kaiju_2"] = "出牌阶段限一次，你选择若干名角色，依次视为你对其使用一张【顺手牵羊】，然后被其使用一张【杀】。",
   ["$jy_kaiju_21"] = "不是啊，我炸一对鬼的时候我在打什么，打一对10。一对10，他四个9炸我，我不输了吗？",
   ["$jy_kaiju_22"] = "怎么赢啊？你别瞎说啊！",
   ["$jy_kaiju_23"] = "打这牌怎么打？兄弟们快教我，我看着头晕！",
@@ -358,9 +357,7 @@ local jy_huxiao_analeptic = fk.CreateViewAsSkill{
       return nil
     end
     local c = Fk:cloneCard("analeptic")
-    -- local c = Fk:cloneCard("ex_nihilo")
     c.skillName = self.name
-    -- print("克隆的牌c的参数：c.name ", c.name, " c.trueName ", c.trueName)
     c:addSubcard(cards[1])
     return c
   end,
@@ -437,7 +434,7 @@ local jy_erduanxiao = fk.CreateTriggerSkill{
         end
       end
     end
-  end,  -- 每个参数的结尾都要逗号。can_trigger是一个参数
+  end,
 
   on_trigger = function(self, event, target, player, data)
     -- 触发之后，设置变量，告诉下一个函数有没有可能在发生变化
@@ -536,7 +533,7 @@ Fk:loadTranslationTable {
 }
 
 -- 唐李元浩
--- 建议删除，太强了。但是在活动服环境里，也许没那么强？
+-- 在活动服环境里，也许没那么强？
 local tym__liyuanhao = General(extension, "tym__liyuanhao", "qun", 3, 3, General.Male)
 
 -- 界虎啸
@@ -779,6 +776,7 @@ Fk:loadTranslationTable {
   
   ["jy_waao"] = "哇袄",
   [":jy_waao"] = [[锁定技，装备区有且仅有武器和进攻马时，你造成的伤害+1。]],
+  -- TODO：加语音
 }
 
 -- 高天亮
@@ -841,8 +839,8 @@ Fk:loadTranslationTable {
   ["~xjb__gaotianliang"] = "顶不住啦！我每天都活在水深火热里面。",
 }
 
--- -- 赵乾熙
-local tym__zhaoqianxi = General(extension, "tym__zhaoqianxi", "qun", 3, 3, General.Male)
+-- 赵乾熙
+local tym__zhaoqianxi = General(extension, "tym__zhaoqianxi", "qun", 4, 4, General.Male)
 
 -- 参考自藤甲。要把DamageInflicted改成DamageCaused，就是你对别人造成伤害的意思。
 -- 如果是DamageInflicted，就是别人对你造成伤害的意思。
@@ -1773,7 +1771,7 @@ local jy_jiangbei_set_0 = fk.CreateTriggerSkill{
     player.room:setPlayerMark(player, "@jy_jiangbei_draw", 0)
   end,
 }
--- 计算出牌阶段使用打出了多少张红桃梅花
+-- 计算出牌阶段使用打出了多少张红桃梅花。一旦使用打出了别的牌，就变为字符串。
 -- TargetSpecified对每个目标都会执行一次，所以改成CardUsing。前面的虎啸也一并改了已经。
 local jy_jiangbei_draw_count = fk.CreateTriggerSkill{
   name = "#jy_jiangbei_draw_count",
@@ -1820,27 +1818,24 @@ jy_jiangbei:addRelatedSkill(jy_jiangbei_set_0)
 jy_jiangbei:addRelatedSkill(jy_jiangbei_draw_count)
 jy_jiangbei:addRelatedSkill(jy_jiangbei_draw)
 
--- zer__yangfan:addSkill(jy_ceshi_des)  -- 开发好之后，这一行是需要去掉的
 zer__yangfan:addSkill(jy_sichi)
 zer__yangfan:addSkill(jy_huapen)
 zer__yangfan:addSkill(jy_boshi)
--- zer__yangfan:addSkill(jy_jiangbei)  -- 开发好之后，这一行是需要去掉的
 zer__yangfan:addRelatedSkill(jy_jiangbei)
 
 Fk:loadTranslationTable {
   ["zer__yangfan"] = "杨藩",
-  ["zer__yangfan_judge"] = "判定",
 
   ["jy_sichi"] = "四吃",
   [":jy_sichi"] = [[受到伤害后，你可以展示牌堆顶的4张牌，根据花色数量触发效果。<br>
   1种：将这些牌交给一名角色；<br>
   2种：获得其中一张可以使用的牌并可以立即使用。若所有的牌都无法使用，弃一张牌；<br>
-  3种：获得其中3张同类型的牌或2张不同类型的牌、除你以外的其他角色各摸一张牌；<br>
+  3种：获得其中3张同类型的牌或2张不同类型的牌，然后除你以外的其他角色各摸一张牌；<br>
   4种：选择至多3名角色，你与其各失去一点体力。]],
 
   ["#jy_sichi_suits_1"] = "四吃：1种花色，选择一个角色获得所有牌",
   ["#jy_sichi_suits_2"] = "四吃：2种花色，获得一张可使用的牌并可以立即使用，若没有则弃牌",
-  ["#jy_sichi_suits_3"] = "四吃：3种花色，获得其中一部分牌，然后其他角色各摸一张",
+  ["#jy_sichi_suits_3"] = "四吃：3种花色，获得其中一部分牌，然后其他角色各摸一张牌",
   ["#jy_sichi_suits_4"] = "四吃：4种花色，选择角色和自己一起失去体力",
 
   ["#jy_sichi_1"] = "四吃：选择一个角色获得所有牌，点击取消选择自己",
@@ -1849,7 +1844,7 @@ Fk:loadTranslationTable {
   ["#jy_sichi_2_failed_toast"] = "四吃：2种花色，但没有任何可以使用的牌，所以弃一张牌",
   ["#jy_sichi_2_failed"] = "四吃：没有可使用的牌，你需要弃一张牌",
   ["jy_sichi_3"] = "四吃",
-  ["#jy_sichi_3"] = "四吃：选择其中3张同类型的牌或2张不同类型的牌获得",
+  ["#jy_sichi_3"] = "四吃：选择其中3张同类型的牌或2张不同类型的牌获得，然后除你以外的角色各摸一张牌",
   ["#jy_sichi_4"] = "四吃：选择至多3名角色，你和他们各失去一点体力",
 
   ["jy_huapen"] = "花盆",
@@ -1863,7 +1858,7 @@ Fk:loadTranslationTable {
 
   ["jy_jiangbei"] = "奖杯",
   [":jy_jiangbei"] = [[锁定技，出牌阶段结束时，若你出牌阶段只使用或打出过♣和<font color="red">♥</font>牌，摸等量的牌；
-  你使用基本牌和锦囊牌时，若花色为♣，无视距离和防具、没有次数限制；若花色为<font color="red">♥</font>，不可被响应。]],
+  你使用的花色为♣的基本牌和锦囊牌无视距离和防具、没有次数限制；你使用的花色为<font color="red">♥</font>的基本牌和锦囊牌不可被响应。]],
   ["#jy_jiangbei_heart"] = "奖杯",
   ["#jy_jiangbei_club"] = "奖杯",
   ["#jy_jiangbei_club_2"] = "奖杯",
