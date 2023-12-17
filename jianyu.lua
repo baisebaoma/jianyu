@@ -1674,7 +1674,7 @@ local jy_boshi = fk.CreateTriggerSkill{
     })
     player:drawCards(3, self.name)
 
-    room:handleAddLoseSkills(player, "-#jy_boshi_count", nil, true, true)  -- 不用再看判定了多少次了
+    room:handleAddLoseSkills(player, "-#jy_boshi_count", jy_boshi, true, true)  -- 不用再看判定了多少次了
     room:setPlayerMark(player, "@jy_boshi_judge_count", 0)
 
     room:handleAddLoseSkills(player, "-jy_huapen", nil, true, true)
@@ -1773,7 +1773,7 @@ local jy_jiangbei_draw_count = fk.CreateTriggerSkill{
   refresh_events = {fk.CardResponding, fk.TargetSpecified},  -- 包括了使用和打出
   can_refresh = function(self, event, target, player, data)
     return player:hasSkill(self) and target == player and data.card and
-      player.phase == Player.Play -- 在我的出牌阶段
+      player.phase == Player.Play and data.from == player -- 在我的出牌阶段，我使用或打出的牌
   end,
   on_refresh = function(self, event, target, player, data)
     local room = player.room
@@ -1844,7 +1844,7 @@ Fk:loadTranslationTable {
   ["jy_boshi"] = "搏十",
   [":jy_boshi"] = [[觉醒技，准备阶段开始时，若你已判定过至少10次，你增加一点体力上限、回复3点体力、
   摸3张牌、失去技能【花盆】，然后获得技能【奖杯】。]],
-  ["@jy_boshi_judge_count"] = "搏时",
+  ["@jy_boshi_judge_count"] = "搏十",
 
   ["jy_huapen"] = "花盆",
   [":jy_huapen"] = [[锁定技，其他角色使用♣非延时锦囊牌或基本牌、指定了有且仅有一个不为你的目标时，
@@ -1854,8 +1854,8 @@ Fk:loadTranslationTable {
   [":jy_jiangbei"] = [[锁定技，出牌阶段结束时，若你出牌阶段只使用或打出过♣和<font color="red">♥</font>牌，摸等量的牌；
   你使用基本牌和锦囊牌时，若花色为：♣，无视距离和防具，没有次数限制；<font color="red">♥</font>，不可被响应。]],
   ["#jy_jiangbei_heart"] = "奖杯·红桃",
-  ["#jy_jiangbei_club"] = "奖杯·梅花·无限",
-  ["#jy_jiangbei_club_2"] = "奖杯·梅花·无视防具",
+  ["#jy_jiangbei_club"] = "奖杯·梅花",
+  ["#jy_jiangbei_club_2"] = "奖杯·梅花",
   ["@jy_jiangbei_draw"] = "奖杯",
   ["#jy_jiangbei_no"] = "不可摸牌",
   -- TODO：改一下这里，按照sp公孙瓒义从改，只提示触发了义从。
