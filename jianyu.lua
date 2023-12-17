@@ -286,7 +286,7 @@ local jy_xizao_2 = fk.CreateTriggerSkill{
 
 tym__jianzihao:addSkill(jy_kaiju_2)
 tym__jianzihao:addSkill(jy_sanjian)
-tym__jianzihao:addSkill("hongyan")  -- 这个技能要加风火林山包才能触发！
+tym__jianzihao:addSkill("hongyan")  -- 这个技能要加风火林山包才能使用！
 tym__jianzihao:addSkill("jy_zouwei")
 tym__jianzihao:addSkill("jy_shengnu")
 tym__jianzihao:addSkill(jy_xizao_2)
@@ -733,51 +733,51 @@ Fk:loadTranslationTable {
 }
 
 
--- -- 侯国玉
-local tym__houguoyu = General(extension, "tym__houguoyu", "qun", 8, 8, General.Male)
+-- -- -- 侯国玉
+-- local tym__houguoyu = General(extension, "tym__houguoyu", "qun", 8, 8, General.Male)
 
--- 界三件 已完成 测试通过
-local jy_waao = fk.CreateTriggerSkill{
-  name = "jy_waao",
-  frequency = Skill.Compulsory,
-  anim_type = "offensive",
-  events = {fk.DamageCaused},
-  can_trigger = function(self, event, target, player, data)
-    if not (target == player and player:hasSkill(self)) then return false end
-    -- 现在 target 已经是 player，并且 player 拥有这个技能了。这个时候再来看他的装备区
-    local weapon = Fk:getCardById(player:getEquipment(Card.SubtypeWeapon))
-    local armor = Fk:getCardById(player:getEquipment(Card.SubtypeArmor))
-    local defensive_ride = Fk:getCardById(player:getEquipment(Card.SubtypeDefensiveRide))
-    local offensive_ride = Fk:getCardById(player:getEquipment(Card.SubtypeOffensiveRide))
-    local treasure = Fk:getCardById(player:getEquipment(Card.Treasure))
-    return weapon and 
-           not armor and
-           not defensive_ride and 
-           offensive_ride and
-           not treasure
-           -- 有且只有武器和-1马
-  end,
-  on_use = function(self, event, target, player, data)
-    local room = player.room
-    player:broadcastSkillInvoke(self.name)
-    room:notifySkillInvoked(player, self.name, "offensive")
-    data.damage = data.damage + 1
-  end,
-}
+-- -- 界三件 已完成 测试通过
+-- local jy_waao = fk.CreateTriggerSkill{
+--   name = "jy_waao",
+--   frequency = Skill.Compulsory,
+--   anim_type = "offensive",
+--   events = {fk.DamageCaused},
+--   can_trigger = function(self, event, target, player, data)
+--     if not (target == player and player:hasSkill(self)) then return false end
+--     -- 现在 target 已经是 player，并且 player 拥有这个技能了。这个时候再来看他的装备区
+--     local weapon = Fk:getCardById(player:getEquipment(Card.SubtypeWeapon))
+--     local armor = Fk:getCardById(player:getEquipment(Card.SubtypeArmor))
+--     local defensive_ride = Fk:getCardById(player:getEquipment(Card.SubtypeDefensiveRide))
+--     local offensive_ride = Fk:getCardById(player:getEquipment(Card.SubtypeOffensiveRide))
+--     local treasure = Fk:getCardById(player:getEquipment(Card.Treasure))
+--     return weapon and 
+--            not armor and
+--            not defensive_ride and 
+--            offensive_ride and
+--            not treasure
+--            -- 有且只有武器和-1马
+--   end,
+--   on_use = function(self, event, target, player, data)
+--     local room = player.room
+--     player:broadcastSkillInvoke(self.name)
+--     room:notifySkillInvoked(player, self.name, "offensive")
+--     data.damage = data.damage + 1
+--   end,
+-- }
 
-tym__houguoyu:addSkill(jy_waao)
-tym__houguoyu:addSkill("zhiheng")
-tym__houguoyu:addSkill("benghuai")
-tym__houguoyu:addSkill("baonve")
+-- tym__houguoyu:addSkill(jy_waao)
+-- tym__houguoyu:addSkill("zhiheng")
+-- tym__houguoyu:addSkill("benghuai")
+-- tym__houguoyu:addSkill("baonve")
 
-Fk:loadTranslationTable {
-  ["tym__houguoyu"] = "侯国玉",
-  ["houguoyu"] = "侯国玉",
+-- Fk:loadTranslationTable {
+--   ["tym__houguoyu"] = "侯国玉",
+--   ["houguoyu"] = "侯国玉",
   
-  ["jy_waao"] = "哇袄",
-  [":jy_waao"] = [[锁定技，装备区有且仅有武器和进攻马时，你造成的伤害+1。]],
-  -- TODO：加语音
-}
+--   ["jy_waao"] = "哇袄",
+--   [":jy_waao"] = [[锁定技，装备区有且仅有武器和进攻马时，你造成的伤害+1。]],
+--   -- TODO：加语音
+-- }
 
 -- 高天亮
 local xjb__gaotianliang = General(extension, "xjb__gaotianliang", "qun", 4, 4, General.Male)
@@ -1376,7 +1376,7 @@ Fk:loadTranslationTable {
   ["@jy_is_luojiao_savage_assault_used"] = "罗绞",
   ["#jy_luojiao_both_ask"] = "罗绞 两个条件同时达成，是否发动",
   ["#jy_luojiao_ask_which"] = "罗绞 两个条件同时达成并发动，请选择要先视为使用的卡牌",
-  ["#jy_luojiao_used"] = "已发动",
+  ["#jy_luojiao_used"] = "已南蛮",
 
   ["jy_yusu"] = "玉玊",
   [":jy_yusu"] = "出牌阶段，每使用第二张基本牌时，可以将其作为【点】置于武将牌上。",
@@ -1413,10 +1413,8 @@ Fk:addPoxiMethod{
     -- 如果已选择卡牌数为2，检查它们的类型是否相同
     if #selected == 2 then
         local type = Fk:getCardById(to_select).type
-
         local type1 = Fk:getCardById(selected[1]).type
         local type2 = Fk:getCardById(selected[2]).type
-        
         -- 如果两张卡牌类型相同，那么对和它们类型相同的牌返回真，因为只能这样满足条件了
         if type1 == type2 then
             return type == type1
@@ -1425,7 +1423,6 @@ Fk:addPoxiMethod{
           return false
         end
     end
-    
     -- 如果以上条件都不满足，返回真
     return true
   end,
@@ -1576,7 +1573,7 @@ local jy_sichi = fk.CreateTriggerSkill{
 
       -- 牌名|点数|花色  -- 这个exppattern.lua里用例子给的写法，可以匹配到
       local pattern = name.."|"..number.."|"..suit
-      -- 雷杀火杀匹配不到，用truename即可，反正花色和点数会限制别的牌
+      -- 雷杀火杀的匹配用truename即可，反正花色和点数会限制别的牌
       local use = room:askForUseCard(player, card.name, pattern, "#jy_sichi_2_use", false)  -- 这里填false也没用，反正是可以取消的
       
       -- useCard
@@ -1636,7 +1633,7 @@ local jy_huapen = fk.CreateTriggerSkill{
       (data.card:isCommonTrick() or data.card.type == Card.TypeBasic) then
       local previous_targets = AimGroup:getAllTargets(data.tos)
       if #AimGroup:getAllTargets(data.tos) ~= 1 then return false end  -- 如果目标不是一个，那就不用管了
-      -- TODO: 借刀杀人也被判定为单体卡牌。也许本来就是？
+      -- 借刀杀人也被判定为单体卡牌。也许本来就是？
       -- 如果目标里面已经有我自己了，那就不要判定了
       for _, v in pairs(previous_targets) do
         if v == player.id then
@@ -1838,12 +1835,12 @@ Fk:loadTranslationTable {
 
   ["jy_sichi"] = "四吃",
   [":jy_sichi"] = [[受到伤害后，你可以展示牌堆顶的4张牌，根据花色数量触发效果。<br>
-  1种：将这些牌交给一名角色；<br>
+  1种：选择一名角色获得这些牌；<br>
   2种：获得其中一张可以使用的牌并可以立即使用。若所有的牌都无法使用，弃一张牌；<br>
   3种：获得其中3张同类型的牌或2张不同类型的牌，然后除你以外的其他角色各摸一张牌；<br>
   4种：选择至多3名角色，你与其各失去一点体力。]],
 
-  ["#jy_sichi_suits_1"] = "四吃：1种花色，选择一个角色获得所有牌",
+  ["#jy_sichi_suits_1"] = "四吃：1种花色，选择一个角色获得这些牌",
   ["#jy_sichi_suits_2"] = "四吃：2种花色，获得一张可使用的牌并可以立即使用，若没有则弃牌",
   ["#jy_sichi_suits_3"] = "四吃：3种花色，获得其中一部分牌，然后其他角色各摸一张牌",
   ["#jy_sichi_suits_4"] = "四吃：4种花色，选择角色和自己一起失去体力",
@@ -1851,7 +1848,7 @@ Fk:loadTranslationTable {
   ["#jy_sichi_1"] = "四吃：选择一个角色获得所有牌，点击取消选择自己",
   ["#jy_sichi_2"] = "四吃：选择其中一张牌并使用",
   ["#jy_sichi_2_use"] = "四吃：你可以立即使用这张牌",
-  ["#jy_sichi_2_failed_toast"] = "四吃：2种花色，但没有任何可以使用的牌，所以弃一张牌",
+  ["#jy_sichi_2_failed_toast"] = "四吃：2种花色，但没有任何可以使用的牌，所以需要弃一张牌",
   ["#jy_sichi_2_failed"] = "四吃：没有可使用的牌，你需要弃一张牌",
   ["jy_sichi_3"] = "四吃",
   ["#jy_sichi_3"] = "四吃：选择其中3张同类型的牌或2张不同类型的牌获得，然后除你以外的角色各摸一张牌",
@@ -1859,16 +1856,19 @@ Fk:loadTranslationTable {
 
   ["jy_huapen"] = "花盆",
   [":jy_huapen"] = [[锁定技，其他角色使用♣非延时锦囊牌或基本牌、指定了有且仅有一个不为你的目标时，
-  你进行一次判定，若为<font color="red">♥</font>，额外指定你为目标。]],
+  你进行一次判定，若为<font color="red">♥</font>，额外指定你为目标。（【借刀杀人】包括在内）]],
 
   ["jy_boshi"] = "搏十",
   [":jy_boshi"] = [[觉醒技，准备阶段开始时，若你已判定过至少10次，你增加一点体力上限、回复一点体力、
-  摸3张牌、失去技能【花盆】，然后获得技能【奖杯】。]],
+  摸3张牌、失去技能【花盆】，然后获得技能【奖杯】（锁定技，你使用的花色为♣的基本牌和锦囊牌无视距离和防具、没有次数限制；
+  你使用的花色为<font color="red">♥</font>的基本牌和锦囊牌不可被响应；
+  出牌阶段结束时，若你出牌阶段只使用或打出过♣和<font color="red">♥</font>牌，摸等量的牌）。]],
   ["@jy_boshi_judge_count"] = "搏十",
 
   ["jy_jiangbei"] = "奖杯",
-  [":jy_jiangbei"] = [[锁定技，出牌阶段结束时，若你出牌阶段只使用或打出过♣和<font color="red">♥</font>牌，摸等量的牌；
-  你使用的花色为♣的基本牌和锦囊牌无视距离和防具、没有次数限制；你使用的花色为<font color="red">♥</font>的基本牌和锦囊牌不可被响应。]],
+  [":jy_jiangbei"] = [[锁定技，你使用的花色为♣的基本牌和锦囊牌无视距离和防具、没有次数限制；
+  你使用的花色为<font color="red">♥</font>的基本牌和锦囊牌不可被响应；
+  出牌阶段结束时，若你出牌阶段只使用或打出过♣和<font color="red">♥</font>牌，摸等量的牌。]],
   ["#jy_jiangbei_heart"] = "奖杯",
   ["#jy_jiangbei_club"] = "奖杯",
   ["#jy_jiangbei_club_2"] = "奖杯",
