@@ -914,8 +914,8 @@ Fk:loadTranslationTable {
 }
 
 -- 界赵乾熙
-local tym__zhaoqianxi_2 = General(extension, "tym__zhaoqianxi_2", "qun", 4, 4, General.Male)
--- tym__zhaoqianxi_2.hidden = true
+local tym__2__zhaoqianxi = General(extension, "tym__2__zhaoqianxi", "qun", 4, 4, General.Male)
+-- tym__2__zhaoqianxi.hidden = true
 
 -- 被铁锁连环的目标如果因为这次伤害受到了元素反应，那么不会让其他被铁锁连环的目标受到附着效果。（已修复）
 -- 这是因为is_jy_yuanshen_2_triggered。目前已经删除了这个变量，但是这样的问题是：
@@ -999,11 +999,11 @@ local jy_fumo = fk.CreateTriggerSkill{
   end,
 }
 
-tym__zhaoqianxi_2:addSkill(jy_yuanshen_2)
-tym__zhaoqianxi_2:addSkill(jy_fumo)
+tym__2__zhaoqianxi:addSkill(jy_yuanshen_2)
+tym__2__zhaoqianxi:addSkill(jy_fumo)
 
 Fk:loadTranslationTable {
-  ["tym__zhaoqianxi_2"] = "界赵乾熙",
+  ["tym__2__zhaoqianxi"] = "界赵乾熙",
   
   ["jy_yuanshen_2"] = "原神",
   [":jy_yuanshen_2"] = [[锁定技，当有角色受到<font color="red">火焰</font>或<font color="Fuchsia">雷电</font>伤害时，若其没有该技能造成的属性标记，令其获得对应属性标记；
