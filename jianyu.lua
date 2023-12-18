@@ -1932,8 +1932,9 @@ local jy_xuexi = fk.CreateActiveSkill{
       room:addPlayerMark(player, "@jy_xuexi_correct_count")
       room:doBroadcastNotify("ShowToast", Fk:translate("#jy_xuexi_correct"))
       room:sendLog{
-        type = "%from 回答正确，选择一张想要的牌",
+        type = "%from 回答正确，正确答案：%arg。选择一张想要的牌",
         from = player.id,
+        arg = correct_answer,
       }
       
       -- cheat，从谋徐盛抄来的，应该不会有什么问题
@@ -1976,8 +1977,10 @@ local jy_xuexi = fk.CreateActiveSkill{
       room:addPlayerMark(player, "@jy_xuexi_incorrect_count")
       room:doBroadcastNotify("ShowToast", Fk:translate("#jy_xuexi_incorrect"))
       room:sendLog{
-        type = "%from 回答错误",
+        type = "%from 回答错误，选择了：%arg，正确答案：%arg2",
         from = player.id,
+        arg = choice,
+        arg2 = correct_answer,
       }
       -- room:loseHp(player, 1, self.name) -- 失去一点体力
     end
@@ -2077,8 +2080,8 @@ Fk:loadTranslationTable {
   你可以进行一次学习，从一道随机的选择题的选项中选出一个你觉得正确的选项。
   若选择正确，你可以选择一个牌名，然后从场上随机位置获得一张该牌名的牌（有概率获得不到）。]],
   ["#jy_xuexi_ob"] = [[正在做题！其他人可以在战报中看到这道题目的完整题干和选项。]],
-  ["#jy_xuexi_correct"] = [[答对了！可以从场上随机位置获取一张特定的牌]],
-  ["#jy_xuexi_incorrect"] = [[答错了！不过没有什么惩罚，你学习到了新知识！]],
+  ["#jy_xuexi_correct"] = [[答对了！可以从场上随机位置获取一张特定的牌！<br>你可以在战报中查看正确答案。]],
+  ["#jy_xuexi_incorrect"] = [[答错了！不过没有什么惩罚，你学习到了新知识！<br>你可以在战报中查看正确答案。]],
   ["@jy_xuexi_correct_count"] = "答对",
   ["@jy_xuexi_incorrect_count"] = "答错",
 
@@ -2088,8 +2091,8 @@ Fk:loadTranslationTable {
   你增加一点体力上限、摸3张牌，然后获得技能【集智】、【看破】、【享乐】；<br>
   失败：回合结束时，若你在【学习】技能中错误回答问题比正确回答问题至少多3次，<s>你高考失败，需要迎接下一场高考。</s>
   你翻面，减一点体力上限，然后获得技能【玉玉】、【红温】。]],
-  ["#jy_fendou_success"] = "结局：成功",
-  ["#jy_fendou_fail"] = "结局：失败",
+  ["#jy_fendou_success"] = "奋斗：成功",
+  ["#jy_fendou_fail"] = "奋斗：失败",
 
 }
 
