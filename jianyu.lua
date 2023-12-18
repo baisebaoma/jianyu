@@ -733,53 +733,6 @@ Fk:loadTranslationTable {
   ["#lose_hp_1_2"] = [[弃置所有<font color="gold">【啸】</font>并恢复一点体力]],
 }
 
-
--- -- -- 侯国玉
--- local tym__houguoyu = General(extension, "tym__houguoyu", "qun", 8, 8, General.Male)
-
--- -- 界三件 已完成 测试通过
--- local jy_waao = fk.CreateTriggerSkill{
---   name = "jy_waao",
---   frequency = Skill.Compulsory,
---   anim_type = "offensive",
---   events = {fk.DamageCaused},
---   can_trigger = function(self, event, target, player, data)
---     if not (target == player and player:hasSkill(self)) then return false end
---     -- 现在 target 已经是 player，并且 player 拥有这个技能了。这个时候再来看他的装备区
---     local weapon = Fk:getCardById(player:getEquipment(Card.SubtypeWeapon))
---     local armor = Fk:getCardById(player:getEquipment(Card.SubtypeArmor))
---     local defensive_ride = Fk:getCardById(player:getEquipment(Card.SubtypeDefensiveRide))
---     local offensive_ride = Fk:getCardById(player:getEquipment(Card.SubtypeOffensiveRide))
---     local treasure = Fk:getCardById(player:getEquipment(Card.Treasure))
---     return weapon and 
---            not armor and
---            not defensive_ride and 
---            offensive_ride and
---            not treasure
---            -- 有且只有武器和-1马
---   end,
---   on_use = function(self, event, target, player, data)
---     local room = player.room
---     player:broadcastSkillInvoke(self.name)
---     room:notifySkillInvoked(player, self.name, "offensive")
---     data.damage = data.damage + 1
---   end,
--- }
-
--- tym__houguoyu:addSkill(jy_waao)
--- tym__houguoyu:addSkill("zhiheng")
--- tym__houguoyu:addSkill("benghuai")
--- tym__houguoyu:addSkill("baonve")
-
--- Fk:loadTranslationTable {
---   ["tym__houguoyu"] = "侯国玉",
---   ["houguoyu"] = "侯国玉",
-  
---   ["jy_waao"] = "哇袄",
---   [":jy_waao"] = [[锁定技，装备区有且仅有武器和进攻马时，你造成的伤害+1。]],
---   -- TODO：加语音
--- }
-
 -- 高天亮
 local xjb__gaotianliang = General(extension, "xjb__gaotianliang", "qun", 4)
 
@@ -1856,8 +1809,8 @@ Fk:loadTranslationTable {
   ["#jy_sichi_4"] = "四吃：选择至多3名角色，你和他们各失去一点体力",
 
   ["jy_huapen"] = "花盆",
-  [":jy_huapen"] = [[锁定技，其他角色使用♣非延时锦囊牌或基本牌、指定了有且仅有一个不为你的目标时，
-  你进行一次判定，若为<font color="red">♥</font>，额外指定你为目标。（【借刀杀人】包括在内）]],
+  [":jy_huapen"] = [[锁定技，其他角色使用♣非延时锦囊牌或基本牌指定了有且仅有一个不为你的目标时，
+  你进行一次判定，若为<font color="red">♥</font>，额外指定你为目标。（含【借刀杀人】）]],
 
   ["jy_boshi"] = "搏十",
   [":jy_boshi"] = [[觉醒技，准备阶段开始时，若你已判定过至少10次，你增加一点体力上限、回复一点体力、
@@ -2026,11 +1979,12 @@ local jy_fendou_success = fk.CreateTriggerSkill {
   on_cost = Util.TrueFunc,
   on_use = function(self, event, target, player)
     local room = player.room
-    room:notifySkillInvoked(player, "jy_fendou")
+    -- room:notifySkillInvoked(player, "jy_fendou")
     room:updateQuestSkillState(player, "jy_fendou")
     room:changeMaxHp(player, 1)
     player:drawCards(3)
     -- player.room:handleAddLoseSkills(player, "-jy_xuexi", nil, true, false)
+    player.room:handleAddLoseSkills(player, "-jy_fendou", nil, true, false)
     player.room:handleAddLoseSkills(player, "jizhi", nil, true, false)
     player.room:handleAddLoseSkills(player, "xiangle", nil, true, false)
     player.room:handleAddLoseSkills(player, "kanpo", nil, true, false)
@@ -2052,10 +2006,11 @@ local jy_fendou_fail = fk.CreateTriggerSkill {
   on_cost = Util.TrueFunc,
   on_use = function(self, event, target, player)
     local room = player.room
-    room:notifySkillInvoked(player, "jy_fendou", "negative")
+    -- room:notifySkillInvoked(player, "jy_fendou", "negative")
     room:updateQuestSkillState(player, "jy_fendou", true)
     room:changeMaxHp(player, -1)
     player:turnOver()
+    room:handleAddLoseSkills(player, "-jy_fendou", nil, true, false)
     room:handleAddLoseSkills(player, "jy_yuyu", nil, true, false)
     room:handleAddLoseSkills(player, "jy_hongwen", nil, true, false)
   end
@@ -2076,9 +2031,8 @@ Fk:loadTranslationTable {
   ["tym__tangshangjun"] = "唐尚珺",
 
   ["jy_xuexi"] = "学习",
-  [":jy_xuexi"] = [[<s>你是高考历史总得分王。这是你的第16次高考，你仍然在为了考上理想的大学而努力学习。</s>出牌阶段限一次，
-  你可以进行一次学习，从一道随机的选择题的选项中选出一个你觉得正确的选项。
-  若选择正确，你可以选择一个牌名，然后从场上随机位置获得一张该牌名的牌（有概率获得不到）。]],
+  [":jy_xuexi"] = [[<s>你是高考历史总得分王。这是你的第16次高考，你仍然在为了考上理想的大学而努力学习。</s>
+  出牌阶段限一次，你可以做一道选择题。若选择正确，你可以获得一张你想要的牌，从场上随机位置（包括被移出游戏的牌、自己的区域等任何位置）。]],
   ["#jy_xuexi_ob"] = [[正在做题！其他人可以在战报中看到这道题目的完整题干和选项。]],
   ["#jy_xuexi_correct"] = [[答对了！可以从场上随机位置获取一张特定的牌！<br>你可以在战报中查看正确答案。]],
   ["#jy_xuexi_incorrect"] = [[答错了！不过没有什么惩罚，你学习到了新知识！<br>你可以在战报中查看正确答案。]],
@@ -2086,11 +2040,9 @@ Fk:loadTranslationTable {
   ["@jy_xuexi_incorrect_count"] = "答错",
 
   ["jy_fendou"] = "奋斗",
-  [":jy_fendou"] = [[<s>你决定再努力一点！</s>使命技，出牌阶段限一次，你可以弃一张牌使得【学习】可以再使用一次。<br>
-  成功：回合结束时，若你在【学习】技能中正确回答问题比错误回答问题至少多3次，<s>你高考成功！恭喜你！</s>
-  你增加一点体力上限、摸3张牌，然后获得技能【集智】、【看破】、【享乐】；<br>
-  失败：回合结束时，若你在【学习】技能中错误回答问题比正确回答问题至少多3次，<s>你高考失败，需要迎接下一场高考。</s>
-  你翻面，减一点体力上限，然后获得技能【玉玉】、【红温】。]],
+  [":jy_fendou"] = [[使命技，出牌阶段限一次，你可以弃一张牌使得【学习】可以再使用一次。<br>
+  成功：回合结束时，若你在【学习】中答对比答错至少多3次，你增加一点体力上限、摸3张牌，然后获得技能【集智】、【看破】、【享乐】；<br>
+  失败：回合结束时，若你在【学习】中答错比答对至少多3次，你翻面、减一点体力上限，然后获得技能【玉玉】、【红温】。]],
   ["#jy_fendou_success"] = "奋斗：成功",
   ["#jy_fendou_fail"] = "奋斗：失败",
 
