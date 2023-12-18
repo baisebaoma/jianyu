@@ -4,6 +4,7 @@ extension.extensionName = "jianyu"
 -- DIY真诚意见：所有你这个包的东西都加一个你自己的开头，这样防止和别人的重名。比如我的"huxiao"一开始就和别人重名了。
 
 local U = require "packages/utility/utility"
+local Q = require "packages/jianyu/question"
 
 Fk:loadTranslationTable {
      ["jy_jianyu"] = "简浴",
@@ -25,7 +26,7 @@ Fk:loadTranslationTable {
 
 
 -- 熊简自豪
-local xjb__jianzihao = General(extension, "xjb__jianzihao", "qun", 3, 3, General.Male)
+local xjb__jianzihao = General(extension, "xjb__jianzihao", "qun", 3)
 
 -- 红温
 local jy_hongwen = fk.CreateFilterSkill{
@@ -202,7 +203,7 @@ Fk:loadTranslationTable{
 
 
 -- 第二代简自豪
-local tym__jianzihao = General(extension, "tym__jianzihao", "qun", 3, 3, General.Male)
+local tym__jianzihao = General(extension, "tym__jianzihao", "qun", 3)
 
 local jy_sanjian = fk.CreateTriggerSkill{
   name = "jy_sanjian",
@@ -319,7 +320,7 @@ Fk:loadTranslationTable{
 }
 
 -- 尚李元浩
-local skl__liyuanhao = General(extension, "skl__liyuanhao", "qun", 3, 3, General.Male)
+local skl__liyuanhao = General(extension, "skl__liyuanhao", "qun", 3)
 
 -- 虎啸
 -- 参考自铁骑，屯田，脑洞包明哲，克己（原来克己已经监视了使用和打出了，不用写那么复杂）
@@ -534,7 +535,7 @@ Fk:loadTranslationTable {
 
 -- 唐李元浩
 -- 在活动服环境里，也许没那么强？
-local tym__liyuanhao = General(extension, "tym__liyuanhao", "qun", 3, 3, General.Male)
+local tym__liyuanhao = General(extension, "tym__liyuanhao", "qun", 3)
 
 -- 界虎啸
 -- 参考自铁骑，屯田，脑洞包明哲，克己（原来克己已经监视了使用和打出了，不用写那么复杂）
@@ -780,7 +781,7 @@ Fk:loadTranslationTable {
 -- }
 
 -- 高天亮
-local xjb__gaotianliang = General(extension, "xjb__gaotianliang", "qun", 4, 4, General.Male)
+local xjb__gaotianliang = General(extension, "xjb__gaotianliang", "qun", 4)
 
 local jy_yuyu = fk.CreateTriggerSkill{
   name = "jy_yuyu",
@@ -791,12 +792,12 @@ local jy_yuyu = fk.CreateTriggerSkill{
     local room = player.room
     self.this_time_slash = false
     if data.card and data.from and data.card.trueName == "slash" then  -- 如果是杀
-      if not data.from:hasMark("@jy_gaotianliang_enemy") then 
+      if not data.from:hasMark("@jy_yuyu_enemy") then 
         self.this_time_slash = true  -- 如果他是因为这次伤害变成了天敌，那么写在this_time_slash里
-        room:setPlayerMark(data.from, "@jy_gaotianliang_enemy", "")  -- 空字符串也是true
+        room:setPlayerMark(data.from, "@jy_yuyu_enemy", "")  -- 空字符串也是true
       end
     end
-    if self.this_time_slash or not data.from:hasMark("@jy_gaotianliang_enemy") then  -- 如果他不是敌人
+    if self.this_time_slash or not data.from:hasMark("@jy_yuyu_enemy") then  -- 如果他不是敌人
       self:doCost(event, target, player, data)
     end
   end,
@@ -826,9 +827,9 @@ Fk:loadTranslationTable {
   ["xjb__gaotianliang"] = "高天亮",
 
   ["jy_yuyu"] = "玉玉",
-  [":jy_yuyu"] = [[1. 锁定技，当有角色对你使用【杀】造成了伤害时，其获得【高天亮之敌】标记；<br>
-  2. 受到没有【高天亮之敌】标记的角色或因本次伤害而获得【高天亮之敌】标记的角色造成的伤害时，你可以选择一项：摸三张牌；摸四张牌并翻面。]],
-  ["@jy_gaotianliang_enemy"] = "高天亮之敌",
+  [":jy_yuyu"] = [[1. 锁定技，当有角色对你使用【杀】造成了伤害时，其获得【致郁】标记；<br>
+  2. 受到没有【致郁】标记的角色或因本次伤害而获得【致郁】标记的角色造成的伤害时，你可以选择一项：摸三张牌；摸四张牌并翻面。]],
+  ["@jy_yuyu_enemy"] = "致郁",
   ["#jy_yuyu_ask_which"] = "玉玉：请选择你要触发的效果",
   ["#jy_yuyu_draw3"] = "摸三张牌",
   ["#jy_yuyu_draw4turnover"] = "摸四张牌并翻面",
@@ -840,7 +841,7 @@ Fk:loadTranslationTable {
 }
 
 -- 赵乾熙
-local tym__zhaoqianxi = General(extension, "tym__zhaoqianxi", "qun", 4, 4, General.Male)
+local tym__zhaoqianxi = General(extension, "tym__zhaoqianxi", "qun", 4)
 
 -- 参考自藤甲。要把DamageInflicted改成DamageCaused，就是你对别人造成伤害的意思。
 -- 如果是DamageInflicted，就是别人对你造成伤害的意思。
@@ -914,7 +915,7 @@ Fk:loadTranslationTable {
 }
 
 -- 界赵乾熙
-local tym__2__zhaoqianxi = General(extension, "tym__2__zhaoqianxi", "qun", 4, 4, General.Male)
+local tym__2__zhaoqianxi = General(extension, "tym__2__zhaoqianxi", "qun", 4)
 -- tym__2__zhaoqianxi.hidden = true
 
 -- 被铁锁连环的目标如果因为这次伤害受到了元素反应，那么不会让其他被铁锁连环的目标受到附着效果。（已修复）
@@ -1023,7 +1024,7 @@ Fk:loadTranslationTable {
 }
 
 -- 阿威罗
-local xjb__aweiluo = General(extension, "xjb__aweiluo", "qun", 3, 3, General.Male)
+local xjb__aweiluo = General(extension, "xjb__aweiluo", "qun", 3)
 
 -- 游龙
 local jy_youlong = fk.CreateTriggerSkill{
@@ -1396,7 +1397,7 @@ Fk:loadTranslationTable {
 -- 无法被响应：tenyear_huicui1 #gonghu_delay
 -- 立即使用一张牌：诸葛恪，借刀
 
-local zer__yangfan = General(extension, "zer__yangfan", "qun", 4, 4, General.Male)
+local zer__yangfan = General(extension, "zer__yangfan", "qun", 4)
 
 -- 四吃3的选牌规则
 Fk:addPoxiMethod{
@@ -1877,6 +1878,222 @@ Fk:loadTranslationTable {
   -- TODO：改一下这里，按照sp公孙瓒义从改，只提示触发了义从。
 }
 
+local tym__tangshangjun = General(extension, "tym__tangshangjun", "qun", 4)
+
+-- 获得一张牌：谋徐盛cheat
+-- 还可以继续发动：甄姬洛神
+-- 出牌阶段主动：界简自豪开局
+-- 选择：界李元浩二段
+-- 使命技：不知道，到时候再说
+
+local jy_xuexi = fk.CreateActiveSkill{
+  name = "jy_xuexi",
+  anim_type = "control",
+  can_use = function(self, player)
+    return player:usedSkillTimes(self.name, Player.HistoryPhase) == 0
+  end,
+  card_filter = function(self, card)
+    return false
+  end,
+  card_num = 0,
+  target_filter = function(self, to_select, selected)
+    return false
+  end,
+  on_use = function(self, room, effect)
+    local player = room:getPlayerById(effect.from)
+    -- 随机从题库拿一道题
+    questionFull = Q.getRandomQuestion()
+
+    local question = questionFull[1]
+    local answers = questionFull[2]
+    local correct_answer = questionFull[3]
+
+    -- 建立输出到战报里的所有选项，无视里面的<br>
+    local answers_string = ""
+    for i, a in ipairs(answers) do
+      if i ~= #answers then
+        answers_string = answers_string .. i .. ". " .. a:gsub("<br>", "") .. "<br><br>"
+      else answers_string = answers_string .. i .. ". " .. a:gsub("<br>", "")
+      end
+    end
+
+    -- 做题
+    -- 不仅要让自己看到题目，还要让全场所有人看到题目。
+    room:doBroadcastNotify("ShowToast", Fk:translate("#jy_xuexi_ob"))
+    room:sendLog{
+      type = "%from 抽到的题目是：<br>%arg<br>可以选择的选项有：<br>%arg2",
+      from = player.id,
+      arg = question,
+      arg2 = answers_string,
+    }
+    
+    local choice = room:askForChoice(player, answers, self.name, question)
+    if choice == correct_answer then
+      room:addPlayerMark(player, "@jy_xuexi_correct_count")
+      room:doBroadcastNotify("ShowToast", Fk:translate("#jy_xuexi_correct"))
+      room:sendLog{
+        type = "%from 回答正确，选择一张想要的牌",
+        from = player.id,
+      }
+      
+      -- cheat，从谋徐盛抄来的，应该不会有什么问题
+      local from = room:getPlayerById(effect.from)
+      local cardType = { 'basic', 'trick', 'equip' }
+      local cardTypeName = room:askForChoice(from, cardType, self.name)
+      local card_types = {Card.TypeBasic, Card.TypeTrick, Card.TypeEquip}
+      cardType = card_types[table.indexOf(cardType, cardTypeName)]
+
+      local allCardIds = Fk:getAllCardIds()
+      local allCardMapper = {}
+      local allCardNames = {}
+      for _, id in ipairs(allCardIds) do
+        local card = Fk:getCardById(id)
+        if card.type == cardType then
+          if allCardMapper[card.name] == nil then
+            table.insert(allCardNames, card.name)
+          end
+
+          allCardMapper[card.name] = allCardMapper[card.name] or {}
+          table.insert(allCardMapper[card.name], id)
+        end
+      end
+
+      if #allCardNames == 0 then
+        return
+      end
+
+      local cardName = room:askForChoice(from, allCardNames, self.name)
+      local toGain -- = room:printCard(cardName, Card.Heart, 1)
+      if #allCardMapper[cardName] > 0 then
+        toGain = allCardMapper[cardName][math.random(1, #allCardMapper[cardName])]
+      end
+
+      -- from:addToPile(self.name, toGain, true, self.name)
+      -- room:setCardMark(Fk:getCardById(toGain), "@@test_cheat-phase", 1)
+      -- room:setCardMark(Fk:getCardById(toGain), "@@test_cheat-inhand", 1)
+      room:obtainCard(effect.from, toGain, true, fk.ReasonPrey)
+    else
+      room:addPlayerMark(player, "@jy_xuexi_incorrect_count")
+      room:doBroadcastNotify("ShowToast", Fk:translate("#jy_xuexi_incorrect"))
+      room:sendLog{
+        type = "%from 回答错误",
+        from = player.id,
+      }
+      -- room:loseHp(player, 1, self.name) -- 失去一点体力
+    end
+  end,
+}
+
+-- touhou_standard extremely_wicked
+local jy_fendou = fk.CreateActiveSkill {
+  name = "jy_fendou",
+  frequency = Skill.Quest,
+  anim_type = "positive",
+  can_use = function(self, player)
+    return player:usedSkillTimes("jy_xuexi", Player.HistoryPhase) ~= 0 and 
+      player:usedSkillTimes(self.name, Player.HistoryPhase) == 0 and 
+      not player:getQuestSkillState("jy_fendou")
+  end,
+  card_filter = function(self, card)
+    return true
+  end,
+  card_num = 1,
+  target_filter = function(self, to_select, selected)
+    return false
+  end,
+  on_use = function(self, room, effect)
+    local from = room:getPlayerById(effect.from)
+    room:throwCard(effect.cards, self.name, from, from)
+    from:setSkillUseHistory("jy_xuexi", 0, Player.HistoryPhase)
+  end,
+}
+local jy_fendou_success = fk.CreateTriggerSkill {
+  name = "#jy_fendou_success",
+  anim_type = "positive",
+  events = {
+      fk.EventPhaseStart,
+  },
+  can_trigger = function(self, event, target, player)
+      if player:getQuestSkillState("jy_fendou") then
+          return false
+      end
+      return player:hasSkill("jy_fendou") and player.phase == Player.Finish and 
+        player:getMark("@jy_xuexi_correct_count") >= player:getMark("@jy_xuexi_incorrect_count") + 3
+  end,
+  on_cost = Util.TrueFunc,
+  on_use = function(self, event, target, player)
+    local room = player.room
+    room:notifySkillInvoked(player, "jy_fendou")
+    room:updateQuestSkillState(player, "jy_fendou")
+    room:changeMaxHp(player, 1)
+    player:drawCards(3)
+    -- player.room:handleAddLoseSkills(player, "-jy_xuexi", nil, true, false)
+    player.room:handleAddLoseSkills(player, "jizhi", nil, true, false)
+    player.room:handleAddLoseSkills(player, "xiangle", nil, true, false)
+    player.room:handleAddLoseSkills(player, "kanpo", nil, true, false)
+  end
+}
+local jy_fendou_fail = fk.CreateTriggerSkill {
+  name = "#jy_fendou_fail",
+  anim_type = "negative",
+  events = {
+      fk.EventPhaseStart,
+  },
+  can_trigger = function(self, event, target, player)
+      if player:getQuestSkillState("jy_fendou") then
+          return false
+      end
+      return player:hasSkill("jy_fendou") and player.phase == Player.Finish and 
+        player:getMark("@jy_xuexi_incorrect_count") >= player:getMark("@jy_xuexi_correct_count") + 3
+  end,
+  on_cost = Util.TrueFunc,
+  on_use = function(self, event, target, player)
+    local room = player.room
+    room:notifySkillInvoked(player, "jy_fendou", "negative")
+    room:updateQuestSkillState(player, "jy_fendou", true)
+    room:changeMaxHp(player, -1)
+    player:turnOver()
+    room:handleAddLoseSkills(player, "jy_yuyu", nil, true, false)
+    room:handleAddLoseSkills(player, "jy_hongwen", nil, true, false)
+  end
+}
+jy_fendou:addRelatedSkill(jy_fendou_success)
+jy_fendou:addRelatedSkill(jy_fendou_fail)
+
+tym__tangshangjun:addSkill(jy_ceshi_des)
+tym__tangshangjun:addSkill(jy_xuexi)
+tym__tangshangjun:addSkill(jy_fendou)
+tym__tangshangjun:addRelatedSkill("jizhi")
+tym__tangshangjun:addRelatedSkill("kanpo")
+tym__tangshangjun:addRelatedSkill("xiangle")
+tym__tangshangjun:addRelatedSkill("jy_yuyu")
+tym__tangshangjun:addRelatedSkill("jy_hongwen")
+
+Fk:loadTranslationTable {
+  ["tym__tangshangjun"] = "唐尚珺",
+
+  ["jy_xuexi"] = "学习",
+  [":jy_xuexi"] = [[<s>你是高考历史总得分王。这是你的第16次高考，你仍然在为了考上理想的大学而努力学习。</s>出牌阶段限一次，
+  你可以进行一次学习，从一道随机的选择题的选项中选出一个你觉得正确的选项。
+  若选择正确，你可以选择一个牌名，然后从场上随机位置获得一张该牌名的牌（有概率获得不到）。]],
+  ["#jy_xuexi_ob"] = [[正在做题！其他人可以在战报中看到这道题目的完整题干和选项。]],
+  ["#jy_xuexi_correct"] = [[答对了！可以从场上随机位置获取一张特定的牌]],
+  ["#jy_xuexi_incorrect"] = [[答错了！不过没有什么惩罚，你学习到了新知识！]],
+  ["@jy_xuexi_correct_count"] = "答对",
+  ["@jy_xuexi_incorrect_count"] = "答错",
+
+  ["jy_fendou"] = "奋斗",
+  [":jy_fendou"] = [[<s>你决定再努力一点！</s>使命技，出牌阶段限一次，你可以弃一张牌使得【学习】可以再使用一次。<br>
+  成功：回合结束时，若你在【学习】技能中正确回答问题比错误回答问题至少多3次，<s>你高考成功！恭喜你！</s>
+  你增加一点体力上限、摸3张牌，然后获得技能【集智】、【看破】、【享乐】；<br>
+  失败：回合结束时，若你在【学习】技能中错误回答问题比正确回答问题至少多3次，<s>你高考失败，需要迎接下一场高考。</s>
+  你翻面，减一点体力上限，然后获得技能【玉玉】、【红温】。]],
+  ["#jy_fendou_success"] = "结局：成功",
+  ["#jy_fendou_fail"] = "结局：失败",
+
+}
+
+
 Fk:loadTranslationTable {
      ["jianzihao"] = "简自豪",
      ["houguoyu"] = "侯国玉",
@@ -1884,6 +2101,8 @@ Fk:loadTranslationTable {
      ["aweiluo"] = "阿威罗",
      ["gaotianliang"] = "高天亮",
      ["zhaoqianxi"] = "赵乾熙",
+     ["yangfan"] = "杨藩",
+     ["tangshangjun"] = "杨藩",
 }
 
 return extension
