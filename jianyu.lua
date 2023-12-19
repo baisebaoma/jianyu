@@ -2033,8 +2033,8 @@ Fk:loadTranslationTable {
   ["tym__kgdxs"] = "考公大学生",
 
   ["jy_zuoti"] = "做题",
-  [":jy_zuoti"] = [[出牌阶段限一次，你可以做一道行测真题。若正确，你可以获得一张想要的牌。
-  这张牌将从场上随机位置（包括其他角色的区域、被移出游戏的牌、自己的区域等任何位置，甚至也可以是自己的手牌）到达你的手牌，所以建议你先把自己手上的同牌名的牌用掉。]],
+  [":jy_zuoti"] = [[出牌阶段限一次，你可以做一道行测真题（目前题库：20）。若正确，你可以获得一张想要的牌。
+  这张牌可能来自于任何位置（包括你自己的手牌），所以建议先把同牌名的牌使用掉。]],
   ["#jy_zuoti_ob"] = [[正在做题！请在战报中查看这道题目的完整题干和选项。]],
   ["#jy_zuoti_correct"] = [[答对了！可以从场上随机位置获取一张想要的牌！<br>你可以在战报中查看正确答案。]],
   ["#jy_zuoti_incorrect"] = [[答错了！不过没有什么惩罚，你学习到了新知识！<br>你可以在战报中查看正确答案。]],
@@ -2162,7 +2162,7 @@ local jy_yali = fk.CreateTriggerSkill{
   events = {fk.DrawNCards},
   on_cost = Util.TrueFunc,
   on_use = function(self, event, target, player, data)
-    data.n = math.max(player.hp - #player:getCardIds(Player.Hand), 0)
+    data.n = math.max(player.hp - #player:getCardIds(Player.Hand), 1)
   end,
 }
 local jy_yali_maxcards = fk.CreateMaxCardsSkill{
@@ -2192,7 +2192,7 @@ Fk:loadTranslationTable {
 
   ["jy_yali"] = "压力",
   [":jy_yali"] = [[锁定技，你的手牌上限等于你的体力上限；
-  你的摸牌阶段改为摸X-Y张牌且至少为0，X为你的体力值，Y为你的手牌数。]],
+  你的摸牌阶段改为摸X-Y张牌且至少为1，X为你的体力值，Y为你的手牌数。]],
 
 }
 
