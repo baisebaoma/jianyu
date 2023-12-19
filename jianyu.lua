@@ -1956,15 +1956,16 @@ local jy_jieju = fk.CreateActiveSkill {
       not player:getQuestSkillState("jy_jieju")
   end,
   card_filter = function(self, card)
-    return true
+    return false
   end,
-  card_num = 2,
+  card_num = 0,
   target_filter = function(self, to_select, selected)
     return false
   end,
   on_use = function(self, room, effect)
     local from = room:getPlayerById(effect.from)
-    room:throwCard(effect.cards, self.name, from, from)
+    room:loseHp(from, 1, self.name)  -- 从弃牌改为失去体力
+    -- room:throwCard(effect.cards, self.name, from, from)
     from:setSkillUseHistory("jy_zuoti", 0, Player.HistoryPhase)
   end,
 }
@@ -2041,16 +2042,17 @@ Fk:loadTranslationTable {
   ["@jy_zuoti_correct_count"] = "答对",
   ["@jy_zuoti_incorrect_count"] = "答错",
 
-  ["jy_jieju"] = "结局",
-  [":jy_jieju"] = [[使命技，出牌阶段限一次，你可以弃两张牌使【做题】可以再使用一次。<br>
-  成功：回合结束时，若你【做题】答对比答错至少多3次，你摸3张牌，然后获得技能【集智】、【看破】；<br>
-  失败：回合结束时，若你【做题】答错比答对至少多3次，你翻面、减一点体力上限，然后获得技能【玉玉】、【红温】。]],
+  ["jy_jieju"] = "熬夜",
+  [":jy_jieju"] = [[使命技，出牌阶段限一次，你可以失去一点体力使【做题】可以再使用一次。<br>
+  成功：回合结束时，若你【做题】答对比答错至少多3，你摸3张牌，然后获得技能【集智】、【看破】；<br>
+  失败：回合结束时，若你【做题】答错比答对至少多3，你翻面、减一点体力上限，然后获得技能【玉玉】、【红温】。]],
   ["#jy_jieju_success"] = "结局：成功",
   ["#jy_jieju_fail"] = "结局：失败",
 
 }
 
 -- 参考：廖化，英姿，蛊惑，血裔
+-- 不能加血，加了血就会变得很难杀
 local skl__mou__gaotianliang = General(extension, "skl__mou__gaotianliang", "qun", 3)
 
 
@@ -2144,7 +2146,7 @@ local jy_tianling_set_0 = fk.CreateTriggerSkill{
   refresh_events = {fk.EventPhaseEnd},
   can_refresh = function(self, event, target, player, data)
     return player:hasSkill(self) and target == player and
-      target.phase == Player.Judge and  -- 如果是这个人的回合结束阶段
+      target.phase == Player.Judge and
       player:getMark("@jy_tianling") ~= 0
   end,
   on_refresh = function(self, event, target, player, data)
