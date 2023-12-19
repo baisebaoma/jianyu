@@ -1,3 +1,4 @@
+---@diagnostic disable: undefined-global, undefined-field
 local extension = Package:new("jy_jianyu")
 extension.extensionName = "jianyu"
 
@@ -673,11 +674,12 @@ local jy_erduanxiao_trigger_2 = fk.CreateTriggerSkill{
   on_cost = function(self, event, target, player, data)
     -- print("jy_erduanxiao_trigger 已触发，现在player.is_xiao_changing的值是", player.is_xiao_changing)
     local room = player.room
+    local choices = {"#lose_xiao_2", "#lose_hp_1_2"}
     -- 如果体力不是满的，两个选项都有；如果是满的，就黑掉【恢复体力】那个按钮。这个改动不需要改到标李元浩那边去，因为标李元浩是掉血。
     if player.hp ~= player.maxHp then
-      self.choice = room:askForChoice(player, {"#lose_xiao_2", "#lose_hp_1_2"}, self.name)
+      self.choice = room:askForChoice(player, choices, self.name)
     else
-      self.choice = room:askForChoice(player, {"#lose_xiao_2"}, self.name, nil, nil, {"#lose_xiao_2", "#lose_hp_1_2"})
+      self.choice = room:askForChoice(player, {"#lose_xiao_2"}, self.name, nil, nil, choices)
     end
     return true
   end,
@@ -2017,7 +2019,7 @@ local jy_jieju_fail = fk.CreateTriggerSkill {
 jy_jieju:addRelatedSkill(jy_jieju_success)
 jy_jieju:addRelatedSkill(jy_jieju_fail)
 
-tym__kgdxs:addSkill(jy_ceshi_des)
+-- tym__kgdxs:addSkill(jy_ceshi_des)
 tym__kgdxs:addSkill(jy_zuoti)
 tym__kgdxs:addSkill(jy_jieju)
 tym__kgdxs:addRelatedSkill("jizhi")
@@ -2040,7 +2042,7 @@ Fk:loadTranslationTable {
   ["@jy_zuoti_incorrect_count"] = "答错",
 
   ["jy_jieju"] = "结局",
-  [":jy_jieju"] = [[使命技，出牌阶段限一次，你可以弃两张牌使得【做题】可以再使用一次。<br>
+  [":jy_jieju"] = [[使命技，出牌阶段限一次，你可以弃一张牌使得【做题】可以再使用一次。<br>
   成功：回合结束时，若你在【做题】中答对比答错至少多3次，你增加一点体力上限、摸3张牌，然后获得技能【集智】、【看破】、【享乐】、【原神】；<br>
   失败：回合结束时，若你在【做题】中答错比答对至少多3次，你翻面、减一点体力上限，然后获得技能【玉玉】、【红温】。]],
   ["#jy_jieju_success"] = "结局：成功",
@@ -2048,16 +2050,150 @@ Fk:loadTranslationTable {
 
 }
 
+-- 参考：廖化，英姿，蛊惑，血裔
+local skl__mou__gaotianliang = General(extension, "skl__mou__gaotianliang", "qun", 3)
+
+
+local jy_tianling = fk.CreateViewAsSkill{
+  name = "jy_tianling",
+  anim_type = "special",
+  pattern = ".",
+  interaction = function()
+    local names = {}
+    for _, id in ipairs(Fk:getAllCardIds()) do
+      local card = Fk:getCardById(id)
+      if card:isCommonTrick() and card.trueName ~= "ex_nihilo" and not card.is_derived and
+      ((Fk.currentResponsePattern == nil and Self:canUse(card)) or
+      (Fk.currentResponsePattern and Exppattern:Parse(Fk.currentResponsePattern):match(card))) then
+        table.insertIfNeed(names, card.name)
+      end
+    end
+    if #names == 0 then return false end
+    return UI.ComboBox { choices = names }
+  end,
+  card_filter = function(self, to_select, selected)
+    return #selected == 0 and Fk:currentRoom():getCardArea(to_select) ~= Card.PlayerEquip
+  end,
+  view_as = function(self, cards)
+    if #cards ~= 1 or not self.interaction.data then return end
+    local card = Fk:cloneCard(self.interaction.data)
+    self.cost_data = cards
+    card.skillName = self.name
+    return card
+  end,
+  before_use = function(self, player, use)
+    local room = player.room
+    local cards = self.cost_data
+    local card_id = cards[1]
+    use.card:addSubcard(card_id)
+  end,
+  enabled_at_play = function(self, player)
+    return player:getMark("@jy_tianling") ~= 0 and not player:isKongcheng() and player.phase ~= Player.NotActive
+  end,
+  enabled_at_response = function(self, player, response)
+    return player:getMark("@jy_tianling") ~= 0 and player.phase ~= Player.NotActive and not response and not player:isKongcheng()
+  end,
+  -- TODO:自己的回合濒死的时候也会亮，但实际上没用
+}
+local jy_tianling_yuyu = fk.CreateTriggerSkill{
+  name = "#jy_tianling_yuyu",
+  anim_type = "masochism",
+  events = {fk.EventPhaseEnd},
+  can_trigger = function(self, event, target, player, data)
+    return player:hasSkill(self) and player == target and player.phase == Player.Finish
+  end,
+  on_use = function(self, event, target, player, data)
+    local room = player.room
+    local choices = {"#jy_tianling_1hp", "#jy_tianling_2cards"}
+    local choice
+
+    -- 检测他是否没有两张牌可以弃了，如果是，就黑掉弃两张牌那个按钮
+    if #player:getCardIds{Player.Hand, Player.Equip} < 2 then
+      choice = room:askForChoice(player, {"#jy_tianling_1hp"}, self.name, nil, nil, choices)
+    -- 如果可以做选择，就让他做选择
+    else
+      choice = room:askForChoice(player, choices, self.name)
+    end
+
+    if choice == "#jy_tianling_1hp" then
+      room:loseHp(player, 1, self.name)
+    else
+      room:askForDiscard(player, 2, 2, true, self.name, false)
+    end
+    room:setPlayerMark(player, "@jy_tianling", "")
+  end,
+}
+local jy_tianling_dangxian = fk.CreateTriggerSkill{
+  name = "#jy_tianling_dangxian",
+  anim_type = "offensive",
+  frequency = Skill.Compulsory,
+  events = {fk.EventPhaseChanging},
+  can_trigger = function(self, event, target, player, data)
+    return target == player and player:hasSkill(self) and 
+      data.to == Player.Start and player:getMark("@jy_tianling") ~= 0
+  end,
+  on_use = function(self, event, target, player, data)
+    player:gainAnExtraPhase(Player.Play, true)
+  end,
+}
+local jy_tianling_set_0 = fk.CreateTriggerSkill{
+  name = "#jy_tianling_set_0",
+  mute = true,
+  frequency = Skill.Compulsory,
+  visible = false,
+  refresh_events = {fk.EventPhaseEnd},
+  can_refresh = function(self, event, target, player, data)
+    return player:hasSkill(self) and target == player and
+      target.phase == Player.Judge and  -- 如果是这个人的回合结束阶段
+      player:getMark("@jy_tianling") ~= 0
+  end,
+  on_refresh = function(self, event, target, player, data)
+    player.room:setPlayerMark(player, "@jy_tianling", 0)
+  end,
+}
+jy_tianling:addRelatedSkill(jy_tianling_yuyu)
+jy_tianling:addRelatedSkill(jy_tianling_dangxian)
+jy_tianling:addRelatedSkill(jy_tianling_set_0)
+
+local jy_yali = fk.CreateTriggerSkill{
+  name = "jy_yali",
+  anim_type = "drawcard",
+  frequency = Skill.Compulsory,
+  events = {fk.DrawNCards},
+  on_cost = Util.TrueFunc,
+  on_use = function(self, event, target, player, data)
+    data.n = math.max(player.hp - #player:getCardIds(Player.Hand), 0)
+  end,
+}
+local jy_yali_maxcards = fk.CreateMaxCardsSkill{
+  name = "#jy_yali_maxcards",
+  fixed_func = function(self, player)
+    if player:hasSkill(self) then
+      return player.maxHp
+    end
+  end,
+}
+jy_yali:addRelatedSkill(jy_yali_maxcards)
+
+skl__mou__gaotianliang:addSkill(jy_tianling)
+skl__mou__gaotianliang:addSkill(jy_yali)
 
 Fk:loadTranslationTable {
-     ["jianzihao"] = "简自豪",
-     ["houguoyu"] = "侯国玉",
-     ["liyuanhao"] = "李元浩",
-     ["aweiluo"] = "阿威罗",
-     ["gaotianliang"] = "高天亮",
-     ["zhaoqianxi"] = "赵乾熙",
-     ["yangfan"] = "杨藩",
-     ["tangshangjun"] = "杨藩",
+  ["skl__mou__gaotianliang"] = "谋高天亮",
+
+  ["jy_tianling"] = "天灵",
+  [":jy_tianling"] = [[结束阶段，你可以弃置两张牌或失去一点体力。如若此做，你的下一个回合：
+  准备阶段后执行一个额外的出牌阶段；判定阶段结束前，你的手牌可当作除【无中生有】外的所有锦囊牌使用。]],
+  ["@jy_tianling"] = "天灵",
+  ["#jy_tianling_1hp"] = "失去一点体力",
+  ["#jy_tianling_2cards"] = "弃置2张牌",
+  ["#jy_tianling_dangxian"] = "天灵",
+  ["#jy_tianling_yuyu"] = "天灵",
+
+  ["jy_yali"] = "压力",
+  [":jy_yali"] = [[锁定技，你的手牌上限等于你的体力上限；
+  你的摸牌阶段改为摸X-Y张牌且至少为0，X为你的体力值，Y为你的手牌数。]],
+
 }
 
 return extension
