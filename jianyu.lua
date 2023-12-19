@@ -1981,7 +1981,7 @@ local jy_jieju_success = fk.CreateTriggerSkill {
     local room = player.room
     -- room:notifySkillInvoked(player, "jy_jieju")
     room:updateQuestSkillState(player, "jy_jieju")
-    room:changeMaxHp(player, 1)
+    -- room:changeMaxHp(player, 1)
     player:drawCards(3)
     -- player.room:handleAddLoseSkills(player, "-jy_zuoti", nil, true, false)
     player.room:handleAddLoseSkills(player, "-jy_jieju", nil, true, false)
@@ -2042,9 +2042,9 @@ Fk:loadTranslationTable {
   ["@jy_zuoti_incorrect_count"] = "答错",
 
   ["jy_jieju"] = "结局",
-  [":jy_jieju"] = [[使命技，出牌阶段限一次，你可以弃一张牌使得【做题】可以再使用一次。<br>
-  成功：回合结束时，若你在【做题】中答对比答错至少多3次，你增加一点体力上限、摸3张牌，然后获得技能【集智】、【看破】、【享乐】、【原神】；<br>
-  失败：回合结束时，若你在【做题】中答错比答对至少多3次，你翻面、减一点体力上限，然后获得技能【玉玉】、【红温】。]],
+  [":jy_jieju"] = [[使命技，出牌阶段限一次，你可以弃一张牌使【做题】可以再使用一次。<br>
+  成功：回合结束时，若你【做题】答对比答错至少多3次，你摸3张牌，然后获得技能【集智】、【看破】、【享乐】、【原神】；<br>
+  失败：回合结束时，若你【做题】答错比答对至少多3次，你翻面、减一点体力上限，然后获得技能【玉玉】、【红温】。]],
   ["#jy_jieju_success"] = "结局：成功",
   ["#jy_jieju_fail"] = "结局：失败",
 
