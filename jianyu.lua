@@ -2098,9 +2098,9 @@ local jy_tianling = fk.CreateViewAsSkill{
 local jy_tianling_yuyu = fk.CreateTriggerSkill{
   name = "#jy_tianling_yuyu",
   anim_type = "masochism",
-  events = {fk.EventPhaseEnd},
+  events = {fk.EventPhaseStart},
   can_trigger = function(self, event, target, player, data)
-    return player:hasSkill(self) and player == target and player.phase == Player.Finish
+    return player:hasSkill(self) and player == target and player.phase == Player.Discard
   end,
   on_use = function(self, event, target, player, data)
     local room = player.room
@@ -2182,7 +2182,7 @@ Fk:loadTranslationTable {
   ["skl__mou__gaotianliang"] = "谋高天亮",
 
   ["jy_tianling"] = "天灵",
-  [":jy_tianling"] = [[结束阶段，你可以弃置两张牌或失去一点体力。如若此做，你的下一个回合：
+  [":jy_tianling"] = [[弃牌阶段开始时，你可以弃置两张牌或失去一点体力。如若此做，你的下一个回合：
   准备阶段后执行一个额外的出牌阶段；判定阶段结束前，你的手牌可当作除【无中生有】外的所有锦囊牌使用。]],
   ["@jy_tianling"] = "天灵",
   ["#jy_tianling_1hp"] = "失去一点体力",
