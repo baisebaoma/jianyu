@@ -1829,7 +1829,7 @@ Fk:loadTranslationTable {
   -- TODO：改一下这里，按照sp公孙瓒义从改，只提示触发了义从。
 }
 
-local tym__tangshangjun = General(extension, "tym__tangshangjun", "qun", 4)
+local tym__kgdxs = General(extension, "tym__kgdxs", "qun", 4)
 
 -- 获得一张牌：谋徐盛cheat
 -- 还可以继续发动：甄姬洛神
@@ -1837,8 +1837,8 @@ local tym__tangshangjun = General(extension, "tym__tangshangjun", "qun", 4)
 -- 选择：界李元浩二段
 -- 使命技：不知道，到时候再说
 
-local jy_xuexi = fk.CreateActiveSkill{
-  name = "jy_xuexi",
+local jy_zuoti = fk.CreateActiveSkill{
+  name = "jy_zuoti",
   anim_type = "control",
   can_use = function(self, player)
     return player:usedSkillTimes(self.name, Player.HistoryPhase) == 0
@@ -1870,7 +1870,7 @@ local jy_xuexi = fk.CreateActiveSkill{
 
     -- 做题
     -- 不仅要让自己看到题目，还要让全场所有人看到题目。
-    room:doBroadcastNotify("ShowToast", Fk:translate("#jy_xuexi_ob"))
+    room:doBroadcastNotify("ShowToast", Fk:translate("#jy_zuoti_ob"))
     room:sendLog{
       type = "%from 抽到的题目是：<br>%arg<br>可以选择的选项有：<br>%arg2",
       from = player.id,
@@ -1880,8 +1880,8 @@ local jy_xuexi = fk.CreateActiveSkill{
     
     local choice = room:askForChoice(player, answers, self.name, question)
     if choice == correct_answer then
-      room:addPlayerMark(player, "@jy_xuexi_correct_count")
-      room:doBroadcastNotify("ShowToast", Fk:translate("#jy_xuexi_correct"))
+      room:addPlayerMark(player, "@jy_zuoti_correct_count")
+      room:doBroadcastNotify("ShowToast", Fk:translate("#jy_zuoti_correct"))
       room:sendLog{
         type = "%from 回答正确，正确答案：%arg。选择一张想要的牌",
         from = player.id,
@@ -1925,8 +1925,8 @@ local jy_xuexi = fk.CreateActiveSkill{
       -- room:setCardMark(Fk:getCardById(toGain), "@@test_cheat-inhand", 1)
       room:obtainCard(effect.from, toGain, true, fk.ReasonPrey)
     else
-      room:addPlayerMark(player, "@jy_xuexi_incorrect_count")
-      room:doBroadcastNotify("ShowToast", Fk:translate("#jy_xuexi_incorrect"))
+      room:addPlayerMark(player, "@jy_zuoti_incorrect_count")
+      room:doBroadcastNotify("ShowToast", Fk:translate("#jy_zuoti_incorrect"))
       room:sendLog{
         type = "%from 回答错误，选择了：%arg，正确答案：%arg2",
         from = player.id,
@@ -1939,14 +1939,14 @@ local jy_xuexi = fk.CreateActiveSkill{
 }
 
 -- touhou_standard extremely_wicked
-local jy_fendou = fk.CreateActiveSkill {
-  name = "jy_fendou",
+local jy_jieju = fk.CreateActiveSkill {
+  name = "jy_jieju",
   frequency = Skill.Quest,
   anim_type = "positive",
   can_use = function(self, player)
-    return player:usedSkillTimes("jy_xuexi", Player.HistoryPhase) ~= 0 and 
+    return player:usedSkillTimes("jy_zuoti", Player.HistoryPhase) ~= 0 and 
       player:usedSkillTimes(self.name, Player.HistoryPhase) == 0 and 
-      not player:getQuestSkillState("jy_fendou")
+      not player:getQuestSkillState("jy_jieju")
   end,
   card_filter = function(self, card)
     return true
@@ -1958,92 +1958,93 @@ local jy_fendou = fk.CreateActiveSkill {
   on_use = function(self, room, effect)
     local from = room:getPlayerById(effect.from)
     room:throwCard(effect.cards, self.name, from, from)
-    from:setSkillUseHistory("jy_xuexi", 0, Player.HistoryPhase)
+    from:setSkillUseHistory("jy_zuoti", 0, Player.HistoryPhase)
   end,
 }
-local jy_fendou_success = fk.CreateTriggerSkill {
-  name = "#jy_fendou_success",
+local jy_jieju_success = fk.CreateTriggerSkill {
+  name = "#jy_jieju_success",
   anim_type = "positive",
   events = {
       fk.EventPhaseStart,
   },
   can_trigger = function(self, event, target, player)
-      if player:getQuestSkillState("jy_fendou") then
+      if player:getQuestSkillState("jy_jieju") then
           return false
       end
-      return player:hasSkill("jy_fendou") and player.phase == Player.Finish and 
-        player:getMark("@jy_xuexi_correct_count") >= player:getMark("@jy_xuexi_incorrect_count") + 3
+      return player:hasSkill("jy_jieju") and player.phase == Player.Finish and 
+        player:getMark("@jy_zuoti_correct_count") >= player:getMark("@jy_zuoti_incorrect_count") + 3
   end,
   on_cost = Util.TrueFunc,
   on_use = function(self, event, target, player)
     local room = player.room
-    -- room:notifySkillInvoked(player, "jy_fendou")
-    room:updateQuestSkillState(player, "jy_fendou")
+    -- room:notifySkillInvoked(player, "jy_jieju")
+    room:updateQuestSkillState(player, "jy_jieju")
     room:changeMaxHp(player, 1)
     player:drawCards(3)
-    -- player.room:handleAddLoseSkills(player, "-jy_xuexi", nil, true, false)
-    player.room:handleAddLoseSkills(player, "-jy_fendou", nil, true, false)
+    -- player.room:handleAddLoseSkills(player, "-jy_zuoti", nil, true, false)
+    player.room:handleAddLoseSkills(player, "-jy_jieju", nil, true, false)
     player.room:handleAddLoseSkills(player, "jizhi", nil, true, false)
     player.room:handleAddLoseSkills(player, "xiangle", nil, true, false)
     player.room:handleAddLoseSkills(player, "kanpo", nil, true, false)
+    player.room:handleAddLoseSkills(player, "jy_yuanshen_2", nil, true, false)
   end
 }
-local jy_fendou_fail = fk.CreateTriggerSkill {
-  name = "#jy_fendou_fail",
+local jy_jieju_fail = fk.CreateTriggerSkill {
+  name = "#jy_jieju_fail",
   anim_type = "negative",
   events = {
       fk.EventPhaseStart,
   },
   can_trigger = function(self, event, target, player)
-      if player:getQuestSkillState("jy_fendou") then
+      if player:getQuestSkillState("jy_jieju") then
           return false
       end
-      return player:hasSkill("jy_fendou") and player.phase == Player.Finish and 
-        player:getMark("@jy_xuexi_incorrect_count") >= player:getMark("@jy_xuexi_correct_count") + 3
+      return player:hasSkill("jy_jieju") and player.phase == Player.Finish and 
+        player:getMark("@jy_zuoti_incorrect_count") >= player:getMark("@jy_zuoti_correct_count") + 3
   end,
   on_cost = Util.TrueFunc,
   on_use = function(self, event, target, player)
     local room = player.room
-    -- room:notifySkillInvoked(player, "jy_fendou", "negative")
-    room:updateQuestSkillState(player, "jy_fendou", true)
+    -- room:notifySkillInvoked(player, "jy_jieju", "negative")
+    room:updateQuestSkillState(player, "jy_jieju", true)
     room:changeMaxHp(player, -1)
     player:turnOver()
-    room:handleAddLoseSkills(player, "-jy_fendou", nil, true, false)
+    room:handleAddLoseSkills(player, "-jy_jieju", nil, true, false)
     room:handleAddLoseSkills(player, "jy_yuyu", nil, true, false)
     room:handleAddLoseSkills(player, "jy_hongwen", nil, true, false)
   end
 }
-jy_fendou:addRelatedSkill(jy_fendou_success)
-jy_fendou:addRelatedSkill(jy_fendou_fail)
+jy_jieju:addRelatedSkill(jy_jieju_success)
+jy_jieju:addRelatedSkill(jy_jieju_fail)
 
-tym__tangshangjun:addSkill(jy_ceshi_des)
-tym__tangshangjun:addSkill(jy_xuexi)
-tym__tangshangjun:addSkill(jy_fendou)
-tym__tangshangjun:addRelatedSkill("jizhi")
-tym__tangshangjun:addRelatedSkill("kanpo")
-tym__tangshangjun:addRelatedSkill("xiangle")
-tym__tangshangjun:addRelatedSkill("jy_yuyu")
-tym__tangshangjun:addRelatedSkill("jy_hongwen")
+tym__kgdxs:addSkill(jy_ceshi_des)
+tym__kgdxs:addSkill(jy_zuoti)
+tym__kgdxs:addSkill(jy_jieju)
+tym__kgdxs:addRelatedSkill("jizhi")
+tym__kgdxs:addRelatedSkill("kanpo")
+tym__kgdxs:addRelatedSkill("xiangle")
+tym__kgdxs:addRelatedSkill("jy_yuanshen_2")
+tym__kgdxs:addRelatedSkill("jy_yuyu")
+tym__kgdxs:addRelatedSkill("jy_hongwen")
 
 Fk:loadTranslationTable {
-  ["tym__tangshangjun"] = "唐尚珺",
+  ["tym__kgdxs"] = "考公大学生",
 
-  ["jy_xuexi"] = "学习",
-  [":jy_xuexi"] = [[<s>你是高考历史总得分王。这是你的第16次高考，你仍然在为了考上理想的大学而努力学习。</s>
-  出牌阶段限一次，你可以做一道选择题。若选择正确，你可以获得一张想要的牌。
+  ["jy_zuoti"] = "做题",
+  [":jy_zuoti"] = [[出牌阶段限一次，你可以做一道选择题。若选择正确，你可以获得一张想要的牌。
   这张牌将从场上随机位置（包括其他角色的区域、被移出游戏的牌、自己的区域等任何位置，甚至也可以是自己的手牌）到达你的手牌。]],
-  ["#jy_xuexi_ob"] = [[正在做题！你可以在战报中看到这道题目的完整题干和选项。]],
-  ["#jy_xuexi_correct"] = [[答对了！可以从场上随机位置获取一张想要的牌！<br>你可以在战报中查看正确答案。]],
-  ["#jy_xuexi_incorrect"] = [[答错了！不过没有什么惩罚，你学习到了新知识！<br>你可以在战报中查看正确答案。]],
-  ["@jy_xuexi_correct_count"] = "答对",
-  ["@jy_xuexi_incorrect_count"] = "答错",
+  ["#jy_zuoti_ob"] = [[正在做题！你可以在战报中看到这道题目的完整题干和选项。]],
+  ["#jy_zuoti_correct"] = [[答对了！可以从场上随机位置获取一张想要的牌！<br>你可以在战报中查看正确答案。]],
+  ["#jy_zuoti_incorrect"] = [[答错了！不过没有什么惩罚，你学习到了新知识！<br>你可以在战报中查看正确答案。]],
+  ["@jy_zuoti_correct_count"] = "答对",
+  ["@jy_zuoti_incorrect_count"] = "答错",
 
-  ["jy_fendou"] = "奋斗",
-  [":jy_fendou"] = [[使命技，出牌阶段限一次，你可以弃一张牌使得【学习】可以再使用一次。<br>
-  成功：回合结束时，若你在【学习】中答对比答错至少多3次，你增加一点体力上限、摸3张牌，然后获得技能【集智】、【看破】、【享乐】；<br>
-  失败：回合结束时，若你在【学习】中答错比答对至少多3次，你翻面、减一点体力上限，然后获得技能【玉玉】、【红温】。]],
-  ["#jy_fendou_success"] = "奋斗：成功",
-  ["#jy_fendou_fail"] = "奋斗：失败",
+  ["jy_jieju"] = "结局",
+  [":jy_jieju"] = [[使命技，出牌阶段限一次，你可以弃两张牌使得【做题】可以再使用一次。<br>
+  成功：回合结束时，若你在【做题】中答对比答错至少多3次，你增加一点体力上限、摸3张牌，然后获得技能【集智】、【看破】、【享乐】、【原神】；<br>
+  失败：回合结束时，若你在【做题】中答错比答对至少多3次，你翻面、减一点体力上限，然后获得技能【玉玉】、【红温】。]],
+  ["#jy_jieju_success"] = "结局：成功",
+  ["#jy_jieju_fail"] = "结局：失败",
 
 }
 
