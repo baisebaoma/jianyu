@@ -1860,13 +1860,14 @@ local jy_zuoti = fk.CreateActiveSkill{
     local question = questionFull[1]
     local answers = questionFull[2]
     local correct_answer = questionFull[3]
+    local answer_key = questionFull[4]
 
     -- 建立输出到战报里的所有选项，无视里面的<br>
     local answers_string = ""
     for i, a in ipairs(answers) do
       if i ~= #answers then
-        answers_string = answers_string .. i .. ". " .. a:gsub("<br>", "") .. "<br><br>"
-      else answers_string = answers_string .. i .. ". " .. a:gsub("<br>", "")
+        answers_string = answers_string .. a .. "<br>"
+      else answers_string = answers_string .. a
       end
     end
 
@@ -1874,20 +1875,25 @@ local jy_zuoti = fk.CreateActiveSkill{
     -- 不仅要让自己看到题目，还要让全场所有人看到题目。
     room:doBroadcastNotify("ShowToast", Fk:translate("#jy_zuoti_ob"))
     room:sendLog{
-      type = "%from 抽到的题目是：<br>%arg<br>可以选择的选项有：<br>%arg2",
+      type = "%from 的题目：<br>%arg<br><br>%arg2",
       from = player.id,
       arg = question,
       arg2 = answers_string,
     }
     
+    local answers_short = {}
+    for _, a in ipairs(answers) do
+      table.insert(answers_short, a[1])
+    end
+
     local choice = room:askForChoice(player, answers, self.name, question)
-    if choice == correct_answer then
+    if choice[1] == correct_answer then  -- 仅判断choice[1]，因为答案只保留正确选项的选项名字（ABCD）
       room:addPlayerMark(player, "@jy_zuoti_correct_count")
       room:doBroadcastNotify("ShowToast", Fk:translate("#jy_zuoti_correct"))
       room:sendLog{
-        type = "%from 回答正确，正确答案：%arg。选择一张想要的牌",
+        type = "%from 回答正确，正确答案：%arg。",
         from = player.id,
-        arg = correct_answer,
+        arg = correct_answer[1],
       }
       
       -- cheat，从谋徐盛抄来的，应该不会有什么问题
@@ -1930,12 +1936,11 @@ local jy_zuoti = fk.CreateActiveSkill{
       room:addPlayerMark(player, "@jy_zuoti_incorrect_count")
       room:doBroadcastNotify("ShowToast", Fk:translate("#jy_zuoti_incorrect"))
       room:sendLog{
-        type = "%from 回答错误，选择了：%arg，正确答案：%arg2",
+        type = "%from 选择了：%arg，正确答案：%arg2。",
         from = player.id,
-        arg = choice,
+        arg = choice[1],
         arg2 = correct_answer,
       }
-      -- room:loseHp(player, 1, self.name) -- 失去一点体力
     end
   end,
 }
@@ -1953,7 +1958,7 @@ local jy_jieju = fk.CreateActiveSkill {
   card_filter = function(self, card)
     return true
   end,
-  card_num = 1,
+  card_num = 2,
   target_filter = function(self, to_select, selected)
     return false
   end,
@@ -1986,9 +1991,7 @@ local jy_jieju_success = fk.CreateTriggerSkill {
     -- player.room:handleAddLoseSkills(player, "-jy_zuoti", nil, true, false)
     player.room:handleAddLoseSkills(player, "-jy_jieju", nil, true, false)
     player.room:handleAddLoseSkills(player, "jizhi", nil, true, false)
-    player.room:handleAddLoseSkills(player, "xiangle", nil, true, false)
     player.room:handleAddLoseSkills(player, "kanpo", nil, true, false)
-    player.room:handleAddLoseSkills(player, "jy_yuanshen_2", nil, true, false)
   end
 }
 local jy_jieju_fail = fk.CreateTriggerSkill {
@@ -2019,13 +2022,10 @@ local jy_jieju_fail = fk.CreateTriggerSkill {
 jy_jieju:addRelatedSkill(jy_jieju_success)
 jy_jieju:addRelatedSkill(jy_jieju_fail)
 
--- tym__kgdxs:addSkill(jy_ceshi_des)
 tym__kgdxs:addSkill(jy_zuoti)
 tym__kgdxs:addSkill(jy_jieju)
 tym__kgdxs:addRelatedSkill("jizhi")
 tym__kgdxs:addRelatedSkill("kanpo")
-tym__kgdxs:addRelatedSkill("xiangle")
-tym__kgdxs:addRelatedSkill("jy_yuanshen_2")
 tym__kgdxs:addRelatedSkill("jy_yuyu")
 tym__kgdxs:addRelatedSkill("jy_hongwen")
 
@@ -2033,17 +2033,17 @@ Fk:loadTranslationTable {
   ["tym__kgdxs"] = "考公大学生",
 
   ["jy_zuoti"] = "做题",
-  [":jy_zuoti"] = [[出牌阶段限一次，你可以做一道选择题。若选择正确，你可以获得一张想要的牌。
-  这张牌将从场上随机位置（包括其他角色的区域、被移出游戏的牌、自己的区域等任何位置，甚至也可以是自己的手牌）到达你的手牌。]],
-  ["#jy_zuoti_ob"] = [[正在做题！你可以在战报中看到这道题目的完整题干和选项。]],
+  [":jy_zuoti"] = [[出牌阶段限一次，你可以做一道行测真题。若正确，你可以获得一张想要的牌。
+  这张牌将从场上随机位置（包括其他角色的区域、被移出游戏的牌、自己的区域等任何位置，甚至也可以是自己的手牌）到达你的手牌，所以建议你先把自己手上的同牌名的牌用掉。]],
+  ["#jy_zuoti_ob"] = [[正在做题！请在战报中查看这道题目的完整题干和选项。]],
   ["#jy_zuoti_correct"] = [[答对了！可以从场上随机位置获取一张想要的牌！<br>你可以在战报中查看正确答案。]],
   ["#jy_zuoti_incorrect"] = [[答错了！不过没有什么惩罚，你学习到了新知识！<br>你可以在战报中查看正确答案。]],
   ["@jy_zuoti_correct_count"] = "答对",
   ["@jy_zuoti_incorrect_count"] = "答错",
 
   ["jy_jieju"] = "结局",
-  [":jy_jieju"] = [[使命技，出牌阶段限一次，你可以弃一张牌使【做题】可以再使用一次。<br>
-  成功：回合结束时，若你【做题】答对比答错至少多3次，你摸3张牌，然后获得技能【集智】、【看破】、【享乐】、【原神】；<br>
+  [":jy_jieju"] = [[使命技，出牌阶段限一次，你可以弃两张牌使【做题】可以再使用一次。<br>
+  成功：回合结束时，若你【做题】答对比答错至少多3次，你摸3张牌，然后获得技能【集智】、【看破】；<br>
   失败：回合结束时，若你【做题】答错比答对至少多3次，你翻面、减一点体力上限，然后获得技能【玉玉】、【红温】。]],
   ["#jy_jieju_success"] = "结局：成功",
   ["#jy_jieju_fail"] = "结局：失败",
