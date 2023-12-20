@@ -1919,13 +1919,12 @@ local jy_zuoti = fk.CreateActiveSkill{
       table.insert(answers_short, a[1])
     end
 
-    -- TODO：用优雅的方式显示题干
     local choice = room:askForChoice(player, answers, self.name, question_wrap)
     if choice[1] == correct_answer then  -- 仅判断choice[1]，因为答案只保留正确选项的选项名字（ABCD）
       room:addPlayerMark(player, "@jy_zuoti_correct_count")
       room:doBroadcastNotify("ShowToast", Fk:translate("#jy_zuoti_correct"))
       room:sendLog{
-        type = "%from 回答正确，正确答案：%arg。",
+        type = "#jy_zuoti_correct_log",
         from = player.id,
         arg = correct_answer[1],
       }
@@ -1970,7 +1969,7 @@ local jy_zuoti = fk.CreateActiveSkill{
       room:addPlayerMark(player, "@jy_zuoti_incorrect_count")
       room:doBroadcastNotify("ShowToast", Fk:translate("#jy_zuoti_incorrect"))
       room:sendLog{
-        type = "%from 选择了：%arg，正确答案：%arg2。",
+        type = "#jy_zuoti_incorrect_log",
         from = player.id,
         arg = choice[1],
         arg2 = correct_answer,
@@ -2064,14 +2063,18 @@ Fk:loadTranslationTable {
   ["tym__kgdxs"] = "考公大学生",
 
   ["jy_zuoti"] = "做题",
-  [":jy_zuoti"] = [[出牌阶段限一次，你可以做一道行测真题（不含图形推理、资料分析）。若正确，你可以获得一张想要的牌。
-  这张牌可能来自于任何位置，包括你自己的手牌，所以建议先把同牌名的牌使用掉。<br>当前题库：379KB]],
+  [":jy_zuoti"] = [[出牌阶段限一次，你可以做一道行测真题。若正确，你可以获得一张想要的牌。<br>
+  <font size="1">题型不含图形推理、资料分析。<br>
+  你选择的这张牌可能来自于任何位置，包括你自己的手牌。所以建议先把同牌名的牌使用掉。<br>
+  当前题目总量：379KB，全部取自2018-2023真题。</font>]],
   ["#jy_zuoti_see_log"] = [[做题：请在战报中查看完整题干]],
   ["#jy_zuoti_ob"] = [[正在做题！请在战报中查看这道题目的完整题干和选项。]],
   ["#jy_zuoti_correct"] = [[答对了！可以从场上随机位置获取一张想要的牌！<br>你可以在战报中查看正确答案。]],
   ["#jy_zuoti_incorrect"] = [[答错了！不过没有什么惩罚，你学习到了新知识！<br>你可以在战报中查看正确答案。]],
   ["@jy_zuoti_correct_count"] = "答对",
+  ["#jy_zuoti_correct_log"] = "%from 回答正确，正确答案：%arg。",
   ["@jy_zuoti_incorrect_count"] = "答错",
+  ["#jy_zuoti_incorrect_log"] = "%from 选择了：%arg，正确答案：%arg2。",
 
   ["jy_jieju"] = "熬夜",
   [":jy_jieju"] = [[使命技，出牌阶段限一次，你可以失去一点体力使【做题】可以再使用一次。<br>
