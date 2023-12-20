@@ -1860,6 +1860,7 @@ local jy_zuoti = fk.CreateActiveSkill{
     local answers = questionFull[2]
     local correct_answer = questionFull[3]
 
+    ------------------------------------------
     -- 插入换行符，每若干个字符一次
     local function insert_br(str, ct)
       local result = ""
@@ -1892,9 +1893,6 @@ local jy_zuoti = fk.CreateActiveSkill{
     end
 
     local question_wrap = insert_br(question, 40)
-    print(question_wrap)
-    -- local answers_wrap = answers
-
     -----------------------------------------------
 
     -- 建立输出到战报里的所有选项
@@ -2025,8 +2023,6 @@ local jy_jieju_success = fk.CreateTriggerSkill {
     room:updateQuestSkillState(player, "jy_jieju")
     -- room:changeMaxHp(player, 1)
     player:drawCards(3)
-    -- player.room:handleAddLoseSkills(player, "-jy_zuoti", nil, true, false)
-    -- player.room:handleAddLoseSkills(player, "-jy_jieju", nil, true, false)
     player.room:handleAddLoseSkills(player, "jizhi", nil, true, false)
     player.room:handleAddLoseSkills(player, "kanpo", nil, true, false)
   end
@@ -2047,11 +2043,9 @@ local jy_jieju_fail = fk.CreateTriggerSkill {
   on_cost = Util.TrueFunc,
   on_use = function(self, event, target, player)
     local room = player.room
-    -- room:notifySkillInvoked(player, "jy_jieju", "negative")
     room:updateQuestSkillState(player, "jy_jieju", true)
     room:changeMaxHp(player, -1)
     player:turnOver()
-    -- room:handleAddLoseSkills(player, "-jy_jieju", nil, true, false)
     room:handleAddLoseSkills(player, "jy_yuyu", nil, true, false)
     room:handleAddLoseSkills(player, "jy_hongwen", nil, true, false)
   end
