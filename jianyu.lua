@@ -1893,6 +1893,10 @@ local jy_zuoti = fk.CreateActiveSkill{
     end
 
     local question_wrap = insert_br(question, 40)
+    local answers_wrap = {}
+    for _, a in ipairs(answers) do
+      table.insert(answers_wrap, insert_br(a, 30))
+    end 
     -----------------------------------------------
 
     -- 建立输出到战报里的所有选项
@@ -1919,7 +1923,7 @@ local jy_zuoti = fk.CreateActiveSkill{
       table.insert(answers_short, a[1])
     end
 
-    local choice = room:askForChoice(player, answers, self.name, question_wrap)
+    local choice = room:askForChoice(player, answers_wrap, self.name, question_wrap)
     if choice[1] == correct_answer then  -- 仅判断choice[1]，因为答案只保留正确选项的选项名字（ABCD）
       room:addPlayerMark(player, "@jy_zuoti_correct_count")
       room:doBroadcastNotify("ShowToast", Fk:translate("#jy_zuoti_correct"))
@@ -2065,8 +2069,8 @@ Fk:loadTranslationTable {
   ["jy_zuoti"] = "做题",
   [":jy_zuoti"] = [[出牌阶段限一次，你可以做一道行测真题。若正确，你可以获得一张想要的牌。<br>
   <font size="1">题型不含图形推理、资料分析。<br>
-  你选择的这张牌可能来自于任何位置，包括你自己的手牌。所以建议先把同牌名的牌使用掉。<br>
-  当前题目总量：379KB，全部取自2018-2023真题。</font>]],
+  当前题目总量：446KB，全部取自2018-2023真题。<br>
+  你选择的这张牌可能来自于任何位置，包括你自己的手牌。所以建议先把同牌名的牌使用掉。</font>]],
   ["#jy_zuoti_see_log"] = [[做题：请在战报中查看完整题干]],
   ["#jy_zuoti_ob"] = [[正在做题！请在战报中查看这道题目的完整题干和选项。]],
   ["#jy_zuoti_correct"] = [[答对了！可以从场上随机位置获取一张想要的牌！<br>你可以在战报中查看正确答案。]],
