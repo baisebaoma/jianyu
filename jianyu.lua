@@ -1867,7 +1867,7 @@ local jy_zuoti = fk.CreateActiveSkill{
       local count = 0
       local in_br = false -- 用于检测是否在原本的 <br> 之内
     
-      for char in str:gmatch("[%z\1-\127\194-\244][\128-\191]*") do
+      for char in str:gmatch("[%z\1-\127\194-\244_][\128-\191]*") do
         if char == "<" then
           in_br = true
         elseif char == ">" and in_br then
