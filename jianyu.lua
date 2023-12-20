@@ -1880,7 +1880,7 @@ local jy_zuoti = fk.CreateActiveSkill{
           count = count + 1
     
           -- 每ct个字符插入一个<br>
-          if count == ct and not char:match("[%p%s]") then
+          if count == ct then
             result = result .. "<br>"
             count = 0
           end
