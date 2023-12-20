@@ -1,4 +1,3 @@
----@diagnostic disable: undefined-global, undefined-field
 local extension = Package:new("jy_jianyu")
 extension.extensionName = "jianyu"
 
@@ -1855,14 +1854,50 @@ local jy_zuoti = fk.CreateActiveSkill{
   on_use = function(self, room, effect)
     local player = room:getPlayerById(effect.from)
     -- 随机从题库拿一道题
-    questionFull = Q.getRandomQuestion()
+    local questionFull = Q.getRandomQuestion()
 
     local question = questionFull[1]
     local answers = questionFull[2]
     local correct_answer = questionFull[3]
-    local answer_key = questionFull[4]
 
-    -- 建立输出到战报里的所有选项，无视里面的<br>
+    -- 插入换行符，每若干个字符一次
+    local function insert_br(str, ct)
+      local result = ""
+      local count = 0
+      local in_br = false -- 用于检测是否在原本的 <br> 之内
+    
+      for char in str:gmatch("[%z\1-\127\194-\244][\128-\191]*") do
+        if char == "<" then
+          in_br = true
+        elseif char == ">" and in_br then
+          in_br = false
+          count = 0
+        end
+    
+        if not in_br then
+          result = result .. char
+          count = count + 1
+    
+          -- 每ct个字符插入一个<br>
+          if count == ct and not char:match("[%p%s]") then
+            result = result .. "<br>"
+            count = 0
+          end
+        else
+          result = result .. char
+        end
+      end
+    
+      return result
+    end
+
+    local question_wrap = insert_br(question, 40)
+    print(question_wrap)
+    -- local answers_wrap = answers
+
+    -----------------------------------------------
+
+    -- 建立输出到战报里的所有选项
     local answers_string = ""
     for i, a in ipairs(answers) do
       if i ~= #answers then
@@ -1886,7 +1921,8 @@ local jy_zuoti = fk.CreateActiveSkill{
       table.insert(answers_short, a[1])
     end
 
-    local choice = room:askForChoice(player, answers, self.name, question)
+    -- TODO：用优雅的方式显示题干
+    local choice = room:askForChoice(player, answers, self.name, question_wrap)
     if choice[1] == correct_answer then  -- 仅判断choice[1]，因为答案只保留正确选项的选项名字（ABCD）
       room:addPlayerMark(player, "@jy_zuoti_correct_count")
       room:doBroadcastNotify("ShowToast", Fk:translate("#jy_zuoti_correct"))
@@ -1990,7 +2026,7 @@ local jy_jieju_success = fk.CreateTriggerSkill {
     -- room:changeMaxHp(player, 1)
     player:drawCards(3)
     -- player.room:handleAddLoseSkills(player, "-jy_zuoti", nil, true, false)
-    player.room:handleAddLoseSkills(player, "-jy_jieju", nil, true, false)
+    -- player.room:handleAddLoseSkills(player, "-jy_jieju", nil, true, false)
     player.room:handleAddLoseSkills(player, "jizhi", nil, true, false)
     player.room:handleAddLoseSkills(player, "kanpo", nil, true, false)
   end
@@ -2015,7 +2051,7 @@ local jy_jieju_fail = fk.CreateTriggerSkill {
     room:updateQuestSkillState(player, "jy_jieju", true)
     room:changeMaxHp(player, -1)
     player:turnOver()
-    room:handleAddLoseSkills(player, "-jy_jieju", nil, true, false)
+    -- room:handleAddLoseSkills(player, "-jy_jieju", nil, true, false)
     room:handleAddLoseSkills(player, "jy_yuyu", nil, true, false)
     room:handleAddLoseSkills(player, "jy_hongwen", nil, true, false)
   end
@@ -2034,8 +2070,9 @@ Fk:loadTranslationTable {
   ["tym__kgdxs"] = "考公大学生",
 
   ["jy_zuoti"] = "做题",
-  [":jy_zuoti"] = [[出牌阶段限一次，你可以做一道行测真题（目前题库：20）。若正确，你可以获得一张想要的牌。
+  [":jy_zuoti"] = [[出牌阶段限一次，你可以做一道行测真题（不含图形推理、资料分析）。若正确，你可以获得一张想要的牌。
   这张牌可能来自于任何位置（包括你自己的手牌），所以建议先把同牌名的牌使用掉。]],
+  ["#jy_zuoti_see_log"] = [[做题：请在战报中查看完整题干]],
   ["#jy_zuoti_ob"] = [[正在做题！请在战报中查看这道题目的完整题干和选项。]],
   ["#jy_zuoti_correct"] = [[答对了！可以从场上随机位置获取一张想要的牌！<br>你可以在战报中查看正确答案。]],
   ["#jy_zuoti_incorrect"] = [[答错了！不过没有什么惩罚，你学习到了新知识！<br>你可以在战报中查看正确答案。]],
@@ -2184,7 +2221,7 @@ Fk:loadTranslationTable {
   ["skl__mou__gaotianliang"] = "谋高天亮",
 
   ["jy_tianling"] = "天灵",
-  [":jy_tianling"] = [[弃牌阶段开始时，你可以弃置两张牌或失去一点体力。如若此做，你的下一个回合：
+  [":jy_tianling"] = [[弃牌阶段开始时，你可以弃置两张牌或失去一点体力。若如此做，你的下一个回合：
   准备阶段后执行一个额外的出牌阶段；判定阶段结束前，你的手牌可当作除【无中生有】外的所有锦囊牌使用。]],
   ["@jy_tianling"] = "天灵",
   ["#jy_tianling_1hp"] = "失去一点体力",
