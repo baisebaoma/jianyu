@@ -745,12 +745,12 @@ local jy_yuyu = fk.CreateTriggerSkill{
     local room = player.room
     self.this_time_slash = false
     if data.card and data.from and data.card.trueName == "slash" then  -- 如果是杀
-      if not data.from:hasMark("@jy_yuyu_enemy") then 
+      if data.from:getMark("@jy_yuyu_enemy") == 0 then   -- 如果他不是敌人
         self.this_time_slash = true  -- 如果他是因为这次伤害变成了天敌，那么写在this_time_slash里
         room:setPlayerMark(data.from, "@jy_yuyu_enemy", "")  -- 空字符串也是true
       end
     end
-    if self.this_time_slash or not data.from:hasMark("@jy_yuyu_enemy") then  -- 如果他不是敌人
+    if self.this_time_slash or data.from:getMark("@jy_yuyu_enemy") == 0 then  -- 如果他不是敌人
       self:doCost(event, target, player, data)
     end
   end,
@@ -2251,7 +2251,7 @@ local jy_leiyan = fk.CreateActiveSkill{
   end,
   card_num = 0,
   target_filter = function(self, to_select, selected)
-    return true
+    return Fk:currentRoom():getPlayerById(to_select):getMark("@jy_raiden_leiyan") == 0
   end,
   target_num = 1,
   on_use = function(self, room, use)
@@ -2267,8 +2267,8 @@ local jy_leiyan_trigger = fk.CreateTriggerSkill{
   events = {fk.Damaged},
   can_trigger = function(self, event, target, player, data)
     local from = data.from
-    return from:getMark("@jy_raiden_leiyan") == "" and player:hasSkill(self) and
-     not data.is_leiyan and not target.dead
+    return from:getMark("@jy_raiden_leiyan") ~= 0 and player:hasSkill(self) and
+     not data.is_leiyan and not target.dead and not target.dying  -- 如果场上有两个雷电将军，那么会分别触发
   end,
   on_use = function(self, event, target, player, data)
     local room = player.room
@@ -2277,12 +2277,15 @@ local jy_leiyan_trigger = fk.CreateTriggerSkill{
     local judge = {
       who = player,
       reason = self.name,
-      pattern = ".|.|black",
+      pattern = ".|.|spade,club",
     }
     room:judge(judge)
     if judge.card.color == Card.Black then
-
+      player:broadcastSkillInvoke("jy_leiyan")
       room:doIndicate(player.id, {to.id})  -- 播放指示线
+      
+      room:delay(700)
+
       room:damage({
         from = player,
         to = to,
@@ -2292,8 +2295,8 @@ local jy_leiyan_trigger = fk.CreateTriggerSkill{
         is_leiyan = true,
       })
 
-      if player:getMark("@jy_raiden_yuanlun") < 5 then
-        room:addPlayerMark(player, "@jy_raiden_yuanlun")
+      if player:getMark("@jy_raiden_yuanli") < 4 then
+        room:addPlayerMark(player, "@jy_raiden_yuanli")
       end
     end
   end,
@@ -2311,46 +2314,52 @@ local jy_zhenshuo = fk.CreateActiveSkill{
   end,
   card_num = 0,
   target_filter = function(self, to_select, selected)
-    return true
+    return to_select ~= Self.id
   end,
   target_num = 1,
   on_use = function(self, room, use)
     local player = room:getPlayerById(use.from)
     local to = room:getPlayerById(use.tos[1])
-    local yuanlun = player:getMark("@jy_raiden_yuanlun")
+    local yuanli = player:getMark("@jy_raiden_yuanli")
+    room:setPlayerMark(player, "@jy_raiden_yuanli", 0)
 
     -- room:throwCard(use.cards, self.name, player, player)
-    
-    room:doIndicate(player.id, {to.id})  -- 播放指示线
+    room:delay(2000)
+
       room:damage({
         from = player,
         to = to,
-        damage = 1 + yuanlun,
+        damage = 1 + yuanli // 2,
         damageType = fk.ThunderDamage,
         skillName = "jy_leiyan",
+        is_leiyan = true,
       })
 
-    room:setPlayerMark(player, "@jy_raiden_yuanlun", 0)
   end,
 }
+-- TODO:参考mobile_effect，写一个超牛逼的动画
 
-tym__raiden:addSkill(jy_ceshi_des)
 tym__raiden:addSkill(jy_leiyan)
 tym__raiden:addSkill(jy_zhenshuo)
 
 Fk:loadTranslationTable {
   ["tym__raiden"] = "雷电将军",
+  ["~tym__raiden"] = "浮世一梦……",
 
   ["jy_leiyan"] = "雷眼",
-  [":jy_leiyan"] = [[出牌阶段限一次，你可以令一名角色获得<font color="Fuchsia">雷罚恶曜之眼</font>标记。持有<font color="Fuchsia">雷罚恶曜之眼</font>标记的角色造成伤害后，你进行一次判定，若为黑色，你对伤害目标造成1点雷电伤害（不会再次触发【雷眼】），并获得一枚<font color="Fuchsia">愿力</font>标记。<font color="Fuchsia">愿力</font>标记最多存在5枚。]],
+  [":jy_leiyan"] = [[出牌阶段限一次，你可以令一名没有<font color="Fuchsia">雷罚恶曜之眼</font>的角色获得<font color="Fuchsia">雷罚恶曜之眼</font>标记。持有<font color="Fuchsia">雷罚恶曜之眼</font>标记的角色造成伤害后，你进行一次判定，若为黑色，你对本次伤害的目标造成1点雷电伤害（不会触发【雷眼】），并获得一枚<font color="Fuchsia">愿力</font>标记。<font color="Fuchsia">愿力</font>标记最多存在4枚。]],
   ["@jy_raiden_leiyan"] = [[<font color="Fuchsia">雷罚恶曜之眼</font>]],
-  ["@jy_raiden_yuanlun"] = [[<font color="Fuchsia">愿力</font>]],
+  ["@jy_raiden_yuanli"] = [[<font color="Fuchsia">愿力</font>]],
   ["#jy_leiyan_trigger"] = "雷眼",
+  ["$jy_leiyan1"] = "泡影看破！",
+  ["$jy_leiyan2"] = "无处遁逃！",
+  ["$jy_leiyan3"] = "威光无赦！",
 
   ["jy_zhenshuo"] = "真说",
-  [":jy_zhenshuo"] = [[出牌阶段限一次，你可以弃所有<font color="Fuchsia">愿力</font>标记来对一名角色造成1点雷电伤害。每以此法失去1枚<font color="Fuchsia">愿力</font>标记，就多造成1点伤害。]],
-
-  -- TODO：然后，出牌阶段结束前，你的所有普通【杀】均视为【雷杀】，你对该角色的【雷杀】无视距离。
+  [":jy_zhenshuo"] = [[出牌阶段限一次，你可以弃所有<font color="Fuchsia">愿力</font>标记来对一名其他角色造成1点雷电伤害。每弃2枚<font color="Fuchsia">愿力</font>标记，就额外造成1点伤害。]],
+  ["$jy_zhenshuo1"] = "此刻，寂灭之时！",
+  ["$jy_zhenshuo2"] = "稻光，亦是永恒！",
+  ["$jy_zhenshuo3"] = "无念，断绝！",
 }
 
 return extension
