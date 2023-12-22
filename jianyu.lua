@@ -2277,10 +2277,10 @@ local jy_leiyan_trigger = fk.CreateTriggerSkill{
     local judge = {
       who = player,
       reason = self.name,
-      pattern = ".|.|club",
+      pattern = ".|.|black",
     }
     room:judge(judge)
-    if judge.card.suit == Card.Club then
+    if judge.card.color == Card.Black then
 
       room:doIndicate(player.id, {to.id})  -- 播放指示线
       room:damage({
@@ -2292,7 +2292,7 @@ local jy_leiyan_trigger = fk.CreateTriggerSkill{
         is_leiyan = true,
       })
 
-      if player:getMark("@jy_raiden_yuanlun") <= 2 then
+      if player:getMark("@jy_raiden_yuanlun") < 5 then
         room:addPlayerMark(player, "@jy_raiden_yuanlun")
       end
     end
@@ -2307,9 +2307,9 @@ local jy_zhenshuo = fk.CreateActiveSkill{
     return player:usedSkillTimes(self.name, Player.HistoryPhase) == 0
   end,
   card_filter = function(self, to_select, selected, selected_targets)
-    return #selected < 3
+    return false
   end,
-  card_num = 3,
+  card_num = 0,
   target_filter = function(self, to_select, selected)
     return true
   end,
@@ -2319,7 +2319,7 @@ local jy_zhenshuo = fk.CreateActiveSkill{
     local to = room:getPlayerById(use.tos[1])
     local yuanlun = player:getMark("@jy_raiden_yuanlun")
 
-    room:throwCard(use.cards, self.name, player, player)
+    -- room:throwCard(use.cards, self.name, player, player)
     
     room:doIndicate(player.id, {to.id})  -- 播放指示线
       room:damage({
@@ -2342,13 +2342,13 @@ Fk:loadTranslationTable {
   ["tym__raiden"] = "雷电将军",
 
   ["jy_leiyan"] = "雷眼",
-  [":jy_leiyan"] = [[出牌阶段限一次，你可以令一名角色获得<font color="Fuchsia">雷罚恶曜之眼</font>标记。持有<font color="Fuchsia">雷罚恶曜之眼</font>标记的角色造成伤害后，你进行一次判定，若为♣，你对伤害目标造成1点雷电伤害（不会再次触发【雷眼】），并获得一枚<font color="Fuchsia">愿力</font>标记。<font color="Fuchsia">愿力</font>标记最多存在2枚。]],
+  [":jy_leiyan"] = [[出牌阶段限一次，你可以令一名角色获得<font color="Fuchsia">雷罚恶曜之眼</font>标记。持有<font color="Fuchsia">雷罚恶曜之眼</font>标记的角色造成伤害后，你进行一次判定，若为黑色，你对伤害目标造成1点雷电伤害（不会再次触发【雷眼】），并获得一枚<font color="Fuchsia">愿力</font>标记。<font color="Fuchsia">愿力</font>标记最多存在5枚。]],
   ["@jy_raiden_leiyan"] = [[<font color="Fuchsia">雷罚恶曜之眼</font>]],
   ["@jy_raiden_yuanlun"] = [[<font color="Fuchsia">愿力</font>]],
   ["#jy_leiyan_trigger"] = "雷眼",
 
   ["jy_zhenshuo"] = "真说",
-  [":jy_zhenshuo"] = [[出牌阶段限一次，你可以弃3张牌并失去所有<font color="Fuchsia">愿力</font>标记来对一名角色造成1点雷电伤害。每以此法失去1枚<font color="Fuchsia">愿力</font>标记，就多造成1点伤害。]],
+  [":jy_zhenshuo"] = [[出牌阶段限一次，你可以弃所有<font color="Fuchsia">愿力</font>标记来对一名角色造成1点雷电伤害。每以此法失去1枚<font color="Fuchsia">愿力</font>标记，就多造成1点伤害。]],
 
   -- TODO：然后，出牌阶段结束前，你的所有普通【杀】均视为【雷杀】，你对该角色的【雷杀】无视距离。
 }
