@@ -2028,6 +2028,7 @@ local jy_jieju_success = fk.CreateTriggerSkill {
     player:drawCards(3)
     player.room:handleAddLoseSkills(player, "jizhi", nil, true, false)
     player.room:handleAddLoseSkills(player, "kanpo", nil, true, false)
+    player.room:handleAddLoseSkills(player, "xiangle", nil, true, false)
   end
 }
 local jy_jieju_fail = fk.CreateTriggerSkill {
@@ -2082,7 +2083,7 @@ Fk:loadTranslationTable {
 
   ["jy_jieju"] = "熬夜",
   [":jy_jieju"] = [[使命技，出牌阶段限一次，你可以失去一点体力使【做题】可以再使用一次。<br>
-  成功：回合结束时，若你【做题】答对比答错至少多3，你摸3张牌，然后获得技能【集智】、【看破】；<br>
+  成功：回合结束时，若你【做题】答对比答错至少多3，你摸3张牌，然后获得技能【集智】、【看破】、【享乐】；<br>
   失败：回合结束时，若你【做题】答错比答对至少多3，你翻面、减一点体力上限，然后获得技能【玉玉】、【红温】。]],
   ["#jy_jieju_success"] = "结局：成功",
   ["#jy_jieju_fail"] = "结局：失败",
@@ -2236,7 +2237,7 @@ Fk:loadTranslationTable {
 
 }
 
-local tym__raiden = General(extension, "tym__raiden", "god", 4)
+local tym__raiden = General(extension, "tym__raiden", "god", 4, 4, General.Female)
 tym__raiden.visible = false
 
 local jy_leiyan = fk.CreateActiveSkill{
@@ -2291,7 +2292,7 @@ local jy_leiyan_trigger = fk.CreateTriggerSkill{
         is_leiyan = true,
       })
 
-      if player:getMark("@jy_raiden_yuanlun") <= 4 then
+      if player:getMark("@jy_raiden_yuanlun") <= 2 then
         room:addPlayerMark(player, "@jy_raiden_yuanlun")
       end
     end
@@ -2305,10 +2306,10 @@ local jy_zhenshuo = fk.CreateActiveSkill{
   can_use = function(self, player)
     return player:usedSkillTimes(self.name, Player.HistoryPhase) == 0
   end,
-  card_filter = function(self, card)
-    return false
+  card_filter = function(self, to_select, selected, selected_targets)
+    return #selected == 3
   end,
-  card_num = 0,
+  card_num = 3,
   target_filter = function(self, to_select, selected)
     return true
   end,
@@ -2317,12 +2318,14 @@ local jy_zhenshuo = fk.CreateActiveSkill{
     local player = room:getPlayerById(use.from)
     local to = room:getPlayerById(use.tos[1])
     local yuanlun = player:getMark("@jy_raiden_yuanlun")
+
+    room:throwCard(use.cards, self.name, player, player)
     
     room:doIndicate(player.id, {to.id})  -- 播放指示线
       room:damage({
         from = player,
         to = to,
-        damage = 1 + yuanlun // 2,
+        damage = 1 + yuanlun,
         damageType = fk.ThunderDamage,
         skillName = "jy_leiyan",
         is_leiyan = true,
@@ -2332,6 +2335,7 @@ local jy_zhenshuo = fk.CreateActiveSkill{
   end,
 }
 
+tym__raiden:addSkill(jy_ceshi_des)
 tym__raiden:addSkill(jy_leiyan)
 tym__raiden:addSkill(jy_zhenshuo)
 
@@ -2342,14 +2346,14 @@ Fk:loadTranslationTable {
   [":jy_leiyan"] = [[出牌阶段限一次，你可以令一名角色获得<font color="Fuchsia">雷罚恶曜之眼</font>标记。
   持有<font color="Fuchsia">雷罚恶曜之眼</font>标记的角色造成伤害后，你进行一次判定，若为♣，
   你对伤害目标造成1点雷电伤害（不会再次触发【雷眼】）、你获得一枚<font color="Fuchsia">诸愿百眼之轮</font>标记。
-  <font color="Fuchsia">诸愿百眼之轮</font>标记最多存在4枚。]],
+  <font color="Fuchsia">诸愿百眼之轮</font>标记最多存在2枚。]],
   ["@jy_raiden_leiyan"] = [[<font color="Fuchsia">雷罚恶曜之眼</font>]],
   ["@jy_raiden_yuanlun"] = [[<font color="Fuchsia">诸愿百眼之轮</font>]],
   ["#jy_leiyan_trigger"] = "雷眼",
 
   ["jy_zhenshuo"] = "真说",
-  [":jy_zhenshuo"] = [[出牌阶段限一次，你可以移除所有<font color="Fuchsia">诸愿百眼之轮</font>标记
-  来对一名角色造成1点雷电伤害（不会触发【雷眼】）。每以此法移除2枚<font color="Fuchsia">诸愿百眼之轮</font>标记，就多造成1点伤害。]],
+  [":jy_zhenshuo"] = [[出牌阶段限一次，你可以弃3张牌并移除所有<font color="Fuchsia">诸愿百眼之轮</font>标记
+  来对一名角色造成1点雷电伤害（不会触发【雷眼】）。每以此法移除1枚<font color="Fuchsia">诸愿百眼之轮</font>标记，就多造成1点伤害。]],
 }
 
 return extension
