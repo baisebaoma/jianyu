@@ -2237,6 +2237,7 @@ Fk:loadTranslationTable {
 }
 
 local tym__raiden = General(extension, "tym__raiden", "god", 4)
+tym__raiden.visible = false
 
 local jy_leiyan = fk.CreateActiveSkill{
   name = "jy_leiyan",
@@ -2265,7 +2266,7 @@ local jy_leiyan_trigger = fk.CreateTriggerSkill{
   events = {fk.Damaged},
   can_trigger = function(self, event, target, player, data)
     local from = data.from
-    return from:getMark("@jy_raiden_leiyan") and player:hasSkill(self) and
+    return from:getMark("@jy_raiden_leiyan") == "" and player:hasSkill(self) and
      not data.is_leiyan
   end,
   on_use = function(self, event, target, player, data)
@@ -2279,8 +2280,6 @@ local jy_leiyan_trigger = fk.CreateTriggerSkill{
     }
     room:judge(judge)
     if judge.card.suit == Card.Club then
-      from:drawCards(1)
-      player:drawCards(1)
 
       room:doIndicate(player.id, {to.id})  -- 播放指示线
       room:damage({
@@ -2317,7 +2316,7 @@ local jy_zhenshuo = fk.CreateActiveSkill{
   on_use = function(self, room, use)
     local player = room:getPlayerById(use.from)
     local to = room:getPlayerById(use.tos[1])
-    local yuanlun = to:getMark("@jy_raiden_yuanlun")
+    local yuanlun = player:getMark("@jy_raiden_yuanlun")
     
     room:doIndicate(player.id, {to.id})  -- 播放指示线
       room:damage({
@@ -2329,7 +2328,7 @@ local jy_zhenshuo = fk.CreateActiveSkill{
         is_leiyan = true,
       })
 
-    room:setPlayerMark(to, "@jy_raiden_yuanlun", 0)
+    room:setPlayerMark(player, "@jy_raiden_yuanlun", 0)
   end,
 }
 
@@ -2340,14 +2339,17 @@ Fk:loadTranslationTable {
   ["tym__raiden"] = "雷电将军",
 
   ["jy_leiyan"] = "雷眼",
-  [":jy_leiyan"] = [[出牌阶段限一次，你可以令一名角色获得<font color="Fuchsia">雷罚恶曜之眼</font>标记。持有<font color="Fuchsia">雷罚恶曜之眼</font>标记的角色造成伤害后，你进行一次判定，若为♣，你与伤害来源各摸一张牌、你对伤害目标造成1点雷电伤害（不会再次触发【雷眼】）、你获得一枚<font color="Fuchsia">诸愿百眼之轮</font>标记。<font color="Fuchsia">诸愿百眼之轮</font>标记最多存在4枚。]],
+  [":jy_leiyan"] = [[出牌阶段限一次，你可以令一名角色获得<font color="Fuchsia">雷罚恶曜之眼</font>标记。
+  持有<font color="Fuchsia">雷罚恶曜之眼</font>标记的角色造成伤害后，你进行一次判定，若为♣，
+  你对伤害目标造成1点雷电伤害（不会再次触发【雷眼】）、你获得一枚<font color="Fuchsia">诸愿百眼之轮</font>标记。
+  <font color="Fuchsia">诸愿百眼之轮</font>标记最多存在4枚。]],
   ["@jy_raiden_leiyan"] = [[<font color="Fuchsia">雷罚恶曜之眼</font>]],
   ["@jy_raiden_yuanlun"] = [[<font color="Fuchsia">诸愿百眼之轮</font>]],
   ["#jy_leiyan_trigger"] = "雷眼",
 
   ["jy_zhenshuo"] = "真说",
-  [":jy_zhenshuo"] = [[出牌阶段限一次，你可以移除所有<font color="Fuchsia">诸愿百眼之轮</font>标记来对一名角色造成1点雷电伤害（不会触发【雷眼】）。
-  每以此法移除2枚<font color="Fuchsia">诸愿百眼之轮</font>标记，就多造成1点伤害。]],
+  [":jy_zhenshuo"] = [[出牌阶段限一次，你可以移除所有<font color="Fuchsia">诸愿百眼之轮</font>标记
+  来对一名角色造成1点雷电伤害（不会触发【雷眼】）。每以此法移除2枚<font color="Fuchsia">诸愿百眼之轮</font>标记，就多造成1点伤害。]],
 }
 
 return extension
