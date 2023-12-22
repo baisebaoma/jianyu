@@ -2267,7 +2267,7 @@ local jy_leiyan_trigger = fk.CreateTriggerSkill{
   can_trigger = function(self, event, target, player, data)
     local from = data.from
     return from:getMark("@jy_raiden_leiyan") == "" and player:hasSkill(self) and
-     not data.is_leiyan
+     not data.is_leiyan and not target.dead
   end,
   on_use = function(self, event, target, player, data)
     local room = player.room
