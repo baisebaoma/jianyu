@@ -14,4 +14,12 @@ Question.getRandomQuestion = function()
   return question
 end
 
+Question.questionCount = function()
+  local count = 0
+  for _, i in ipairs(Question.question_set) do
+    count = count + #i
+  end
+  return #Question.question_set, count
+end
+
 return Question

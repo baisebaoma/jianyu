@@ -20,8 +20,7 @@ local jy_ceshi_des = fk.CreateTriggerSkill{
 
 Fk:loadTranslationTable {
   ["jy_ceshi_des"] = "测试",
-  [":jy_ceshi_des"] = [[<strong>这个武将正在测试中，可能会有大量bug。
-  如果发现bug，请反馈给开发者。<\strong>]],
+  [":jy_ceshi_des"] = [[<strong>这个武将正在测试中，可能会有bug、强度超模/过弱。<\strong>]],
 }
 
 
@@ -2064,13 +2063,15 @@ tym__kgdxs:addRelatedSkill("kanpo")
 tym__kgdxs:addRelatedSkill("jy_yuyu")
 tym__kgdxs:addRelatedSkill("jy_hongwen")
 
+local total_papers, total_questions = Q.questionCount()
+
 Fk:loadTranslationTable {
   ["tym__kgdxs"] = "考公大学生",
 
   ["jy_zuoti"] = "做题",
   [":jy_zuoti"] = [[出牌阶段限一次，你可以做一道行测真题。若正确，你可以获得一张想要的牌。<br>
   <font size="1">题型不含图形推理、资料分析。<br>
-  当前题目总量：446KB，全部取自2018-2023真题。<br>
+  当前收录试卷总量：]]..total_papers..[[，题目总量：]]..total_questions..[[（含相同题目），全部取自2018-2023真题。<br>
   你选择的这张牌可能来自于任何位置，包括你自己的手牌。所以建议先把同牌名的牌使用掉。</font>]],
   ["#jy_zuoti_see_log"] = [[做题：请在战报中查看完整题干]],
   ["#jy_zuoti_ob"] = [[正在做题！请在战报中查看这道题目的完整题干和选项。]],
@@ -2092,7 +2093,7 @@ Fk:loadTranslationTable {
 
 -- 参考：廖化，英姿，蛊惑，血裔
 -- 不能加血，加了血就会变得很难杀
-local skl__mou__gaotianliang = General(extension, "skl__mou__gaotianliang", "qun", 3)
+local skl__mou__gaotianliang = General(extension, "skl__mou__gaotianliang", "qun", 4)
 
 
 local jy_tianling = fk.CreateViewAsSkill{
@@ -2103,7 +2104,8 @@ local jy_tianling = fk.CreateViewAsSkill{
     local names = {}
     for _, id in ipairs(Fk:getAllCardIds()) do
       local card = Fk:getCardById(id)
-      if card:isCommonTrick() and card.trueName ~= "ex_nihilo" and not card.is_derived and
+      if card:isCommonTrick() and card.trueName ~= "ex_nihilo" and card.trueName ~= "snatch"
+      and not card.is_derived and
       ((Fk.currentResponsePattern == nil and Self:canUse(card)) or
       (Fk.currentResponsePattern and Exppattern:Parse(Fk.currentResponsePattern):match(card))) then
         table.insertIfNeed(names, card.name)
@@ -2223,8 +2225,7 @@ Fk:loadTranslationTable {
   ["skl__mou__gaotianliang"] = "谋高天亮",
 
   ["jy_tianling"] = "天灵",
-  [":jy_tianling"] = [[弃牌阶段开始时，你可以弃置两张牌或失去一点体力。若如此做，你的下一个回合：
-  准备阶段后执行一个额外的出牌阶段；判定阶段结束前，你的手牌可当作除【无中生有】外的所有锦囊牌使用。]],
+  [":jy_tianling"] = [[弃牌阶段开始时，你可以弃置两张牌或失去一点体力。若如此做，你的下一个回合：准备阶段后执行一个额外的出牌阶段；判定阶段结束前，你的手牌可当作除【无中生有】和【顺手牵羊】外的所有锦囊牌使用。]],
   ["@jy_tianling"] = "天灵",
   ["#jy_tianling_1hp"] = "失去一点体力",
   ["#jy_tianling_2cards"] = "弃置2张牌",
@@ -2232,8 +2233,7 @@ Fk:loadTranslationTable {
   ["#jy_tianling_yuyu"] = "天灵",
 
   ["jy_yali"] = "压力",
-  [":jy_yali"] = [[锁定技，你的手牌上限等于你的体力上限；
-  你的摸牌阶段改为摸X-Y张牌且至少为1，X为你的体力值，Y为你的手牌数。]],
+  [":jy_yali"] = [[锁定技，你的手牌上限等于你的体力上限；你的摸牌阶段改为摸X-Y张牌且至少为1，X为你的体力值，Y为你的手牌数。]],
 
 }
 
@@ -2328,7 +2328,6 @@ local jy_zhenshuo = fk.CreateActiveSkill{
         damage = 1 + yuanlun,
         damageType = fk.ThunderDamage,
         skillName = "jy_leiyan",
-        is_leiyan = true,
       })
 
     room:setPlayerMark(player, "@jy_raiden_yuanlun", 0)
@@ -2343,17 +2342,15 @@ Fk:loadTranslationTable {
   ["tym__raiden"] = "雷电将军",
 
   ["jy_leiyan"] = "雷眼",
-  [":jy_leiyan"] = [[出牌阶段限一次，你可以令一名角色获得<font color="Fuchsia">雷罚恶曜之眼</font>标记。
-  持有<font color="Fuchsia">雷罚恶曜之眼</font>标记的角色造成伤害后，你进行一次判定，若为♣，
-  你对伤害目标造成1点雷电伤害（不会再次触发【雷眼】）、你获得一枚<font color="Fuchsia">诸愿百眼之轮</font>标记。
-  <font color="Fuchsia">诸愿百眼之轮</font>标记最多存在2枚。]],
+  [":jy_leiyan"] = [[出牌阶段限一次，你可以令一名角色获得<font color="Fuchsia">雷罚恶曜之眼</font>标记。持有<font color="Fuchsia">雷罚恶曜之眼</font>标记的角色造成伤害后，你进行一次判定，若为♣，你对伤害目标造成1点雷电伤害（不会再次触发【雷眼】），并获得一枚<font color="Fuchsia">愿力</font>标记。<font color="Fuchsia">愿力</font>标记最多存在2枚。]],
   ["@jy_raiden_leiyan"] = [[<font color="Fuchsia">雷罚恶曜之眼</font>]],
-  ["@jy_raiden_yuanlun"] = [[<font color="Fuchsia">诸愿百眼之轮</font>]],
+  ["@jy_raiden_yuanlun"] = [[<font color="Fuchsia">愿力</font>]],
   ["#jy_leiyan_trigger"] = "雷眼",
 
   ["jy_zhenshuo"] = "真说",
-  [":jy_zhenshuo"] = [[出牌阶段限一次，你可以弃3张牌并移除所有<font color="Fuchsia">诸愿百眼之轮</font>标记
-  来对一名角色造成1点雷电伤害（不会触发【雷眼】）。每以此法移除1枚<font color="Fuchsia">诸愿百眼之轮</font>标记，就多造成1点伤害。]],
+  [":jy_zhenshuo"] = [[出牌阶段限一次，你可以弃3张牌并失去所有<font color="Fuchsia">愿力</font>标记来对一名角色造成1点雷电伤害。每以此法失去1枚<font color="Fuchsia">愿力</font>标记，就多造成1点伤害。]],
+
+  -- TODO：然后，出牌阶段结束前，你的所有普通【杀】均视为【雷杀】，你对该角色的【雷杀】无视距离。
 }
 
 return extension
