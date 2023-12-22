@@ -2236,4 +2236,118 @@ Fk:loadTranslationTable {
 
 }
 
+local tym__raiden = General(extension, "tym__raiden", "god", 4)
+
+local jy_leiyan = fk.CreateActiveSkill{
+  name = "jy_leiyan",
+  anim_type = "offensive",
+  can_use = function(self, player)
+    return player:usedSkillTimes(self.name, Player.HistoryPhase) == 0
+  end,
+  card_filter = function(self, card)
+    return false
+  end,
+  card_num = 0,
+  target_filter = function(self, to_select, selected)
+    return true
+  end,
+  target_num = 1,
+  on_use = function(self, room, use)
+    local to = room:getPlayerById(use.tos[1])
+    room:setPlayerMark(to, "@jy_raiden_leiyan", "")
+  end,
+}
+local jy_leiyan_trigger = fk.CreateTriggerSkill{
+  name = "#jy_leiyan_trigger",
+  -- mute = true,
+  anim_type = "support",
+  frequency = Skill.Compulsory,
+  events = {fk.Damaged},
+  can_trigger = function(self, event, target, player, data)
+    local from = data.from
+    return from:getMark("@jy_raiden_leiyan") and player:hasSkill(self) and
+     not data.is_leiyan
+  end,
+  on_use = function(self, event, target, player, data)
+    local room = player.room
+    local from = data.from
+    local to = data.to
+    local judge = {
+      who = player,
+      reason = self.name,
+      pattern = ".|.|club",
+    }
+    room:judge(judge)
+    if judge.card.suit == Card.Club then
+      from:drawCards(1)
+      player:drawCards(1)
+
+      room:doIndicate(player.id, {to.id})  -- 播放指示线
+      room:damage({
+        from = player,
+        to = to,
+        damage = 1,
+        damageType = fk.ThunderDamage,
+        skillName = "jy_leiyan",
+        is_leiyan = true,
+      })
+
+      if player:getMark("@jy_raiden_yuanlun") <= 4 then
+        room:addPlayerMark(player, "@jy_raiden_yuanlun")
+      end
+    end
+  end,
+}
+jy_leiyan:addRelatedSkill(jy_leiyan_trigger)
+
+local jy_zhenshuo = fk.CreateActiveSkill{
+  name = "jy_zhenshuo",
+  anim_type = "offensive",
+  can_use = function(self, player)
+    return player:usedSkillTimes(self.name, Player.HistoryPhase) == 0
+  end,
+  card_filter = function(self, card)
+    return false
+  end,
+  card_num = 0,
+  target_filter = function(self, to_select, selected)
+    return true
+  end,
+  target_num = 1,
+  on_use = function(self, room, use)
+    local player = room:getPlayerById(use.from)
+    local to = room:getPlayerById(use.tos[1])
+    local yuanlun = to:getMark("@jy_raiden_yuanlun")
+    
+    room:doIndicate(player.id, {to.id})  -- 播放指示线
+      room:damage({
+        from = player,
+        to = to,
+        damage = 1 + yuanlun // 2,
+        damageType = fk.ThunderDamage,
+        skillName = "jy_leiyan",
+        is_leiyan = true,
+      })
+
+    room:setPlayerMark(to, "@jy_raiden_yuanlun", 0)
+  end,
+}
+
+tym__raiden:addSkill(jy_leiyan)
+tym__raiden:addSkill(jy_zhenshuo)
+
+Fk:loadTranslationTable {
+  ["tym__raiden"] = "雷电将军",
+
+  ["jy_leiyan"] = "雷眼",
+  [":jy_leiyan"] = [[出牌阶段限一次，你可以令一名角色获得<font color="Fuchsia">雷罚恶曜之眼</font>标记。持有<font color="Fuchsia">雷罚恶曜之眼</font>标记的角色造成伤害后，你进行一次判定，若为♣，你与伤害来源各摸一张牌、你对伤害目标造成1点雷电伤害（不会再次触发【雷眼】）、你获得一枚<font color="Fuchsia">诸愿百眼之轮</font>标记。<font color="Fuchsia">诸愿百眼之轮</font>标记最多存在4枚。]],
+  ["@jy_raiden_leiyan"] = [[<font color="Fuchsia">雷罚恶曜之眼</font>]],
+  ["@jy_raiden_yuanlun"] = [[<font color="Fuchsia">诸愿百眼之轮</font>]],
+  ["#jy_leiyan_trigger"] = "雷眼",
+
+  ["jy_zhenshuo"] = "真说",
+  [":jy_zhenshuo"] = [[出牌阶段限一次，你可以移除所有<font color="Fuchsia">诸愿百眼之轮</font>标记来对一名角色造成1点雷电伤害（不会触发【雷眼】）。
+  每以此法移除2枚<font color="Fuchsia">诸愿百眼之轮</font>标记，就多造成1点伤害。]],
+}
+
 return extension
