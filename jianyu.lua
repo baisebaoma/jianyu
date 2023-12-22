@@ -2307,7 +2307,7 @@ local jy_zhenshuo = fk.CreateActiveSkill{
     return player:usedSkillTimes(self.name, Player.HistoryPhase) == 0
   end,
   card_filter = function(self, to_select, selected, selected_targets)
-    return #selected == 3
+    return #selected < 3
   end,
   card_num = 3,
   target_filter = function(self, to_select, selected)
