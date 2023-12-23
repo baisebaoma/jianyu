@@ -793,8 +793,6 @@ Fk:loadTranslationTable {
   ["~xjb__gaotianliang"] = "顶不住啦！我每天都活在水深火热里面。",
 }
 
--- 说实话这两个将又垃圾又冷门，先禁用吧
-
 -- -- 赵乾熙
 -- local tym__zhaoqianxi = General(extension, "tym__zhaoqianxi", "qun", 4)
 
@@ -1906,7 +1904,7 @@ local jy_zuoti = fk.CreateActiveSkill{
     -- 不仅要让自己看到题目，还要让全场所有人看到题目。
     room:doBroadcastNotify("ShowToast", Fk:translate("#jy_zuoti_ob"))
     room:sendLog{
-      type = "%from 的题目：<br>%arg<br><br>%arg2",
+      type = "%from 的题目：<br>%arg<br>%arg2",
       from = player.id,
       arg = question,
       arg2 = answers_string,
@@ -2088,7 +2086,6 @@ Fk:loadTranslationTable {
 }
 
 -- 参考：廖化，英姿，蛊惑，血裔
--- 不能加血，加了血就会变得很难杀
 local skl__mou__gaotianliang = General(extension, "skl__mou__gaotianliang", "qun", 4)
 
 
@@ -2201,7 +2198,7 @@ local jy_yali = fk.CreateTriggerSkill{
   events = {fk.DrawNCards},
   on_cost = Util.TrueFunc,
   on_use = function(self, event, target, player, data)
-    data.n = math.max(player.hp - #player:getCardIds(Player.Hand), 1)
+    data.n = data.n + math.max(player.hp - #player:getCardIds(Player.Hand), 0)
   end,
 }
 local jy_yali_maxcards = fk.CreateMaxCardsSkill{
@@ -2229,11 +2226,11 @@ Fk:loadTranslationTable {
   ["#jy_tianling_yuyu"] = "天灵",
 
   ["jy_yali"] = "压力",
-  [":jy_yali"] = [[锁定技，你的手牌上限等于你的体力上限；你的摸牌阶段改为摸X-Y张牌且至少为1，X为你的体力值，Y为你的手牌数。]],
+  [":jy_yali"] = [[锁定技，你的手牌上限等于你的体力上限；你的摸牌阶段额外摸X-Y张牌且至少为0，X为你的体力值，Y为你的手牌数。]],
 
 }
 
-local tym__raiden = General(extension, "tym__raiden", "god", 3, 3, General.Female)
+local tym__raiden = General(extension, "tym__raiden", "god", 4, 4, General.Female)
 tym__raiden.visible = false
 
 local jy_leiyan = fk.CreateActiveSkill{
@@ -2279,10 +2276,10 @@ local jy_leiyan_trigger = fk.CreateTriggerSkill{
     room:judge(judge)
 
     if judge.card.suit == Card.Spade then
-      if player:getMark("@jy_raiden_yuanli") < 2 then
+      if player:getMark("@jy_raiden_yuanli") < 3 then
         room:addPlayerMark(player, "@jy_raiden_yuanli")
       end
-      if player:getMark("@jy_raiden_yuanli") == 2 then
+      if player:getMark("@jy_raiden_yuanli") == 3 then
         room:doBroadcastNotify("ShowToast", Fk:translate("#jy_yuanli_full"))
       end
 
@@ -2290,7 +2287,7 @@ local jy_leiyan_trigger = fk.CreateTriggerSkill{
       if not target.dead then
         player:broadcastSkillInvoke("jy_leiyan")
         room:doIndicate(player.id, {to.id})  -- 播放指示线
-        room:delay(500)
+        room:delay(400)
         room:damage({
           from = player,
           to = to,
@@ -2330,7 +2327,7 @@ local jy_zhenshuo = fk.CreateActiveSkill{
 
     -- TODO:参考mobile_effect，写一个超牛逼的动画
     -- room:doSuperLightBox("packages/jianyu/qml/FirstBlood.qml")
-    room:delay(1500)
+    room:delay(1600 + 100 * dmg)
 
       room:damage({
         from = player,
@@ -2377,6 +2374,7 @@ local jy_yuanshen = fk.CreateTriggerSkill{
         if data.damageType == element[1] then  -- 如果是A属性伤害
           if data.to:getMark(element[3]) ~= 0 then  -- 如果目标有B附着
             room:setPlayerMark(data.to, element[3], 0)  -- 将B附着解除
+            -- player:broadcastSkillInvoke("jy_yuanshen")
             room:doBroadcastNotify("ShowToast", Fk:translate(element[5]))  -- 广播发生了元素反应。先广播再造成效果！
             element[4](self, event, target, player, data)  -- 造成效果
             data.is_jy_yuanshen_triggered = true  -- 如果有多个拥有这个技能的人，告诉他不用再发动了
@@ -2402,7 +2400,7 @@ Fk:loadTranslationTable {
   ["~tym__raiden"] = "浮世一梦……",
 
   ["jy_leiyan"] = "雷眼",
-  [":jy_leiyan"] = [[出牌阶段限一次，你可以令一名角色获得<font color="Fuchsia">雷罚恶曜之眼</font>标记。持有<font color="Fuchsia">雷罚恶曜之眼</font>标记的角色造成伤害后，你进行一次判定，若为：♠，你获得一枚<font color="Fuchsia">愿力</font>标记，<font color="Fuchsia">愿力</font>标记最多同时存在2枚；♣，你对伤害目标造成1点雷电伤害，该伤害不会再次触发【雷眼】。]],
+  [":jy_leiyan"] = [[出牌阶段限一次，你可以令一名角色获得<font color="Fuchsia">雷罚恶曜之眼</font>标记。持有<font color="Fuchsia">雷罚恶曜之眼</font>标记的角色造成伤害后，你进行一次判定，若为：♠，你获得一枚<font color="Fuchsia">愿力</font>标记，<font color="Fuchsia">愿力</font>标记最多同时存在3枚；♣，你对伤害目标造成1点雷电伤害，该伤害不会再次触发【雷眼】。]],
   ["@jy_raiden_leiyan"] = [[<font color="Fuchsia">雷罚恶曜之眼</font>]],
   ["@jy_raiden_yuanli"] = [[<font color="Fuchsia">愿力</font>]],
   ["#jy_leiyan_trigger"] = "雷眼",
@@ -2418,12 +2416,16 @@ Fk:loadTranslationTable {
   ["$jy_zhenshuo3"] = "无念，断绝！",
 
   ["jy_yuanshen"] = "原神",
-  [":jy_yuanshen"] = [[锁定技，当有角色受到<font color="red">火焰</font>或<font color="Fuchsia">雷电</font>伤害时，若其没有属性标记，其获得对应属性标记；若其拥有属性标记且与此次伤害属性不同，则移除标记并：<font color="Fuchsia">雷电伤害</font>令其翻面；<font color="red">火焰伤害</font>+1。<br>该技能对每次伤害只会触发一次，不论场上是否有多个角色拥有该技能。]],
+  [":jy_yuanshen"] = [[锁定技，当有角色受到<font color="red">火焰</font>或<font color="Fuchsia">雷电</font>伤害时，若其没有属性标记，其获得对应属性标记；若其拥有属性标记且与此次伤害属性不同，则移除标记并按照以下规则触发效果：<br>
+  <font color="Fuchsia">雷电伤害</font>与<font color="red">【火焰】</font>发生反应，令其翻面；<br>
+  <font color="red">火焰伤害</font>与<font color="Fuchsia">【雷电】</font>发生反应，伤害+1。<br>
+  <font size="1">该技能对每次伤害只会触发一次，不论场上是否有多个角色拥有该技能。</font>]],
   ["#jy_yuanshen_reaction_1"] = [[<font color="red">火焰伤害</font>与<font color="Fuchsia">【雷电】</font>发生反应，伤害+1]],
   ["#jy_yuanshen_reaction_2"] = [[<font color="Fuchsia">雷电伤害</font>与<font color="red">【火焰】</font>发生反应，翻面]],
 
   ["@jy_yuanshen_pyro"] = [[<font color="red">火焰</font>]],
   ["@jy_yuanshen_electro"] = [[<font color="Fuchsia">雷电</font>]],
+  ["$jy_yuanshen1"] = "（音乐）",
 }
 
 -- for k, v in pairs(Fk.translations["zh_CN"]) do
