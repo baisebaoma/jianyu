@@ -2055,6 +2055,7 @@ tym__kgdxs:addSkill(jy_zuoti)
 tym__kgdxs:addSkill(jy_jieju)
 tym__kgdxs:addRelatedSkill("jizhi")
 tym__kgdxs:addRelatedSkill("kanpo")
+tym__kgdxs:addRelatedSkill("xiangle")
 tym__kgdxs:addRelatedSkill("jy_yuyu")
 tym__kgdxs:addRelatedSkill("jy_hongwen")
 
