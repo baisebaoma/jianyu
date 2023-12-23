@@ -178,7 +178,7 @@ Fk:loadTranslationTable{
   ["$jy_hongwen2"] = "哎，兄弟我为什么不打四带两对儿啊，兄弟？",
   ["$jy_hongwen3"] = "好难受啊！",
   ["$jy_hongwen4"] = "操，可惜！",
-  ["$jy_hongwen5"] = "那他咋想的呀？",
+  -- ["$jy_hongwen5"] = "这是咋想的呀？",  -- 这条语音太吵了
 
   ["jy_zouwei"] = "走位",
   [":jy_zouwei"] = "锁定技，当装备区没有牌时，其他角色计算与你的距离时，始终+1；当装备区有牌时，你计算与其他角色的距离时，始终-1。",
@@ -2233,7 +2233,7 @@ Fk:loadTranslationTable {
 
 }
 
-local tym__raiden = General(extension, "tym__raiden", "god", 4, 4, General.Female)
+local tym__raiden = General(extension, "tym__raiden", "god", 3, 3, General.Female)
 tym__raiden.visible = false
 
 local jy_leiyan = fk.CreateActiveSkill{
@@ -2262,6 +2262,7 @@ local jy_leiyan_trigger = fk.CreateTriggerSkill{
   frequency = Skill.Compulsory,
   events = {fk.Damaged},
   can_trigger = function(self, event, target, player, data)
+    if not data.from then return false end  -- 如果这次伤害没有伤害来源，就不用看了
     local from = data.from
     return from:getMark("@jy_raiden_leiyan") ~= 0 and player:hasSkill(self) and
      not data.is_leiyan  -- 如果场上有两个雷电将军，那么会分别触发
@@ -2273,7 +2274,7 @@ local jy_leiyan_trigger = fk.CreateTriggerSkill{
     local judge = {
       who = player,
       reason = self.name,
-      pattern = ".|.|spade,club,diamond",
+      pattern = ".|.|spade,club",
     }
     room:judge(judge)
 
@@ -2299,14 +2300,6 @@ local jy_leiyan_trigger = fk.CreateTriggerSkill{
           is_leiyan = true,
         })
       end
-      
-    elseif judge.card.suit == Card.Diamond then
-      if player ~= data.from then 
-        data.from:drawCards(1) 
-        player:drawCards(1)
-      else
-        player:drawCards(2)
-      end
     end
   end,
 }
@@ -2320,9 +2313,9 @@ local jy_zhenshuo = fk.CreateActiveSkill{
       player:getMark("@jy_raiden_yuanli") ~= 0
   end,
   card_filter = function(self, to_select, selected, selected_targets)
-    return false
+    return #selected < 3
   end,
-  card_num = 0,
+  card_num = 3,
   target_filter = function(self, to_select, selected)
     return to_select ~= Self.id
   end,
@@ -2333,7 +2326,8 @@ local jy_zhenshuo = fk.CreateActiveSkill{
     local dmg = player:getMark("@jy_raiden_yuanli")
     room:setPlayerMark(player, "@jy_raiden_yuanli", 0)
 
-    -- room:throwCard(use.cards, self.name, player, player)
+    room:throwCard(use.cards, self.name, player, player)
+
     -- TODO:参考mobile_effect，写一个超牛逼的动画
     -- room:doSuperLightBox("packages/jianyu/qml/FirstBlood.qml")
     room:delay(1500)
@@ -2408,7 +2402,7 @@ Fk:loadTranslationTable {
   ["~tym__raiden"] = "浮世一梦……",
 
   ["jy_leiyan"] = "雷眼",
-  [":jy_leiyan"] = [[出牌阶段限一次，你可以令一名角色获得<font color="Fuchsia">雷罚恶曜之眼</font>标记。持有<font color="Fuchsia">雷罚恶曜之眼</font>标记的角色造成伤害后，你进行一次判定，若为：♠，你获得一枚<font color="Fuchsia">愿力</font>标记，<font color="Fuchsia">愿力</font>标记最多同时存在2枚；♣，你对伤害目标造成1点雷电伤害，该伤害不会再次触发【雷眼】；<font color="red">♦</font>，你与伤害来源各摸一张牌，若你是伤害来源，则你摸两张。]],
+  [":jy_leiyan"] = [[出牌阶段限一次，你可以令一名角色获得<font color="Fuchsia">雷罚恶曜之眼</font>标记。持有<font color="Fuchsia">雷罚恶曜之眼</font>标记的角色造成伤害后，你进行一次判定，若为：♠，你获得一枚<font color="Fuchsia">愿力</font>标记，<font color="Fuchsia">愿力</font>标记最多同时存在2枚；♣，你对伤害目标造成1点雷电伤害，该伤害不会再次触发【雷眼】。]],
   ["@jy_raiden_leiyan"] = [[<font color="Fuchsia">雷罚恶曜之眼</font>]],
   ["@jy_raiden_yuanli"] = [[<font color="Fuchsia">愿力</font>]],
   ["#jy_leiyan_trigger"] = "雷眼",
@@ -2418,13 +2412,13 @@ Fk:loadTranslationTable {
   ["#jy_yuanli_full"] = [[<font color="Fuchsia">愿力</font>已满！]],
 
   ["jy_zhenshuo"] = "真说",
-  [":jy_zhenshuo"] = [[出牌阶段限一次，你可以弃所有<font color="Fuchsia">愿力</font>标记来对一名其他角色造成X点雷电伤害，X为你以此法弃的<font color="Fuchsia">愿力</font>标记数。]],
+  [":jy_zhenshuo"] = [[出牌阶段限一次，你可以弃3张牌和所有<font color="Fuchsia">愿力</font>标记，来对一名其他角色造成等同于所弃<font color="Fuchsia">愿力</font>标记数的雷电伤害。]],
   ["$jy_zhenshuo1"] = "此刻，寂灭之时！",
   ["$jy_zhenshuo2"] = "稻光，亦是永恒！",
   ["$jy_zhenshuo3"] = "无念，断绝！",
 
   ["jy_yuanshen"] = "原神",
-  [":jy_yuanshen"] = [[原神技，锁定技，当有角色受到<font color="red">火焰</font>或<font color="Fuchsia">雷电</font>伤害时，若其没有属性标记，其获得对应属性标记；若其拥有属性标记且与此次伤害属性不同，则移除标记并：<font color="Fuchsia">雷电伤害</font>令其翻面；<font color="red">火焰伤害</font>+1。该技能对每次伤害只会触发一次，不论场上是否有多个角色拥有该技能。]],
+  [":jy_yuanshen"] = [[锁定技，当有角色受到<font color="red">火焰</font>或<font color="Fuchsia">雷电</font>伤害时，若其没有属性标记，其获得对应属性标记；若其拥有属性标记且与此次伤害属性不同，则移除标记并：<font color="Fuchsia">雷电伤害</font>令其翻面；<font color="red">火焰伤害</font>+1。<br>该技能对每次伤害只会触发一次，不论场上是否有多个角色拥有该技能。]],
   ["#jy_yuanshen_reaction_1"] = [[<font color="red">火焰伤害</font>与<font color="Fuchsia">【雷电】</font>发生反应，伤害+1]],
   ["#jy_yuanshen_reaction_2"] = [[<font color="Fuchsia">雷电伤害</font>与<font color="red">【火焰】</font>发生反应，翻面]],
 
@@ -2432,9 +2426,9 @@ Fk:loadTranslationTable {
   ["@jy_yuanshen_electro"] = [[<font color="Fuchsia">雷电</font>]],
 }
 
-for k, v in pairs(Fk.translations["zh_CN"]) do
-  v = string.gsub(v, "原神技", "<font color=\"skyblue\">原神技</font>")
-  Fk.translations["zh_CN"][k] = v
-end
+-- for k, v in pairs(Fk.translations["zh_CN"]) do
+--   v = string.gsub(v, "原神技", "<font color=\"skyblue\">原神技</font>")
+--   Fk.translations["zh_CN"][k] = v
+-- end
 
 return extension
