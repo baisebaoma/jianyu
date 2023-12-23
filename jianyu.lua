@@ -2064,9 +2064,9 @@ Fk:loadTranslationTable {
 
   ["jy_zuoti"] = "做题",
   [":jy_zuoti"] = [[出牌阶段限一次，你可以做一道行测真题。若正确，你可以获得一张想要的牌。<br>
-  <font size="1">题型不含图形推理、资料分析。<br>
-  当前收录试卷总量：]]..total_papers..[[，题目总量：]]..total_questions..[[（含相同题目），全部取自2018-2023真题。<br>
-  你选择的这张牌可能来自于任何位置，包括你自己的手牌。所以建议先把同牌名的牌使用掉。</font>]],
+  <font size="1">本武将推荐操作时长：60秒<br>
+  当前收录试卷：]]..total_papers..[[套，题目总量：]]..total_questions..[[（含相同题目），全部经人工筛选，不含图形推理、资料分析，全部取自2018-2023国家公务员录用考试《行测》真题。<br>
+  你选择的这张牌可能来自于任何位置，包括其他角色的区域、你自己的手牌。所以建议先把同牌名的牌使用掉。</font>]],
   ["#jy_zuoti_see_log"] = [[做题：请在战报中查看完整题干]],
   ["#jy_zuoti_ob"] = [[正在做题！请在战报中查看这道题目的完整题干和选项。]],
   ["#jy_zuoti_correct"] = [[答对了！可以从场上随机位置获取一张想要的牌！<br>你可以在战报中查看正确答案。]],
@@ -2342,6 +2342,7 @@ local jy_zhenshuo = fk.CreateActiveSkill{
 }
 
 local jy_yuanshen = fk.CreateTriggerSkill{
+  mute = true,
   name = "jy_yuanshen",
   frequency = Skill.Compulsory,
   anim_type = "offensive",
@@ -2374,8 +2375,12 @@ local jy_yuanshen = fk.CreateTriggerSkill{
         if data.damageType == element[1] then  -- 如果是A属性伤害
           if data.to:getMark(element[3]) ~= 0 then  -- 如果目标有B附着
             room:setPlayerMark(data.to, element[3], 0)  -- 将B附着解除
-            -- player:broadcastSkillInvoke("jy_yuanshen")
+            player:broadcastSkillInvoke("jy_yuanshen")
             room:doBroadcastNotify("ShowToast", Fk:translate(element[5]))  -- 广播发生了元素反应。先广播再造成效果！
+            room:sendLog{
+              type = element[5],
+              from = data.to.id,
+            }
             element[4](self, event, target, player, data)  -- 造成效果
             data.is_jy_yuanshen_triggered = true  -- 如果有多个拥有这个技能的人，告诉他不用再发动了
             return  -- 结束了，不用判断下面的了
@@ -2420,8 +2425,8 @@ Fk:loadTranslationTable {
   <font color="Fuchsia">雷电伤害</font>与<font color="red">【火焰】</font>发生反应，令其翻面；<br>
   <font color="red">火焰伤害</font>与<font color="Fuchsia">【雷电】</font>发生反应，伤害+1。<br>
   <font size="1">该技能对每次伤害只会触发一次，不论场上是否有多个角色拥有该技能。</font>]],
-  ["#jy_yuanshen_reaction_1"] = [[<font color="red">火焰伤害</font>与<font color="Fuchsia">【雷电】</font>发生反应，伤害+1]],
-  ["#jy_yuanshen_reaction_2"] = [[<font color="Fuchsia">雷电伤害</font>与<font color="red">【火焰】</font>发生反应，翻面]],
+  ["#jy_yuanshen_reaction_1"] = [[因为【原神】，受到的<font color="red">火焰伤害</font>与<font color="Fuchsia">【雷电】</font>发生反应，伤害+1]],
+  ["#jy_yuanshen_reaction_2"] = [[因为【原神】，受到的<font color="Fuchsia">雷电伤害</font>与<font color="red">【火焰】</font>发生反应，翻面]],
 
   ["@jy_yuanshen_pyro"] = [[<font color="red">火焰</font>]],
   ["@jy_yuanshen_electro"] = [[<font color="Fuchsia">雷电</font>]],
