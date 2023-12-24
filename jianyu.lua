@@ -245,6 +245,7 @@ local jy_kaiju_2 = fk.CreateActiveSkill{
   min_target_num = 1,
   on_use = function(self, room, use)
     local player = room:getPlayerById(use.from)
+    -- TODO：sort use.tos
     for _, to in ipairs(use.tos) do
       local p = room:getPlayerById(to)
 
@@ -1859,6 +1860,7 @@ local jy_zuoti = fk.CreateActiveSkill{
       local count = 0
       local in_br = false -- 用于检测是否在原本的 <br> 之内
     
+      -- TODO：如果这是最后一个字符，那么不要添加br了
       for char in str:gmatch("[%z\1-\127\194-\244_][\128-\191]*") do
         if char == "<" then
           in_br = true
@@ -2335,7 +2337,7 @@ local jy_zhenshuo = fk.CreateActiveSkill{
         damage = dmg,
         damageType = fk.ThunderDamage,
         skillName = "jy_leiyan",
-        is_leiyan = true,
+        -- is_leiyan = true,
       })
 
   end,
