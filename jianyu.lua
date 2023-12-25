@@ -2312,9 +2312,10 @@ local jy_zhenshuo = fk.CreateActiveSkill{
       player:getMark("@jy_raiden_yuanli") ~= 0
   end,
   card_filter = function(self, to_select, selected, selected_targets)
-    return #selected < 3
+    -- return #selected < 3
+    return false
   end,
-  card_num = 3,
+  card_num = 0,
   target_filter = function(self, to_select, selected)
     return to_select ~= Self.id
   end,
@@ -2322,7 +2323,7 @@ local jy_zhenshuo = fk.CreateActiveSkill{
   on_use = function(self, room, use)
     local player = room:getPlayerById(use.from)
     local to = room:getPlayerById(use.tos[1])
-    local dmg = player:getMark("@jy_raiden_yuanli")
+    local dmg = player:getMark("@jy_raiden_yuanli") + 1
     room:setPlayerMark(player, "@jy_raiden_yuanli", 0)
 
     room:throwCard(use.cards, self.name, player, player)
@@ -2339,6 +2340,12 @@ local jy_zhenshuo = fk.CreateActiveSkill{
         skillName = "jy_leiyan",
         -- is_leiyan = true,
       })
+
+    for _, p in ipairs(room:getAlivePlayers()) do
+      if p:getMark("@jy_raiden_leiyan") ~= 0 then
+        p:drawCards(dmg)
+      end
+    end
 
   end,
 }
@@ -2417,7 +2424,7 @@ Fk:loadTranslationTable {
   ["#jy_yuanli_full"] = [[<font color="Fuchsia">愿力</font>已满！]],
 
   ["jy_zhenshuo"] = "真说",
-  [":jy_zhenshuo"] = [[出牌阶段限一次，你可以弃3张牌和所有<font color="Fuchsia">愿力</font>标记，来对一名其他角色造成等同于所弃<font color="Fuchsia">愿力</font>标记数的雷电伤害。]],
+  [":jy_zhenshuo"] = [[出牌阶段限一次，你可以弃所有<font color="Fuchsia">愿力</font>标记来对一名其他角色造成X点雷电伤害，然后所有有<font color="Fuchsia">雷罚恶曜之眼</font>标记的角色摸X张牌，X等同于所弃<font color="Fuchsia">愿力</font>标记数+1。]],
   ["$jy_zhenshuo1"] = "此刻，寂灭之时！",
   ["$jy_zhenshuo2"] = "稻光，亦是永恒！",
   ["$jy_zhenshuo3"] = "无念，断绝！",
@@ -2427,8 +2434,8 @@ Fk:loadTranslationTable {
   <font color="Fuchsia">雷电伤害</font>与<font color="red">【火焰】</font>发生反应，令其翻面；<br>
   <font color="red">火焰伤害</font>与<font color="Fuchsia">【雷电】</font>发生反应，伤害+1。<br>
   <font size="1">该技能对每次伤害只会触发一次，不论场上是否有多个角色拥有该技能。</font>]],
-  ["#jy_yuanshen_reaction_1"] = [[因为【原神】，受到的<font color="red">火焰伤害</font>与<font color="Fuchsia">【雷电】</font>发生反应，伤害+1]],
-  ["#jy_yuanshen_reaction_2"] = [[因为【原神】，受到的<font color="Fuchsia">雷电伤害</font>与<font color="red">【火焰】</font>发生反应，翻面]],
+  ["#jy_yuanshen_reaction_1"] = [[<font color="red">火焰伤害</font>与<font color="Fuchsia">【雷电】</font>发生反应，伤害+1]],
+  ["#jy_yuanshen_reaction_2"] = [[<font color="Fuchsia">雷电伤害</font>与<font color="red">【火焰】</font>发生反应，翻面]],
 
   ["@jy_yuanshen_pyro"] = [[<font color="red">火焰</font>]],
   ["@jy_yuanshen_electro"] = [[<font color="Fuchsia">雷电</font>]],
