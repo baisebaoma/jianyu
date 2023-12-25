@@ -2246,7 +2246,7 @@ local jy_leiyan = fk.CreateActiveSkill{
   end,
   card_num = 0,
   target_filter = function(self, to_select, selected)
-    return Fk:currentRoom():getPlayerById(to_select):getMark("@jy_raiden_leiyan") == 0
+    return Fk:currentRoom():getPlayerById(to_select):getMark("@jy_raiden_leiyan") == 0 and #selected <= 1
   end,
   target_num = 1,
   on_use = function(self, room, use)
@@ -2256,7 +2256,7 @@ local jy_leiyan = fk.CreateActiveSkill{
 }
 local jy_leiyan_trigger = fk.CreateTriggerSkill{
   name = "#jy_leiyan_trigger",
-  -- mute = true,
+  mute = true,
   anim_type = "support",
   frequency = Skill.Compulsory,
   events = {fk.Damaged},
@@ -2278,10 +2278,11 @@ local jy_leiyan_trigger = fk.CreateTriggerSkill{
     room:judge(judge)
 
     if judge.card.suit == Card.Spade then
-      if player:getMark("@jy_raiden_yuanli") < 3 then
+      if player:getMark("@jy_raiden_yuanli") < 2 then
+        player:broadcastSkillInvoke("jy_leiyan")
         room:addPlayerMark(player, "@jy_raiden_yuanli")
       end
-      if player:getMark("@jy_raiden_yuanli") == 3 then
+      if player:getMark("@jy_raiden_yuanli") == 2 then
         room:doBroadcastNotify("ShowToast", Fk:translate("#jy_yuanli_full"))
       end
 
@@ -2323,7 +2324,7 @@ local jy_zhenshuo = fk.CreateActiveSkill{
   on_use = function(self, room, use)
     local player = room:getPlayerById(use.from)
     local to = room:getPlayerById(use.tos[1])
-    local dmg = player:getMark("@jy_raiden_yuanli") + 1
+    local dmg = player:getMark("@jy_raiden_yuanli")
     room:setPlayerMark(player, "@jy_raiden_yuanli", 0)
 
     room:throwCard(use.cards, self.name, player, player)
@@ -2338,7 +2339,6 @@ local jy_zhenshuo = fk.CreateActiveSkill{
         damage = dmg,
         damageType = fk.ThunderDamage,
         skillName = "jy_leiyan",
-        -- is_leiyan = true,
       })
 
     for _, p in ipairs(room:getAlivePlayers()) do
@@ -2414,7 +2414,7 @@ Fk:loadTranslationTable {
   ["~tym__raiden"] = "浮世一梦……",
 
   ["jy_leiyan"] = "雷眼",
-  [":jy_leiyan"] = [[出牌阶段限一次，你可以令一名角色获得<font color="Fuchsia">雷罚恶曜之眼</font>标记。持有<font color="Fuchsia">雷罚恶曜之眼</font>标记的角色造成伤害后，你进行一次判定，若为：♠，你获得一枚<font color="Fuchsia">愿力</font>标记，<font color="Fuchsia">愿力</font>标记最多同时存在3枚；♣，你对伤害目标造成1点雷电伤害，该伤害不会再次触发【雷眼】。]],
+  [":jy_leiyan"] = [[出牌阶段限一次，你可以令一名角色获得<font color="Fuchsia">雷罚恶曜之眼</font>标记。持有<font color="Fuchsia">雷罚恶曜之眼</font>标记的角色造成伤害后，你进行一次判定，若为：♠，你获得一枚<font color="Fuchsia">愿力</font>标记，<font color="Fuchsia">愿力</font>标记最多同时存在2枚；♣，你对伤害目标造成1点雷电伤害，该伤害不会再次触发【雷眼】。]],
   ["@jy_raiden_leiyan"] = [[<font color="Fuchsia">雷罚恶曜之眼</font>]],
   ["@jy_raiden_yuanli"] = [[<font color="Fuchsia">愿力</font>]],
   ["#jy_leiyan_trigger"] = "雷眼",
@@ -2424,7 +2424,7 @@ Fk:loadTranslationTable {
   ["#jy_yuanli_full"] = [[<font color="Fuchsia">愿力</font>已满！]],
 
   ["jy_zhenshuo"] = "真说",
-  [":jy_zhenshuo"] = [[出牌阶段限一次，你可以弃所有<font color="Fuchsia">愿力</font>标记来对一名其他角色造成X点雷电伤害，然后所有有<font color="Fuchsia">雷罚恶曜之眼</font>标记的角色摸X张牌，X等同于所弃<font color="Fuchsia">愿力</font>标记数+1。]],
+  [":jy_zhenshuo"] = [[出牌阶段限一次，你可以弃所有<font color="Fuchsia">愿力</font>标记来对一名其他角色造成X点雷电伤害，然后所有持有<font color="Fuchsia">雷罚恶曜之眼</font>标记的角色摸X张牌，X等同于所弃<font color="Fuchsia">愿力</font>标记数。]],
   ["$jy_zhenshuo1"] = "此刻，寂灭之时！",
   ["$jy_zhenshuo2"] = "稻光，亦是永恒！",
   ["$jy_zhenshuo3"] = "无念，断绝！",
@@ -2433,7 +2433,7 @@ Fk:loadTranslationTable {
   [":jy_yuanshen"] = [[锁定技，当有角色受到<font color="red">火焰</font>或<font color="Fuchsia">雷电</font>伤害时，若其没有属性标记，其获得对应属性标记；若其拥有属性标记且与此次伤害属性不同，则移除标记并按照以下规则触发效果：<br>
   <font color="Fuchsia">雷电伤害</font>与<font color="red">【火焰】</font>发生反应，令其翻面；<br>
   <font color="red">火焰伤害</font>与<font color="Fuchsia">【雷电】</font>发生反应，伤害+1。<br>
-  <font size="1">该技能对每次伤害只会触发一次，不论场上是否有多个角色拥有该技能。</font>]],
+  该技能对每次伤害只会触发一次，不论场上是否有多个角色拥有该技能。]],
   ["#jy_yuanshen_reaction_1"] = [[<font color="red">火焰伤害</font>与<font color="Fuchsia">【雷电】</font>发生反应，伤害+1]],
   ["#jy_yuanshen_reaction_2"] = [[<font color="Fuchsia">雷电伤害</font>与<font color="red">【火焰】</font>发生反应，翻面]],
 
