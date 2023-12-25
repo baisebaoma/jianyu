@@ -1983,7 +1983,7 @@ local jy_jieju = fk.CreateActiveSkill {
   anim_type = "positive",
   can_use = function(self, player)
     return player:usedSkillTimes("jy_zuoti", Player.HistoryPhase) ~= 0 and 
-      player:usedSkillTimes(self.name, Player.HistoryPhase) == 0 and 
+      player:usedSkillTimes(self.name, Player.HistoryPhase) <= 1 and 
       not player:getQuestSkillState("jy_jieju")
   end,
   card_filter = function(self, card)
@@ -2079,7 +2079,7 @@ Fk:loadTranslationTable {
   ["#jy_zuoti_incorrect_log"] = "%from 选择了：%arg，正确答案：%arg2。",
 
   ["jy_jieju"] = "熬夜",
-  [":jy_jieju"] = [[使命技，出牌阶段限一次，你可以失去一点体力使【做题】可以再使用一次。<br>
+  [":jy_jieju"] = [[使命技，出牌阶段限两次，你可以失去一点体力使【做题】可以再使用一次。<br>
   成功：回合结束时，若你【做题】答对比答错至少多3，你摸3张牌，然后获得技能【集智】、【看破】、【享乐】；<br>
   失败：回合结束时，若你【做题】答错比答对至少多3，你翻面、减一点体力上限，然后获得技能【玉玉】、【红温】。]],
   ["#jy_jieju_success"] = "结局：成功",
