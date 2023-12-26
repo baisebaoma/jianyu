@@ -2471,6 +2471,7 @@ local jy_jianying = Fk.CreateTriggerSkill{
   end,
   on_use = function(self, event, target, player, data)
     player.drawCards(2 - #player:getCardIds(Player.Hand))
+  end,
 }
 
 tym__ayato:addSkill(jy_jianying)
