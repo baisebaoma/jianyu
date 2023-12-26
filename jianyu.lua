@@ -2450,11 +2450,14 @@ local jy_jinghua = fk.CreateTriggerSkill{
     -- room:setPlayerMark(player, "@jy_jinghua", "")
 
     -- 询问是否要使用一张杀
-    local extraData = {bypass_times = true,}
-    local use = room:askForUseCard(player, "slash", "slash|.|.", "#jy_jinghua_use", false, extraData)  -- 这里填false也没用，反正是可以取消的
+    local extraData = {bypass_times = true}
+    local use = room:askForUseCard(player, "slash", "slash|.|.", "#jy_jinghua_use", true, extraData)  -- 这里填false也没用，反正是可以取消的
 
     -- useCard
-    if use then room:useCard(use) end
+    if use then
+      use.extraUse = true  -- 加上这个，就可以让它不计入次数了
+      room:useCard(use)
+    end
 
     -- 其他的交给别的函数
   end,
@@ -2489,7 +2492,7 @@ Fk:loadTranslationTable {
   ["~tym__ayato"] = "世事无常……",
 
   ["jy_jinghua"] = "镜花",
-  [":jy_jinghua"] = [[（这个技能还没做完，但已经实现了描述的效果）每回合限一次，使用或打出基本牌后，你可以立即使用一张无视次数限制的【杀】。]],
+  [":jy_jinghua"] = [[每回合限一次，使用或打出基本牌后，你可以使用一张不计入使用次数的【杀】。]],
   ["@jy_jinghua"] = "镜花",
   ["$jy_jinghua1"] = "苍流水影！",
   ["$jy_jinghua2"] = "剑影！",
