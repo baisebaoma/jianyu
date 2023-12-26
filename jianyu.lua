@@ -2191,7 +2191,7 @@ local jy_yali = fk.CreateTriggerSkill{
   events = {fk.DrawNCards},
   on_cost = Util.TrueFunc,
   on_use = function(self, event, target, player, data)
-    data.n = data.n + math.max(player.hp - #player:getCardIds(Player.Hand), 1)
+    data.n = data.n + math.max(player.hp - #player:getCardIds(Player.Hand), 0)
   end,
 }
 local jy_yali_maxcards = fk.CreateMaxCardsSkill{
@@ -2219,12 +2219,11 @@ Fk:loadTranslationTable {
   ["#jy_tianling_yuyu"] = "天灵",
 
   ["jy_yali"] = "压力",
-  [":jy_yali"] = [[锁定技，你的手牌上限等于你的体力上限；你的摸牌阶段额外摸X-Y张牌且至少为1，X为你的体力值，Y为你的手牌数。]],
+  [":jy_yali"] = [[锁定技，你的手牌上限等于你的体力上限；你的摸牌阶段额外摸X-Y张牌且至少为0，X为你的体力值，Y为你的手牌数。]],
 
 }
 
 local tym__raiden = General(extension, "tym__raiden", "god", 4, 4, General.Female)
-tym__raiden.visible = false
 
 local jy_leiyan = fk.CreateActiveSkill{
   name = "jy_leiyan",
@@ -2318,7 +2317,7 @@ local jy_zhenshuo = fk.CreateActiveSkill{
 
     -- TODO:参考mobile_effect，写一个超牛逼的动画
     -- room:doSuperLightBox("packages/jianyu/qml/FirstBlood.qml")
-    room:delay(1145 + 140 * dmg)
+    room:delay(1145 + 141 * dmg)
 
       room:damage({
         from = player,
@@ -2330,7 +2329,7 @@ local jy_zhenshuo = fk.CreateActiveSkill{
 
     for _, p in ipairs(room:getAlivePlayers()) do
       if p:getMark("@jy_raiden_leiyan") ~= 0 then
-        p:drawCards(dmg * 2)
+        p:drawCards(dmg * 3)
       end
     end
 
@@ -2411,7 +2410,7 @@ Fk:loadTranslationTable {
   ["#jy_yuanli_full"] = [[<font color="Fuchsia">愿力</font>已满！]],
 
   ["jy_zhenshuo"] = "真说",
-  [":jy_zhenshuo"] = [[出牌阶段限一次，你弃所有<font color="Fuchsia">愿力</font>标记来对一名其他角色造成1点雷电伤害，然后所有持有<font color="Fuchsia">雷罚恶曜之眼</font>标记的角色摸2X张牌，X等同于所弃<font color="Fuchsia">愿力</font>标记数。]],
+  [":jy_zhenshuo"] = [[出牌阶段限一次，你弃所有<font color="Fuchsia">愿力</font>标记来对一名其他角色造成1点雷电伤害，然后所有持有<font color="Fuchsia">雷罚恶曜之眼</font>标记的角色摸3X张牌，X等同于所弃<font color="Fuchsia">愿力</font>标记数。]],
   ["$jy_zhenshuo1"] = "此刻，寂灭之时！",
   ["$jy_zhenshuo2"] = "稻光，亦是永恒！",
   ["$jy_zhenshuo3"] = "无念，断绝！",
@@ -2427,6 +2426,68 @@ Fk:loadTranslationTable {
   ["@jy_yuanshen_pyro"] = [[<font color="red">火焰</font>]],
   ["@jy_yuanshen_electro"] = [[<font color="Fuchsia">雷电</font>]],
   ["$jy_yuanshen1"] = "（音乐）",
+}
+
+local tym__ayato = General(extension, "tym__ayato", "qun", 4)
+
+local jy_jinghua = Fk.CreateTriggerSkill{
+  frequency = Skill.Compulsory,
+  name = "jy_jinghua",
+  anim_type = "offensive",
+  events = {fk.CardResponding, fk.CardUsing},
+  refresh_events = {fk.EventPhaseEnd},
+  can_refresh = function(self, event, target, player, data)
+    return player:hasSkill(self)
+      and target.phase == Player.Finish and  -- 如果是这个人的回合结束阶段
+      player:getMark("@jy_jinghua") ~= 0
+  end,
+  can_trigger = function(self, event, target, player, data)
+    return player:hasSkill(self) and data.card and data.card.type == Card.TypeBasic and target == player
+  end,
+  on_use = function(self, event, target, player, data)
+    local room = player.room
+    -- 添加一个标记
+    room:setPlayerMark(player, "@jy_jinghua", "")
+    -- 立即询问是否需要使用一张杀，去抄界仁德
+
+    -- 其他的交给别的函数
+  end,
+  on_refresh = function(self, event, target, player, data)
+    local room = player.room
+    room:setPlayerMark(player, "@jy_jinghua", 0)
+  end,
+}
+
+local jy_jianying = Fk.CreateTriggerSkill{
+  frequency = Skill.Compulsory,
+  name = "jy_jianying",
+  anim_type = "defensive",
+  events = {fk.EventPhaseEnd},
+  can_trigger = function(self, event, target, player, data)
+    -- 任何一个人回合都要发动
+    return player:hasSkill(self)
+      and target.phase == Player.Finish and  -- 如果是这个人的回合结束阶段
+      #player:getCardIds(Player.Hand) < 2
+  end,
+  on_use = function(self, event, target, player, data)
+    player.drawCards(2 - #player:getCardIds(Player.Hand))
+}
+
+tym__ayato:addSkill(jy_jianying)
+
+Fk:loadTranslationTable {
+  ["tym__ayato"] = "神里绫人",
+  ["~tym__ayato"] = "世事无常……",
+
+  ["jy_jinghua"] = "镜花",
+  [":jy_jinghua"] = [[锁定技，使用或打出基本牌后：你可以视为立即使用一张不计入使用次数的【杀】；你的攻击距离+1；你的【杀】可以指定相邻的2个目标。这些效果持续到当前角色回合结束。]],
+  ["$jy_jinghua1"] = "苍流水影！",
+  ["$jy_jinghua2"] = "剑影！",
+
+  ["jy_jianying"] = "渐盈",
+  [":jy_jianying"] = [[锁定技，每个角色的结束阶段，若你的手牌数小于2，你将手牌数补至2。]],
+  ["$jy_jianying1"] = "冒进是大忌。",
+  ["$jy_jianying2"] = "呵……余兴节目。",
 }
 
 -- for k, v in pairs(Fk.translations["zh_CN"]) do
