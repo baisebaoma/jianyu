@@ -14,16 +14,6 @@ Fk:loadTranslationTable {
      ["zer"] = "敏敏伊人",
 }
 
-local jy_ceshi_des = fk.CreateTriggerSkill{
-  name = "jy_ceshi_des",
-}
-
-Fk:loadTranslationTable {
-  ["jy_ceshi_des"] = "测试",
-  [":jy_ceshi_des"] = [[<strong>这个武将正在测试中，可能会有bug、强度超模/过弱。<\strong>]],
-}
-
-
 -- 熊简自豪
 local xjb__jianzihao = General(extension, "xjb__jianzihao", "qun", 3)
 
@@ -451,7 +441,7 @@ local jy_erduanxiao_trigger = fk.CreateTriggerSkill{
   frequency = Skill.Compulsory,
   can_trigger = function(self, event, target, player, data)
     local xiaos = player:getPile("skl__liyuanhao_xiao")
-    -- 如果卡牌移动前和移动后【点】相同，那就证明是其他的特殊区的牌，直接return
+    -- 如果卡牌移动前和移动后“点”相同，那就证明是其他的特殊区的牌，直接return
     if player.is_xiao_changing == #xiaos then return false end
 
     if not player:hasSkill(self) then return false end
@@ -511,21 +501,21 @@ Fk:loadTranslationTable {
   ["skl__liyuanhao_xiao"] = "啸",
 
   ["jy_huxiao"] = "虎啸",
-  [":jy_huxiao"] = [[当你使用或打出一张【杀】时，可以将牌堆顶的一张牌置于武将牌上，称为【啸】。
+  [":jy_huxiao"] = [[当你使用或打出一张【杀】时，可以将牌堆顶的一张牌置于武将牌上，称为“啸”。
   <br><font size="1"><i>“我希望我的后辈们能够记住，在你踏上职业道路的这一刻开始，你的目标就只有，冠军。”</i></font>]],
 
   ["jy_huxiao_analeptic"] = "横刀",
-  [":jy_huxiao_analeptic"] = [[你可以将【啸】当作【酒】使用或打出。
+  [":jy_huxiao_analeptic"] = [[你可以将“啸”当作【酒】使用或打出。
   <br><font size="1"><i>“谁敢横刀立马……”——钱晨</i></font>]],
 
   ["jy_huxiao_jink"] = "立马",
-  [":jy_huxiao_jink"] = [[你可以将【啸】当作【闪】使用或打出。
+  [":jy_huxiao_jink"] = [[你可以将“啸”当作【闪】使用或打出。
   <br><font size="1"><i>“……唯我虎大将军！”——钱晨</i></font>]],
 
   ["jy_erduanxiao"] = "二段",
-  [":jy_erduanxiao"] = "锁定技，有且仅有两张【啸】时，你选择失去一点体力或失去所有【啸】。",
+  [":jy_erduanxiao"] = "锁定技，有且仅有两张“啸”时，你选择失去一点体力或失去所有“啸”。",
   ["#jy_erduanxiao_trigger"] = "二段",
-  ["#lose_xiao"] = "失去所有【啸】", 
+  ["#lose_xiao"] = "失去所有“啸”", 
   ["#lose_hp_1"] = "失去一点体力",
 
   ["jy_husanjian"] = "三件",
@@ -535,7 +525,7 @@ Fk:loadTranslationTable {
 
 -- 唐李元浩
 -- 在活动服环境里，也许没那么强？
-local tym__liyuanhao = General(extension, "tym__liyuanhao", "qun", 3)
+local tym__liyuanhao = General(extension, "tym__liyuanhao", "qun", 2)
 
 -- 界虎啸
 -- 参考自铁骑，屯田，脑洞包明哲，克己（原来克己已经监视了使用和打出了，不用写那么复杂）
@@ -687,10 +677,10 @@ local jy_erduanxiao_trigger_2 = fk.CreateTriggerSkill{
     local xiaos = player:getPile("tym__liyuanhao_xiao")
     local room = player.room
     if self.choice == "#lose_xiao_2" then
-      -- 将所有【啸】纳入自己的手牌
+      -- 将所有“啸”纳入自己的手牌
       room:moveCardTo(xiaos, Card.PlayerHand, player, fk.ReasonJustMove, self.name, "tym__liyuanhao_xiao", true, player.id)
     elseif self.choice == "#lose_hp_1_2" then
-      -- 弃置所有【啸】
+      -- 弃置所有“啸”
       room:throwCard(xiaos, self.name, player, player)  -- 把啸全部扔掉
       -- 回复1点体力
       room:recover({
@@ -709,29 +699,31 @@ tym__liyuanhao:addSkill(jy_huxiao_2)
 tym__liyuanhao:addSkill(jy_huxiao_analeptic_2)
 tym__liyuanhao:addSkill(jy_huxiao_jink_2)
 tym__liyuanhao:addSkill(jy_erduanxiao_2)
+tym__liyuanhao:addSkill("wusheng")
+tym__liyuanhao:addSkill("paoxiao")
 
 Fk:loadTranslationTable {
   ["tym__liyuanhao"] = "界李元浩",
   ["tym__liyuanhao_xiao"] = "<font color=\"gold\">啸</font>",
 
   ["jy_huxiao_2"] = "虎啸",
-  [":jy_huxiao_2"] = [[当你使用或打出一张【杀】时，可以将牌堆顶的一张牌置于武将牌上，称为<font color="gold">【啸】</font>。
+  [":jy_huxiao_2"] = [[当你使用或打出一张【杀】时，可以将牌堆顶的一张牌置于武将牌上，称为“啸”。
   <br><font size="1"><i>“我希望我的后辈们能够记住，在你踏上职业道路的这一刻开始，你的目标就只有，冠军。”</i></font>]],
 
   ["jy_huxiao_analeptic_2"] = "横刀",
-  [":jy_huxiao_analeptic_2"] = [[你可以将<font color="gold">【啸】</font>当作【酒】使用或打出。
+  [":jy_huxiao_analeptic_2"] = [[你可以将“啸”当作【酒】使用或打出。
   <br><font size="1"><i>“谁敢横刀立马……”——钱晨</i></font>]],
 
   ["jy_huxiao_jink_2"] = "立马",
-  [":jy_huxiao_jink_2"] = [[你可以将<font color="gold">【啸】</font>当作【闪】使用或打出。
+  [":jy_huxiao_jink_2"] = [[你可以将“啸”当作【闪】使用或打出。
   <br><font size="1"><i>“……唯我虎大将军！”——钱晨</i></font>]],
 
   ["jy_erduanxiao_2"] = "二段",
-  [":jy_erduanxiao_2"] = [[锁定技，有且仅有两张<font color="gold">【啸】</font>时，
-  选择：弃置所有<font color="gold">【啸】</font>并恢复一点体力；将所有<font color="gold">【啸】</font>纳入手牌。]],
+  [":jy_erduanxiao_2"] = [[锁定技，有且仅有两张“啸”时，
+  选择：弃置所有“啸”并恢复一点体力；将所有“啸”纳入手牌。]],
   ["#jy_erduanxiao_trigger_2"] = "二段",
-  ["#lose_xiao_2"] = [[将所有<font color="gold">【啸】</font>纳入手牌]], 
-  ["#lose_hp_1_2"] = [[弃置所有<font color="gold">【啸】</font>并恢复一点体力]],
+  ["#lose_xiao_2"] = [[将所有“啸”纳入手牌]], 
+  ["#lose_hp_1_2"] = [[弃置所有“啸”并恢复一点体力]],
 }
 
 -- 高天亮
@@ -766,9 +758,9 @@ local jy_yuyu = fk.CreateTriggerSkill{
   end,
   on_use = function(self, event, target, player, data)
     if self.choice == "#jy_yuyu_draw3" then
-      player:drawCards(3)
-    else
       player:drawCards(4)
+    else
+      player:drawCards(5)
       player:turnOver()
     end
     self.this_time_slash = false
@@ -782,7 +774,7 @@ Fk:loadTranslationTable {
 
   ["jy_yuyu"] = "玉玉",
   [":jy_yuyu"] = [[1. 锁定技，当有角色对你使用【杀】造成了伤害时，其获得【致郁】标记；<br>
-  2. 受到没有【致郁】标记的角色或因本次伤害而获得【致郁】标记的角色造成的伤害时，你可以选择一项：摸三张牌；摸四张牌并翻面。]],
+  2. 受到没有【致郁】标记的角色或因本次伤害而获得【致郁】标记的角色造成的伤害时，你可以选择一项：摸四张牌；摸五张牌并翻面。]],
   ["@jy_yuyu_enemy"] = "致郁",
   ["#jy_yuyu_ask_which"] = "玉玉：请选择你要触发的效果",
   ["#jy_yuyu_draw3"] = "摸三张牌",
@@ -1040,9 +1032,9 @@ local jy_tiaoshui = fk.CreateTriggerSkill{
 -- 如邓艾，在准备阶段才判断有几张。所以我注释写详细一点，方便其他开发者参考。
 -- 其实前面的两个李元浩也是这样。不过这个技能比那两个更复杂，解释这个会比较好。
 -- 
--- 新月杀现有的函数无法判断一张牌移动时，如果是离开特殊区，离开的是否是某特定的特殊区（在这个技能里，是【点】）。我们作如下设计：
--- 罗绞主技能监视“卡牌移动前”事件，将卡牌移动前的【点】数量记录，并传给另一个关联技能，其监视“卡牌移动后”事件，也记录一次移动后【点】的数量。
--- 如果卡牌移动之后【点】数没有变化，那么不要触发。
+-- 新月杀现有的函数无法判断一张牌移动时，如果是离开特殊区，离开的是否是某特定的特殊区（在这个技能里，是“点”）。我们作如下设计：
+-- 罗绞主技能监视“卡牌移动前”事件，将卡牌移动前的“点”数量记录，并传给另一个关联技能，其监视“卡牌移动后”事件，也记录一次移动后“点”的数量。
+-- 如果卡牌移动之后“点”数没有变化，那么不要触发。
 -- 这样就能防止当其他人给我挂上或丢掉其他特殊区的牌时，也触发我们的技能。
 local jy_luojiao = fk.CreateTriggerSkill{
   name = "jy_luojiao",
@@ -1057,7 +1049,7 @@ local jy_luojiao = fk.CreateTriggerSkill{
     player.is_luojiao_archery_attack_may_be_triggered = false
     player.is_dian_may_changing = nil
 
-    local dians = player:getPile("xjb__aweiluo_dian")  -- dians是【点】的牌
+    local dians = player:getPile("xjb__aweiluo_dian")  -- dians是“点”的牌
 
     -- 判断是否有牌进出特殊区
     -- 为什么不用data传参数，因为这里是BeforeCardsMove，后面是AfterCardsMove，两个不是同一个事件，data不一样。用player
@@ -1102,13 +1094,13 @@ local jy_luojiao_after = fk.CreateTriggerSkill{
   -- can_trigger是用来判断是否能触发这个技能的，返回真就能触发，返回假就不能触发
   can_trigger = function(self, event, target, player, data)
     if not player:hasSkill(self) then return false end
-    if not player.is_dian_may_changing then return false end  -- 如果【点】有可能在变化
+    if not player.is_dian_may_changing then return false end  -- 如果“点”有可能在变化
 
     local dians = player:getPile("xjb__aweiluo_dian")
-    -- 如果卡牌移动前和移动后【点】相同，那就证明是其他的特殊区的牌，直接return
+    -- 如果卡牌移动前和移动后“点”相同，那就证明是其他的特殊区的牌，直接return
     if player.is_dian_may_changing == #dians then return false end
 
-    -- 判断是否有两张同样花色的【点】，若有返回false，若没有返回true
+    -- 判断是否有两张同样花色的“点”，若有返回false，若没有返回true
     if #dians == 0 then return false end  -- 设计者说1张也可以发动南蛮
     dict = {}
     local is_luojiao_suit_satisfied = true
@@ -1168,7 +1160,7 @@ local jy_luojiao_after = fk.CreateTriggerSkill{
       end
     end
 
-    -- 如果玩家选择不触发，那擦屁股，这次【点】结算完成了
+    -- 如果玩家选择不触发，那擦屁股，这次“点”结算完成了
     self.do_archery_attack = false
     self.do_savage_assault = false
     self.first = nil
@@ -1215,7 +1207,7 @@ local jy_luojiao_after = fk.CreateTriggerSkill{
         room:useVirtualCard("savage_assault", nil, player, room:getOtherPlayers(player, true), self.name, true)
       end
     end
-    -- 一次【点】的变化结算完成，把所有变量都设为初始
+    -- 一次“点”的变化结算完成，把所有变量都设为初始
     self.do_archery_attack = false
     self.do_savage_assault = false
     self.first = nil
@@ -1251,7 +1243,7 @@ local jy_yusu = fk.CreateTriggerSkill{
   can_trigger = function(self, event, target, player, data)
     if not player:hasSkill(self) then return false end
     if player.phase ~= Player.NotActive and data.card and 
-    data.card.type == Card.TypeBasic and target == player then  -- target == player：使用者是你自己
+    data.card.type == Card.TypeBasic and target == player then  -- target == player：触发者是你自己
       return true
     end
   end,
@@ -1259,7 +1251,7 @@ local jy_yusu = fk.CreateTriggerSkill{
     local room = player.room
     room:addPlayerMark(player, "@jy_yusu_basic_count")
     basic_count = player:getMark("@jy_yusu_basic_count")
-    if basic_count % 2 == 0 and basic_count ~= 0 then  -- 每第二张基本牌
+    if basic_count == 2 then  -- 第二张基本牌
       return room:askForSkillInvoke(player, self.name)
     end
   end,
@@ -1302,32 +1294,32 @@ Fk:loadTranslationTable {
   ["$jy_youlong1"] = "翩若惊鸿！婉若游龙！",
 
   ["jy_hebao"] = "核爆",
-  [":jy_hebao"] = "准备阶段，可以将一张手牌置于武将牌上，称为【点】。",
-  ["#jy_hebao-choose"] = "核爆：选择一张手牌成为【点】",
+  [":jy_hebao"] = "准备阶段，可以将一张手牌置于武将牌上，称为“点”。",
+  ["#jy_hebao-choose"] = "核爆：选择一张手牌成为“点”",
   ["$jy_hebao1"] = "Siu~",
 
   ["jy_tiaoshui"] = "跳水",
-  [":jy_tiaoshui"] = "受到伤害时，可以弃置一张【点】。",
-  ["#jy_tiaoshui"] = "弃置一张【点】",
+  [":jy_tiaoshui"] = "受到伤害时，可以弃置一张“点”。",
+  ["#jy_tiaoshui"] = "弃置一张“点”",
   ["$jy_tiaoshui1"] = "Siu, hahahaha!",
 
   ["jy_luojiao"] = "罗绞",
-  [":jy_luojiao"] = [[当【点】的数量变化后：<br>
-  1. 若你没有两张及以上相同花色的【点】，可以视为立即使用一张【南蛮入侵】，每回合限一次；<br>
-  2. 若你有4张【点】，可以视为立即使用一张【万箭齐发】。]],
+  [":jy_luojiao"] = [[当“点”的数量变化后：<br>
+  1. 若你没有两张及以上相同花色的“点”，可以视为立即使用一张【南蛮入侵】，每回合限一次；<br>
+  2. 若你有4张“点”，可以视为立即使用一张【万箭齐发】。]],
   ["$jy_luojiao1"] = "Muchas gracias afición, esto es para vosotros, Siuuu!!",
   ["#jy_luojiao_after"] = "罗绞",
   ["#jy_luojiao_archery_attack"] = "罗绞·万箭",
   ["#jy_luojiao_savage_assault"] = "罗绞·南蛮",
-  ["#jy_luojiao_archery_attack_ask"] = "【点】数量为4，是否发动 罗绞·万箭",
-  ["#jy_luojiao_savage_assault_ask"] = "【点】花色不同，是否发动 罗绞·南蛮，每回合限一次",
+  ["#jy_luojiao_archery_attack_ask"] = "“点”数量为4，是否发动 罗绞·万箭",
+  ["#jy_luojiao_savage_assault_ask"] = "“点”花色不同，是否发动 罗绞·南蛮，每回合限一次",
   ["@jy_is_luojiao_savage_assault_used"] = "罗绞",
   ["#jy_luojiao_both_ask"] = "罗绞 两个条件同时达成，是否发动",
-  ["#jy_luojiao_ask_which"] = "罗绞 两个条件同时达成并发动，请选择要先视为使用的卡牌",
+  ["#jy_luojiao_ask_which"] = "罗绞 两个条件同时达成并发动，请选择要先视为使用的牌",
   ["#jy_luojiao_used"] = "已南蛮",
 
   ["jy_yusu"] = "玉玊",
-  [":jy_yusu"] = "出牌阶段，每使用第二张基本牌时，可以将其作为【点】置于武将牌上。",
+  [":jy_yusu"] = "出牌阶段，使用第二张基本牌时，可以将其作为“点”置于武将牌上。",
   ["@jy_yusu_basic_count"] = "玉玊",
   ["$jy_yusu1"] = "Siu...",
 
@@ -1983,7 +1975,7 @@ local jy_jieju = fk.CreateActiveSkill {
   anim_type = "positive",
   can_use = function(self, player)
     return player:usedSkillTimes("jy_zuoti", Player.HistoryPhase) ~= 0 and 
-      player:usedSkillTimes(self.name, Player.HistoryPhase) <= 1 and 
+      -- player:usedSkillTimes(self.name, Player.HistoryPhase) <= 1 and 
       not player:getQuestSkillState("jy_jieju")
   end,
   card_filter = function(self, card)
@@ -2066,8 +2058,8 @@ Fk:loadTranslationTable {
 
   ["jy_zuoti"] = "做题",
   [":jy_zuoti"] = [[出牌阶段限一次，你做一道行测真题。若正确，你可以获得一张想要的牌。<br>
-  <font size="1">本武将推荐操作时长：60秒<br>
-  当前收录试卷：]]..total_papers..[[套，题目总量：]]..total_questions..[[（含相同题目），全部经人工筛选，不含图形推理、资料分析，全部取自2018-2023国家公务员录用考试《行测》真题。<br>
+  <font size="1">推荐操作时长：60秒；自备纸笔以应对数学题。<br>
+  当前收录试卷：]]..total_papers..[[套，题目总量：]]..total_questions..[[（含相同），经人工筛选，不含图形推理、资料分析，全部取自2018-2023国家公务员录用考试《行测》真题。<br>
   你选择的这张牌可能来自于任何位置，包括其他角色的区域、你自己的手牌。所以建议先把同牌名的牌使用掉。</font>]],
   ["#jy_zuoti_see_log"] = [[做题：请在战报中查看完整题干]],
   ["#jy_zuoti_ob"] = [[正在做题！请在战报中查看这道题目的完整题干和选项。]],
@@ -2079,7 +2071,7 @@ Fk:loadTranslationTable {
   ["#jy_zuoti_incorrect_log"] = "%from 选择了：%arg，正确答案：%arg2。",
 
   ["jy_jieju"] = "熬夜",
-  [":jy_jieju"] = [[使命技，出牌阶段限两次，你失去一点体力使【做题】视为未发动过。<br>
+  [":jy_jieju"] = [[使命技，出牌阶段，你失去一点体力使【做题】视为未发动过。<br>
   成功：回合结束时，若你【做题】答对比答错至少多3，你摸3张牌，然后获得技能【集智】、【看破】、【享乐】；<br>
   失败：回合结束时，若你【做题】答错比答对至少多3，你翻面、减一点体力上限，然后获得技能【玉玉】、【红温】。]],
   ["#jy_jieju_success"] = "结局：成功",
@@ -2200,7 +2192,7 @@ local jy_yali = fk.CreateTriggerSkill{
   events = {fk.DrawNCards},
   on_cost = Util.TrueFunc,
   on_use = function(self, event, target, player, data)
-    data.n = data.n + math.max(player.hp - #player:getCardIds(Player.Hand), 0)
+    data.n = data.n + math.max(player.hp - #player:getCardIds(Player.Hand), 1)
   end,
 }
 local jy_yali_maxcards = fk.CreateMaxCardsSkill{
@@ -2228,7 +2220,7 @@ Fk:loadTranslationTable {
   ["#jy_tianling_yuyu"] = "天灵",
 
   ["jy_yali"] = "压力",
-  [":jy_yali"] = [[锁定技，你的手牌上限等于你的体力上限；你的摸牌阶段额外摸X-Y张牌且至少为0，X为你的体力值，Y为你的手牌数。]],
+  [":jy_yali"] = [[锁定技，你的手牌上限等于你的体力上限；你的摸牌阶段额外摸X-Y张牌且至少为1，X为你的体力值，Y为你的手牌数。]],
 
 }
 
