@@ -525,7 +525,7 @@ Fk:loadTranslationTable {
 
 -- 唐李元浩
 -- 在活动服环境里，也许没那么强？
-local tym__liyuanhao = General(extension, "tym__liyuanhao", "qun", 2)
+local tym__liyuanhao = General(extension, "tym__liyuanhao", "qun", 3)
 
 -- 界虎啸
 -- 参考自铁骑，屯田，脑洞包明哲，克己（原来克己已经监视了使用和打出了，不用写那么复杂）
@@ -699,7 +699,6 @@ tym__liyuanhao:addSkill(jy_huxiao_2)
 tym__liyuanhao:addSkill(jy_huxiao_analeptic_2)
 tym__liyuanhao:addSkill(jy_huxiao_jink_2)
 tym__liyuanhao:addSkill(jy_erduanxiao_2)
-tym__liyuanhao:addSkill("wusheng")
 tym__liyuanhao:addSkill("paoxiao")
 
 Fk:loadTranslationTable {
@@ -758,9 +757,9 @@ local jy_yuyu = fk.CreateTriggerSkill{
   end,
   on_use = function(self, event, target, player, data)
     if self.choice == "#jy_yuyu_draw3" then
-      player:drawCards(4)
+      player:drawCards(3)
     else
-      player:drawCards(5)
+      player:drawCards(6)
       player:turnOver()
     end
     self.this_time_slash = false
@@ -774,11 +773,11 @@ Fk:loadTranslationTable {
 
   ["jy_yuyu"] = "玉玉",
   [":jy_yuyu"] = [[1. 锁定技，当有角色对你使用【杀】造成了伤害时，其获得【致郁】标记；<br>
-  2. 受到没有【致郁】标记的角色或因本次伤害而获得【致郁】标记的角色造成的伤害时，你可以选择一项：摸四张牌；摸五张牌并翻面。]],
+  2. 受到没有【致郁】标记的角色或因本次伤害而获得【致郁】标记的角色造成的伤害时，你可以选择一项：摸三张牌；摸六张牌并翻面。]],
   ["@jy_yuyu_enemy"] = "致郁",
   ["#jy_yuyu_ask_which"] = "玉玉：请选择你要触发的效果",
   ["#jy_yuyu_draw3"] = "摸三张牌",
-  ["#jy_yuyu_draw4turnover"] = "摸四张牌并翻面",
+  ["#jy_yuyu_draw4turnover"] = "摸六张牌并翻面",
   ["$jy_yuyu1"] = "我……我真的很想听到你们说话……",
   ["$jy_yuyu2"] = "我天天被队霸欺负，他们天天骂我。",
   ["$jy_yuyu3"] = "有什么话是真的不能讲的……为什么一定……每次都是……一个人在讲……",
@@ -2319,19 +2318,19 @@ local jy_zhenshuo = fk.CreateActiveSkill{
 
     -- TODO:参考mobile_effect，写一个超牛逼的动画
     -- room:doSuperLightBox("packages/jianyu/qml/FirstBlood.qml")
-    room:delay(1500 + 100 * dmg)
+    room:delay(1145 + 140 * dmg)
 
       room:damage({
         from = player,
         to = to,
-        damage = dmg,
+        damage = 1,
         damageType = fk.ThunderDamage,
         skillName = "jy_leiyan",
       })
 
     for _, p in ipairs(room:getAlivePlayers()) do
       if p:getMark("@jy_raiden_leiyan") ~= 0 then
-        p:drawCards(dmg)
+        p:drawCards(dmg * 2)
       end
     end
 
@@ -2395,7 +2394,7 @@ local jy_yuanshen = fk.CreateTriggerSkill{
 
 tym__raiden:addSkill(jy_leiyan)
 tym__raiden:addSkill(jy_zhenshuo)
--- tym__raiden:addSkill(jy_yuanshen)  -- 赋给了雷电将军，别的用引号
+tym__raiden:addSkill(jy_yuanshen)  -- 赋给了雷电将军，别的用引号
 
 Fk:loadTranslationTable {
   ["tym__raiden"] = "雷电将军",
@@ -2412,7 +2411,7 @@ Fk:loadTranslationTable {
   ["#jy_yuanli_full"] = [[<font color="Fuchsia">愿力</font>已满！]],
 
   ["jy_zhenshuo"] = "真说",
-  [":jy_zhenshuo"] = [[出牌阶段限一次，你弃所有<font color="Fuchsia">愿力</font>标记来对一名其他角色造成X点雷电伤害，然后所有持有<font color="Fuchsia">雷罚恶曜之眼</font>标记的角色摸X张牌，X等同于所弃<font color="Fuchsia">愿力</font>标记数。]],
+  [":jy_zhenshuo"] = [[出牌阶段限一次，你弃所有<font color="Fuchsia">愿力</font>标记来对一名其他角色造成1点雷电伤害，然后所有持有<font color="Fuchsia">雷罚恶曜之眼</font>标记的角色摸2X张牌，X等同于所弃<font color="Fuchsia">愿力</font>标记数。]],
   ["$jy_zhenshuo1"] = "此刻，寂灭之时！",
   ["$jy_zhenshuo2"] = "稻光，亦是永恒！",
   ["$jy_zhenshuo3"] = "无念，断绝！",
