@@ -2430,7 +2430,7 @@ Fk:loadTranslationTable {
 
 local tym__ayato = General(extension, "tym__ayato", "qun", 4)
 
-local jy_jinghua = Fk.CreateTriggerSkill{
+local jy_jinghua = fk.CreateTriggerSkill{
   frequency = Skill.Compulsory,
   name = "jy_jinghua",
   anim_type = "offensive",
@@ -2458,7 +2458,7 @@ local jy_jinghua = Fk.CreateTriggerSkill{
   end,
 }
 
-local jy_jianying = Fk.CreateTriggerSkill{
+local jy_jianying = fk.CreateTriggerSkill{
   frequency = Skill.Compulsory,
   name = "jy_jianying",
   anim_type = "defensive",
