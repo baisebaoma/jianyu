@@ -2446,6 +2446,7 @@ local jy_jinghua = fk.CreateTriggerSkill{
   end,
   on_cost = function(self, event, target, player, data)
     -- 询问是否要使用一张杀
+    local room = player.room
     local extraData = {bypass_times = true,}
     data.use = room:askForUseCard(player, "slash", "slash|.|.", "#jy_jinghua_use", false, extraData)  -- 这里填false也没用，反正是可以取消的
   end,
