@@ -2444,21 +2444,20 @@ local jy_jinghua = fk.CreateTriggerSkill{
   can_trigger = function(self, event, target, player, data)
     return player:hasSkill(self) and data.card and data.card.type == Card.TypeBasic and target == player and player:usedSkillTimes(self.name, Player.HistoryPhase) == 0
   end,
-  on_use = function(self, event, target, player, data)
+  on_cost = function(self, event, target, player, data)
     local room = player.room
     -- 添加一个标记
     -- room:setPlayerMark(player, "@jy_jinghua", "")
-
     -- 询问是否要使用一张杀
     local extraData = {bypass_times = true}
     local use = room:askForUseCard(player, "slash", "slash|.|.", "#jy_jinghua_use", true, extraData)  -- 这里填false也没用，反正是可以取消的
-
-    -- useCard
+    if use then return true else return false end
+  end,
+  on_use = function(self, event, target, player, data)
     if use then
       use.extraUse = true  -- 加上这个，就可以让它不计入次数了
       room:useCard(use)
     end
-
     -- 其他的交给别的函数
   end,
   on_refresh = function(self, event, target, player, data)
