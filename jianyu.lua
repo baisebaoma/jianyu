@@ -2065,7 +2065,7 @@ Fk:loadTranslationTable {
   ["tym__kgdxs"] = "考公大学生",
 
   ["jy_zuoti"] = "做题",
-  [":jy_zuoti"] = [[出牌阶段限一次，你可以做一道行测真题。若正确，你可以获得一张想要的牌。<br>
+  [":jy_zuoti"] = [[出牌阶段限一次，你做一道行测真题。若正确，你可以获得一张想要的牌。<br>
   <font size="1">本武将推荐操作时长：60秒<br>
   当前收录试卷：]]..total_papers..[[套，题目总量：]]..total_questions..[[（含相同题目），全部经人工筛选，不含图形推理、资料分析，全部取自2018-2023国家公务员录用考试《行测》真题。<br>
   你选择的这张牌可能来自于任何位置，包括其他角色的区域、你自己的手牌。所以建议先把同牌名的牌使用掉。</font>]],
@@ -2079,7 +2079,7 @@ Fk:loadTranslationTable {
   ["#jy_zuoti_incorrect_log"] = "%from 选择了：%arg，正确答案：%arg2。",
 
   ["jy_jieju"] = "熬夜",
-  [":jy_jieju"] = [[使命技，出牌阶段限两次，你可以失去一点体力使【做题】可以再使用一次。<br>
+  [":jy_jieju"] = [[使命技，出牌阶段限两次，你失去一点体力使【做题】视为未发动过。<br>
   成功：回合结束时，若你【做题】答对比答错至少多3，你摸3张牌，然后获得技能【集智】、【看破】、【享乐】；<br>
   失败：回合结束时，若你【做题】答错比答对至少多3，你翻面、减一点体力上限，然后获得技能【玉玉】、【红温】。]],
   ["#jy_jieju_success"] = "结局：成功",
@@ -2246,7 +2246,7 @@ local jy_leiyan = fk.CreateActiveSkill{
   end,
   card_num = 0,
   target_filter = function(self, to_select, selected)
-    return Fk:currentRoom():getPlayerById(to_select):getMark("@jy_raiden_leiyan") == 0 and #selected <= 1
+    return Fk:currentRoom():getPlayerById(to_select):getMark("@jy_raiden_leiyan") == 0 and #selected < 1
   end,
   target_num = 1,
   on_use = function(self, room, use)
@@ -2279,6 +2279,7 @@ local jy_leiyan_trigger = fk.CreateTriggerSkill{
 
     if judge.card.suit == Card.Spade then
       local marks = player:getMark("@jy_raiden_yuanli")
+      room:doIndicate(from.id, {player.id})  -- 播放指示线，意思是“令我获得了一点愿力”
       player:broadcastSkillInvoke("jy_leiyan")
       room:addPlayerMark(player, "@jy_raiden_yuanli")
 
@@ -2309,7 +2310,6 @@ local jy_zhenshuo = fk.CreateActiveSkill{
       player:getMark("@jy_raiden_yuanli") ~= 0
   end,
   card_filter = function(self, to_select, selected, selected_targets)
-    -- return #selected < 3
     return false
   end,
   card_num = 0,
@@ -2327,7 +2327,7 @@ local jy_zhenshuo = fk.CreateActiveSkill{
 
     -- TODO:参考mobile_effect，写一个超牛逼的动画
     -- room:doSuperLightBox("packages/jianyu/qml/FirstBlood.qml")
-    room:delay(1600 + 100 * dmg)
+    room:delay(1500 + 100 * dmg)
 
       room:damage({
         from = player,
@@ -2410,7 +2410,7 @@ Fk:loadTranslationTable {
   ["~tym__raiden"] = "浮世一梦……",
 
   ["jy_leiyan"] = "雷眼",
-  [":jy_leiyan"] = [[出牌阶段限一次，你可以令一名角色获得<font color="Fuchsia">雷罚恶曜之眼</font>标记。持有<font color="Fuchsia">雷罚恶曜之眼</font>标记的角色造成伤害后，你进行一次判定，若为：♠，你获得1枚<font color="Fuchsia">愿力</font>标记；♣，你对伤害目标造成1点雷电伤害。]],
+  [":jy_leiyan"] = [[出牌阶段限一次，你令一名角色获得<font color="Fuchsia">雷罚恶曜之眼</font>标记。持有<font color="Fuchsia">雷罚恶曜之眼</font>标记的角色造成伤害后，你进行一次判定，若为：♠，你获得1枚<font color="Fuchsia">愿力</font>标记；♣，你对伤害目标造成1点雷电伤害。]],
   ["@jy_raiden_leiyan"] = [[<font color="Fuchsia">雷罚恶曜之眼</font>]],
   ["@jy_raiden_yuanli"] = [[<font color="Fuchsia">愿力</font>]],
   ["#jy_leiyan_trigger"] = "雷眼",
@@ -2420,7 +2420,7 @@ Fk:loadTranslationTable {
   ["#jy_yuanli_full"] = [[<font color="Fuchsia">愿力</font>已满！]],
 
   ["jy_zhenshuo"] = "真说",
-  [":jy_zhenshuo"] = [[出牌阶段限一次，你可以弃所有<font color="Fuchsia">愿力</font>标记来对一名其他角色造成X点雷电伤害，然后所有持有<font color="Fuchsia">雷罚恶曜之眼</font>标记的角色摸X张牌，X等同于所弃<font color="Fuchsia">愿力</font>标记数。]],
+  [":jy_zhenshuo"] = [[出牌阶段限一次，你弃所有<font color="Fuchsia">愿力</font>标记来对一名其他角色造成X点雷电伤害，然后所有持有<font color="Fuchsia">雷罚恶曜之眼</font>标记的角色摸X张牌，X等同于所弃<font color="Fuchsia">愿力</font>标记数。]],
   ["$jy_zhenshuo1"] = "此刻，寂灭之时！",
   ["$jy_zhenshuo2"] = "稻光，亦是永恒！",
   ["$jy_zhenshuo3"] = "无念，断绝！",
