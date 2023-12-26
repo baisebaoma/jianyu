@@ -2451,10 +2451,10 @@ local jy_jinghua = fk.CreateTriggerSkill{
 
     -- 询问是否要使用一张杀
     local extraData = {bypass_times = true,}
-    data.use = room:askForUseCard(player, "slash", "slash|.|.", "#jy_jinghua_use", false, extraData)  -- 这里填false也没用，反正是可以取消的
+    local use = room:askForUseCard(player, "slash", "slash|.|.", "#jy_jinghua_use", false, extraData)  -- 这里填false也没用，反正是可以取消的
 
     -- useCard
-    if data.use then room:useCard(use) end
+    if use then room:useCard(use) end
 
     -- 其他的交给别的函数
   end,
