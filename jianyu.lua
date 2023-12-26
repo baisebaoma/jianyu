@@ -2454,6 +2454,8 @@ local jy_jinghua = fk.CreateTriggerSkill{
     if data.jinghua_use then return true else return false end
   end,
   on_use = function(self, event, target, player, data)
+    local room = player.room
+    
     if data.jinghua_use then
       data.jinghua_use.extraUse = true  -- 加上这个，就可以让它不计入次数了
       room:useCard(data.jinghua_use)
