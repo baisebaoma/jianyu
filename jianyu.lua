@@ -2470,7 +2470,7 @@ local jy_jianying = fk.CreateTriggerSkill{
       #player:getCardIds(Player.Hand) < 2
   end,
   on_use = function(self, event, target, player, data)
-    player.drawCards(2 - #player:getCardIds(Player.Hand))
+    player:drawCards(2 - #player:getCardIds(Player.Hand))
   end,
 }
 
