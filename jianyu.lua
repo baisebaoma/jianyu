@@ -2442,12 +2442,12 @@ local jy_jinghua = fk.CreateTriggerSkill{
       player:getMark("@jy_jinghua") ~= 0
   end,
   can_trigger = function(self, event, target, player, data)
-    return player:hasSkill(self) and data.card and data.card.type == Card.TypeBasic and target == player
+    return player:hasSkill(self) and data.card and data.card.type == Card.TypeBasic and target == player and player:usedSkillTimes(self.name, Player.HistoryPhase) == 0
   end,
   on_use = function(self, event, target, player, data)
     local room = player.room
     -- 添加一个标记
-    room:setPlayerMark(player, "@jy_jinghua", "")
+    -- room:setPlayerMark(player, "@jy_jinghua", "")
     -- 立即询问是否需要使用一张杀
     local use = room:askForUseCard(player, "slash", "slash|.|.", "#jy_jinghua_use", false)  -- 这里填false也没用，反正是可以取消的
       
@@ -2458,8 +2458,8 @@ local jy_jinghua = fk.CreateTriggerSkill{
 
   end,
   on_refresh = function(self, event, target, player, data)
-    local room = player.room
-    room:setPlayerMark(player, "@jy_jinghua", 0)
+    -- local room = player.room
+    -- room:setPlayerMark(player, "@jy_jinghua", 0)
   end,
 }
 
@@ -2488,7 +2488,8 @@ Fk:loadTranslationTable {
   ["~tym__ayato"] = "世事无常……",
 
   ["jy_jinghua"] = "镜花",
-  [":jy_jinghua"] = [[（这个技能还没做完，但已经实现了描述的效果）锁定技，使用或打出基本牌后，你可以立即使用一张【杀】。]],
+  [":jy_jinghua"] = [[（这个技能还没做完，但已经实现了描述的效果）每回合限一次，使用或打出基本牌后，你可以立即使用一张【杀】。]],
+  ["@jy_jinghua"] = "镜花",
   ["$jy_jinghua1"] = "苍流水影！",
   ["$jy_jinghua2"] = "剑影！",
   ["#jy_jinghua_use"] = "镜花：你可以立即使用一张【杀】",
