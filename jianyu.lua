@@ -2448,9 +2448,14 @@ local jy_jinghua = fk.CreateTriggerSkill{
     local room = player.room
     -- 添加一个标记
     room:setPlayerMark(player, "@jy_jinghua", "")
-    -- 立即询问是否需要使用一张杀，去抄界仁德
+    -- 立即询问是否需要使用一张杀
+    local use = room:askForUseCard(player, "slash", "slash|.|.", "#jy_jinghua_use", false)  -- 这里填false也没用，反正是可以取消的
+      
+    -- useCard
+    if use then room:useCard(use) end
 
     -- 其他的交给别的函数
+
   end,
   on_refresh = function(self, event, target, player, data)
     local room = player.room
@@ -2458,6 +2463,7 @@ local jy_jinghua = fk.CreateTriggerSkill{
   end,
 }
 
+-- 测试通过，没什么问题
 local jy_jianying = fk.CreateTriggerSkill{
   frequency = Skill.Compulsory,
   name = "jy_jianying",
@@ -2470,10 +2476,11 @@ local jy_jianying = fk.CreateTriggerSkill{
       #player:getCardIds(Player.Hand) < 2
   end,
   on_use = function(self, event, target, player, data)
-    player:drawCards(2 - #player:getCardIds(Player.Hand))
+    player:drawCards(1)
   end,
 }
 
+tym__ayato:addSkill(jy_jinghua)
 tym__ayato:addSkill(jy_jianying)
 
 Fk:loadTranslationTable {
@@ -2481,12 +2488,13 @@ Fk:loadTranslationTable {
   ["~tym__ayato"] = "世事无常……",
 
   ["jy_jinghua"] = "镜花",
-  [":jy_jinghua"] = [[锁定技，使用或打出基本牌后：你可以视为立即使用一张不计入使用次数的【杀】；你的攻击距离+1；你的【杀】可以指定相邻的2个目标。这些效果持续到当前角色回合结束。]],
+  [":jy_jinghua"] = [[（这个技能还没做完，但已经实现了描述的效果）锁定技，使用或打出基本牌后，你可以立即使用一张【杀】。]],
   ["$jy_jinghua1"] = "苍流水影！",
   ["$jy_jinghua2"] = "剑影！",
+  ["#jy_jinghua_use"] = "镜花：你可以立即使用一张【杀】"
 
   ["jy_jianying"] = "渐盈",
-  [":jy_jianying"] = [[锁定技，每个角色的结束阶段，若你的手牌数小于2，你将手牌数补至2。]],
+  [":jy_jianying"] = [[锁定技，每个角色的结束阶段，若你的手牌数小于2，你摸一张牌。]],
   ["$jy_jianying1"] = "冒进是大忌。",
   ["$jy_jianying2"] = "呵……余兴节目。",
 }
