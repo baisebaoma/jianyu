@@ -2444,19 +2444,20 @@ local jy_jinghua = fk.CreateTriggerSkill{
   can_trigger = function(self, event, target, player, data)
     return player:hasSkill(self) and data.card and data.card.type == Card.TypeBasic and target == player and player:usedSkillTimes(self.name, Player.HistoryPhase) == 0
   end,
+  on_cost = function(self, event, target, player, data)
+    -- 询问是否要使用一张杀
+    local extraData = {bypass_times = true,}
+    data.use = room:askForUseCard(player, "slash", "slash|.|.", "#jy_jinghua_use", false, extraData)  -- 这里填false也没用，反正是可以取消的
+  end
   on_use = function(self, event, target, player, data)
     local room = player.room
     -- 添加一个标记
     -- room:setPlayerMark(player, "@jy_jinghua", "")
-    -- 立即询问是否需要使用一张杀
-    local extraData = {bypass_times = true,}
-    local use = room:askForUseCard(player, "slash", "slash|.|.", "#jy_jinghua_use", false, extraData)  -- 这里填false也没用，反正是可以取消的
-      
+
     -- useCard
-    if use then room:useCard(use) end
+    if data.use then room:useCard(use) end
 
     -- 其他的交给别的函数
-
   end,
   on_refresh = function(self, event, target, player, data)
     -- local room = player.room
