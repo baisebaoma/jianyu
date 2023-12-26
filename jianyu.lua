@@ -2450,13 +2450,13 @@ local jy_jinghua = fk.CreateTriggerSkill{
     -- room:setPlayerMark(player, "@jy_jinghua", "")
     -- 询问是否要使用一张杀
     local extraData = {bypass_times = true}
-    local use = room:askForUseCard(player, "slash", "slash|.|.", "#jy_jinghua_use", true, extraData)  -- 这里填false也没用，反正是可以取消的
-    if use then return true else return false end
+    data.jinghua_use = room:askForUseCard(player, "slash", "slash|.|.", "#jy_jinghua_use", true, extraData)  -- 这里填false也没用，反正是可以取消的
+    if data.jinghua_use then return true else return false end
   end,
   on_use = function(self, event, target, player, data)
-    if use then
-      use.extraUse = true  -- 加上这个，就可以让它不计入次数了
-      room:useCard(use)
+    if data.jinghua_use then
+      data.jinghua_use.extraUse = true  -- 加上这个，就可以让它不计入次数了
+      room:useCard(data.jinghua_use)
     end
     -- 其他的交给别的函数
   end,
