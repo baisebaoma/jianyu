@@ -2078,7 +2078,7 @@ local jy_leiyan_trigger = fk.CreateTriggerSkill{
     if not data.from then return false end  -- 如果这次伤害没有伤害来源，就不用看了
     local from = data.from
     return from:getMark("@jy_raiden_leiyan") ~= 0 and player:hasSkill(self)
-      -- and not data.is_leiyan  -- 现在已经解除了这个限制，雷眼可以再次触发雷眼
+      and not data.is_leiyan
   end,
   on_use = function(self, event, target, player, data)
     local room = player.room
@@ -2108,7 +2108,7 @@ local jy_leiyan_trigger = fk.CreateTriggerSkill{
           damage = 1,
           damageType = fk.ThunderDamage,
           skillName = "jy_leiyan",
-          -- is_leiyan = true,
+          is_leiyan = true,
         })
       end
     end
@@ -2141,7 +2141,7 @@ local jy_zhenshuo = fk.CreateActiveSkill{
 
     -- TODO:参考mobile_effect，写一个超牛逼的动画
     -- room:doSuperLightBox("packages/jianyu/qml/FirstBlood.qml")
-    room:delay(1145 + 141 * dmg)
+    room:delay(1000)
 
       room:damage({
         from = player,
@@ -2153,7 +2153,7 @@ local jy_zhenshuo = fk.CreateActiveSkill{
 
     for _, p in ipairs(room:getAlivePlayers()) do
       if p:getMark("@jy_raiden_leiyan") ~= 0 then
-        p:drawCards(dmg * 3)
+        p:drawCards(dmg * 2)
       end
     end
 
@@ -2294,7 +2294,7 @@ Fk:loadTranslationTable {
   ["~tym__raiden"] = "浮世一梦……",
 
   ["jy_leiyan"] = "雷眼",
-  [":jy_leiyan"] = [[出牌阶段限一次，你令一名角色获得<font color="Fuchsia">雷罚恶曜之眼</font>标记。持有<font color="Fuchsia">雷罚恶曜之眼</font>标记的角色造成伤害后，你进行一次判定，若为：红色，你获得1枚<font color="Fuchsia">愿力</font>标记；黑色，你对伤害目标造成1点雷电伤害。]],
+  [":jy_leiyan"] = [[出牌阶段限一次，你令一名角色获得<font color="Fuchsia">雷罚恶曜之眼</font>标记。持有<font color="Fuchsia">雷罚恶曜之眼</font>标记的角色造成伤害后，你进行一次判定，若为：红色，你获得1枚<font color="Fuchsia">愿力</font>标记；黑色，你对伤害目标造成1点雷电伤害，该伤害不会再次触发【雷眼】。]],
   ["@jy_raiden_leiyan"] = [[<font color="Fuchsia">雷罚恶曜之眼</font>]],
   ["@jy_raiden_yuanli"] = [[<font color="Fuchsia">愿力</font>]],
   ["#jy_leiyan_trigger"] = "雷眼",
@@ -2304,7 +2304,7 @@ Fk:loadTranslationTable {
   ["#jy_yuanli_full"] = [[<font color="Fuchsia">愿力</font>已满！]],
 
   ["jy_zhenshuo"] = "真说",
-  [":jy_zhenshuo"] = [[出牌阶段限一次，你弃所有<font color="Fuchsia">愿力</font>标记来对一名其他角色造成1点雷电伤害，然后所有持有<font color="Fuchsia">雷罚恶曜之眼</font>标记的角色摸3X张牌，X等同于所弃<font color="Fuchsia">愿力</font>标记数。]],
+  [":jy_zhenshuo"] = [[出牌阶段限一次，你弃所有<font color="Fuchsia">愿力</font>标记来对一名其他角色造成1点雷电伤害，然后所有持有<font color="Fuchsia">雷罚恶曜之眼</font>标记的角色摸2X张牌，X等同于所弃<font color="Fuchsia">愿力</font>标记数。]],
   ["$jy_zhenshuo1"] = "此刻，寂灭之时！",
   ["$jy_zhenshuo2"] = "稻光，亦是永恒！",
   ["$jy_zhenshuo3"] = "无念，断绝！",
@@ -2438,11 +2438,10 @@ Fk:loadTranslationTable {
   ["$jy_jianying2"] = "呵……余兴节目。",
 }
 
--- 如果不这样的话，字会旋转
-for k, v in pairs(Fk.translations["zh_CN"]) do
-  v = string.gsub(v, "雷电将军", "<font color=\"Fuchsia\">雷电将军</font>")
-  v = string.gsub(v, "神里绫人", "<font color=\"skyblue\">神里绫人</font>")
-  Fk.translations["zh_CN"][k] = v
-end
+-- for k, v in pairs(Fk.translations["zh_CN"]) do
+--   v = string.gsub(v, "雷电将军", "<font color=\"Fuchsia\">雷电将军</font>")
+--   v = string.gsub(v, "神里绫人", "<font color=\"skyblue\">神里绫人</font>")
+--   Fk.translations["zh_CN"][k] = v
+-- end
 
 return extension
