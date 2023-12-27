@@ -2540,11 +2540,15 @@ local jy_jinghua_hydro = fk.CreateTriggerSkill{
   mute = true,
   name = "#jy_jinghua_hydro",
   frequency = Skill.Compulsory,
-  events = {fk.DamageCaused},
-  can_refresh = function(self, event, target, player, data)
-    return player:hasSkill(self) and data.from == player and data.damageType == fk.NormalDamage and player:getMark("@jy_jinghua") ~= 0
+  events = {fk.PreDamage},
+  can_trigger = function(self, event, target, player, data)
+    return target == player and 
+      data.damageType == fk.NormalDamage and player:getMark("@jy_jinghua") ~= 0
+      -- data.from 到底是什么数据结构？为什么jy_huapen里写的data.from ~= player.id，jy_leiyan_trigger里又from:getmark()?
   end,
-  on_refresh = function(self, event, target, player, data)
+  on_cost = Util.TrueFunc,
+  on_use = function(self, event, target, player, data)
+    local room = player.room
     player:broadcastSkillInvoke("jy_jinghua")
     data.yuanshen_type = "hydro"
     room:doBroadcastNotify("ShowToast", Fk:translate("#jy_jinghua_hydro_toast"))
@@ -2588,7 +2592,7 @@ Fk:loadTranslationTable {
   ["$jy_jinghua1"] = "苍流水影。",
   ["$jy_jinghua2"] = "剑影。",
   ["#jy_jinghua_use"] = "镜花：你可以立即使用一张不计入使用次数的【杀】",
-  ["#jy_jinghua_hydro_toast"] = "已经转化成“水元素伤害”",
+  ["#jy_jinghua_hydro_toast"] = "此次伤害被转化成“水元素伤害”",
 
   ["jy_jianying"] = "渐盈",
   [":jy_jianying"] = [[锁定技，所有角色的结束阶段，若你的手牌数小于体力值，你摸一张牌。]],
