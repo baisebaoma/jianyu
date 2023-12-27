@@ -2432,7 +2432,7 @@ local jy_yuanshen = fk.CreateTriggerSkill{
 
           if data.to:getMark(element[2]) == 0 then   -- 如果目标没有A附着
             local has_reactable_mark = false  -- 也没有能被A反应的附着
-            for _, m in ipairs(can_react(element[2])) do
+            for _, m in ipairs(can_react[element[2]]) do
               if player:getMark(m) ~= 0 then
                 has_reactable_mark = true
                 break
