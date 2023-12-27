@@ -785,182 +785,6 @@ Fk:loadTranslationTable {
   ["~xjb__gaotianliang"] = "顶不住啦！我每天都活在水深火热里面。",
 }
 
--- -- 赵乾熙
--- local tym__zhaoqianxi = General(extension, "tym__zhaoqianxi", "qun", 4)
-
--- -- 参考自藤甲。要把DamageInflicted改成DamageCaused，就是你对别人造成伤害的意思。
--- -- 如果是DamageInflicted，就是别人对你造成伤害的意思。
--- local jy_yuanshen = fk.CreateTriggerSkill{
---   name = "jy_yuanshen",
---   frequency = Skill.Compulsory,
---   anim_type = "offensive",
---   refresh_events = {fk.DamageCaused},
---   can_refresh = function(self, event, target, player, data)
---     if not (target == player and player:hasSkill(self)) then return false end
---     return data.damageType ~= fk.NormalDamage and not data.chain
---   end,
---   on_refresh = function(self, event, target, player, data)
---     data.damage = data.damage + 1
---   end,
--- }
-
--- local jy_cathat = fk.CreateViewAsSkill{
---   name = "jy_cathat",
---   anim_type = "offensive",
---   pattern = "slash",
---   card_filter = function(self, to_select, selected)
---     return #selected == 0 and Fk:getCardById(to_select).suit == Card.Spade and Fk:currentRoom():getCardArea(to_select) ~= Player.Equip
---   end,
---   view_as = function(self, cards)
---     if #cards ~= 1 then return end
---     local card = Fk:cloneCard("fire__slash")
---     card.skillName = self.name
---     card:addSubcard(cards[1])
---     return card
---   end,
--- }
-
--- local jy_hatcat = fk.CreateViewAsSkill{
---   name = "jy_hatcat",
---   anim_type = "offensive",
---   pattern = "slash",
---   card_filter = function(self, to_select, selected)
---     return #selected == 0 and Fk:getCardById(to_select).suit == Card.Spade and Fk:currentRoom():getCardArea(to_select) ~= Player.Equip
---   end,
---   view_as = function(self, cards)
---     if #cards ~= 1 then return end
---     local card = Fk:cloneCard("thunder__slash")
---     card.skillName = self.name
---     card:addSubcard(cards[1])
---     return card
---   end,
--- }
-
--- tym__zhaoqianxi:addSkill(jy_yuanshen)
--- tym__zhaoqianxi:addSkill(jy_cathat)
--- tym__zhaoqianxi:addSkill(jy_hatcat)
-
--- Fk:loadTranslationTable {
---   ["tym__zhaoqianxi"] = "赵乾熙",
-  
---   ["jy_yuanshen"] = "原力",
---   [":jy_yuanshen"] = [[锁定技，你造成的非【铁锁连环】传导的属性伤害+1。]],
-
---   ["jy_cathat"] = "猫帽",
---   [":jy_cathat"] = [[你可以将一张♠手牌当作【火杀】使用或打出。]],
-
---   ["jy_hatcat"] = "帽猫",
---   [":jy_hatcat"] = [[你可以将一张♠手牌当作【雷杀】使用或打出。
---   <br /><font size="1"><i><s>因为Beryl抽满命林尼歪了六次，所以他决定在新月杀中为自己设计一套林尼的技能。</s></i></font>]],
--- }
-
--- -- 界赵乾熙
--- local tym__2__zhaoqianxi = General(extension, "tym__2__zhaoqianxi", "qun", 4)
--- -- tym__2__zhaoqianxi.hidden = true
-
--- local jy_yuanshen_2 = fk.CreateTriggerSkill{
---   name = "jy_yuanshen_2",
---   frequency = Skill.Compulsory,
---   anim_type = "offensive",
---   events = {fk.DamageInflicted},
---   can_trigger = function(self, event, target, player, data)
---     if not player:hasSkill(self) then return false end
---     return (data.damageType == fk.FireDamage or data.damageType == fk.ThunderDamage) and
---       not data.is_jy_yuanshen_2_triggered
---   end,
---   on_use = function(self, event, target, player, data)
---     local room = player.room
---     if data.damageType then
---       -- 使用for循环以方便后面添加元素反应类型。每次只会有一种反应发生。
---       -- element[1]是A属性类型，element[2]是A对应的附着标记，
---       -- element[3]是A要反应的附着标记B，element[4]是要造成的效果
---       -- element[5]是这个反应需要造成的广播提示
---       -- Lua 的数组从1开始
---       for _, element in ipairs({ 
---         {fk.FireDamage, "@jy_yuanshen_2_pyro", "@jy_yuanshen_2_electro", 
---           function(self, event, target, player, data) data.damage = data.damage + 1 end,
---           "#jy_yuanshen_2_reaction_1",
---         },
---         {fk.ThunderDamage, "@jy_yuanshen_2_electro", "@jy_yuanshen_2_pyro", 
---           function(self, event, target, player, data) 
---             data.to:turnOver()  -- 受到伤害的人翻面
---           end,
---           "#jy_yuanshen_2_reaction_2",
---         }, 
---       }) do
---         if data.damageType == element[1] then  -- 如果是A属性伤害
---           if data.to:getMark(element[3]) ~= 0 then  -- 如果目标有B附着
---             room:setPlayerMark(data.to, element[3], 0)  -- 将B附着解除
---             room:doBroadcastNotify("ShowToast", Fk:translate(element[5]))  -- 广播发生了元素反应。先广播再造成效果！
---             element[4](self, event, target, player, data)  -- 造成效果
---             data.is_jy_yuanshen_2_triggered = true  -- 如果有多个拥有这个技能的人，告诉他不用再发动了
---             return  -- 结束了，不用判断下面的了
---           end
---           if data.to:getMark(element[2]) == 0 then   -- 如果目标没有A附着
---             room:setPlayerMark(data.to, element[2], "")  -- 造成A附着
---             data.is_jy_yuanshen_2_triggered = true  -- 如果有多个拥有这个技能的人，告诉他不用再发动了
---             return
---           end
---         end
---       end
---     end
---   end,
--- }
-
--- -- 参考自悲歌
--- local jy_fumo = fk.CreateTriggerSkill{
---   name = "jy_fumo",
---   anim_type = "masochism",
---   events = {fk.DamageInflicted},
---   can_trigger = function(self, event, target, player, data)
---     return player:hasSkill(self) and 
---       data.damageType == fk.NormalDamage and not data.to.dead and not player:isNude()
---   end,
---   on_cost = function(self, event, target, player, data)
---     local room = player.room
---     local card = room:askForDiscard(player, 1, 1, true, self.name, true, ".", "#jy_fumo-invoke::"..target.id, true)
---     if #card > 0 then
---       room:doIndicate(player.id, {target.id})  -- 播放指示线
---       self.cost_data = card
---       return true
---     end
---   end,
---   on_use = function(self, event, target, player, data)
---     local room = player.room
---     room:throwCard(self.cost_data, self.name, player, player)
---     if target.dead then return false end
---     card = Fk:getCardById(self.cost_data[1])  -- 这张被弃置的牌是通过self.cost_data传过来的，是一个int table，你得转化成一张card
---     if card.color == Card.Red then
---       data.damageType = fk.FireDamage
---     elseif card.color == Card.Black then
---       data.damageType = fk.ThunderDamage
---     end
---   end,
--- }
-
--- tym__2__zhaoqianxi:addSkill(jy_yuanshen_2)
--- tym__2__zhaoqianxi:addSkill(jy_fumo)
-
--- Fk:loadTranslationTable {
---   ["tym__2__zhaoqianxi"] = "界赵乾熙",
-  
---   ["jy_yuanshen_2"] = "原神",
---   [":jy_yuanshen_2"] = [[锁定技，当有角色受到<font color="red">火焰</font>或<font color="Fuchsia">雷电</font>伤害时，若其没有该技能造成的属性标记，令其获得对应属性标记；
---   若其拥有该技能造成的属性标记且与此次伤害属性不同，则依据伤害属性造成对应效果并移除标记：<font color="Fuchsia">雷电伤害</font>其翻面；<font color="red">火焰伤害</font>该伤害+1。该技能对每次伤害只会触发一次，不论场上是否有多个角色拥有该技能。]],
---   ["#jy_yuanshen_2_reaction_1"] = [[<font color="red">火焰伤害</font>与<font color="Fuchsia">【雷电】</font>发生反应，伤害+1]],
---   ["#jy_yuanshen_2_reaction_2"] = [[<font color="Fuchsia">雷电伤害</font>与<font color="red">【火焰】</font>发生反应，目标翻面]],
-
---   ["@jy_yuanshen_2_pyro"] = [[<font color="red">火焰</font>]],
---   ["@jy_yuanshen_2_electro"] = [[<font color="Fuchsia">雷电</font>]],
-
---   ["jy_fumo"] = "附魔",
---   ["#jy_fumo-invoke"] = "附魔：%dest 受到伤害，你可以弃置一张牌，改为属性伤害",
---   [":jy_fumo"] = [[当有角色受到无属性伤害时，
---   你可以弃置一张牌，根据颜色变更伤害属性：
---   <font color="red">红色</font>，改为<font color="red">火焰</font>；
---   黑色，改为<font color="Fuchsia">雷电</font>。]],
--- }
-
 -- 阿威罗
 local xjb__aweiluo = General(extension, "xjb__aweiluo", "qun", 3)
 
@@ -2263,17 +2087,17 @@ local jy_leiyan_trigger = fk.CreateTriggerSkill{
     local judge = {
       who = player,
       reason = self.name,
-      pattern = ".|.|spade,club",
+      pattern = ".|.|.",
     }
     room:judge(judge)
 
-    if judge.card.suit == Card.Spade then
+    if judge.card.color == Card.Red then
       local marks = player:getMark("@jy_raiden_yuanli")
       room:doIndicate(from.id, {player.id})  -- 播放指示线，意思是“令我获得了一点愿力”
       player:broadcastSkillInvoke("jy_leiyan")
       room:addPlayerMark(player, "@jy_raiden_yuanli")
 
-    elseif judge.card.suit == Card.Club then
+    elseif judge.card.color == Card.Black then
       if not target.dead then
         player:broadcastSkillInvoke("jy_leiyan")
         room:doIndicate(player.id, {to.id})  -- 播放指示线
@@ -2336,145 +2160,141 @@ local jy_zhenshuo = fk.CreateActiveSkill{
   end,
 }
 
-local jy_yuanshen = fk.CreateTriggerSkill{
-  mute = true,
-  name = "jy_yuanshen",
-  frequency = Skill.Compulsory,
-  anim_type = "offensive",
-  events = {fk.DamageInflicted},
-  can_trigger = function(self, event, target, player, data)
-    if not player:hasSkill(self) then return false end
-    return not data.is_jy_yuanshen_triggered
-    -- 现在由于引进了新的元素，所以也得用data.yuanshen_type判断有没有新的元素
-  end,
-  on_use = function(self, event, target, player, data)
-    local room = player.room
+-- 这个机制真的烂，你写的代码也是屎山，建议删除。实在要启用，建议重写，
+-- 先写好保存反应的数据结构，跟着做就是了
+-- local jy_yuanshen = fk.CreateTriggerSkill{
+--   mute = true,
+--   name = "jy_yuanshen",
+--   frequency = Skill.Compulsory,
+--   anim_type = "offensive",
+--   events = {fk.DamageInflicted},
+--   can_trigger = function(self, event, target, player, data)
+--     if not player:hasSkill(self) then return false end
+--     return not data.is_jy_yuanshen_triggered
+--     -- 现在由于引进了新的元素，所以也得用data.yuanshen_type判断有没有新的元素
+--   end,
+--   on_use = function(self, event, target, player, data)
+--     local room = player.room
 
-    local can_react = {}
-    can_react["@jy_yuanshen_pyro"] = {"@jy_yuanshen_electro", "@jy_yuanshen_hydro"}
-    can_react["@jy_yuanshen_electro"] = {"@jy_yuanshen_pyro", "@jy_yuanshen_hydro"}
-    can_react["@jy_yuanshen_hydro"] = {"@jy_yuanshen_pyro", "@jy_yuanshen_electro"}
+--     if data.damageType then
+--       -- 使用for循环以方便后面添加元素反应类型。每次只会有一种反应发生。
+--       -- element[1]是A属性类型，element[2]是A对应的附着标记，
+--       -- element[3]是A要反应的附着标记B，element[4]是要造成的效果
+--       -- element[5]是这个反应需要造成的广播提示
+--       -- Lua 的数组从1开始
+--       for _, element in ipairs({ 
+--         -- 火雷，造成一点额外无属性伤害
+--         {fk.FireDamage, "@jy_yuanshen_pyro", "@jy_yuanshen_electro", 
+--           function(self, event, target, player, data)
+--             room:damage({
+--               from = data.from,
+--               to = data.to,
+--               damage = 1,
+--               damageType = fk.NormalDamage,
+--               skillName = self.name,
+--             })
+--           end,
+--           "#jy_yuanshen_reaction_1",
+--         },
+--         -- 雷火，造成一点额外无属性伤害
+--         {fk.ThunderDamage, "@jy_yuanshen_electro", "@jy_yuanshen_pyro", 
+--           function(self, event, target, player, data) 
+--             room:damage({
+--               from = data.from,
+--               to = data.to,
+--               damage = 1,
+--               damageType = fk.NormalDamage,
+--               skillName = self.name,
+--             })
+--           end,
+--           "#jy_yuanshen_reaction_2",
+--         }, 
+--         -- 水火，伤害+1
+--         {"hydro", "@jy_yuanshen_hydro", "@jy_yuanshen_pyro", 
+--           function(self, event, target, player, data) 
+--             data.damage = data.damage + 1
+--           end,
+--           "#jy_yuanshen_reaction_3",
+--         }, 
+--         -- 火水，伤害+1
+--         {fk.FireDamage, "@jy_yuanshen_pyro", "@jy_yuanshen_hydro", 
+--           function(self, event, target, player, data) 
+--             data.damage = data.damage + 1
+--           end,
+--           "#jy_yuanshen_reaction_4",
+--         }, 
+--         -- 水雷，弃两张牌
+--         {"hydro", "@jy_yuanshen_hydro", "@jy_yuanshen_electro", 
+--           function(self, event, target, player, data) 
+--             local room = player.room
+--             room:askForDiscard(data.to, 2, 2, true, self.name, false)
+--           end,
+--           "#jy_yuanshen_reaction_5",
+--         }, 
+--         -- 雷水，弃两张牌
+--         {fk.ThunderDamage, "@jy_yuanshen_electro", "@jy_yuanshen_hydro", 
+--           function(self, event, target, player, data) 
+--             local room = player.room
+--             room:askForDiscard(data.to, 2, 2, true, self.name, false)
+--           end,
+--           "#jy_yuanshen_reaction_6",
+--         }, 
+--       }) do
 
-    if data.damageType then
-      -- 使用for循环以方便后面添加元素反应类型。每次只会有一种反应发生。
-      -- element[1]是A属性类型，element[2]是A对应的附着标记，
-      -- element[3]是A要反应的附着标记B，element[4]是要造成的效果
-      -- element[5]是这个反应需要造成的广播提示
-      -- Lua 的数组从1开始
-      for _, element in ipairs({ 
-        -- 火雷，造成一点额外无属性伤害
-        {fk.FireDamage, "@jy_yuanshen_pyro", "@jy_yuanshen_electro", 
-          function(self, event, target, player, data)
-            room:damage({
-              from = data.from,
-              to = data.to,
-              damage = 1,
-              damageType = fk.NormalDamage,
-              skillName = self.name,
-            })
-          end,
-          "#jy_yuanshen_reaction_1",
-        },
-        -- 雷火，造成一点额外无属性伤害
-        {fk.ThunderDamage, "@jy_yuanshen_electro", "@jy_yuanshen_pyro", 
-          function(self, event, target, player, data) 
-            room:damage({
-              from = data.from,
-              to = data.to,
-              damage = 1,
-              damageType = fk.NormalDamage,
-              skillName = self.name,
-            })
-          end,
-          "#jy_yuanshen_reaction_2",
-        }, 
-        -- 水火，伤害+1
-        {"hydro", "@jy_yuanshen_hydro", "@jy_yuanshen_pyro", 
-          function(self, event, target, player, data) 
-            data.damage = data.damage + 1
-          end,
-          "#jy_yuanshen_reaction_3",
-        }, 
-        -- 火水，伤害+1
-        {fk.FireDamage, "@jy_yuanshen_pyro", "@jy_yuanshen_hydro", 
-          function(self, event, target, player, data) 
-            data.damage = data.damage + 1
-          end,
-          "#jy_yuanshen_reaction_4",
-        }, 
-        -- 水雷，弃两张牌
-        {"hydro", "@jy_yuanshen_hydro", "@jy_yuanshen_electro", 
-          function(self, event, target, player, data) 
-            local room = player.room
-            room:askForDiscard(data.to, 2, 2, true, self.name, false)
-          end,
-          "#jy_yuanshen_reaction_5",
-        }, 
-        -- 雷水，弃两张牌
-        {fk.ThunderDamage, "@jy_yuanshen_electro", "@jy_yuanshen_hydro", 
-          function(self, event, target, player, data) 
-            local room = player.room
-            room:askForDiscard(data.to, 2, 2, true, self.name, false)
-          end,
-          "#jy_yuanshen_reaction_6",
-        }, 
-      }) do
+--         -- 判断是正常的属性伤害，还是【原神】的无属性伤害
+--         local damage_type_to_check
+--         if data.yuanshen_type then
+--           damage_type_to_check = data.yuanshen_type
+--         else
+--           damage_type_to_check = data.damageType
+--         end
 
-        -- 判断是正常的属性伤害，还是【原神】的无属性伤害
-        local damage_type_to_check
-        if data.yuanshen_type then
-          damage_type_to_check = data.yuanshen_type
-        else
-          damage_type_to_check = data.damageType
-        end
+--         if damage_type_to_check == element[1] then  -- 如果是A属性伤害
 
-        if damage_type_to_check == element[1] then  -- 如果是A属性伤害
+--           if data.to:getMark(element[2]) == 0 then   -- 如果目标没有A附着
+--             local has_reactable_mark = false
+--             for _, m in ipairs(can_react[element[2]]) do
+--               if player:getMark(m) ~= 0 then
+--                 has_reactable_mark = true
+--                 break
+--               end
+--             end
 
-          if data.to:getMark(element[2]) == 0 then   -- 如果目标没有A附着
-            local has_reactable_mark = false  -- 也没有能被A反应的附着
-            for _, m in ipairs(can_react[element[2]]) do
-              if player:getMark(m) ~= 0 then
-                has_reactable_mark = true
-                break
-              end
-            end
+--             if not has_reactable_mark then  -- 也没有能被A反应的附着
+--               room:setPlayerMark(data.to, element[2], "")  -- 造成A附着
+--               data.is_jy_yuanshen_triggered = true  -- 如果有多个拥有这个技能的人，告诉他不用再发动了
+--               return
+--             end
+--           end
 
-            if not has_reactable_mark then
-              room:setPlayerMark(data.to, element[2], "")  -- 造成A附着
-              data.is_jy_yuanshen_triggered = true  -- 如果有多个拥有这个技能的人，告诉他不用再发动了
-              return
-            end
-          end
+--           if data.to:getMark(element[3]) ~= 0 then  -- 如果目标有B附着，那就反应
+--             room:setPlayerMark(data.to, element[3], 0)  -- 将B附着解除
+--             player:broadcastSkillInvoke("jy_yuanshen")
+--             room:doBroadcastNotify("ShowToast", Fk:translate(element[5]))  -- 广播发生了元素反应。先广播再造成效果！
+--             room:sendLog{
+--               type = element[5],
+--               from = data.to.id,
+--             }
+--             element[4](self, event, target, player, data)  -- 造成效果
+--             data.is_jy_yuanshen_triggered = true  -- 如果有多个拥有这个技能的人，告诉他不用再发动了
+--             return  -- 结束了，不用判断下面的了
+--           end
 
-          if data.to:getMark(element[3]) ~= 0 then  -- 如果目标有B附着，那就反应
-            room:setPlayerMark(data.to, element[3], 0)  -- 将B附着解除
-            player:broadcastSkillInvoke("jy_yuanshen")
-            room:doBroadcastNotify("ShowToast", Fk:translate(element[5]))  -- 广播发生了元素反应。先广播再造成效果！
-            room:sendLog{
-              type = element[5],
-              from = data.to.id,
-            }
-            element[4](self, event, target, player, data)  -- 造成效果
-            data.is_jy_yuanshen_triggered = true  -- 如果有多个拥有这个技能的人，告诉他不用再发动了
-            return  -- 结束了，不用判断下面的了
-          end
-
-        end
-      end
-    end
-  end,
-}
+--         end
+--       end
+--     end
+--   end,
+-- }
 
 tym__raiden:addSkill(jy_leiyan)
 tym__raiden:addSkill(jy_zhenshuo)
-tym__raiden:addSkill(jy_yuanshen)  -- 赋给了雷电将军，别的用引号
 
 Fk:loadTranslationTable {
-  ["tym__raiden"] = "雷电将军",
+  ["tym__raiden"] = [[<font color="Fuchsia">雷电将军</font>]],
   ["~tym__raiden"] = "浮世一梦……",
 
   ["jy_leiyan"] = "雷眼",
-  [":jy_leiyan"] = [[出牌阶段限一次，你令一名角色获得<font color="Fuchsia">雷罚恶曜之眼</font>标记。持有<font color="Fuchsia">雷罚恶曜之眼</font>标记的角色造成伤害后，你进行一次判定，若为：♠，你获得1枚<font color="Fuchsia">愿力</font>标记；♣，你对伤害目标造成1点雷电伤害。]],
+  [":jy_leiyan"] = [[出牌阶段限一次，你令一名角色获得<font color="Fuchsia">雷罚恶曜之眼</font>标记。持有<font color="Fuchsia">雷罚恶曜之眼</font>标记的角色造成伤害后，你进行一次判定，若为：红色，你获得1枚<font color="Fuchsia">愿力</font>标记；黑色，你对伤害目标造成1点雷电伤害。]],
   ["@jy_raiden_leiyan"] = [[<font color="Fuchsia">雷罚恶曜之眼</font>]],
   ["@jy_raiden_yuanli"] = [[<font color="Fuchsia">愿力</font>]],
   ["#jy_leiyan_trigger"] = "雷眼",
@@ -2489,23 +2309,23 @@ Fk:loadTranslationTable {
   ["$jy_zhenshuo2"] = "稻光，亦是永恒！",
   ["$jy_zhenshuo3"] = "无念，断绝！",
 
-  ["jy_yuanshen"] = "原神",
-  [":jy_yuanshen"] = [[锁定技，当有角色受到火焰、雷电、“水元素伤害”伤害时，若其没有属性标记，其获得对应属性标记；若其拥有属性标记且与伤害属性不同，则移除标记并按照以下规则触发效果：<br>
-  火焰与雷电，造成一点无属性伤害；<br>
-  “水元素”与火焰，伤害+1；<br>
-  “水元素”与雷电，令其弃两张牌。<br>
-  该技能对每次伤害只会触发一次，不论场上是否有多个角色拥有该技能。]],
-  ["#jy_yuanshen_reaction_1"] = [[火焰伤害与【雷电】发生反应，造成一点无属性伤害]],
-  ["#jy_yuanshen_reaction_2"] = [[雷电伤害与【火焰】发生反应，造成一点无属性伤害]],
-  ["#jy_yuanshen_reaction_3"] = [[“水元素伤害”与【火焰】发生反应，伤害+1]],
-  ["#jy_yuanshen_reaction_4"] = [[火焰伤害与【水元素】发生反应，伤害+1]],
-  ["#jy_yuanshen_reaction_5"] = [[“水元素伤害”与【雷电】发生反应，弃两张牌]],
-  ["#jy_yuanshen_reaction_6"] = [[雷电伤害与【水元素】发生反应，弃两张牌]],
+  -- ["jy_yuanshen"] = "原神",
+  -- [":jy_yuanshen"] = [[锁定技，当有角色受到火焰、雷电、“水元素伤害”伤害时，若其没有属性标记，其获得对应属性标记；若其拥有属性标记且与伤害属性不同，则移除标记并按照以下规则触发效果：<br>
+  -- 火焰与雷电，造成一点无属性伤害；<br>
+  -- “水元素”与火焰，伤害+1；<br>
+  -- “水元素”与雷电，令其弃两张牌。<br>
+  -- 该技能对每次伤害只会触发一次，不论场上是否有多个角色拥有该技能。]],
+  -- ["#jy_yuanshen_reaction_1"] = [[火焰伤害与【雷电】发生反应，造成一点无属性伤害]],
+  -- ["#jy_yuanshen_reaction_2"] = [[雷电伤害与【火焰】发生反应，造成一点无属性伤害]],
+  -- ["#jy_yuanshen_reaction_3"] = [[“水元素伤害”与【火焰】发生反应，伤害+1]],
+  -- ["#jy_yuanshen_reaction_4"] = [[火焰伤害与【水元素】发生反应，伤害+1]],
+  -- ["#jy_yuanshen_reaction_5"] = [[“水元素伤害”与【雷电】发生反应，弃两张牌]],
+  -- ["#jy_yuanshen_reaction_6"] = [[雷电伤害与【水元素】发生反应，弃两张牌]],
 
-  ["@jy_yuanshen_pyro"] = [[火焰]],
-  ["@jy_yuanshen_electro"] = [[雷电]],
-  ["@jy_yuanshen_hydro"] = [[水元素]],
-  ["$jy_yuanshen1"] = "（音乐）",
+  -- ["@jy_yuanshen_pyro"] = [[火焰]],
+  -- ["@jy_yuanshen_electro"] = [[雷电]],
+  -- ["@jy_yuanshen_hydro"] = [[水元素]],
+  -- ["$jy_yuanshen1"] = "（音乐）",
 }
 
 local tym__ayato = General(extension, "tym__ayato", "qun", 4)
@@ -2527,9 +2347,6 @@ local jy_jinghua = fk.CreateTriggerSkill{
   end,
   on_cost = function(self, event, target, player, data)
     local room = player.room
-    -- 添加一个标记
-    -- room:setPlayerMark(player, "@jy_jinghua", "")
-    -- 询问是否要使用一张杀
     local extraData = {bypass_times = true}
     data.jinghua_use = room:askForUseCard(player, "slash", "slash|.|.", "#jy_jinghua_use", true, extraData)  -- 这里填false也没用，反正是可以取消的
     if data.jinghua_use then return true else return false end
@@ -2540,43 +2357,43 @@ local jy_jinghua = fk.CreateTriggerSkill{
     if data.jinghua_use then
       data.jinghua_use.extraUse = true  -- 加上这个，就可以让它不计入次数了
       room:setPlayerMark(player, "@jy_jinghua", "")
-      room:changeMaxHp(player, 1)  -- 先加体力上限
+      room:changeMaxHp(player, 2)  -- 先加体力上限
       room:recover({  -- 再回复体力
         who = player,
-        num = 1,
+        num = 2,
         recoverBy = player,
         skillName = self.name,
       })
       room:useCard(data.jinghua_use)
     end
-    -- 其他的交给别的函数
   end,
   on_refresh = function(self, event, target, player, data)
     local room = player.room
-    room:loseHp(player, 1, self.name)  -- 先失去体力
-    room:changeMaxHp(player, -1)  -- 再减体力上限
+    room:loseHp(player, 2, self.name)  -- 先失去体力
+    room:changeMaxHp(player, -2)  -- 再减体力上限
     room:setPlayerMark(player, "@jy_jinghua", 0)
   end,
 }
-local jy_jinghua_hydro = fk.CreateTriggerSkill{
-  mute = true,
-  name = "#jy_jinghua_hydro",
-  frequency = Skill.Compulsory,
-  events = {fk.DamageCaused},
-  can_trigger = function(self, event, target, player, data)
-    return target == player and data.card and data.card.trueName == "slash" and
-      data.damageType == fk.NormalDamage and player:getMark("@jy_jinghua") ~= 0
-      -- data.from 到底是什么数据结构？为什么jy_huapen里写的data.from ~= player.id，jy_leiyan_trigger里又from:getmark()?
-  end,
-  on_cost = Util.TrueFunc,
-  on_use = function(self, event, target, player, data)
-    local room = player.room
-    -- player:broadcastSkillInvoke("jy_jinghua")
-    data.yuanshen_type = "hydro"
-    room:doBroadcastNotify("ShowToast", Fk:translate("#jy_jinghua_hydro_toast"))
-  end,
-}
-jy_jinghua:addRelatedSkill(jy_jinghua_hydro)
+-- -- 因为已经删除了原神机制，所以不需要这个了。
+-- local jy_jinghua_hydro = fk.CreateTriggerSkill{
+--   mute = true,
+--   name = "#jy_jinghua_hydro",
+--   frequency = Skill.Compulsory,
+--   events = {fk.DamageCaused},
+--   can_trigger = function(self, event, target, player, data)
+--     return target == player and data.card and data.card.trueName == "slash" and
+--       data.damageType == fk.NormalDamage and player:getMark("@jy_jinghua") ~= 0
+--       -- data.from 到底是什么数据结构？为什么jy_huapen里写的data.from ~= player.id，jy_leiyan_trigger里又from:getmark()?
+--   end,
+--   on_cost = Util.TrueFunc,
+--   on_use = function(self, event, target, player, data)
+--     local room = player.room
+--     -- player:broadcastSkillInvoke("jy_jinghua")
+--     data.yuanshen_type = "hydro"
+--     room:doBroadcastNotify("ShowToast", Fk:translate("#jy_jinghua_hydro_toast"))
+--   end,
+-- }
+-- jy_jinghua:addRelatedSkill(jy_jinghua_hydro)
 
 -- 测试通过，没什么问题
 local jy_jianying = fk.CreateTriggerSkill{
@@ -2597,7 +2414,6 @@ local jy_jianying = fk.CreateTriggerSkill{
 
 tym__ayato:addSkill(jy_jinghua)
 tym__ayato:addSkill(jy_jianying)
-tym__ayato:addSkill("jy_yuanshen")  -- 赋给了雷电将军，别的用引号
 
 --[[
   获取原神配音方法：去下面网站找到你的角色的页面，然后查看源文件，搜索配音即可。
@@ -2605,16 +2421,16 @@ tym__ayato:addSkill("jy_yuanshen")  -- 赋给了雷电将军，别的用引号
 ]]
 
 Fk:loadTranslationTable {
-  ["tym__ayato"] = "神里绫人",
+  ["tym__ayato"] = [[<font color="skyblue">神里绫人</font>]],
   ["~tym__ayato"] = "世事无常……",
 
   ["jy_jinghua"] = "镜花",
-  [":jy_jinghua"] = [[每回合限一次，使用或打出基本牌后，你可以使用一张不计入使用次数的【杀】。若如此做，你获得1点体力上限和1点体力、你的普通【杀】造成的伤害均视为“水元素伤害”（这种伤害不视作属性伤害、不能被【铁索连环】传导，但可以被技能【原神】利用），持续到当前角色的回合结束。]],
+  [":jy_jinghua"] = [[每回合限一次，使用或打出基本牌后，你可以使用一张【杀】，该【杀】不计入使用次数。若如此做，你获得2点体力上限和2点体力，持续到当前角色的回合结束。]],
   ["@jy_jinghua"] = "镜花",
   ["$jy_jinghua1"] = "苍流水影。",
   ["$jy_jinghua2"] = "剑影。",
   ["#jy_jinghua_use"] = "镜花：你可以立即使用一张不计入使用次数的【杀】",
-  ["#jy_jinghua_hydro_toast"] = "此次伤害被转化成“水元素伤害”",
+  -- ["#jy_jinghua_hydro_toast"] = "此次伤害被转化成“水元素伤害”",
 
   ["jy_jianying"] = "渐盈",
   [":jy_jianying"] = [[锁定技，所有角色的结束阶段，若你的手牌数小于体力值，你摸一张牌。]],
