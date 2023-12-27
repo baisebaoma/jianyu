@@ -2356,18 +2356,64 @@ local jy_yuanshen = fk.CreateTriggerSkill{
       -- element[5]是这个反应需要造成的广播提示
       -- Lua 的数组从1开始
       for _, element in ipairs({ 
+        -- 火雷，造成一点额外火焰伤害
         {fk.FireDamage, "@jy_yuanshen_pyro", "@jy_yuanshen_electro", 
-          function(self, event, target, player, data) data.damage = data.damage + 1 end,
+          function(self, event, target, player, data)
+            room:damage({
+              from = data.from,
+              to = data.to,
+              damage = 1,
+              damageType = fk.FireDamage,
+              skillName = self.name,
+            })
+          end,
           "#jy_yuanshen_reaction_1",
         },
+        -- 雷火，造成一点额外火焰伤害
         {fk.ThunderDamage, "@jy_yuanshen_electro", "@jy_yuanshen_pyro", 
           function(self, event, target, player, data) 
             data.to:turnOver()  -- 受到伤害的人翻面
           end,
           "#jy_yuanshen_reaction_2",
         }, 
+        -- 水火，伤害+1
+        {"hydro", "@jy_yuanshen_hydro", "@jy_yuanshen_pyro", 
+          function(self, event, target, player, data) 
+            data.damage = data.damage + 1
+          end,
+          "#jy_yuanshen_reaction_3",
+        }, 
+        -- 火水，伤害+1
+        {fk.FireDamage, "@jy_yuanshen_pyro", "@jy_yuanshen_hydro", 
+          function(self, event, target, player, data) 
+            data.damage = data.damage + 1
+          end,
+          "#jy_yuanshen_reaction_4",
+        }, 
+        -- 水雷，弃两张牌
+        {"hydro", "@jy_yuanshen_hydro", "@jy_yuanshen_electro", 
+          function(self, event, target, player, data) 
+            room:askForDiscard(data.to, 2, 2, true, self.name, false, ".", "#jy_yuanshen_reaction_5", false)
+          end,
+          "#jy_yuanshen_reaction_5",
+        }, 
+        -- 雷水，弃两张牌
+        {fk.ThunderDamage, "@jy_yuanshen_electro", "@jy_yuanshen_pyro", 
+          function(self, event, target, player, data) 
+            room:askForDiscard(data.to, 2, 2, true, self.name, false, ".", "#jy_yuanshen_reaction_6", false)
+          end,
+          "#jy_yuanshen_reaction_6",
+        }, 
       }) do
-        if data.damageType == element[1] then  -- 如果是A属性伤害
+        -- 判断是正常的属性伤害，还是【原神】的无属性伤害
+        local damage_type_to_check
+        if type(element[1]) == "string" then
+          damage_type_to_check = data.yuanshen_type
+        elseif type(element[1]) == "int" then
+          damage_type_to_check = data.damageType
+        end
+
+        if damage_type_to_check == element[1] then  -- 如果是A属性伤害
           if data.to:getMark(element[3]) ~= 0 then  -- 如果目标有B附着
             room:setPlayerMark(data.to, element[3], 0)  -- 将B附着解除
             player:broadcastSkillInvoke("jy_yuanshen")
@@ -2416,11 +2462,12 @@ Fk:loadTranslationTable {
   ["$jy_zhenshuo3"] = "无念，断绝！",
 
   ["jy_yuanshen"] = "原神",
-  [":jy_yuanshen"] = [[锁定技，当有角色受到<font color="red">火焰</font>或<font color="Fuchsia">雷电</font>伤害时，若其没有属性标记，其获得对应属性标记；若其拥有属性标记且与伤害属性不同，则移除标记并按照以下规则触发效果：<br>
-  <font color="Fuchsia">雷电伤害</font>与<font color="red">【火焰】</font>发生反应，令其翻面；<br>
-  <font color="red">火焰伤害</font>与<font color="Fuchsia">【雷电】</font>发生反应，伤害+1。<br>
+  [":jy_yuanshen"] = [[锁定技，当有角色受到<font color="red">火焰</font>、<font color="Fuchsia">雷电</font>、</font color="blue">“水元素伤害”</font>伤害时，若其没有属性标记，其获得对应属性标记；若其拥有属性标记且与伤害属性不同，则移除标记并按照以下规则触发效果：<br>
+  <font color="red">火焰</font>与<font color="Fuchsia">雷电</font>，造成一点火焰伤害；<br>
+  <font color="blue">“水元素”</font>与<font color="red">火焰</font>，伤害+1；<br>
+  <font color="blue">“水元素”</font>与<font color="Fuchsia">雷电</font>，令其弃两张牌。<br>
   该技能对每次伤害只会触发一次，不论场上是否有多个角色拥有该技能。]],
-  ["#jy_yuanshen_reaction_1"] = [[<font color="red">火焰伤害</font>与<font color="Fuchsia">【雷电】</font>发生反应，伤害+1]],
+  ["#jy_yuanshen_reaction_1"] = [[<font color="red">火焰伤害</font>与<font color="Fuchsia">【雷电】</font>发生反应，造成一点火焰伤害]],
   ["#jy_yuanshen_reaction_2"] = [[<font color="Fuchsia">雷电伤害</font>与<font color="red">【火焰】</font>发生反应，翻面]],
 
   ["@jy_yuanshen_pyro"] = [[<font color="red">火焰</font>]],
@@ -2479,6 +2526,20 @@ local jy_jinghua = fk.CreateTriggerSkill{
     room:setPlayerMark(player, "@jy_jinghua", 0)
   end,
 }
+local jy_jinghua_hydro = fk.CreateTriggerSkill{
+  mute = true,
+  name = "#jy_jinghua_hydro",
+  frequency = Skill.Compulsory,
+  events = {fk.PreDamage},
+  can_refresh = function(self, event, target, player, data)
+    return player:hasSkill(self) and data.from == player and data.damageType == fk.NormalDamage and player:getMark("@jy_jinghua") ~= 0
+  end
+  on_refresh = function(self, event, target, player, data)
+    player:broadcastSkillInvoke("jy_jinghua")
+    data.yuanshen_type = "hydro"
+  end
+}
+jy_jinghua:addRelatedSkill(jy_jinghua_hydro)
 
 -- 测试通过，没什么问题
 local jy_jianying = fk.CreateTriggerSkill{
@@ -2511,7 +2572,7 @@ Fk:loadTranslationTable {
   ["~tym__ayato"] = "世事无常……",
 
   ["jy_jinghua"] = "镜花",
-  [":jy_jinghua"] = [[每回合限一次，使用或打出基本牌后，你可以使用一张不计入使用次数的【杀】。若如此做，你获得1点体力上限和1点体力，持续到当前角色的回合结束。]],
+  [":jy_jinghua"] = [[每回合限一次，使用或打出基本牌后，你可以使用一张不计入使用次数的【杀】。若如此做，你获得1点体力上限和1点体力、你造成的无属性伤害均视为“水元素伤害”（这种伤害不视作属性伤害、不能被【铁索连环】传导，但可以被技能【原神】利用），持续到当前角色的回合结束。]],
   ["@jy_jinghua"] = "镜花",
   ["$jy_jinghua1"] = "苍流水影。",
   ["$jy_jinghua2"] = "剑影。",
