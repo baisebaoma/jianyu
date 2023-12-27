@@ -2411,11 +2411,12 @@ local jy_yuanshen = fk.CreateTriggerSkill{
           "#jy_yuanshen_reaction_6",
         }, 
       }) do
+
         -- 判断是正常的属性伤害，还是【原神】的无属性伤害
         local damage_type_to_check
-        if type(element[1]) == "string" then
+        if data.yuanshen_type then
           damage_type_to_check = data.yuanshen_type
-        elseif type(element[1]) == "number" then
+        else
           damage_type_to_check = data.damageType
         end
 
