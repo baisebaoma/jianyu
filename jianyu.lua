@@ -2236,7 +2236,7 @@ local jy_jianying = fk.CreateTriggerSkill{
   frequency = Skill.Compulsory,
   name = "jy_jianying",
   anim_type = "defensive",
-  events = {fk.EventPhaseEnd},
+  events = {fk.EventPhaseProceeding},
   can_trigger = function(self, event, target, player, data)
     -- 任何一个人回合都要发动
     return player:hasSkill(self) and
