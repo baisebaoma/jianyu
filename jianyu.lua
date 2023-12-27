@@ -2344,12 +2344,17 @@ local jy_yuanshen = fk.CreateTriggerSkill{
   events = {fk.DamageInflicted},
   can_trigger = function(self, event, target, player, data)
     if not player:hasSkill(self) then return false end
-    return (data.damageType == fk.FireDamage or data.damageType == fk.ThunderDamage or data.yuanshen_type) and
-      not data.is_jy_yuanshen_triggered
+    return not data.is_jy_yuanshen_triggered
     -- 现在由于引进了新的元素，所以也得用data.yuanshen_type判断有没有新的元素
   end,
   on_use = function(self, event, target, player, data)
     local room = player.room
+
+    local can_react = {}
+    can_react["@jy_yuanshen_pyro"] = {"@jy_yuanshen_electro", "@jy_yuanshen_hydro"}
+    can_react["@jy_yuanshen_electro"] = {"@jy_yuanshen_pyro", "@jy_yuanshen_hydro"}
+    can_react["@jy_yuanshen_hydro"] = {"@jy_yuanshen_pyro", "@jy_yuanshen_electro"}
+
     if data.damageType then
       -- 使用for循环以方便后面添加元素反应类型。每次只会有一种反应发生。
       -- element[1]是A属性类型，element[2]是A对应的附着标记，
@@ -2400,18 +2405,16 @@ local jy_yuanshen = fk.CreateTriggerSkill{
         -- 水雷，弃两张牌
         {"hydro", "@jy_yuanshen_hydro", "@jy_yuanshen_electro", 
           function(self, event, target, player, data) 
-            -- local room = player.room
-            -- room:askForDiscard(data.to, 2, 2, true, self.name, false)
-            data.damage = data.damage + 1
+            local room = player.room
+            room:askForDiscard(data.to, 2, 2, true, self.name, false)
           end,
           "#jy_yuanshen_reaction_5",
         }, 
         -- 雷水，弃两张牌
         {fk.ThunderDamage, "@jy_yuanshen_electro", "@jy_yuanshen_hydro", 
           function(self, event, target, player, data) 
-            -- local room = player.room
-            -- room:askForDiscard(data.to, 2, 2, true, self.name, false)
-            data.damage = data.damage + 1
+            local room = player.room
+            room:askForDiscard(data.to, 2, 2, true, self.name, false)
           end,
           "#jy_yuanshen_reaction_6",
         }, 
@@ -2422,12 +2425,28 @@ local jy_yuanshen = fk.CreateTriggerSkill{
         if data.yuanshen_type then
           damage_type_to_check = data.yuanshen_type
         else
-          -- room:doBroadcastNotify("ShowToast", Fk:translate("没有传入yuanshen_type"))
           damage_type_to_check = data.damageType
         end
 
         if damage_type_to_check == element[1] then  -- 如果是A属性伤害
-          if data.to:getMark(element[3]) ~= 0 then  -- 如果目标有B附着
+
+          if data.to:getMark(element[2]) == 0 then   -- 如果目标没有A附着
+            local has_reactable_mark = false  -- 也没有能被A反应的附着
+            for _, m in ipairs(can_react(element[2])) do
+              if player:getMark(m) ~= 0 then
+                has_reactable_mark = true
+                break
+              end
+            end
+
+            if not has_reactable_mark then
+              room:setPlayerMark(data.to, element[2], "")  -- 造成A附着
+              data.is_jy_yuanshen_triggered = true  -- 如果有多个拥有这个技能的人，告诉他不用再发动了
+              return
+            end
+          end
+
+          if data.to:getMark(element[3]) ~= 0 then  -- 如果目标有B附着，那就反应
             room:setPlayerMark(data.to, element[3], 0)  -- 将B附着解除
             player:broadcastSkillInvoke("jy_yuanshen")
             room:doBroadcastNotify("ShowToast", Fk:translate(element[5]))  -- 广播发生了元素反应。先广播再造成效果！
@@ -2439,11 +2458,7 @@ local jy_yuanshen = fk.CreateTriggerSkill{
             data.is_jy_yuanshen_triggered = true  -- 如果有多个拥有这个技能的人，告诉他不用再发动了
             return  -- 结束了，不用判断下面的了
           end
-          if data.to:getMark(element[2]) == 0 then   -- 如果目标没有A附着
-            room:setPlayerMark(data.to, element[2], "")  -- 造成A附着
-            data.is_jy_yuanshen_triggered = true  -- 如果有多个拥有这个技能的人，告诉他不用再发动了
-            return
-          end
+
         end
       end
     end
