@@ -2290,7 +2290,7 @@ tym__raiden:addSkill(jy_leiyan)
 tym__raiden:addSkill(jy_zhenshuo)
 
 Fk:loadTranslationTable {
-  ["tym__raiden"] = [[<font color="Fuchsia">雷电将军</font>]],
+  ["tym__raiden"] = [[雷电将军]],
   ["~tym__raiden"] = "浮世一梦……",
 
   ["jy_leiyan"] = "雷眼",
@@ -2421,7 +2421,7 @@ tym__ayato:addSkill(jy_jianying)
 ]]
 
 Fk:loadTranslationTable {
-  ["tym__ayato"] = [[<font color="skyblue">神里绫人</font>]],
+  ["tym__ayato"] = [[神里绫人]],
   ["~tym__ayato"] = "世事无常……",
 
   ["jy_jinghua"] = "镜花",
@@ -2438,11 +2438,11 @@ Fk:loadTranslationTable {
   ["$jy_jianying2"] = "呵……余兴节目。",
 }
 
--- for k, v in pairs(Fk.translations["zh_CN"]) do
---   v = string.gsub(v, "火焰", "<font color=\"red\">火焰</font>")
---   v = string.gsub(v, "雷电", "<font color=\"Fuchsia\">雷电</font>")
---   v = string.gsub(v, "水元素", "<font color=\"skyblue\">水元素</font>")
---   Fk.translations["zh_CN"][k] = v
--- end
+-- 如果不这样的话，字会旋转
+for k, v in pairs(Fk.translations["zh_CN"]) do
+  v = string.gsub(v, "雷电将军", "<font color=\"Fuchsia\">雷电将军</font>")
+  v = string.gsub(v, "神里绫人", "<font color=\"skyblue\">神里绫人</font>")
+  Fk.translations["zh_CN"][k] = v
+end
 
 return extension
