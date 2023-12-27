@@ -2400,16 +2400,18 @@ local jy_yuanshen = fk.CreateTriggerSkill{
         -- 水雷，弃两张牌
         {"hydro", "@jy_yuanshen_hydro", "@jy_yuanshen_electro", 
           function(self, event, target, player, data) 
-            local room = player.room
-            room:askForDiscard(data.to, 2, 2, true, self.name, false, ".", "#jy_yuanshen_reaction_5", false)
+            -- local room = player.room
+            -- room:askForDiscard(data.to, 2, 2, true, self.name, false)
+            data.damage = data.damage + 1
           end,
           "#jy_yuanshen_reaction_5",
         }, 
         -- 雷水，弃两张牌
-        {fk.ThunderDamage, "@jy_yuanshen_electro", "@jy_yuanshen_pyro", 
+        {fk.ThunderDamage, "@jy_yuanshen_electro", "@jy_yuanshen_hydro", 
           function(self, event, target, player, data) 
-            local room = player.room
-            room:askForDiscard(data.to, 2, 2, true, self.name, false, ".", "#jy_yuanshen_reaction_6", false)
+            -- local room = player.room
+            -- room:askForDiscard(data.to, 2, 2, true, self.name, false)
+            data.damage = data.damage + 1
           end,
           "#jy_yuanshen_reaction_6",
         }, 
@@ -2547,14 +2549,14 @@ local jy_jinghua_hydro = fk.CreateTriggerSkill{
   frequency = Skill.Compulsory,
   events = {fk.DamageCaused},
   can_trigger = function(self, event, target, player, data)
-    return target == player and 
+    return target == player and data.card and data.card.trueName == "slash" and
       data.damageType == fk.NormalDamage and player:getMark("@jy_jinghua") ~= 0
       -- data.from 到底是什么数据结构？为什么jy_huapen里写的data.from ~= player.id，jy_leiyan_trigger里又from:getmark()?
   end,
   on_cost = Util.TrueFunc,
   on_use = function(self, event, target, player, data)
     local room = player.room
-    player:broadcastSkillInvoke("jy_jinghua")
+    -- player:broadcastSkillInvoke("jy_jinghua")
     data.yuanshen_type = "hydro"
     room:doBroadcastNotify("ShowToast", Fk:translate("#jy_jinghua_hydro_toast"))
   end,
@@ -2592,7 +2594,7 @@ Fk:loadTranslationTable {
   ["~tym__ayato"] = "世事无常……",
 
   ["jy_jinghua"] = "镜花",
-  [":jy_jinghua"] = [[每回合限一次，使用或打出基本牌后，你可以使用一张不计入使用次数的【杀】。若如此做，你获得1点体力上限和1点体力、你造成的无属性伤害均视为“水元素伤害”（这种伤害不视作属性伤害、不能被【铁索连环】传导，但可以被技能【原神】利用），持续到当前角色的回合结束。]],
+  [":jy_jinghua"] = [[每回合限一次，使用或打出基本牌后，你可以使用一张不计入使用次数的【杀】。若如此做，你获得1点体力上限和1点体力、你的普通【杀】造成的伤害均视为“水元素伤害”（这种伤害不视作属性伤害、不能被【铁索连环】传导，但可以被技能【原神】利用），持续到当前角色的回合结束。]],
   ["@jy_jinghua"] = "镜花",
   ["$jy_jinghua1"] = "苍流水影。",
   ["$jy_jinghua2"] = "剑影。",
