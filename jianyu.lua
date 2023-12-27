@@ -2400,6 +2400,7 @@ local jy_yuanshen = fk.CreateTriggerSkill{
         -- 水雷，弃两张牌
         {"hydro", "@jy_yuanshen_hydro", "@jy_yuanshen_electro", 
           function(self, event, target, player, data) 
+            local room = player.room
             room:askForDiscard(data.to, 2, 2, true, self.name, false, ".", "#jy_yuanshen_reaction_5", false)
           end,
           "#jy_yuanshen_reaction_5",
@@ -2407,6 +2408,7 @@ local jy_yuanshen = fk.CreateTriggerSkill{
         -- 雷水，弃两张牌
         {fk.ThunderDamage, "@jy_yuanshen_electro", "@jy_yuanshen_pyro", 
           function(self, event, target, player, data) 
+            local room = player.room
             room:askForDiscard(data.to, 2, 2, true, self.name, false, ".", "#jy_yuanshen_reaction_6", false)
           end,
           "#jy_yuanshen_reaction_6",
@@ -2471,21 +2473,21 @@ Fk:loadTranslationTable {
   ["$jy_zhenshuo3"] = "无念，断绝！",
 
   ["jy_yuanshen"] = "原神",
-  [":jy_yuanshen"] = [[锁定技，当有角色受到<font color="red">火焰</font>、<font color="Fuchsia">雷电</font>、</font color="blue">“水元素伤害”</font>伤害时，若其没有属性标记，其获得对应属性标记；若其拥有属性标记且与伤害属性不同，则移除标记并按照以下规则触发效果：<br>
-  <font color="red">火焰</font>与<font color="Fuchsia">雷电</font>，造成一点火焰伤害；<br>
-  <font color="blue">“水元素”</font>与<font color="red">火焰</font>，伤害+1；<br>
-  <font color="blue">“水元素”</font>与<font color="Fuchsia">雷电</font>，令其弃两张牌。<br>
+  [":jy_yuanshen"] = [[锁定技，当有角色受到火焰、雷电、“水元素伤害”伤害时，若其没有属性标记，其获得对应属性标记；若其拥有属性标记且与伤害属性不同，则移除标记并按照以下规则触发效果：<br>
+  火焰与雷电，造成一点火焰伤害；<br>
+  “水元素”与火焰，伤害+1；<br>
+  “水元素”与雷电，令其弃两张牌。<br>
   该技能对每次伤害只会触发一次，不论场上是否有多个角色拥有该技能。]],
-  ["#jy_yuanshen_reaction_1"] = [[<font color="red">火焰伤害</font>与<font color="Fuchsia">【雷电】</font>发生反应，造成一点无属性伤害]],
-  ["#jy_yuanshen_reaction_2"] = [[<font color="Fuchsia">雷电伤害</font>与<font color="red">【火焰】</font>发生反应，造成一点无属性伤害]],
-  ["#jy_yuanshen_reaction_3"] = [[<font color="blue">“水元素伤害”</font>与<font color="red">【火焰】</font>发生反应，伤害+1]],
-  ["#jy_yuanshen_reaction_4"] = [[<font color="red">火焰伤害</font>与<font color="blue">【水元素】</font>发生反应，伤害+1]],
-  ["#jy_yuanshen_reaction_5"] = [[<font color="blue">“水元素伤害”</font>与<font color="Fuchsia">【雷电】</font>发生反应，弃两张牌]],
-  ["#jy_yuanshen_reaction_6"] = [[<font color="Fuchsia">雷电伤害</font>与<font color="blue">【水元素】</font>发生反应，弃两张牌]],
+  ["#jy_yuanshen_reaction_1"] = [[火焰伤害与【雷电】发生反应，造成一点无属性伤害]],
+  ["#jy_yuanshen_reaction_2"] = [[雷电伤害与【火焰】发生反应，造成一点无属性伤害]],
+  ["#jy_yuanshen_reaction_3"] = [[“水元素伤害”与【火焰】发生反应，伤害+1]],
+  ["#jy_yuanshen_reaction_4"] = [[火焰伤害与【水元素】发生反应，伤害+1]],
+  ["#jy_yuanshen_reaction_5"] = [[“水元素伤害”与【雷电】发生反应，弃两张牌]],
+  ["#jy_yuanshen_reaction_6"] = [[雷电伤害与【水元素】发生反应，弃两张牌]],
 
-  ["@jy_yuanshen_pyro"] = [[<font color="red">火焰</font>]],
-  ["@jy_yuanshen_electro"] = [[<font color="Fuchsia">雷电</font>]],
-  ["@jy_yuanshen_hydro"] = [[<font color="blue">水元素</font>]],
+  ["@jy_yuanshen_pyro"] = [[火焰]],
+  ["@jy_yuanshen_electro"] = [[雷电]],
+  ["@jy_yuanshen_hydro"] = [[水元素]],
   ["$jy_yuanshen1"] = "（音乐）",
 }
 
@@ -2603,9 +2605,11 @@ Fk:loadTranslationTable {
   ["$jy_jianying2"] = "呵……余兴节目。",
 }
 
--- for k, v in pairs(Fk.translations["zh_CN"]) do
---   v = string.gsub(v, "原神技", "<font color=\"skyblue\">原神技</font>")
---   Fk.translations["zh_CN"][k] = v
--- end
+for k, v in pairs(Fk.translations["zh_CN"]) do
+  v = string.gsub(v, "火焰", "<font color=\"red\">火焰</font>")
+  v = string.gsub(v, "雷电", "<font color=\"Fuchsia\">雷电</font>")
+  v = string.gsub(v, "水元素", "<font color=\"skyblue\">水元素</font>")
+  Fk.translations["zh_CN"][k] = v
+end
 
 return extension
