@@ -2344,8 +2344,9 @@ local jy_yuanshen = fk.CreateTriggerSkill{
   events = {fk.DamageInflicted},
   can_trigger = function(self, event, target, player, data)
     if not player:hasSkill(self) then return false end
-    return (data.damageType == fk.FireDamage or data.damageType == fk.ThunderDamage) and
+    return (data.damageType == fk.FireDamage or data.damageType == fk.ThunderDamage or damage.yuanshen_type) and
       not data.is_jy_yuanshen_triggered
+    -- 现在由于引进了新的元素，所以也得判断有没有新的元素
   end,
   on_use = function(self, event, target, player, data)
     local room = player.room
@@ -2417,6 +2418,7 @@ local jy_yuanshen = fk.CreateTriggerSkill{
         if data.yuanshen_type then
           damage_type_to_check = data.yuanshen_type
         else
+          -- room:doBroadcastNotify("ShowToast", Fk:translate("没有传入yuanshen_type"))
           damage_type_to_check = data.damageType
         end
 
