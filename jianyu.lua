@@ -2474,7 +2474,7 @@ Fk:loadTranslationTable {
 
   ["jy_yuanshen"] = "原神",
   [":jy_yuanshen"] = [[锁定技，当有角色受到火焰、雷电、“水元素伤害”伤害时，若其没有属性标记，其获得对应属性标记；若其拥有属性标记且与伤害属性不同，则移除标记并按照以下规则触发效果：<br>
-  火焰与雷电，造成一点火焰伤害；<br>
+  火焰与雷电，造成一点无属性伤害；<br>
   “水元素”与火焰，伤害+1；<br>
   “水元素”与雷电，令其弃两张牌。<br>
   该技能对每次伤害只会触发一次，不论场上是否有多个角色拥有该技能。]],
@@ -2545,7 +2545,7 @@ local jy_jinghua_hydro = fk.CreateTriggerSkill{
   mute = true,
   name = "#jy_jinghua_hydro",
   frequency = Skill.Compulsory,
-  events = {fk.PreDamage},
+  events = {fk.DamageCaused},
   can_trigger = function(self, event, target, player, data)
     return target == player and 
       data.damageType == fk.NormalDamage and player:getMark("@jy_jinghua") ~= 0
@@ -2605,11 +2605,11 @@ Fk:loadTranslationTable {
   ["$jy_jianying2"] = "呵……余兴节目。",
 }
 
-for k, v in pairs(Fk.translations["zh_CN"]) do
-  v = string.gsub(v, "火焰", "<font color=\"red\">火焰</font>")
-  v = string.gsub(v, "雷电", "<font color=\"Fuchsia\">雷电</font>")
-  v = string.gsub(v, "水元素", "<font color=\"skyblue\">水元素</font>")
-  Fk.translations["zh_CN"][k] = v
-end
+-- for k, v in pairs(Fk.translations["zh_CN"]) do
+--   v = string.gsub(v, "火焰", "<font color=\"red\">火焰</font>")
+--   v = string.gsub(v, "雷电", "<font color=\"Fuchsia\">雷电</font>")
+--   v = string.gsub(v, "水元素", "<font color=\"skyblue\">水元素</font>")
+--   Fk.translations["zh_CN"][k] = v
+-- end
 
 return extension
