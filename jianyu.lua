@@ -2533,11 +2533,11 @@ local jy_jinghua_hydro = fk.CreateTriggerSkill{
   events = {fk.PreDamage},
   can_refresh = function(self, event, target, player, data)
     return player:hasSkill(self) and data.from == player and data.damageType == fk.NormalDamage and player:getMark("@jy_jinghua") ~= 0
-  end
+  end,
   on_refresh = function(self, event, target, player, data)
     player:broadcastSkillInvoke("jy_jinghua")
     data.yuanshen_type = "hydro"
-  end
+  end,
 }
 jy_jinghua:addRelatedSkill(jy_jinghua_hydro)
 
