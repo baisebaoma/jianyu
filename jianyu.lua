@@ -2460,7 +2460,6 @@ local jy_jinghua = fk.CreateTriggerSkill{
     if data.jinghua_use then
       data.jinghua_use.extraUse = true  -- 加上这个，就可以让它不计入次数了
       room:setPlayerMark(player, "@jy_jinghua", "")
-      room:useCard(data.jinghua_use)
       room:changeMaxHp(player, 1)  -- 先加体力上限
       room:recover({  -- 再回复体力
         who = player,
@@ -2468,6 +2467,7 @@ local jy_jinghua = fk.CreateTriggerSkill{
         recoverBy = player,
         skillName = self.name,
       })
+      room:useCard(data.jinghua_use)
     end
     -- 其他的交给别的函数
   end,
@@ -2499,16 +2499,21 @@ local jy_jianying = fk.CreateTriggerSkill{
 tym__ayato:addSkill(jy_jinghua)
 tym__ayato:addSkill(jy_jianying)
 
+--[[
+  获取原神配音方法：去下面网站找到你的角色的页面，然后查看源文件，搜索配音即可。
+  https://bbs.mihoyo.com/ys/obc/channel/map/189/25?bbs_presentation_style=no_header
+]]
+
 Fk:loadTranslationTable {
   ["tym__ayato"] = "神里绫人",
   ["~tym__ayato"] = "世事无常……",
 
   ["jy_jinghua"] = "镜花",
-  [":jy_jinghua"] = [[每回合限一次，使用或打出基本牌后，你可以使用一张不计入使用次数的【杀】。若使用，则你增加一点体力上限并回复一点体力，持续到当前角色的回合结束。]],
-  ["@jy_jinghua"] = "镜花",
-  ["$jy_jinghua1"] = "苍流水影！",
-  ["$jy_jinghua2"] = "剑影！",
-  ["#jy_jinghua_use"] = "镜花：你可以立即使用一张【杀】",
+  [":jy_jinghua"] = [[每回合限一次，使用或打出基本牌后，你可以使用一张不计入使用次数的【杀】。若如此做：你增加一点体力上限然后回复一点体力；当前角色的回合结束时，你失去一点体力然后减少一点体力上限。]],
+  ["@jy_jinghua"] = "镜花若如此做：
+  ["$jy_jinghua1"] = "苍流水影。",
+  ["$jy_jinghua2"] = "剑影。",
+  ["#jy_jinghua_use"] = "镜花：你可以立即使用一张不计入使用次数的【杀】",
 
   ["jy_jianying"] = "渐盈",
   [":jy_jianying"] = [[锁定技，每名角色的结束阶段，若你的手牌数小于体力值，你摸一张牌。]],
