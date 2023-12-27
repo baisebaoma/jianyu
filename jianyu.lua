@@ -2393,7 +2393,7 @@ local jy_yuanshen = fk.CreateTriggerSkill{
 
 tym__raiden:addSkill(jy_leiyan)
 tym__raiden:addSkill(jy_zhenshuo)
-tym__raiden:addSkill(jy_yuanshen)  -- 赋给了雷电将军，别的用引号
+-- tym__raiden:addSkill(jy_yuanshen)  -- 赋给了雷电将军，别的用引号
 
 Fk:loadTranslationTable {
   ["tym__raiden"] = "雷电将军",
@@ -2467,6 +2467,7 @@ local jy_jinghua = fk.CreateTriggerSkill{
         recoverBy = player,
         skillName = self.name,
       })
+      room:delay(1000)
       room:useCard(data.jinghua_use)
     end
     -- 其他的交给别的函数
@@ -2487,9 +2488,9 @@ local jy_jianying = fk.CreateTriggerSkill{
   events = {fk.EventPhaseEnd},
   can_trigger = function(self, event, target, player, data)
     -- 任何一个人回合都要发动
-    return player:hasSkill(self)
-      and target.phase == Player.Finish and  -- 如果是这个人的回合结束阶段
-      #player:getCardIds(Player.Hand) < player.hp // 2
+    return player:hasSkill(self) and target ~= player and
+      target.phase == Player.Finish and  -- 如果是这个人的回合结束阶段
+      #player:getCardIds(Player.Hand) < player.hp
   end,
   on_use = function(self, event, target, player, data)
     player:drawCards(1)
@@ -2509,14 +2510,14 @@ Fk:loadTranslationTable {
   ["~tym__ayato"] = "世事无常……",
 
   ["jy_jinghua"] = "镜花",
-  [":jy_jinghua"] = [[每回合限一次，使用或打出基本牌后，你可以使用一张不计入使用次数的【杀】。若如此做：你获得2点体力上限和2点体力，持续到当前角色的回合结束。]],
+  [":jy_jinghua"] = [[每回合限一次，使用或打出基本牌后，你可以使用一张不计入使用次数的【杀】。若如此做，你获得2点体力上限和2点体力，持续到当前角色的回合结束。]],
   ["@jy_jinghua"] = "镜花",
   ["$jy_jinghua1"] = "苍流水影。",
   ["$jy_jinghua2"] = "剑影。",
   ["#jy_jinghua_use"] = "镜花：你可以立即使用一张不计入使用次数的【杀】",
 
   ["jy_jianying"] = "渐盈",
-  [":jy_jianying"] = [[锁定技，每名角色的结束阶段，若你的手牌数小于体力值的一半（向下取整），你摸一张牌。]],
+  [":jy_jianying"] = [[锁定技，其他角色的结束阶段，若你的手牌数小于体力值，你摸一张牌。]],
   ["$jy_jianying1"] = "冒进是大忌。",
   ["$jy_jianying2"] = "呵……余兴节目。",
 }
