@@ -2409,7 +2409,7 @@ local jy_yuanshen = fk.CreateTriggerSkill{
         local damage_type_to_check
         if type(element[1]) == "string" then
           damage_type_to_check = data.yuanshen_type
-        elseif type(element[1]) == "int" then
+        elseif type(element[1]) == "number" then
           damage_type_to_check = data.damageType
         end
 
@@ -2469,9 +2469,14 @@ Fk:loadTranslationTable {
   该技能对每次伤害只会触发一次，不论场上是否有多个角色拥有该技能。]],
   ["#jy_yuanshen_reaction_1"] = [[<font color="red">火焰伤害</font>与<font color="Fuchsia">【雷电】</font>发生反应，造成一点火焰伤害]],
   ["#jy_yuanshen_reaction_2"] = [[<font color="Fuchsia">雷电伤害</font>与<font color="red">【火焰】</font>发生反应，翻面]],
+  ["#jy_yuanshen_reaction_3"] = [[<font color="blue">“水元素伤害”</font>与<font color="red">【火焰】</font>发生反应，伤害+1]],
+  ["#jy_yuanshen_reaction_4"] = [[<font color="red">火焰伤害</font>与<font color="blue">【水元素】</font>发生反应，伤害+1]],
+  ["#jy_yuanshen_reaction_5"] = [[<font color="blue">“水元素伤害”</font>与<font color="Fuchsia">【雷电】</font>发生反应，弃两张牌]],
+  ["#jy_yuanshen_reaction_6"] = [[<font color="Fuchsia">雷电伤害</font>与<font color="blue">【水元素】</font>发生反应，弃两张牌]],
 
   ["@jy_yuanshen_pyro"] = [[<font color="red">火焰</font>]],
   ["@jy_yuanshen_electro"] = [[<font color="Fuchsia">雷电</font>]],
+  ["@jy_yuanshen_hydro"] = [[<font color="blue">水元素</font>]],
   ["$jy_yuanshen1"] = "（音乐）",
 }
 
@@ -2514,7 +2519,7 @@ local jy_jinghua = fk.CreateTriggerSkill{
         recoverBy = player,
         skillName = self.name,
       })
-      room:delay(400)
+      room:delay(200)
       room:useCard(data.jinghua_use)
     end
     -- 其他的交给别的函数
