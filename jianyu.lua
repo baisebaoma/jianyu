@@ -2191,11 +2191,10 @@ local jy_jinghua = fk.CreateTriggerSkill{
   name = "jy_jinghua",
   anim_type = "offensive",
   events = {fk.CardResponding, fk.CardUseFinished},
-  refresh_events = {fk.EventPhaseEnd},
+  refresh_events = {fk.EventPhaseChanging},
   can_refresh = function(self, event, target, player, data)
-    return player:hasSkill(self)
-      and target.phase == Player.Finish and  -- 如果是这个人的回合结束阶段
-      player:getMark("@jy_jinghua") ~= 0
+    return player:hasSkill(self) and 
+      data.to == Player.Start and player:getMark("@jy_jinghua") ~= 0
   end,
   can_trigger = function(self, event, target, player, data)
     return player:hasSkill(self) and data.card and data.card.type == Card.TypeBasic and 
