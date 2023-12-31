@@ -2047,7 +2047,7 @@ Fk:loadTranslationTable {
 
 }
 
-local tym__raiden = General(extension, "tym__raiden", "god", 4, 4, General.Female)
+local tym__raiden = General(extension, "tym__raiden", "god", 3, 3, General.Female)
 
 local jy_leiyan = fk.CreateActiveSkill{
   name = "jy_leiyan",
@@ -2224,7 +2224,11 @@ local jy_jinghua = fk.CreateTriggerSkill{
   end,
   on_refresh = function(self, event, target, player, data)
     local room = player.room
-    room:loseHp(player, 2, self.name)  -- 先失去体力
+    if player.hp <= 2 then
+      room:loseHp(player, 2-player.hp, self.name)
+    else
+      room:loseHp(player, 2, self.name)  -- 先失去体力
+    end
     room:changeMaxHp(player, -2)  -- 再减体力上限
     room:setPlayerMark(player, "@jy_jinghua", 0)
   end,
@@ -2260,14 +2264,14 @@ Fk:loadTranslationTable {
   ["~tym__ayato"] = "世事无常……",
 
   ["jy_jinghua"] = "镜花",
-  [":jy_jinghua"] = [[每回合限一次，使用或打出基本牌后，你可以使用一张【杀】，该【杀】不计入使用次数。若如此做，你获得2点体力上限和2点体力，持续到当前角色的回合结束。]],
+  [":jy_jinghua"] = [[每回合限一次，使用或打出基本牌后，你可以使用一张不计入使用次数的【杀】。若如此做，你获得2点体力上限和2点体力，持续到当前角色的回合结束。若你会因为该技能的失去体力而进入濒死状态，则改为将体力降至1。]],
   ["@jy_jinghua"] = "镜花",
   ["$jy_jinghua1"] = "苍流水影。",
   ["$jy_jinghua2"] = "剑影。",
   ["#jy_jinghua_use"] = "镜花：你可以立即使用一张不计入使用次数的【杀】",
 
   ["jy_jianying"] = "渐盈",
-  [":jy_jianying"] = [[锁定技，所有角色的结束阶段，若你的手牌数小于体力值，你摸一张牌。]],
+  [":jy_jianying"] = [[锁定技，所有角色的结束阶段，若手牌数小于体力值，你摸一张牌。]],
   ["$jy_jianying1"] = "冒进是大忌。",
   ["$jy_jianying2"] = "呵……余兴节目。",
 }
