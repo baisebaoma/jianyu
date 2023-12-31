@@ -7,15 +7,24 @@ local U = require "packages/utility/utility"
 local Q = require "packages/jianyu/question"  -- 考公大学生用的题库
 
 Fk:loadTranslationTable {
-     ["jy_jianyu"] = "简浴",
+     ["jy_jianyu"] = [[<font color="red">简</font>浴]],
      ["xjb"] = "导演",
      ["tym"] = "反赌专家",
      ["skl"] = "拂却心尘",
      ["zer"] = "敏敏伊人",
 }
 
+local jy_note = fk.CreateTriggerSkill{
+  name = "jy_note",
+}
+
+Fk:loadTranslationTable {
+  ["jy_note"] = [[<font color="red">注意</font>]],
+  [":jy_note"] = [[为了追上活动服的普遍强度，简浴包对所有武将进行了过度的加强。可能已经不适合普通对局。]],
+}
+
 -- 熊简自豪
-local xjb__jianzihao = General(extension, "xjb__jianzihao", "qun", 3)
+local xjb__jianzihao = General(extension, "xjb__jianzihao", "qun", 12)
 
 -- 红温
 local jy_hongwen = fk.CreateFilterSkill{
@@ -206,7 +215,9 @@ local jy_sanjian = fk.CreateTriggerSkill{
   end,
   on_use = function(self, event, target, player, data)
     local room = player.room
-    room:useVirtualCard("analeptic", nil, player, player, self.name, false)
+    -- room:useVirtualCard("analeptic", nil, player, player, self.name, false)
+    room:useVirtualCard("ex_nihilo", nil, player, player, self.name, false)
+    room:useVirtualCard("ex_nihilo", nil, player, player, self.name, false)
     room:useVirtualCard("ex_nihilo", nil, player, player, self.name, false)
   end,
 }
@@ -272,7 +283,7 @@ local jy_xizao_2 = fk.CreateTriggerSkill{
     })
     equip_num = #player:getCardIds(Player.Equip)
     player:throwAllCards("e")
-    player:drawCards(equip_num)
+    player:drawCards(equip_num * 3)
   end,
 }
 
@@ -298,11 +309,11 @@ Fk:loadTranslationTable{
   ["$jy_kaiju_28"] = "Oh my God，我要珍惜这段时光，我要好好地将它珍惜！",
 
   ["jy_sanjian"] = "三件",
-  [":jy_sanjian"] = [[锁定技，出牌阶段开始时，若装备区有且仅有3张牌，你视为使用一张【酒】和一张【无中生有】。]],
+  [":jy_sanjian"] = [[锁定技，出牌阶段开始时，若装备区有且仅有3张牌，你视为使用三张【无中生有】。]],
   ["$jy_sanjian1"] = "也不是稳赢吧，我觉得赢了！",
 
   ["jy_xizao_2"] = "洗澡",
-  [":jy_xizao_2"] = "限定技，处于濒死状态且装备区有牌时，你可以弃置所有装备区的牌、将体力恢复至1，然后每以此法弃置一张牌，你摸一张牌。",
+  [":jy_xizao_2"] = "限定技，处于濒死状态且装备区有牌时，你可以弃置所有装备区的牌、将体力恢复至1，然后每以此法弃置一张牌，你摸三张牌。",
   ["$jy_xizao_21"] = "呃啊啊啊啊啊啊啊！！",
   ["$jy_xizao_22"] = "也不是稳赢吧，我觉得赢了！",
   ["$jy_xizao_23"] = "真的我是真玩不了，这跟变态没关系，我好他妈的气！",
@@ -311,7 +322,7 @@ Fk:loadTranslationTable{
 }
 
 -- 尚李元浩
-local skl__liyuanhao = General(extension, "skl__liyuanhao", "qun", 3)
+local skl__liyuanhao = General(extension, "skl__liyuanhao", "qun", 4)
 
 -- 虎啸
 -- 参考自铁骑，屯田，脑洞包明哲，克己（原来克己已经监视了使用和打出了，不用写那么复杂）
@@ -526,7 +537,7 @@ Fk:loadTranslationTable {
 
 -- 唐李元浩
 -- 在活动服环境里，也许没那么强？
-local tym__liyuanhao = General(extension, "tym__liyuanhao", "qun", 3)
+local tym__liyuanhao = General(extension, "tym__liyuanhao", "qun", 4)
 
 -- 界虎啸
 -- 参考自铁骑，屯田，脑洞包明哲，克己（原来克己已经监视了使用和打出了，不用写那么复杂）
@@ -698,7 +709,7 @@ tym__liyuanhao:addSkill(jy_huxiao_2)
 tym__liyuanhao:addSkill(jy_huxiao_analeptic_2)
 tym__liyuanhao:addSkill(jy_huxiao_jink_2)
 tym__liyuanhao:addSkill(jy_erduanxiao_2)
-tym__liyuanhao:addSkill("paoxiao")
+tym__liyuanhao:addSkill("wusheng")
 
 Fk:loadTranslationTable {
   ["tym__liyuanhao"] = "界李元浩",
@@ -756,9 +767,9 @@ local jy_yuyu = fk.CreateTriggerSkill{
   end,
   on_use = function(self, event, target, player, data)
     if self.choice == "#jy_yuyu_draw3" then
-      player:drawCards(4)
+      player:drawCards(10)
     else
-      player:drawCards(7)
+      player:drawCards(20)
       player:turnOver()
     end
     self.this_time_slash = false
@@ -772,11 +783,11 @@ Fk:loadTranslationTable {
 
   ["jy_yuyu"] = "玉玉",
   [":jy_yuyu"] = [[1. 锁定技，当有角色对你使用【杀】造成了伤害时，其获得【致郁】标记；<br>
-  2. 受到没有【致郁】标记的角色或因本次伤害而获得【致郁】标记的角色造成的伤害时，你可以选择一项：摸四张牌；摸七张牌并翻面。]],
+  2. 受到没有【致郁】标记的角色或因本次伤害而获得【致郁】标记的角色造成的伤害时，你可以选择一项：摸10张牌；摸20张牌并翻面。]],
   ["@jy_yuyu_enemy"] = "致郁",
   ["#jy_yuyu_ask_which"] = "玉玉：请选择你要触发的效果",
-  ["#jy_yuyu_draw3"] = "摸三张牌",
-  ["#jy_yuyu_draw4turnover"] = "摸六张牌并翻面",
+  ["#jy_yuyu_draw3"] = "摸10张牌",
+  ["#jy_yuyu_draw4turnover"] = "摸20张牌并翻面",
   ["$jy_yuyu1"] = "我……我真的很想听到你们说话……",
   ["$jy_yuyu2"] = "我天天被队霸欺负，他们天天骂我。",
   ["$jy_yuyu3"] = "有什么话是真的不能讲的……为什么一定……每次都是……一个人在讲……",
@@ -785,7 +796,7 @@ Fk:loadTranslationTable {
 }
 
 -- 阿威罗
-local xjb__aweiluo = General(extension, "xjb__aweiluo", "qun", 3)
+local xjb__aweiluo = General(extension, "xjb__aweiluo", "qun", 4)
 
 -- 游龙
 local jy_youlong = fk.CreateTriggerSkill{
@@ -1631,7 +1642,7 @@ Fk:loadTranslationTable {
   -- TODO：改一下这里，按照sp公孙瓒义从改，只提示触发了义从。
 }
 
-local tym__kgdxs = General(extension, "tym__kgdxs", "qun", 4)
+local tym__kgdxs = General(extension, "tym__kgdxs", "qun", 5)
 
 -- 获得一张牌：谋徐盛cheat
 -- 还可以继续发动：甄姬洛神
@@ -1896,7 +1907,7 @@ Fk:loadTranslationTable {
 }
 
 -- 参考：廖化，英姿，蛊惑，血裔
-local skl__mou__gaotianliang = General(extension, "skl__mou__gaotianliang", "qun", 4)
+local skl__mou__gaotianliang = General(extension, "skl__mou__gaotianliang", "qun", 3)
 
 
 local jy_tianling = fk.CreateViewAsSkill{
@@ -1907,7 +1918,7 @@ local jy_tianling = fk.CreateViewAsSkill{
     local names = {}
     for _, id in ipairs(Fk:getAllCardIds()) do
       local card = Fk:getCardById(id)
-      if card:isCommonTrick() and card.trueName ~= "ex_nihilo" and card.trueName ~= "snatch"
+      if card:isCommonTrick() -- and card.trueName ~= "ex_nihilo" and card.trueName ~= "snatch"
       and not card.is_derived and
       ((Fk.currentResponsePattern == nil and Self:canUse(card)) or
       (Fk.currentResponsePattern and Exppattern:Parse(Fk.currentResponsePattern):match(card))) then
@@ -2028,7 +2039,7 @@ Fk:loadTranslationTable {
   ["skl__mou__gaotianliang"] = "谋高天亮",
 
   ["jy_tianling"] = "天灵",
-  [":jy_tianling"] = [[弃牌阶段开始时，你可以弃置两张牌或失去一点体力。若如此做，你的下一个回合：准备阶段后执行一个额外的出牌阶段；判定阶段结束前，你的手牌可当作除【无中生有】和【顺手牵羊】外的所有锦囊牌使用。]],
+  [":jy_tianling"] = [[弃牌阶段开始时，你可以弃置两张牌或失去一点体力。若如此做，你的下一个回合：准备阶段后执行一个额外的出牌阶段；判定阶段结束前，你的手牌可当作所有锦囊牌使用。]],
   ["@jy_tianling"] = "天灵",
   ["#jy_tianling_1hp"] = "失去一点体力",
   ["#jy_tianling_2cards"] = "弃置2张牌",
@@ -2053,10 +2064,10 @@ local jy_leiyan = fk.CreateActiveSkill{
   end,
   card_num = 0,
   target_filter = function(self, to_select, selected)
-    return Fk:currentRoom():getPlayerById(to_select):getMark("@jy_raiden_leiyan") == 0 and 
-      #selected < 1
+    return Fk:currentRoom():getPlayerById(to_select):getMark("@jy_raiden_leiyan") == 0 
+      -- and #selected < 1
   end,
-  target_num = 1,
+  min_target_num = 1,
   on_use = function(self, room, use)
     for _, to in ipairs(use.tos) do
       local p = room:getPlayerById(to)
@@ -2104,7 +2115,7 @@ local jy_leiyan_trigger = fk.CreateTriggerSkill{
           damage = 1,
           damageType = fk.ThunderDamage,
           skillName = "jy_leiyan",
-          is_leiyan = true,
+          -- is_leiyan = true,
         })
       end
     end
@@ -2116,8 +2127,8 @@ local jy_zhenshuo = fk.CreateActiveSkill{
   name = "jy_zhenshuo",
   anim_type = "offensive",
   can_use = function(self, player)
-    return player:getMark("@jy_raiden_yuanli") ~= 0 and
-      player:usedSkillTimes(self.name, Player.HistoryPhase) == 0
+    return player:getMark("@jy_raiden_yuanli") ~= 0 
+      -- and player:usedSkillTimes(self.name, Player.HistoryPhase) == 0
   end,
   card_filter = function(self, to_select, selected, selected_targets)
     return false
@@ -2164,7 +2175,7 @@ Fk:loadTranslationTable {
   ["~tym__raiden"] = "浮世一梦……",
 
   ["jy_leiyan"] = "雷眼",
-  [":jy_leiyan"] = [[出牌阶段限一次，你令一名角色获得<font color="Fuchsia">雷罚恶曜之眼</font>标记。持有<font color="Fuchsia">雷罚恶曜之眼</font>标记的角色造成伤害后，你进行一次判定，若为：红色，你获得1枚<font color="Fuchsia">愿力</font>标记；黑色，你对伤害目标造成1点雷电伤害，该伤害不会再次触发【雷眼】。]],
+  [":jy_leiyan"] = [[出牌阶段限一次，你令至少一名角色获得<font color="Fuchsia">雷罚恶曜之眼</font>标记。持有<font color="Fuchsia">雷罚恶曜之眼</font>标记的角色造成伤害后，你进行一次判定，若为：红色，你获得1枚<font color="Fuchsia">愿力</font>标记；黑色，你对伤害目标造成1点雷电伤害。]],
   ["@jy_raiden_leiyan"] = [[<font color="Fuchsia">雷罚恶曜之眼</font>]],
   ["@jy_raiden_yuanli"] = [[<font color="Fuchsia">愿力</font>]],
   ["#jy_leiyan_trigger"] = "雷眼",
@@ -2174,7 +2185,7 @@ Fk:loadTranslationTable {
   ["#jy_yuanli_full"] = [[<font color="Fuchsia">愿力</font>已满！]],
 
   ["jy_zhenshuo"] = "真说",
-  [":jy_zhenshuo"] = [[出牌阶段限一次，你弃所有<font color="Fuchsia">愿力</font>标记来对一名攻击范围内的角色造成1点雷电伤害，然后所有持有<font color="Fuchsia">雷罚恶曜之眼</font>标记的角色摸2X张牌，X等同于所弃<font color="Fuchsia">愿力</font>标记数。]],
+  [":jy_zhenshuo"] = [[出牌阶段，你弃所有<font color="Fuchsia">愿力</font>标记来对一名攻击范围内的角色造成1点雷电伤害，然后所有持有<font color="Fuchsia">雷罚恶曜之眼</font>标记的角色摸2X张牌，X等同于所弃<font color="Fuchsia">愿力</font>标记数。]],
   ["$jy_zhenshuo1"] = "此刻，寂灭之时！",
   ["$jy_zhenshuo2"] = "稻光，亦是永恒！",
   ["$jy_zhenshuo3"] = "无念，断绝！",
@@ -2249,7 +2260,7 @@ local jy_jianying = fk.CreateTriggerSkill{
     -- 任何一个人回合都要发动
     return player:hasSkill(self) and
       target.phase == Player.Finish and  -- 如果是这个人的结束阶段
-      #player:getCardIds(Player.Hand) < player.maxHp
+      #player:getCardIds(Player.Hand) ~= player.maxHp
   end,
   on_use = function(self, event, target, player, data)
     player:drawCards(1)
@@ -2276,7 +2287,7 @@ Fk:loadTranslationTable {
   ["#jy_jinghua_use"] = "镜花：你可以使用一张不计入使用次数的【杀】",
 
   ["jy_jianying"] = "渐盈",
-  [":jy_jianying"] = [[锁定技，所有角色的结束阶段，若手牌数小于体力上限，你摸一张牌。]],
+  [":jy_jianying"] = [[锁定技，所有角色的结束阶段，若你的手牌数不等于体力上限，你摸一张牌。]],
   ["$jy_jianying1"] = "冒进是大忌。",
   ["$jy_jianying2"] = "呵……余兴节目。",
 }
