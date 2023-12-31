@@ -4,7 +4,7 @@ extension.extensionName = "jianyu"
 -- DIY真诚意见：所有你这个包的东西都加一个你自己的开头，这样防止和别人的重名。比如我的"huxiao"一开始就和别人重名了。
 
 local U = require "packages/utility/utility"
-local Q = require "packages/jianyu/question"
+local Q = require "packages/jianyu/question"  -- 考公大学生用的题库
 
 Fk:loadTranslationTable {
      ["jy_jianyu"] = "简浴",
@@ -47,6 +47,7 @@ local jy_zouwei = fk.CreateDistanceSkill{
     return 0
   end,
 }
+-- TODO：写一个语音触发，游戏开始时、装备时、没有装备时
 
 -- 圣弩
 -- 参考自formation包的君刘备
@@ -529,6 +530,7 @@ local tym__liyuanhao = General(extension, "tym__liyuanhao", "qun", 3)
 
 -- 界虎啸
 -- 参考自铁骑，屯田，脑洞包明哲，克己（原来克己已经监视了使用和打出了，不用写那么复杂）
+-- 新版本的克己换了个写法了
 local jy_huxiao_2 = fk.CreateTriggerSkill{
   name = "jy_huxiao_2",
   anim_type = "special",
@@ -563,9 +565,7 @@ local jy_huxiao_analeptic_2 = fk.CreateViewAsSkill{
       return nil
     end
     local c = Fk:cloneCard("analeptic")
-    -- local c = Fk:cloneCard("ex_nihilo")
     c.skillName = self.name
-    -- print("克隆的牌c的参数：c.name ", c.name, " c.trueName ", c.trueName)
     c:addSubcard(cards[1])
     return c
   end,
@@ -661,7 +661,6 @@ local jy_erduanxiao_trigger_2 = fk.CreateTriggerSkill{
   end,
 
   on_cost = function(self, event, target, player, data)
-    -- print("jy_erduanxiao_trigger 已触发，现在player.is_xiao_changing的值是", player.is_xiao_changing)
     local room = player.room
     local choices = {"#lose_xiao_2", "#lose_hp_1_2"}
     -- 如果体力不是满的，两个选项都有；如果是满的，就黑掉【恢复体力】那个按钮。这个改动不需要改到标李元浩那边去，因为标李元浩是掉血。
@@ -757,9 +756,9 @@ local jy_yuyu = fk.CreateTriggerSkill{
   end,
   on_use = function(self, event, target, player, data)
     if self.choice == "#jy_yuyu_draw3" then
-      player:drawCards(3)
+      player:drawCards(4)
     else
-      player:drawCards(6)
+      player:drawCards(7)
       player:turnOver()
     end
     self.this_time_slash = false
@@ -773,7 +772,7 @@ Fk:loadTranslationTable {
 
   ["jy_yuyu"] = "玉玉",
   [":jy_yuyu"] = [[1. 锁定技，当有角色对你使用【杀】造成了伤害时，其获得【致郁】标记；<br>
-  2. 受到没有【致郁】标记的角色或因本次伤害而获得【致郁】标记的角色造成的伤害时，你可以选择一项：摸三张牌；摸六张牌并翻面。]],
+  2. 受到没有【致郁】标记的角色或因本次伤害而获得【致郁】标记的角色造成的伤害时，你可以选择一项：摸四张牌；摸七张牌并翻面。]],
   ["@jy_yuyu_enemy"] = "致郁",
   ["#jy_yuyu_ask_which"] = "玉玉：请选择你要触发的效果",
   ["#jy_yuyu_draw3"] = "摸三张牌",
@@ -1246,8 +1245,6 @@ local jy_sichi = fk.CreateTriggerSkill{
     end
     room:doBroadcastNotify("ShowToast", Fk:translate(msg))
 
-    -- suit_count = 2  -- 测试用的，记得删掉
-
     -- 一种花色：全部给一个人，测试通过
     if suit_count == 1 then
       -- 不能直接用room:getOtherPlayers(player)，因为这个函数返回的是player，而askForChoosePlayers需要的是id（integer）。
@@ -1438,7 +1435,6 @@ local jy_boshi = fk.CreateTriggerSkill{
   end,
   can_wake = function(self, event, target, player, data)
     return player:getMark("@jy_boshi_judge_count") >= 10
-    -- 10才是正确的数值
   end,
   on_use = function(self, event, target, player, data)
     local room = player.room
@@ -1450,11 +1446,8 @@ local jy_boshi = fk.CreateTriggerSkill{
       skillName = self.name,
     })
     player:drawCards(3, self.name)
-
     room:setPlayerMark(player, "@jy_boshi_judge_count", 0)  -- 清空标记
-
     room:handleAddLoseSkills(player, "-jy_huapen")
-
     room:handleAddLoseSkills(player, "jy_jiangbei")
   end,
 }
@@ -2067,7 +2060,7 @@ local jy_leiyan = fk.CreateActiveSkill{
   on_use = function(self, room, use)
     for _, to in ipairs(use.tos) do
       local p = room:getPlayerById(to)
-      room:setPlayerMark(to, "@jy_raiden_leiyan", "")
+      room:setPlayerMark(p, "@jy_raiden_leiyan", "")
     end
   end,
 }
@@ -2201,8 +2194,7 @@ local jy_jinghua = fk.CreateTriggerSkill{
   end,
   can_trigger = function(self, event, target, player, data)
     return player:hasSkill(self) and data.card and data.card.type == Card.TypeBasic and 
-      target == player and player:usedSkillTimes(self.name, Player.HistoryPhase) == 0 and
-      player:getMark("@jy_jinghua") == 0
+      target == player and player:getMark("@jy_jinghua") == 0
   end,
   on_use = function(self, event, target, player, data)
     local room = player.room
@@ -2263,7 +2255,7 @@ local jy_jianying = fk.CreateTriggerSkill{
     -- 任何一个人回合都要发动
     return player:hasSkill(self) and
       target.phase == Player.Finish and  -- 如果是这个人的结束阶段
-      #player:getCardIds(Player.Hand) < player.hp
+      #player:getCardIds(Player.Hand) < player.maxHp
   end,
   on_use = function(self, event, target, player, data)
     player:drawCards(1)
@@ -2283,15 +2275,14 @@ Fk:loadTranslationTable {
   ["~tym__ayato"] = "世事无常……",
 
   ["jy_jinghua"] = "镜花",
-  [":jy_jinghua"] = [[每回合限一次，使用或打出基本牌后，你可以进入<font color="skyblue">【镜花】</font>状态，直到当前回合结束。<br><font color="skyblue">【镜花】</font>状态：你获得2攻击距离、2体力上限、2体力；你可以立即使用一张不计入使用次数的【杀】。因<font color="skyblue">【镜花】</font>状态结束而失去体力时，至多使体力降至1。]],
-  ["@jy_jinghua"] = [[<font color="skyblue">镜花</font>]],
+  [":jy_jinghua"] = [[使用或打出基本牌后，你可以进入<font color="skyblue">泷廻鉴花</font>状态，直到当前回合结束。<br><font color="skyblue">泷廻鉴花</font>：获得2攻击距离、2体力上限、2体力；可以立即使用一张不计入使用次数的【杀】。因<font color="skyblue">泷廻鉴花</font>状态结束而失去体力时，至多使体力降至1。]],
+  ["@jy_jinghua"] = [[<font color="skyblue">泷廻鉴花</font>]],
   ["$jy_jinghua1"] = "苍流水影。",
   ["$jy_jinghua2"] = "剑影。",
   ["#jy_jinghua_use"] = "镜花：你可以使用一张不计入使用次数的【杀】",
-  ["#jy_jinghua_gain_hp"] = "进入【镜花】状态，获得2点体力",
 
   ["jy_jianying"] = "渐盈",
-  [":jy_jianying"] = [[锁定技，所有角色的结束阶段，若手牌数小于体力值，你摸一张牌。]],
+  [":jy_jianying"] = [[锁定技，所有角色的结束阶段，若手牌数小于体力上限，你摸一张牌。]],
   ["$jy_jianying1"] = "冒进是大忌。",
   ["$jy_jianying2"] = "呵……余兴节目。",
 }
