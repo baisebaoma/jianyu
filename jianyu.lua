@@ -7,7 +7,7 @@ local U = require "packages/utility/utility"
 local Q = require "packages/jianyu/question"  -- 考公大学生用的题库
 
 Fk:loadTranslationTable {
-     ["jy_jianyu"] = [[<font color="red">简</font>浴]],
+     ["jy_jianyu"] = [[简浴]],
      ["xjb"] = "导演",
      ["tym"] = "反赌专家",
      ["skl"] = "拂却心尘",
@@ -2158,11 +2158,13 @@ local jy_zhenshuo = fk.CreateActiveSkill{
         skillName = "jy_leiyan",
       })
 
-    for _, p in ipairs(room:getAlivePlayers()) do
-      if p:getMark("@jy_raiden_leiyan") ~= 0 then
-        p:drawCards(2 * dmg)
-      end
-    end
+    -- for _, p in ipairs(room:getAlivePlayers()) do
+    --   if p:getMark("@jy_raiden_leiyan") ~= 0 then
+    --     p:drawCards(dmg)
+    --   end
+    -- end
+
+    player:drawCards(dmg)
 
   end,
 }
@@ -2175,7 +2177,7 @@ Fk:loadTranslationTable {
   ["~tym__raiden"] = "浮世一梦……",
 
   ["jy_leiyan"] = "雷眼",
-  [":jy_leiyan"] = [[出牌阶段限一次，你令至少一名角色获得<font color="Fuchsia">雷罚恶曜之眼</font>标记。持有<font color="Fuchsia">雷罚恶曜之眼</font>标记的角色造成伤害后，你进行一次判定，若为：红色，你获得1枚<font color="Fuchsia">愿力</font>标记；黑色，你对伤害目标造成1点雷电伤害。]],
+  [":jy_leiyan"] = [[出牌阶段限一次，你令至少一名角色获得<font color="Fuchsia">雷罚恶曜之眼</font>标记。<br><font color="Fuchsia">雷罚恶曜之眼</font>：拥有该标记的角色造成伤害后，你进行一次判定，若为：红色，你获得1枚<font color="Fuchsia">愿力</font>标记；黑色，你对伤害目标造成1点雷电伤害。]],
   ["@jy_raiden_leiyan"] = [[<font color="Fuchsia">雷罚恶曜之眼</font>]],
   ["@jy_raiden_yuanli"] = [[<font color="Fuchsia">愿力</font>]],
   ["#jy_leiyan_trigger"] = "雷眼",
@@ -2185,7 +2187,7 @@ Fk:loadTranslationTable {
   ["#jy_yuanli_full"] = [[<font color="Fuchsia">愿力</font>已满！]],
 
   ["jy_zhenshuo"] = "真说",
-  [":jy_zhenshuo"] = [[出牌阶段，你弃所有<font color="Fuchsia">愿力</font>标记来对一名攻击范围内的角色造成1点雷电伤害，然后所有持有<font color="Fuchsia">雷罚恶曜之眼</font>标记的角色摸2X张牌，X等同于所弃<font color="Fuchsia">愿力</font>标记数。]],
+  [":jy_zhenshuo"] = [[出牌阶段，你弃所有<font color="Fuchsia">愿力</font>标记来对一名攻击范围内的角色造成1点雷电伤害，然后你摸X张牌，X等同于所弃<font color="Fuchsia">愿力</font>标记数。]],
   ["$jy_zhenshuo1"] = "此刻，寂灭之时！",
   ["$jy_zhenshuo2"] = "稻光，亦是永恒！",
   ["$jy_zhenshuo3"] = "无念，断绝！",
