@@ -2116,8 +2116,8 @@ local jy_zhenshuo = fk.CreateActiveSkill{
   name = "jy_zhenshuo",
   anim_type = "offensive",
   can_use = function(self, player)
-    return player:getMark("@jy_raiden_yuanli") ~= 0
-    -- player:usedSkillTimes(self.name, Player.HistoryPhase) == 0
+    return player:getMark("@jy_raiden_yuanli") ~= 0 and
+      player:usedSkillTimes(self.name, Player.HistoryPhase) == 0
   end,
   card_filter = function(self, to_select, selected, selected_targets)
     return false
@@ -2149,7 +2149,7 @@ local jy_zhenshuo = fk.CreateActiveSkill{
 
     for _, p in ipairs(room:getAlivePlayers()) do
       if p:getMark("@jy_raiden_leiyan") ~= 0 then
-        p:drawCards(dmg)
+        p:drawCards(2 * dmg)
       end
     end
 
@@ -2174,7 +2174,7 @@ Fk:loadTranslationTable {
   ["#jy_yuanli_full"] = [[<font color="Fuchsia">愿力</font>已满！]],
 
   ["jy_zhenshuo"] = "真说",
-  [":jy_zhenshuo"] = [[出牌阶段，你弃所有<font color="Fuchsia">愿力</font>标记来对一名其他角色造成1点雷电伤害，然后所有持有<font color="Fuchsia">雷罚恶曜之眼</font>标记的角色摸X张牌，X等同于所弃<font color="Fuchsia">愿力</font>标记数。]],
+  [":jy_zhenshuo"] = [[出牌阶段限一次，你弃所有<font color="Fuchsia">愿力</font>标记来对一名攻击范围内的角色造成1点雷电伤害，然后所有持有<font color="Fuchsia">雷罚恶曜之眼</font>标记的角色摸2X张牌，X等同于所弃<font color="Fuchsia">愿力</font>标记数。]],
   ["$jy_zhenshuo1"] = "此刻，寂灭之时！",
   ["$jy_zhenshuo2"] = "稻光，亦是永恒！",
   ["$jy_zhenshuo3"] = "无念，断绝！",
@@ -2202,12 +2202,6 @@ local jy_jinghua = fk.CreateTriggerSkill{
     room:setPlayerMark(player, "@jy_jinghua", "")
     room:changeMaxHp(player, 2)  -- 先加体力上限
     -- 别用回复体力，直接更改体力，不然总是触发医术高超
-    -- room:recover({  -- 再回复体力
-    --   who = player,
-    --   num = 2,
-    --   recoverBy = player,
-    --   skillName = self.name,
-    -- })
     room:changeHp(player, 2, "recover", self.name)
 
     local extraData = {bypass_times = true}  -- 加上这个，就可以让它就算之前使用过杀，也可以再使用了
