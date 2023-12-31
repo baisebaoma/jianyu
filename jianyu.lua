@@ -2060,12 +2060,15 @@ local jy_leiyan = fk.CreateActiveSkill{
   end,
   card_num = 0,
   target_filter = function(self, to_select, selected)
-    return Fk:currentRoom():getPlayerById(to_select):getMark("@jy_raiden_leiyan") == 0 and #selected < 1
+    return Fk:currentRoom():getPlayerById(to_select):getMark("@jy_raiden_leiyan") == 0 and 
+      #selected < 1
   end,
   target_num = 1,
   on_use = function(self, room, use)
-    local to = room:getPlayerById(use.tos[1])
-    room:setPlayerMark(to, "@jy_raiden_leiyan", "")
+    for _, to in ipairs(use.tos) do
+      local p = room:getPlayerById(to)
+      room:setPlayerMark(to, "@jy_raiden_leiyan", "")
+    end
   end,
 }
 local jy_leiyan_trigger = fk.CreateTriggerSkill{
@@ -2120,8 +2123,8 @@ local jy_zhenshuo = fk.CreateActiveSkill{
   name = "jy_zhenshuo",
   anim_type = "offensive",
   can_use = function(self, player)
-    return player:usedSkillTimes(self.name, Player.HistoryPhase) == 0 and 
-      player:getMark("@jy_raiden_yuanli") ~= 0
+    return player:getMark("@jy_raiden_yuanli") ~= 0
+    -- player:usedSkillTimes(self.name, Player.HistoryPhase) == 0
   end,
   card_filter = function(self, to_select, selected, selected_targets)
     return false
@@ -2137,7 +2140,7 @@ local jy_zhenshuo = fk.CreateActiveSkill{
     local dmg = player:getMark("@jy_raiden_yuanli")
     room:setPlayerMark(player, "@jy_raiden_yuanli", 0)
 
-    room:throwCard(use.cards, self.name, player, player)
+    -- room:throwCard(use.cards, self.name, player, player)  -- 因为现在不需要弃牌，所以不需要这一行（当然加上了也没关系）
 
     -- TODO:参考mobile_effect，写一个超牛逼的动画
     -- room:doSuperLightBox("packages/jianyu/qml/FirstBlood.qml")
@@ -2178,7 +2181,7 @@ Fk:loadTranslationTable {
   ["#jy_yuanli_full"] = [[<font color="Fuchsia">愿力</font>已满！]],
 
   ["jy_zhenshuo"] = "真说",
-  [":jy_zhenshuo"] = [[出牌阶段限一次，你弃所有<font color="Fuchsia">愿力</font>标记来对一名其他角色造成1点雷电伤害，然后所有持有<font color="Fuchsia">雷罚恶曜之眼</font>标记的角色摸X张牌，X等同于所弃<font color="Fuchsia">愿力</font>标记数。]],
+  [":jy_zhenshuo"] = [[出牌阶段，你弃所有<font color="Fuchsia">愿力</font>标记来对一名其他角色造成1点雷电伤害，然后所有持有<font color="Fuchsia">雷罚恶曜之眼</font>标记的角色摸X张牌，X等同于所弃<font color="Fuchsia">愿力</font>标记数。]],
   ["$jy_zhenshuo1"] = "此刻，寂灭之时！",
   ["$jy_zhenshuo2"] = "稻光，亦是永恒！",
   ["$jy_zhenshuo3"] = "无念，断绝！",
@@ -2187,7 +2190,7 @@ Fk:loadTranslationTable {
 local tym__ayato = General(extension, "tym__ayato", "qun", 4)
 
 local jy_jinghua = fk.CreateTriggerSkill{
-  frequency = Skill.Compulsory,
+  -- frequency = Skill.Compulsory,
   name = "jy_jinghua",
   anim_type = "offensive",
   events = {fk.CardResponding, fk.CardUseFinished},
@@ -2198,41 +2201,59 @@ local jy_jinghua = fk.CreateTriggerSkill{
   end,
   can_trigger = function(self, event, target, player, data)
     return player:hasSkill(self) and data.card and data.card.type == Card.TypeBasic and 
-      target == player and player:usedSkillTimes(self.name, Player.HistoryPhase) == 0
-  end,
-  on_cost = function(self, event, target, player, data)
-    local room = player.room
-    local extraData = {bypass_times = true}
-    data.jinghua_use = room:askForUseCard(player, "slash", "slash|.|.", "#jy_jinghua_use", true, extraData)  -- 这里填false也没用，反正是可以取消的
-    if data.jinghua_use then return true else return false end
+      target == player and player:usedSkillTimes(self.name, Player.HistoryPhase) == 0 and
+      player:getMark("@jy_jinghua") == 0
   end,
   on_use = function(self, event, target, player, data)
     local room = player.room
 
+    room:setPlayerMark(player, "@jy_jinghua", "")
+    room:changeMaxHp(player, 2)  -- 先加体力上限
+    -- 别用回复体力，直接更改体力，不然总是触发医术高超
+    -- room:recover({  -- 再回复体力
+    --   who = player,
+    --   num = 2,
+    --   recoverBy = player,
+    --   skillName = self.name,
+    -- })
+    room:changeHp(player, 2, "#jy_jinghua_gain_hp", self.name)
+
+    local extraData = {bypass_times = true}  -- 加上这个，就可以让它就算之前使用过杀，也可以再使用了
+
+    data.jinghua_use = room:askForUseCard(player, "slash", "slash|.|.", "#jy_jinghua_use", true, extraData)  -- 这里填false也没用，反正是可以取消的
+    if data.jinghua_use then return true else return false end
+
     if data.jinghua_use then
-      data.jinghua_use.extraUse = true  -- 加上这个，就可以让它不计入次数了
-      room:setPlayerMark(player, "@jy_jinghua", "")
-      room:changeMaxHp(player, 2)  -- 先加体力上限
-      room:recover({  -- 再回复体力
-        who = player,
-        num = 2,
-        recoverBy = player,
-        skillName = self.name,
-      })
+      data.jinghua_use.extraUse = true  -- 加上这个，就可以让它不计入次数了，也就是说还可以再使用一张杀
       room:useCard(data.jinghua_use)
     end
   end,
   on_refresh = function(self, event, target, player, data)
     local room = player.room
+
+    -- 最多减少体力至1
+    -- 其实这里用失去体力更合理，因为可以和比如界黄盖之类的在双将时联动。
     if player.hp <= 2 then
+      -- room:changeHp(player, -math.max(player.hp - 1, 0), self.name)
       room:loseHp(player, math.max(player.hp - 1, 0), self.name)  -- 失去体力，但保证大于等于0（因为不知道这个函数里面有没有处理大于等于0）
     else
-      room:loseHp(player, 2, self.name)  -- 先失去体力
+      room:loseHp(player, 2, self.name)  -- 先改变体力
     end
     room:changeMaxHp(player, -2)  -- 再减体力上限
     room:setPlayerMark(player, "@jy_jinghua", 0)
   end,
 }
+local jy_jinghua_attack_range = fk.CreateAttackRangeSkill{
+  name = "#jy_jinghua_attack_range",
+  frequency = Skill.Compulsory,
+  correct_func = function(self, from, to)
+    if from:hasSkill(self) and from:getMark("@jy_jinghua") ~= 0 then
+      return 2
+    end
+  end
+}
+-- TODO: 写一个造成伤害时的声音特效，最好是能关闭【杀】原本的声音。
+jy_jinghua:addRelatedSkill(jy_jinghua_attack_range)
 
 -- 测试通过，没什么问题
 local jy_jianying = fk.CreateTriggerSkill{
@@ -2264,11 +2285,12 @@ Fk:loadTranslationTable {
   ["~tym__ayato"] = "世事无常……",
 
   ["jy_jinghua"] = "镜花",
-  [":jy_jinghua"] = [[每回合限一次，使用或打出基本牌后，你可以使用一张不计入使用次数的【杀】。若如此做，你获得2点体力上限和2点体力，持续到当前角色的回合结束。以此法失去体力时，不会使你进入濒死状态。]],
-  ["@jy_jinghua"] = "镜花",
+  [":jy_jinghua"] = [[每回合限一次，使用或打出基本牌后，你可以进入【镜花】状态，持续到当前角色的回合结束。在此状态下：你获得额外2点攻击距离、2点体力上限、2点体力；你可以立即使用一张不计入使用次数的【杀】。因【镜花】状态结束而失去体力时，至多使体力降至1。]],
+  ["@jy_jinghua"] = [[<font color="skyblue">镜花</font>]],
   ["$jy_jinghua1"] = "苍流水影。",
   ["$jy_jinghua2"] = "剑影。",
-  ["#jy_jinghua_use"] = "镜花：你可以立即使用一张不计入使用次数的【杀】",
+  ["#jy_jinghua_use"] = "镜花：你可以视为使用一张不计入使用次数的【杀】",
+  ["#jy_jinghua_gain_hp"] = "进入【镜花】状态，获得2点体力"
 
   ["jy_jianying"] = "渐盈",
   [":jy_jianying"] = [[锁定技，所有角色的结束阶段，若手牌数小于体力值，你摸一张牌。]],
