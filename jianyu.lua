@@ -2290,7 +2290,7 @@ Fk:loadTranslationTable {
   ["$jy_jinghua1"] = "苍流水影。",
   ["$jy_jinghua2"] = "剑影。",
   ["#jy_jinghua_use"] = "镜花：你可以视为使用一张不计入使用次数的【杀】",
-  ["#jy_jinghua_gain_hp"] = "进入【镜花】状态，获得2点体力"
+  ["#jy_jinghua_gain_hp"] = "进入【镜花】状态，获得2点体力",
 
   ["jy_jianying"] = "渐盈",
   [":jy_jianying"] = [[锁定技，所有角色的结束阶段，若手牌数小于体力值，你摸一张牌。]],
