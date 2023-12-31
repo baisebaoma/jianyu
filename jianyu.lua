@@ -2221,8 +2221,6 @@ local jy_jinghua = fk.CreateTriggerSkill{
     local extraData = {bypass_times = true}  -- 加上这个，就可以让它就算之前使用过杀，也可以再使用了
 
     data.jinghua_use = room:askForUseCard(player, "slash", "slash|.|.", "#jy_jinghua_use", true, extraData)  -- 这里填false也没用，反正是可以取消的
-    if data.jinghua_use then return true else return false end
-
     if data.jinghua_use then
       data.jinghua_use.extraUse = true  -- 加上这个，就可以让它不计入次数了，也就是说还可以再使用一张杀
       room:useCard(data.jinghua_use)
@@ -2252,7 +2250,7 @@ local jy_jinghua_attack_range = fk.CreateAttackRangeSkill{
     end
   end
 }
--- TODO: 写一个造成伤害时的声音特效，最好是能关闭【杀】原本的声音。
+-- TODO: 写一个造成伤害时的声音特效，最好是能关闭【杀】原本的声音。【杀】原本的声音在audio/system/下，调用它的是RoomLogic.js。看起来没有什么办法，不过一起放也可以。
 jy_jinghua:addRelatedSkill(jy_jinghua_attack_range)
 
 -- 测试通过，没什么问题
@@ -2285,11 +2283,11 @@ Fk:loadTranslationTable {
   ["~tym__ayato"] = "世事无常……",
 
   ["jy_jinghua"] = "镜花",
-  [":jy_jinghua"] = [[每回合限一次，使用或打出基本牌后，你可以进入【镜花】状态，持续到当前角色的回合结束。在此状态下：你获得额外2点攻击距离、2点体力上限、2点体力；你可以立即使用一张不计入使用次数的【杀】。因【镜花】状态结束而失去体力时，至多使体力降至1。]],
+  [":jy_jinghua"] = [[每回合限一次，使用或打出基本牌后，你可以进入<font color="skyblue">【镜花】</font>状态，直到当前回合结束。<br><font color="skyblue">【镜花】</font>状态：你获得2攻击距离、2体力上限、2体力；你可以立即使用一张不计入使用次数的【杀】。因<font color="skyblue">【镜花】</font>状态结束而失去体力时，至多使体力降至1。]],
   ["@jy_jinghua"] = [[<font color="skyblue">镜花</font>]],
   ["$jy_jinghua1"] = "苍流水影。",
   ["$jy_jinghua2"] = "剑影。",
-  ["#jy_jinghua_use"] = "镜花：你可以视为使用一张不计入使用次数的【杀】",
+  ["#jy_jinghua_use"] = "镜花：你可以使用一张不计入使用次数的【杀】",
   ["#jy_jinghua_gain_hp"] = "进入【镜花】状态，获得2点体力",
 
   ["jy_jianying"] = "渐盈",
