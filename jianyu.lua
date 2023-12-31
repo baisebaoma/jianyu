@@ -2216,7 +2216,7 @@ local jy_jinghua = fk.CreateTriggerSkill{
     --   recoverBy = player,
     --   skillName = self.name,
     -- })
-    room:changeHp(player, 2, "#jy_jinghua_gain_hp", self.name)
+    room:changeHp(player, 2, "recover", self.name)
 
     local extraData = {bypass_times = true}  -- 加上这个，就可以让它就算之前使用过杀，也可以再使用了
 
