@@ -2225,7 +2225,7 @@ local jy_jinghua = fk.CreateTriggerSkill{
   on_refresh = function(self, event, target, player, data)
     local room = player.room
     if player.hp <= 2 then
-      room:loseHp(player, max(player.hp - 1, 0), self.name)  -- 失去体力，但保证大于等于0（因为不知道这个函数里面有没有处理大于等于0）
+      room:loseHp(player, math.max(player.hp - 1, 0), self.name)  -- 失去体力，但保证大于等于0（因为不知道这个函数里面有没有处理大于等于0）
     else
       room:loseHp(player, 2, self.name)  -- 先失去体力
     end
