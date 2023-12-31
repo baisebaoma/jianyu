@@ -2225,7 +2225,7 @@ local jy_jinghua = fk.CreateTriggerSkill{
   on_refresh = function(self, event, target, player, data)
     local room = player.room
     if player.hp <= 2 then
-      room:loseHp(player, 2-player.hp, self.name)
+      room:loseHp(player, max(player.hp - 1, 0), self.name)  -- 失去体力，但保证大于等于0（因为不知道这个函数里面有没有处理大于等于0）
     else
       room:loseHp(player, 2, self.name)  -- 先失去体力
     end
@@ -2264,7 +2264,7 @@ Fk:loadTranslationTable {
   ["~tym__ayato"] = "世事无常……",
 
   ["jy_jinghua"] = "镜花",
-  [":jy_jinghua"] = [[每回合限一次，使用或打出基本牌后，你可以使用一张不计入使用次数的【杀】。若如此做，你获得2点体力上限和2点体力，持续到当前角色的回合结束。若你会因为该技能的失去体力而进入濒死状态，则改为将体力降至1。]],
+  [":jy_jinghua"] = [[每回合限一次，使用或打出基本牌后，你可以使用一张不计入使用次数的【杀】。若如此做，你获得2点体力上限和2点体力，持续到当前角色的回合结束。以此法失去体力时，不会使你进入濒死状态。]],
   ["@jy_jinghua"] = "镜花",
   ["$jy_jinghua1"] = "苍流水影。",
   ["$jy_jinghua2"] = "剑影。",
