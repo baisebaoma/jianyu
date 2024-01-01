@@ -955,9 +955,10 @@ local jy_luojiao_after = fk.CreateTriggerSkill {
         player.is_luojiao_archery_attack_may_be_triggered and
         #player:getPile("xjb__aweiluo_dian") == 4
 
-    -- 南蛮需要满足的条件：花色全部不同，且本回合未使用过
-    player.is_savage_assault = is_luojiao_suit_satisfied and
-        player:usedSkillTimes(self.name) == 0
+    -- 南蛮需要满足的条件：花色全部不同
+    -- 且本回合未使用过（目前已删除）
+    player.is_savage_assault = is_luojiao_suit_satisfied
+    -- and player:usedSkillTimes(self.name) == 0
 
     -- 万箭或南蛮满足，返回真
     return player.is_archery_attack or player.is_savage_assault
@@ -1059,10 +1060,9 @@ local jy_yusu = fk.CreateTriggerSkill {
   events = { fk.CardUsing },
   can_trigger = function(self, event, target, player, data)
     if not player:hasSkill(self) then return false end
-    if player.phase ~= Player.NotActive and data.card and
-        data.card.type == Card.TypeBasic and target == player then
-      return true
-    end
+    return player.phase ~= Player.NotActive and data.card and
+        data.card.type == Card.TypeBasic and target == player and
+        player:getMark("_jy_yusu_triggered") ~= 0
   end,
   on_cost = function(self, event, target, player, data)
     local room = player.room
@@ -1071,6 +1071,7 @@ local jy_yusu = fk.CreateTriggerSkill {
     if basic_count == 2 then -- 第二张基本牌
       local return_value = room:askForSkillInvoke(player, self.name)
       room:setPlayerMark(player, "@jy_yusu_basic_count", 0)
+      room:setPlayerMark(player, "_jy_yusu_triggered", true)
     end
   end,
   on_use = function(self, event, target, player, data)
@@ -1092,6 +1093,7 @@ local jy_yusu_set_0 = fk.CreateTriggerSkill {
   on_refresh = function(self, event, target, player, data)
     local room = player.room
     room:setPlayerMark(player, "@jy_yusu_basic_count", 0)
+    room:setPlayerMark(player, "_jy_yusu_triggered", 0)
   end,
 }
 jy_yusu:addRelatedSkill(jy_yusu_set_0)
