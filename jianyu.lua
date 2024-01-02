@@ -8,19 +8,10 @@ local Q = require "packages/jianyu/question" -- 考公大学生用的题库
 
 Fk:loadTranslationTable {
   ["jy_jianyu"] = [[简浴]],
-  ["xjb"] = "导演",
-  ["tym"] = "反赌专家",
-  ["skl"] = "拂却心尘",
-  ["zer"] = "敏敏伊人",
-}
-
-local jy_note = fk.CreateTriggerSkill {
-  name = "jy_note",
-}
-
-Fk:loadTranslationTable {
-  ["jy_note"] = [[<font color="red">注意</font>]],
-  [":jy_note"] = [[为了追上活动服的普遍强度，简浴包对所有武将进行了过度的加强。可能已经不适合普通对局。]],
+  ["xjb"] = "简浴",
+  ["tym"] = "简浴",
+  ["skl"] = "简浴",
+  ["zer"] = "简浴",
 }
 
 -- 熊简自豪
