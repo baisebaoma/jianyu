@@ -2059,7 +2059,8 @@ local jy_leiyan = fk.CreateActiveSkill {
     local all_players = true -- 默认所有人都有雷眼
 
     -- 只要有一个人没有雷眼，那么就是假
-    for _, p in ipairs(room:getAlivePlayers()) do
+    -- 不知道为什么在这里写room:getAlivePlayers不行
+    for _, p in ipairs(Fk:currentRoom():getAlivePlayers()) do
       if p:getMark("@jy_raiden_leiyan") == 0 then
         all_players = false
         break
@@ -2194,7 +2195,7 @@ Fk:loadTranslationTable {
   ["#jy_yuanli_full"] = [[<font color="Fuchsia">愿力</font>已满！]],
 
   ["jy_zhenshuo"] = "真说",
-  [":jy_zhenshuo"] = [[出牌阶段限一次，你弃所有<font color="Fuchsia">愿力</font>标记来对一名攻击范围内的角色造成1点雷电伤害，然后你摸2X张牌，X等同于所弃<font color="Fuchsia">愿力</font>标记数。]],
+  [":jy_zhenshuo"] = [[出牌阶段限一次，你弃所有<font color="Fuchsia">愿力</font>标记来对一名攻击范围内的角色造成1点雷电伤害，然后所有持有<font color="Fuchsia">雷罚恶曜之眼</font>的角色摸2X张牌，X等同于所弃<font color="Fuchsia">愿力</font>标记数。]],
   ["$jy_zhenshuo1"] = "此刻，寂灭之时！",
   ["$jy_zhenshuo2"] = "稻光，亦是永恒！",
   ["$jy_zhenshuo3"] = "无念，断绝！",
