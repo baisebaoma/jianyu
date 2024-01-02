@@ -1835,9 +1835,9 @@ local jy_jieju_success = fk.CreateTriggerSkill {
     room:updateQuestSkillState(player, "jy_jieju")
     -- room:changeMaxHp(player, 1)
     player:drawCards(3)
-    player.room:handleAddLoseSkills(player, "jizhi", nil, true, false)
-    player.room:handleAddLoseSkills(player, "kanpo", nil, true, false)
-    player.room:handleAddLoseSkills(player, "xiangle", nil, true, false)
+    room:handleAddLoseSkills(player, "jizhi", nil, true, false)
+    room:handleAddLoseSkills(player, "kanpo", nil, true, false)
+    room:handleAddLoseSkills(player, "xiangle", nil, true, false)
   end
 }
 local jy_jieju_fail = fk.CreateTriggerSkill {
@@ -2166,13 +2166,13 @@ local jy_zhenshuo = fk.CreateActiveSkill {
       skillName = "jy_leiyan",
     })
 
-    -- for _, p in ipairs(room:getAlivePlayers()) do
-    --   if p:getMark("@jy_raiden_leiyan") ~= 0 then
-    --     p:drawCards(dmg)
-    --   end
-    -- end
+    for _, p in ipairs(room:getAlivePlayers()) do
+      if p:getMark("@jy_raiden_leiyan") ~= 0 then
+        p:drawCards(2 * dmg)
+      end
+    end
 
-    player:drawCards(2 * dmg)
+    -- player:drawCards(2 * dmg)
   end,
 }
 
