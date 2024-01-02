@@ -812,6 +812,7 @@ local jy_youlong = fk.CreateTriggerSkill {
   on_use = function(self, event, target, player, data)
     local room = player.room
     for _, p in ipairs(room:getAlivePlayers(player, true)) do
+      -- getAlivePlayers 只需要一个参数。这里为什么两个也行？
       if not p:isKongcheng() then -- 如果他有手牌
         local id = room:askForCard(p, 1, 1, false, self.name, false, nil, "#jy_youlong-choose")
         assert(id)
@@ -2058,7 +2059,7 @@ local jy_leiyan = fk.CreateActiveSkill {
     local all_players = true -- 默认所有人都有雷眼
 
     -- 只要有一个人没有雷眼，那么就是假
-    for _, p in ipairs(room:getAlivePlayers(player, true)) do
+    for _, p in ipairs(room:getAlivePlayers()) do
       if p:getMark("@jy_raiden_leiyan") == 0 then
         all_players = false
         break
