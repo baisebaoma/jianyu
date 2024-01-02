@@ -2059,8 +2059,10 @@ local jy_leiyan = fk.CreateActiveSkill {
     local all_players = true -- 默认所有人都有雷眼
 
     -- 只要有一个人没有雷眼，那么就是假
+
     -- 不知道为什么在这里写room:getAlivePlayers不行
-    for _, p in ipairs(Fk:currentRoom():getAlivePlayers()) do
+    -- Fk:currentRoom()也不行。为什么？
+    for _, p in ipairs(Fk:currentRoom():getAllPlayers()) do
       if p:getMark("@jy_raiden_leiyan") == 0 then
         all_players = false
         break
