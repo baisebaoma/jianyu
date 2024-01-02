@@ -281,7 +281,7 @@ local jy_xizao_2 = fk.CreateTriggerSkill {
       recoverBy = player,
       skillName = self.name,
     })
-    equip_num = #player:getCardIds(Player.Equip)
+    local equip_num = #player:getCardIds(Player.Equip)
     player:throwAllCards("e")
     player:drawCards(equip_num * 3)
   end,
@@ -1356,7 +1356,9 @@ local jy_sichi = fk.CreateTriggerSkill {
       end
       -- 所有其他人各摸一张
       for _, p in ipairs(room:getOtherPlayers(player)) do
-        p:drawCards(1, self.name)
+        if not p.dead then
+          p:drawCards(1, self.name)
+        end
       end
 
       -- 4种花色：选择至多3个角色，你和他们各失去一点体力
@@ -2057,11 +2059,11 @@ local jy_leiyan = fk.CreateActiveSkill {
     -- local room = player.room
     -- 如果所有人都有雷眼，那么就不能发动
     local all_players = true -- 默认所有人都有雷眼
-
     -- 只要有一个人没有雷眼，那么就是假
 
-    -- 不知道为什么在这里写room:getAlivePlayers不行
-    -- Fk:currentRoom()也不行。为什么？
+    -- 在这里写room:getAlivePlayers不行
+    -- Fk:currentRoom():getAlivePlayer也不行。因为这里用的是客户端Room。
+    -- 这几个函数定义在服务端Room里
     for _, p in ipairs(Fk:currentRoom().alive_players) do
       if p:getMark("@jy_raiden_leiyan") == 0 then
         all_players = false
@@ -2078,9 +2080,9 @@ local jy_leiyan = fk.CreateActiveSkill {
   card_num = 0,
   target_filter = function(self, to_select, selected)
     return Fk:currentRoom():getPlayerById(to_select):getMark("@jy_raiden_leiyan") == 0
-        and #selected < 1
+    -- and #selected < 1
   end,
-  target_num = 1,
+  min_target_num = 1,
   on_use = function(self, room, use)
     for _, to in ipairs(use.tos) do
       local p = room:getPlayerById(to)
@@ -2170,7 +2172,7 @@ local jy_zhenshuo = fk.CreateActiveSkill {
     })
 
     for _, p in ipairs(room:getAlivePlayers()) do
-      if p:getMark("@jy_raiden_leiyan") ~= 0 then
+      if p:getMark("@jy_raiden_leiyan") ~= 0 and not p.dead then
         p:drawCards(2 * dmg)
       end
     end
