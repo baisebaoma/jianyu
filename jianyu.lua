@@ -2052,9 +2052,9 @@ local tym__raiden = General(extension, "tym__raiden", "god", 3, 3, General.Femal
 
 local jy_leiyan = fk.CreateActiveSkill {
   name = "jy_leiyan",
-  anim_type = "offensive",
+  anim_type = "support",
   can_use = function(self, player)
-    local room = player.room
+    -- local room = player.room
     -- 如果所有人都有雷眼，那么就不能发动
     local all_players = true -- 默认所有人都有雷眼
 
@@ -2062,7 +2062,7 @@ local jy_leiyan = fk.CreateActiveSkill {
 
     -- 不知道为什么在这里写room:getAlivePlayers不行
     -- Fk:currentRoom()也不行。为什么？
-    for _, p in ipairs(Fk:currentRoom():getAllPlayers()) do
+    for _, p in ipairs(Fk:currentRoom().alive_players) do
       if p:getMark("@jy_raiden_leiyan") == 0 then
         all_players = false
         break
