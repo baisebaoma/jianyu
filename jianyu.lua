@@ -2316,7 +2316,7 @@ local jy_jieyin = fk.CreateActiveSkill {
     return to_select ~= Self.id and      -- 如果目标不是自己
         s.gender == General.Male and     -- 而且是男的
         s:getMark("@jy_jieyin") == 0 and -- 而且没被结姻过
-        -- s.maxHp ~= s.hp and              -- 而且受了伤
+        s.maxHp ~= s.hp and              -- 而且受了伤
         #selected < 1                    -- 而且只选了一个
   end,
   target_num = 1,
@@ -2360,11 +2360,12 @@ local jy_jieyin = fk.CreateActiveSkill {
 }
 
 local jy_lihun = fk.CreateActiveSkill {
+  frequency = Skill.Limited,
   name = "jy_lihun",
   anim_type = "masochism",
   can_use = function(self, player)
     if player:usedSkillTimes("jy_jieyin", Player.HistoryGame) == 0 then return false end
-    if player:usedSkillTimes(self.name) ~= 0 then return false end
+    if player:usedSkillTimes(self.name, Player.HistoryGame) ~= 0 then return false end
 
     -- 看有没有没被结姻的人，有就能亮
     local all_players = true
@@ -2386,7 +2387,7 @@ local jy_lihun = fk.CreateActiveSkill {
   end,
   on_use = function(self, room, effect)
     local from = room:getPlayerById(effect.from)
-    room:changeMaxHp(from, -from.hp)
+    room:changeMaxHp(from, -1)
     from:setSkillUseHistory("jy_jieyin", 0, Player.HistoryGame)
   end,
 }
@@ -2398,11 +2399,11 @@ Fk:loadTranslationTable {
   ["tym__liuxian"] = [[刘仙]],
 
   ["jy_jieyin"] = "结姻",
-  [":jy_jieyin"] = [[限定技，出牌阶段，你令一名未被【结姻】过的男性角色回复2点体力，然后你获得其所有牌并拥有其所有技能。]],
+  [":jy_jieyin"] = [[限定技，出牌阶段，你令一名未被【结姻】过且已受伤的男性角色回复2点体力，然后你获得其所有牌并拥有其所有技能。]],
   ["@jy_jieyin"] = "结姻过",
 
   ["jy_lihun"] = "离婚",
-  [":jy_lihun"] = [[出牌阶段限一次，你可以减少X点体力上限使得【结姻】视为未发动过，X为你的体力值。]],
+  [":jy_lihun"] = [[限定技，出牌阶段，你可以减少1点体力上限使得【结姻】视为未发动过。]],
 }
 
 -- for k, v in pairs(Fk.translations["zh_CN"]) do
