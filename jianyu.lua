@@ -2306,11 +2306,11 @@ local jy_jieyin = fk.CreateActiveSkill {
     -- 判断目标是否不能成为【顺手牵羊】的目标
     local s = Fk:currentRoom():getPlayerById(to_select)
 
-    return to_select ~= Self.id and      -- 如果目标不是自己
-        s.gender == General.Male and     -- 而且是男的
-        s:getMark("@jy_jieyin") == 0 and -- 而且没被结姻过
-        s.maxHp ~= s.hp and              -- 而且受了伤
-        #selected < 1                    -- 而且只选了一个
+    return to_select ~= Self.id and  -- 如果目标不是自己
+        s.gender == General.Male and -- 而且是男的
+        -- s:getMark("@jy_jieyin") == 0 and -- 而且没被结姻过
+        -- s.maxHp ~= s.hp and              -- 而且受了伤
+        #selected < 1 -- 而且只选了一个
   end,
   target_num = 1,
   on_use = function(self, room, use)
@@ -2328,12 +2328,12 @@ local jy_jieyin = fk.CreateActiveSkill {
       })
 
       -- 获得其所有牌
-      -- if not p:isNude() then
-      --   local cards_id = p:getCardIds { Player.Hand, Player.Equip }
-      --   local dummy = Fk:cloneCard 'slash'
-      --   dummy:addSubcards(cards_id)
-      --   room:obtainCard(player.id, dummy, false, fk.ReasonPrey)
-      -- end
+      if not p:isNude() then
+        local cards_id = p:getCardIds { Player.Hand, Player.Equip, Player.Judge }
+        local dummy = Fk:cloneCard 'slash'
+        dummy:addSubcards(cards_id)
+        room:obtainCard(player.id, dummy, false, fk.ReasonPrey)
+      end
 
       -- 获得其所有技能
       local skills = {}
@@ -2346,7 +2346,7 @@ local jy_jieyin = fk.CreateActiveSkill {
         room:handleAddLoseSkills(player, table.concat(skills, "|"), nil, true, false)
       end
 
-      room:setPlayerMark(p, "@jy_jieyin", "")
+      -- room:setPlayerMark(p, "@jy_jieyin", "")
     end
   end,
 }
@@ -2390,7 +2390,7 @@ Fk:loadTranslationTable {
   ["tym__liuxian"] = [[刘仙]],
 
   ["jy_jieyin"] = "结姻",
-  [":jy_jieyin"] = [[限定技，出牌阶段，你选择一名未选择过且已受伤的男性角色，你令其回复2点体力，然后你拥有其所有技能。]],
+  [":jy_jieyin"] = [[限定技，出牌阶段，你令一名男性角色回复2点体力，然后你获得其所有牌并拥有其所有技能。]],
   ["@jy_jieyin"] = "结姻",
 
   ["jy_lihun"] = "离婚",
