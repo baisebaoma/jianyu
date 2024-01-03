@@ -2351,7 +2351,7 @@ local jy_lihun = fk.CreateActiveSkill {
   name = "jy_lihun",
   anim_type = "masochism",
   can_use = function(self, player)
-    if player:usedSkillTimes("jy_jieyin", Player.HistoryGame) ~= 0 then return false end
+    if player:usedSkillTimes("jy_jieyin", Player.HistoryGame) == 0 then return false end
 
     -- 看有没有没被结姻的人，有就能亮
     local all_players = true
