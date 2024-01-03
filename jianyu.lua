@@ -2325,15 +2325,15 @@ local jy_jieyin = fk.CreateActiveSkill {
         skillName = self.name,
       })
 
-      if not to:isNude() then
-        local cards_id = to:getCardIds { Player.Hand, Player.Equip }
+      if not p:isNude() then
+        local cards_id = p:getCardIds { Player.Hand, Player.Equip }
         local dummy = Fk:cloneCard 'slash'
         dummy:addSubcards(cards_id)
         room:obtainCard(player.id, dummy, false, fk.ReasonPrey)
       end
 
       local skills = {}
-      for _, s in ipairs(to.player_skills) do
+      for _, s in ipairs(p.player_skills) do
         if not (s.attached_equip or s.name[#s.name] == "&") then
           table.insertIfNeed(skills, s.name)
         end
@@ -2342,7 +2342,7 @@ local jy_jieyin = fk.CreateActiveSkill {
         room:handleAddLoseSkills(player, table.concat(skills, "|"), nil, true, false)
       end
 
-      room:setPlayerMark(to, "@jy_jieyin", true)
+      room:setPlayerMark(p, "@jy_jieyin", true)
     end
   end,
 }
