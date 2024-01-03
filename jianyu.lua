@@ -1096,7 +1096,7 @@ Fk:loadTranslationTable {
   ["xjb__aweiluo_dian"] = "点",
 
   ["jy_youlong"] = "游龙",
-  ["#jy_youlong-choose"] = "游龙：选择一张牌交给下家",
+  ["#jy_youlong-choose"] = "游龙：选择一张手牌交给下家",
   [":jy_youlong"] = "锁定技，准备阶段，有手牌的角色依次将一张手牌交给下家。",
   ["$jy_youlong1"] = "翩若惊鸿！婉若游龙！",
 
@@ -1124,7 +1124,7 @@ Fk:loadTranslationTable {
   ["#jy_luojiao_ask_which"] = "罗绞 两个条件同时达成并发动，请选择要先视为使用的牌",
 
   ["jy_yusu"] = "玉玊",
-  [":jy_yusu"] = "你的回合内使用第二张基本牌时，可以将其作为“点”置于武将牌上。",
+  [":jy_yusu"] = "你的回合内，使用或打出第二张基本牌时，可以将其作为“点”置于武将牌上。",
   ["@jy_yusu_basic_count"] = "玉玊",
   ["$jy_yusu1"] = "Siu...",
   ["#jy_yusu_triggered"] = "已触发",
@@ -1587,8 +1587,8 @@ Fk:loadTranslationTable {
   ["jy_sichi"] = "四吃",
   [":jy_sichi"] = [[受到伤害后，你可以展示牌堆顶的4张牌，根据花色数量触发效果。<br>
   1种：选择一名角色获得这些牌；<br>
-  2种：获得其中一张可以使用的牌并可以立即使用。若所有的牌都无法使用，弃一张牌；<br>
-  3种：获得其中3张同类型的牌或2张不同类型的牌，然后除你以外的其他角色各摸一张牌；<br>
+  2种：获得其中一张可以使用的牌并可以立即使用。若没有可以使用的牌，弃一张牌；<br>
+  3种：获得其中3张同类型的牌或2张不同类型的牌，然后所有其他角色各摸一张牌；<br>
   4种：选择至多3名角色，你与其各失去一点体力。]],
 
   ["#jy_sichi_suits_1"] = "四吃：1种花色，选择一个角色获得这些牌",
@@ -2163,8 +2163,6 @@ local jy_zhenshuo = fk.CreateActiveSkill {
         p:drawCards(2 * dmg)
       end
     end
-
-    -- player:drawCards(2 * dmg)
   end,
 }
 
