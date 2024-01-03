@@ -45,3 +45,6 @@ luac.out
 
 # macOS files
 .DS_Store
+
+# vscode files
+.vscode/

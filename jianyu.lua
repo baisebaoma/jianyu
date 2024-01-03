@@ -226,7 +226,7 @@ local jy_kaiju_2 = fk.CreateActiveSkill {
   card_num = 0,
   target_filter = function(self, to_select, selected)
     -- 判断目标是否不能成为【顺手牵羊】的目标
-    s = Fk:currentRoom():getPlayerById(to_select)
+    local s = Fk:currentRoom():getPlayerById(to_select)
     local snatch = Fk:cloneCard("snatch")
     if Self:isProhibited(s, snatch) then -- 前面的是自己，后面的是别人！
       return false
@@ -2287,6 +2287,98 @@ Fk:loadTranslationTable {
   [":jy_jianying"] = [[锁定技，所有角色的结束阶段，若你的手牌数小于体力值，你摸一张牌。]],
   ["$jy_jianying1"] = "冒进是大忌。",
   ["$jy_jianying2"] = "呵……余兴节目。",
+}
+
+local tym__liuxian = General(extension, "tym__liuxian", "god", 3, 3, General.Female)
+
+local jy_jieyin = fk.CreateActiveSkill {
+  frequency = Skill.Limited,
+  name = "jy_jieyin",
+  anim_type = "support",
+  can_use = function(self, player)
+    return player:usedSkillTimes(self.name, Player.HistoryGame) == 0
+  end,
+  card_filter = function(self, card)
+    return false
+  end,
+  card_num = 0,
+  target_filter = function(self, to_select, selected)
+    -- 判断目标是否不能成为【顺手牵羊】的目标
+    local s = Fk:currentRoom():getPlayerById(to_select)
+
+    return to_select ~= Self.id and      -- 如果目标不是自己
+        s.gender == General.Male and     -- 而且是男的
+        s:getMark("@jy_jieyin") == 0 and -- 而且没被结姻过
+        #selected < 1                    -- 而且只选了一个
+  end,
+  target_num = 1,
+  on_use = function(self, room, use)
+    local player = room:getPlayerById(use.from)
+
+    for _, to in ipairs(use.tos) do
+      local p = room:getPlayerById(to)
+
+      room:recover({
+        who = p,
+        num = p.maxHp - p.hp,
+        recoverBy = player,
+        skillName = self.name,
+      })
+
+      if not to:isNude() then
+        local cards_id = to:getCardIds { Player.Hand, Player.Equip }
+        local dummy = Fk:cloneCard 'slash'
+        dummy:addSubcards(cards_id)
+        room:obtainCard(player.id, dummy, false, fk.ReasonPrey)
+      end
+
+      local skills = {}
+      for _, s in ipairs(to.player_skills) do
+        if not (s.attached_equip or s.name[#s.name] == "&") then
+          table.insertIfNeed(skills, s.name)
+        end
+      end
+      if #skills > 0 then
+        room:handleAddLoseSkills(player, table.concat(skills, "|"), nil, true, false)
+      end
+
+      room:setPlayerMark(to, "@jy_jieyin", true)
+    end
+  end,
+}
+
+local jy_lihun = fk.CreateActiveSkill {
+  name = "jy_lihun",
+  anim_type = "masochism",
+  can_use = function(self, player)
+    return player:usedSkillTimes("jy_jieyin", Player.HistoryGame) ~= 0
+  end,
+  card_filter = function(self, card)
+    return false
+  end,
+  card_num = 0,
+  target_filter = function(self, to_select, selected)
+    return false
+  end,
+  on_use = function(self, room, effect)
+    local from = room:getPlayerById(effect.from)
+    room:changeMaxHp(from, -1)
+    from:setSkillUseHistory("jy_jieyin", 0, Player.HistoryGame)
+  end,
+}
+
+tym__liuxian:addSkill(jy_jieyin)
+tym__liuxian:addSkill(jy_lihun)
+
+Fk:loadTranslationTable {
+  ["tym__liuxian"] = [[刘仙]],
+
+  ["jy_jieyin"] = "结姻",
+  [":jy_jieyin"] = [[限定技，出牌阶段，你选择一名未被选择过的男性角色，令其回复体力至上限；你获得其所有牌、拥有其所有技能。]],
+  ["@jy_jieyin"] = "结姻",
+
+  ["jy_lihun"] = "离婚",
+  [":jy_lihun"] = [[出牌阶段，你可以减少一点体力上限使得【结姻】视为未发动过。]],
 }
 
 -- for k, v in pairs(Fk.translations["zh_CN"]) do
