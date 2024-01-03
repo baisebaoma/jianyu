@@ -929,7 +929,7 @@ local jy_luojiao_after = fk.CreateTriggerSkill {
 
     -- 判断是否有两张同样花色的“点”，若有返回false，若没有返回true
     if #dians == 0 then return false end -- 设计者说1张也可以发动南蛮
-    dict = {}
+    local dict = {}
     local is_luojiao_suit_satisfied = true
     for _, c in ipairs(dians) do
       local suit = Fk:getCardById(c).suit
@@ -1002,7 +1002,7 @@ local jy_luojiao_after = fk.CreateTriggerSkill {
 
     if self.first then -- 如果self.first这个值有，那就代表两个条件同时满足
       local cards
-      local skills
+      local skill_names
       -- 这样写方便以后扩展，也可以更好地移植到别的代码里去
       if self.first == "archery_attack" then -- 如果玩家选择先用万箭
         cards = { "archery_attack", "savage_assault" }
@@ -1054,12 +1054,12 @@ local jy_yusu = fk.CreateTriggerSkill {
     if not player:hasSkill(self) then return false end
     return player.phase ~= Player.NotActive and data.card and
         data.card.type == Card.TypeBasic and target == player and
-        player:getMark("_jy_yusu_triggered") ~= 0
+        player:getMark("_jy_yusu_triggered") == 0
   end,
   on_cost = function(self, event, target, player, data)
     local room = player.room
     room:addPlayerMark(player, "@jy_yusu_basic_count")
-    basic_count = player:getMark("@jy_yusu_basic_count")
+    local basic_count = player:getMark("@jy_yusu_basic_count")
     if basic_count == 2 then -- 第二张基本牌
       local return_value = room:askForSkillInvoke(player, self.name)
       room:setPlayerMark(player, "@jy_yusu_basic_count", 0)
@@ -1132,6 +1132,7 @@ Fk:loadTranslationTable {
   [":jy_yusu"] = "出牌阶段，使用第二张基本牌时，可以将其作为“点”置于武将牌上。",
   ["@jy_yusu_basic_count"] = "玉玊",
   ["$jy_yusu1"] = "Siu...",
+  ["_jy_yusu_triggered"] = "",
 
   ["~xjb__aweiluo"] = "Messi, Messi, Messi, Messi...",
 
@@ -1211,7 +1212,7 @@ local jy_sichi = fk.CreateTriggerSkill {
     -- player:showCards(card_ids)  -- 这个和上面的是一个效果，区别在于这个可以在牌上显示是自己展示的
 
     -- 看花色有多少种，测试通过
-    dict = { false, false, false, false }
+    local dict = { false, false, false, false }
     local suit_count = 0
     for _, c in ipairs(card_ids) do
       local suit = Fk:getCardById(c).suit
