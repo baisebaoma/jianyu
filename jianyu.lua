@@ -2342,7 +2342,7 @@ local jy_jieyin = fk.CreateActiveSkill {
         room:handleAddLoseSkills(player, table.concat(skills, "|"), nil, true, false)
       end
 
-      room:setPlayerMark(p, "@jy_jieyin", true)
+      room:setPlayerMark(p, "@jy_jieyin", "")
     end
   end,
 }
@@ -2351,7 +2351,18 @@ local jy_lihun = fk.CreateActiveSkill {
   name = "jy_lihun",
   anim_type = "masochism",
   can_use = function(self, player)
-    return player:usedSkillTimes("jy_jieyin", Player.HistoryGame) ~= 0
+    if player:usedSkillTimes("jy_jieyin", Player.HistoryGame) ~= 0 then return false end
+
+    -- 看有没有没被结姻的人，有就能亮
+    local all_players = true
+    for _, p in ipairs(Fk:currentRoom().alive_players) do
+      if p:getMark("@jy_jieyin") == 0 then
+        all_players = false
+        break
+      end
+    end
+
+    return not all_players
   end,
   card_filter = function(self, card)
     return false
