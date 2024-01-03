@@ -1049,39 +1049,7 @@ jy_luojiao:addRelatedSkill(jy_luojiao_after)
 local jy_yusu = fk.CreateTriggerSkill {
   name = "jy_yusu",
   anim_type = "special",
-  events = { fk.CardResponding, fk.CardUsing },
-  can_trigger = function(self, event, target, player, data)
-    if not player:hasSkill(self) then return false end
-    return player.phase ~= Player.NotActive and data.card and
-        data.card.type == Card.TypeBasic and target == player and
-        player:getMark("_jy_yusu_triggered") == 0
-  end,
-  on_trigger = function(self, event, target, player, data)
-    local room = player.room
-    room:addPlayerMark(player, "@jy_yusu_basic_count")
-  end,
-  on_cost = function(self, event, target, player, data)
-    local room = player.room
-    local basic_count = player:getMark("@jy_yusu_basic_count")
-    if basic_count ~= 2 then return false end -- 第二张基本牌
-    local return_value = room:askForSkillInvoke(player, self.name)
-    if return_value then
-      room:setPlayerMark(player, "@jy_yusu_basic_count", 0)
-    end
-    room:setPlayerMark(player, "_jy_yusu_triggered", true) -- 不管他发不发动，反正只能第二张基本牌触发
-    return return_value
-  end,
-  on_use = function(self, event, target, player, data)
-    local room = player.room
-    local id = data.card
-    player:addToPile("xjb__aweiluo_dian", id, true, self.name)
-  end,
-}
-local jy_yusu_set_0 = fk.CreateTriggerSkill {
-  name = "#jy_yusu_set_0",
-  mute = true,
-  frequency = Skill.Compulsory,
-  visible = false,
+
   refresh_events = { fk.EventPhaseEnd },
   can_refresh = function(self, event, target, player, data)
     return target == player and player:hasSkill(self)
@@ -1090,10 +1058,32 @@ local jy_yusu_set_0 = fk.CreateTriggerSkill {
   on_refresh = function(self, event, target, player, data)
     local room = player.room
     room:setPlayerMark(player, "@jy_yusu_basic_count", 0)
-    room:setPlayerMark(player, "_jy_yusu_triggered", 0)
+  end,
+
+  events = { fk.CardResponding, fk.CardUsing },
+  can_trigger = function(self, event, target, player, data)
+    if not player:hasSkill(self) then return false end
+    if type(player:getMark("@jy_yusu_basic_count")) ~= "number" then return false end
+    if player.phase ~= Player.NotActive and data.card and
+        data.card.type == Card.TypeBasic and target == player then -- target == player：触发者是你自己
+      return true
+    end
+  end,
+  on_cost = function(self, event, target, player, data)
+    local room = player.room
+    room:addPlayerMark(player, "@jy_yusu_basic_count")
+    local basic_count = player:getMark("@jy_yusu_basic_count")
+    if basic_count == 2 then -- 第二张基本牌
+      return room:askForSkillInvoke(player, self.name)
+    end
+  end,
+  on_use = function(self, event, target, player, data)
+    local room = player.room
+    local id = data.card
+    player:addToPile("xjb__aweiluo_dian", id, true, self.name)
+    room:setPlayerMark(player, "@jy_yusu_basic_count", "#jy_yusu_triggered")
   end,
 }
-jy_yusu:addRelatedSkill(jy_yusu_set_0)
 
 xjb__aweiluo:addSkill(jy_youlong)
 xjb__aweiluo:addSkill(jy_hebao)
@@ -1137,7 +1127,7 @@ Fk:loadTranslationTable {
   [":jy_yusu"] = "你的回合内使用第二张基本牌时，可以将其作为“点”置于武将牌上。",
   ["@jy_yusu_basic_count"] = "玉玊",
   ["$jy_yusu1"] = "Siu...",
-  ["_jy_yusu_triggered"] = "",
+  ["#jy_yusu_triggered"] = "已触发",
 
   ["~xjb__aweiluo"] = "Messi, Messi, Messi, Messi...",
 
