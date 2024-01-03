@@ -2214,12 +2214,18 @@ local jy_jinghua = fk.CreateTriggerSkill {
     -- 别用回复体力，直接更改体力，不然总是触发医术高超
     room:changeHp(player, 2, "recover", self.name)
 
-    local extraData = { bypass_times = true }                                                               -- 加上这个，就可以让它就算之前使用过杀，也可以再使用了
+    local extraData = { bypass_times = true }                                                                -- 加上这个，就可以让它就算之前使用过杀，也可以再使用了
 
-    data.jinghua_use = room:askForUseCard(player, "slash", "slash|.|.", "#jy_jinghua_use", true, extraData) -- 这里填false也没用，反正是可以取消的
-    if data.jinghua_use then
-      data.jinghua_use.extraUse = true                                                                      -- 加上这个，就可以让它不计入次数了，也就是说还可以再使用一张杀
-      room:useCard(data.jinghua_use)
+    local jinghua_use = room:askForUseCard(player, "slash", "slash|.|.", "#jy_jinghua_use", true, extraData) -- 这里填false也没用，反正是可以取消的
+    if jinghua_use then
+      jinghua_use.extraUse = true                                                                            -- 加上这个，就可以让它不计入次数了，也就是说还可以再使用一张杀
+      room:useCard(jinghua_use)
+
+      jinghua_use = room:askForUseCard(player, "slash", "slash|.|.", "#jy_jinghua_use_again", true, extraData) -- 这里填false也没用，反正是可以取消的
+      if jinghua_use then
+        jinghua_use.extraUse = true                                                                            -- 加上这个，就可以让它不计入次数了，也就是说还可以再使用一张杀
+        room:useCard(jinghua_use)
+      end
     end
   end,
   on_refresh = function(self, event, target, player, data)
@@ -2277,11 +2283,12 @@ Fk:loadTranslationTable {
   ["~tym__ayato"] = "世事无常……",
 
   ["jy_jinghua"] = "镜花",
-  [":jy_jinghua"] = [[使用或打出基本牌后，你可以进入<font color="skyblue">泷廻鉴花</font>状态，直到当前回合结束。<br><font color="skyblue">泷廻鉴花</font>：获得2攻击距离、2体力上限、2体力；可以立即使用一张不计入使用次数的【杀】。因<font color="skyblue">泷廻鉴花</font>状态结束而失去体力时，至多使体力降至2。]],
+  [":jy_jinghua"] = [[使用或打出基本牌后，你可以进入<font color="skyblue">泷廻鉴花</font>状态，直到当前回合结束。<br><font color="skyblue">泷廻鉴花</font>：获得2攻击距离、2体力上限、2体力；可以立即使用两张不计入使用次数的【杀】。因<font color="skyblue">泷廻鉴花</font>状态结束而失去体力时，至多使体力降至2。]],
   ["@jy_jinghua"] = [[<font color="skyblue">泷廻鉴花</font>]],
   ["$jy_jinghua1"] = "苍流水影。",
   ["$jy_jinghua2"] = "剑影。",
-  ["#jy_jinghua_use"] = "镜花：你可以使用一张不计入使用次数的【杀】",
+  ["#jy_jinghua_use"] = "镜花：你可以使用两张不计入使用次数的【杀】，第一张",
+  ["#jy_jinghua_use_again"] = "镜花：你可以使用两张不计入使用次数的【杀】，第二张",
 
   ["jy_jianying"] = "渐盈",
   [":jy_jianying"] = [[锁定技，所有角色的结束阶段，若你的手牌数小于体力值，你摸一张牌。]],
@@ -2306,11 +2313,11 @@ local jy_jieyin = fk.CreateActiveSkill {
     -- 判断目标是否不能成为【顺手牵羊】的目标
     local s = Fk:currentRoom():getPlayerById(to_select)
 
-    return to_select ~= Self.id and  -- 如果目标不是自己
-        s.gender == General.Male and -- 而且是男的
-        -- s:getMark("@jy_jieyin") == 0 and -- 而且没被结姻过
+    return to_select ~= Self.id and      -- 如果目标不是自己
+        s.gender == General.Male and     -- 而且是男的
+        s:getMark("@jy_jieyin") == 0 and -- 而且没被结姻过
         -- s.maxHp ~= s.hp and              -- 而且受了伤
-        #selected < 1 -- 而且只选了一个
+        #selected < 1                    -- 而且只选了一个
   end,
   target_num = 1,
   on_use = function(self, room, use)
@@ -2346,7 +2353,8 @@ local jy_jieyin = fk.CreateActiveSkill {
         room:handleAddLoseSkills(player, table.concat(skills, "|"), nil, true, false)
       end
 
-      -- room:setPlayerMark(p, "@jy_jieyin", "")
+      -- 已被结姻了
+      room:setPlayerMark(p, "@jy_jieyin", "")
     end
   end,
 }
@@ -2390,8 +2398,8 @@ Fk:loadTranslationTable {
   ["tym__liuxian"] = [[刘仙]],
 
   ["jy_jieyin"] = "结姻",
-  [":jy_jieyin"] = [[限定技，出牌阶段，你令一名男性角色回复2点体力，然后你获得其所有牌并拥有其所有技能。]],
-  ["@jy_jieyin"] = "结姻",
+  [":jy_jieyin"] = [[限定技，出牌阶段，你令一名未被【结姻】过的男性角色回复2点体力，然后你获得其所有牌并拥有其所有技能。]],
+  ["@jy_jieyin"] = "结姻过",
 
   ["jy_lihun"] = "离婚",
   [":jy_lihun"] = [[出牌阶段限一次，你可以减少X点体力上限使得【结姻】视为未发动过，X为你的体力值。]],
