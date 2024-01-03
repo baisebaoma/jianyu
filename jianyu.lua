@@ -1049,22 +1049,27 @@ jy_luojiao:addRelatedSkill(jy_luojiao_after)
 local jy_yusu = fk.CreateTriggerSkill {
   name = "jy_yusu",
   anim_type = "special",
-  events = { fk.CardUsing },
+  events = { fk.CardResponding, fk.CardUsing },
   can_trigger = function(self, event, target, player, data)
     if not player:hasSkill(self) then return false end
     return player.phase ~= Player.NotActive and data.card and
         data.card.type == Card.TypeBasic and target == player and
         player:getMark("_jy_yusu_triggered") == 0
   end,
-  on_cost = function(self, event, target, player, data)
+  on_trigger = function(self, event, target, player, data)
     local room = player.room
     room:addPlayerMark(player, "@jy_yusu_basic_count")
+  end,
+  on_cost = function(self, event, target, player, data)
+    local room = player.room
     local basic_count = player:getMark("@jy_yusu_basic_count")
-    if basic_count == 2 then -- 第二张基本牌
-      local return_value = room:askForSkillInvoke(player, self.name)
+    if basic_count ~= 2 then return false end -- 第二张基本牌
+    local return_value = room:askForSkillInvoke(player, self.name)
+    if return_value then
       room:setPlayerMark(player, "@jy_yusu_basic_count", 0)
       room:setPlayerMark(player, "_jy_yusu_triggered", true)
     end
+    return return_value
   end,
   on_use = function(self, event, target, player, data)
     local room = player.room
@@ -1129,7 +1134,7 @@ Fk:loadTranslationTable {
   ["#jy_luojiao_ask_which"] = "罗绞 两个条件同时达成并发动，请选择要先视为使用的牌",
 
   ["jy_yusu"] = "玉玊",
-  [":jy_yusu"] = "出牌阶段，使用第二张基本牌时，可以将其作为“点”置于武将牌上。",
+  [":jy_yusu"] = "你的回合内使用第二张基本牌时，可以将其作为“点”置于武将牌上。",
   ["@jy_yusu_basic_count"] = "玉玊",
   ["$jy_yusu1"] = "Siu...",
   ["_jy_yusu_triggered"] = "",
