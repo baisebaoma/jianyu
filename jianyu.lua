@@ -2309,6 +2309,7 @@ local jy_jieyin = fk.CreateActiveSkill {
     return to_select ~= Self.id and      -- 如果目标不是自己
         s.gender == General.Male and     -- 而且是男的
         s:getMark("@jy_jieyin") == 0 and -- 而且没被结姻过
+        s.maxHp ~= s.hp and              -- 而且受了伤
         #selected < 1                    -- 而且只选了一个
   end,
   target_num = 1,
@@ -2318,20 +2319,23 @@ local jy_jieyin = fk.CreateActiveSkill {
     for _, to in ipairs(use.tos) do
       local p = room:getPlayerById(to)
 
+      -- 治疗其
       room:recover({
         who = p,
-        num = p.maxHp - p.hp,
+        num = 2,
         recoverBy = player,
         skillName = self.name,
       })
 
-      if not p:isNude() then
-        local cards_id = p:getCardIds { Player.Hand, Player.Equip }
-        local dummy = Fk:cloneCard 'slash'
-        dummy:addSubcards(cards_id)
-        room:obtainCard(player.id, dummy, false, fk.ReasonPrey)
-      end
+      -- 获得其所有牌
+      -- if not p:isNude() then
+      --   local cards_id = p:getCardIds { Player.Hand, Player.Equip }
+      --   local dummy = Fk:cloneCard 'slash'
+      --   dummy:addSubcards(cards_id)
+      --   room:obtainCard(player.id, dummy, false, fk.ReasonPrey)
+      -- end
 
+      -- 获得其所有技能
       local skills = {}
       for _, s in ipairs(p.player_skills) do
         if not (s.attached_equip or s.name[#s.name] == "&") then
@@ -2352,6 +2356,7 @@ local jy_lihun = fk.CreateActiveSkill {
   anim_type = "masochism",
   can_use = function(self, player)
     if player:usedSkillTimes("jy_jieyin", Player.HistoryGame) == 0 then return false end
+    if player:usedSkillTimes(self.name) ~= 0 then return false end
 
     -- 看有没有没被结姻的人，有就能亮
     local all_players = true
@@ -2373,7 +2378,7 @@ local jy_lihun = fk.CreateActiveSkill {
   end,
   on_use = function(self, room, effect)
     local from = room:getPlayerById(effect.from)
-    room:changeMaxHp(from, -1)
+    room:changeMaxHp(from, -from.hp)
     from:setSkillUseHistory("jy_jieyin", 0, Player.HistoryGame)
   end,
 }
@@ -2385,11 +2390,11 @@ Fk:loadTranslationTable {
   ["tym__liuxian"] = [[刘仙]],
 
   ["jy_jieyin"] = "结姻",
-  [":jy_jieyin"] = [[限定技，出牌阶段，你选择一名未被选择过的男性角色，令其回复体力至上限；你获得其所有牌、拥有其所有技能。]],
+  [":jy_jieyin"] = [[限定技，出牌阶段，你选择一名未选择过且已受伤的男性角色，你令其回复2点体力，然后你拥有其所有技能。]],
   ["@jy_jieyin"] = "结姻",
 
   ["jy_lihun"] = "离婚",
-  [":jy_lihun"] = [[出牌阶段，你可以减少一点体力上限使得【结姻】视为未发动过。]],
+  [":jy_lihun"] = [[出牌阶段限一次，你可以减少X点体力上限使得【结姻】视为未发动过，X为你的体力值。]],
 }
 
 -- for k, v in pairs(Fk.translations["zh_CN"]) do
