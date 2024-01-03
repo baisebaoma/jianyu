@@ -1067,8 +1067,8 @@ local jy_yusu = fk.CreateTriggerSkill {
     local return_value = room:askForSkillInvoke(player, self.name)
     if return_value then
       room:setPlayerMark(player, "@jy_yusu_basic_count", 0)
-      room:setPlayerMark(player, "_jy_yusu_triggered", true)
     end
+    room:setPlayerMark(player, "_jy_yusu_triggered", true) -- 不管他发不发动，反正只能第二张基本牌触发
     return return_value
   end,
   on_use = function(self, event, target, player, data)
