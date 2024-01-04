@@ -2468,6 +2468,14 @@ Fk:loadTranslationTable {
   [":jy_lihun"] = [[出牌阶段，你可以减少一点体力上限使〖结姻〗视为未发动过。]],
 }
 
+local tym__zhafu = General(extension, "tym__zhafu", "qun", 8)
+tym__zhafu:addSkill("jy_kaiju")
+tym__zhafu:addSkill("jy_yuyu")
+
+Fk:loadTranslationTable {
+  ["tym__zhafu"] = [[炸服专家]],
+}
+
 -- for k, v in pairs(Fk.translations["zh_CN"]) do
 --   v = string.gsub(v, "雷电将军", "<font color=\"Fuchsia\">雷电将军</font>")
 --   v = string.gsub(v, "神里绫人", "<font color=\"skyblue\">神里绫人</font>")
