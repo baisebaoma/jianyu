@@ -759,7 +759,7 @@ local jy_yuyu = fk.CreateTriggerSkill {
   end,
   on_use = function(self, event, target, player, data)
     if self.choice == "#jy_yuyu_draw3" then
-      player:drawCards(5)
+      player:drawCards(4)
     else
       player:drawCards(3)
       player:turnOver()
@@ -782,10 +782,10 @@ Fk:loadTranslationTable {
 
   ["jy_yuyu"] = "玉玉",
   [":jy_yuyu"] = [[1. 锁定技，当有角色对你使用【杀】造成了伤害时，其获得“致郁”标记；<br>
-  2. 受到没有【致郁】标记的角色或因本次伤害而获得“致郁”标记的角色造成的伤害时，你可以选择一项：摸5张牌；摸3张牌并翻面，然后对自己造成1点伤害。]],
+  2. 受到没有“致郁”标记的角色或因本次伤害而获得“致郁”标记的角色造成的伤害时，你可以选择一项：摸4张牌；摸3张牌并翻面，然后对自己造成1点伤害。]],
   ["@jy_yuyu_enemy"] = "致郁",
   ["#jy_yuyu_ask_which"] = "玉玉：请选择你要触发的效果",
-  ["#jy_yuyu_draw3"] = "摸5张牌",
+  ["#jy_yuyu_draw3"] = "摸4张牌",
   ["#jy_yuyu_draw4turnover"] = "摸3张牌并翻面，然后对自己造成1点伤害",
   ["$jy_yuyu1"] = "我……我真的很想听到你们说话……",
   ["$jy_yuyu2"] = "我天天被队霸欺负，他们天天骂我。",
@@ -2339,7 +2339,7 @@ local jy_jieyin = fk.CreateActiveSkill {
       -- 治疗其
       room:recover({
         who = p,
-        num = p.maxHp - p.hp,
+        num = player.hp,
         recoverBy = player,
         skillName = self.name,
       })
@@ -2410,7 +2410,7 @@ Fk:loadTranslationTable {
   ["tym__liuxian"] = [[刘仙]],
 
   ["jy_jieyin"] = "结姻",
-  [":jy_jieyin"] = [[限定技，出牌阶段，你可以令一名已受伤的男性角色回复体力至上限，然后你获得其所有牌并拥有其所有技能。]],
+  [":jy_jieyin"] = [[限定技，出牌阶段，你可以选择一名已受伤的男性角色，令其回复X点体力，然后你获得其所有牌并拥有其所有技能，X为你的体力值。]],
   -- ["@jy_jieyin"] = "结姻过",
 
   ["jy_lihun"] = "离婚",
