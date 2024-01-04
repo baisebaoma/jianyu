@@ -2338,7 +2338,7 @@ local jy_jieyin = fk.CreateActiveSkill {
       -- 治疗其
       room:recover({
         who = p,
-        num = player.hp,
+        num = 3,
         recoverBy = player,
         skillName = self.name,
       })
@@ -2437,7 +2437,7 @@ local jy_xiannu = fk.CreateActiveSkill {
 
     for _, to in ipairs(use.tos) do
       local p = room:getPlayerById(to)
-      room:loseHp(player, 3)
+      room:changeMaxHp(player, -1)
 
       room:damage({
         from = player,
@@ -2458,7 +2458,7 @@ Fk:loadTranslationTable {
   ["tym__liuxian"] = [[刘仙]],
 
   ["jy_xiannu"] = "仙怒",
-  [":jy_xiannu"] = [[限定技，出牌阶段，你可以失去3点体力对一名未受伤的男性角色造成1点伤害。]],
+  [":jy_xiannu"] = [[限定技，出牌阶段，你可以减少一点体力上限对一名未受伤的男性角色造成1点伤害。]],
 
   ["jy_jieyin"] = "结姻",
   [":jy_jieyin"] = [[限定技，出牌阶段，你可以令一名已受伤的男性角色回复3点体力，然后你获得其所有牌并拥有其所有技能。]],
