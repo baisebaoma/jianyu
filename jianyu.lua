@@ -1806,7 +1806,7 @@ local jy_jieju = fk.CreateActiveSkill {
   end,
   on_use = function(self, room, effect)
     local from = room:getPlayerById(effect.from)
-    local hp_to_be_lost = 2 ^ from:usedSkillTimes(self.name, Player.HistoryPhase)
+    local hp_to_be_lost = 2 ^ (from:usedSkillTimes(self.name, Player.HistoryPhase) - 1)
     room:loseHp(from, hp_to_be_lost, self.name) -- 从弃牌改为失去体力
     -- room:throwCard(effect.cards, self.name, from, from)
     from:setSkillUseHistory("jy_zuoti", 0, Player.HistoryPhase)
@@ -1891,7 +1891,7 @@ Fk:loadTranslationTable {
   ["#jy_zuoti_incorrect_log"] = "%from 选择了：%arg，正确答案：%arg2。",
 
   ["jy_jieju"] = "熬夜",
-  [":jy_jieju"] = [[使命技，出牌阶段，你失去2^X点体力使〖做题〗视为未发动过，X你本回合发动该技能的次数。<br>
+  [":jy_jieju"] = [[使命技，出牌阶段，你失去2^X点体力使〖做题〗视为未发动过，X为你本回合已发动该技能的次数（不含本次）。<br>
   成功：回合结束时，若你【做题】答对比答错至少多3，你摸3张牌，然后获得技能〖集智〗、〖看破〗、〖享乐〗；<br>
   失败：回合结束时，若你【做题】答错比答对至少多3，你翻面、减两点体力上限，然后获得技能〖玉玉〗、〖红温〗。]],
   ["#jy_jieju_success"] = "结局：成功",
