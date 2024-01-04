@@ -759,10 +759,17 @@ local jy_yuyu = fk.CreateTriggerSkill {
   end,
   on_use = function(self, event, target, player, data)
     if self.choice == "#jy_yuyu_draw3" then
-      player:drawCards(12)
+      player:drawCards(5)
     else
-      player:drawCards(24)
+      player:drawCards(3)
       player:turnOver()
+      Fk:currentRoom():damage({
+        from = player,
+        to = player,
+        damage = 1,
+        damageType = fk.NormalDamage,
+        skillName = self.name,
+      })
     end
     self.this_time_slash = false
   end,
@@ -774,12 +781,12 @@ Fk:loadTranslationTable {
   ["xjb__gaotianliang"] = "高天亮",
 
   ["jy_yuyu"] = "玉玉",
-  [":jy_yuyu"] = [[1. 锁定技，当有角色对你使用【杀】造成了伤害时，其获得【致郁】标记；<br>
-  2. 受到没有【致郁】标记的角色或因本次伤害而获得【致郁】标记的角色造成的伤害时，你可以选择一项：摸12张牌；摸24张牌并翻面。]],
+  [":jy_yuyu"] = [[1. 锁定技，当有角色对你使用【杀】造成了伤害时，其获得“致郁”标记；<br>
+  2. 受到没有【致郁】标记的角色或因本次伤害而获得“致郁”标记的角色造成的伤害时，你可以选择一项：摸5张牌；摸3张牌并翻面，然后对自己造成1点伤害。]],
   ["@jy_yuyu_enemy"] = "致郁",
   ["#jy_yuyu_ask_which"] = "玉玉：请选择你要触发的效果",
-  ["#jy_yuyu_draw3"] = "摸12张牌",
-  ["#jy_yuyu_draw4turnover"] = "摸24张牌并翻面",
+  ["#jy_yuyu_draw3"] = "摸5张牌",
+  ["#jy_yuyu_draw4turnover"] = "摸3张牌并翻面，然后对自己造成1点伤害",
   ["$jy_yuyu1"] = "我……我真的很想听到你们说话……",
   ["$jy_yuyu2"] = "我天天被队霸欺负，他们天天骂我。",
   ["$jy_yuyu3"] = "有什么话是真的不能讲的……为什么一定……每次都是……一个人在讲……",
@@ -1611,7 +1618,7 @@ Fk:loadTranslationTable {
 
   ["jy_boshi"] = "搏十",
   [":jy_boshi"] = [[觉醒技，准备阶段，若你已判定过至少10次，你增加一点体力上限、回复一点体力、
-  摸3张牌、失去技能【花盆】，然后获得技能【奖杯】。]],
+  摸3张牌、失去技能〖花盆〗，然后获得技能〖奖杯〗。]],
   ["@jy_boshi_judge_count"] = "搏十",
 
   ["jy_jiangbei"] = "奖杯",
@@ -1799,7 +1806,8 @@ local jy_jieju = fk.CreateActiveSkill {
   end,
   on_use = function(self, room, effect)
     local from = room:getPlayerById(effect.from)
-    room:loseHp(from, 1, self.name) -- 从弃牌改为失去体力
+    local hp_to_be_lost = 2 ^ from:usedSkillTimes(self.name, Player.HistoryPhase)
+    room:loseHp(from, hp_to_be_lost, self.name) -- 从弃牌改为失去体力
     -- room:throwCard(effect.cards, self.name, from, from)
     from:setSkillUseHistory("jy_zuoti", 0, Player.HistoryPhase)
   end,
@@ -1883,16 +1891,16 @@ Fk:loadTranslationTable {
   ["#jy_zuoti_incorrect_log"] = "%from 选择了：%arg，正确答案：%arg2。",
 
   ["jy_jieju"] = "熬夜",
-  [":jy_jieju"] = [[使命技，出牌阶段，你失去一点体力使【做题】视为未发动过。<br>
-  成功：回合结束时，若你【做题】答对比答错至少多3，你摸3张牌，然后获得技能【集智】、【看破】、【享乐】；<br>
-  失败：回合结束时，若你【做题】答错比答对至少多3，你翻面、减两点体力上限，然后获得技能【玉玉】、【红温】。]],
+  [":jy_jieju"] = [[使命技，出牌阶段，你失去2^X点体力使〖做题〗视为未发动过，X你本回合发动该技能的次数。<br>
+  成功：回合结束时，若你【做题】答对比答错至少多3，你摸3张牌，然后获得技能〖集智〗、〖看破〗、〖享乐〗；<br>
+  失败：回合结束时，若你【做题】答错比答对至少多3，你翻面、减两点体力上限，然后获得技能〖玉玉〗、〖红温〗。]],
   ["#jy_jieju_success"] = "结局：成功",
   ["#jy_jieju_fail"] = "结局：失败",
 
 }
 
 -- 参考：廖化，英姿，蛊惑，血裔
-local skl__mou__gaotianliang = General(extension, "skl__mou__gaotianliang", "qun", 3)
+local skl__mou__gaotianliang = General(extension, "skl__mou__gaotianliang", "qun", 4)
 
 
 local jy_tianling = fk.CreateViewAsSkill {
@@ -1903,7 +1911,7 @@ local jy_tianling = fk.CreateViewAsSkill {
     local names = {}
     for _, id in ipairs(Fk:getAllCardIds()) do
       local card = Fk:getCardById(id)
-      if card:isCommonTrick() -- and card.trueName ~= "ex_nihilo" and card.trueName ~= "snatch"
+      if card:isCommonTrick() and card.trueName ~= "ex_nihilo" -- and card.trueName ~= "snatch"
           and not card.is_derived and
           ((Fk.currentResponsePattern == nil and Self:canUse(card)) or
             (Fk.currentResponsePattern and Exppattern:Parse(Fk.currentResponsePattern):match(card))) then
@@ -2005,7 +2013,7 @@ local jy_yali = fk.CreateTriggerSkill {
   events = { fk.DrawNCards },
   on_cost = Util.TrueFunc,
   on_use = function(self, event, target, player, data)
-    data.n = data.n + math.max(player.hp - #player:getCardIds(Player.Hand), 0)
+    data.n = math.max(player.hp - #player:getCardIds(Player.Hand), 0)
   end,
 }
 local jy_yali_maxcards = fk.CreateMaxCardsSkill {
@@ -2025,7 +2033,7 @@ Fk:loadTranslationTable {
   ["skl__mou__gaotianliang"] = "谋高天亮",
 
   ["jy_tianling"] = "天灵",
-  [":jy_tianling"] = [[弃牌阶段开始时，你可以弃置两张牌或失去一点体力。若如此做，你的下一个回合：准备阶段后执行一个额外的出牌阶段；判定阶段结束前，你的手牌可当作所有锦囊牌使用。]],
+  [":jy_tianling"] = [[弃牌阶段开始时，你可以弃置两张牌或失去一点体力。若如此做，你的下一个回合：准备阶段后执行一个额外的出牌阶段；判定阶段结束前，你的手牌可当作除【无中生有】外所有锦囊牌使用。]],
   ["@jy_tianling"] = "天灵",
   ["#jy_tianling_1hp"] = "失去一点体力",
   ["#jy_tianling_2cards"] = "弃置2张牌",
@@ -2033,7 +2041,7 @@ Fk:loadTranslationTable {
   ["#jy_tianling_yuyu"] = "天灵",
 
   ["jy_yali"] = "压力",
-  [":jy_yali"] = [[锁定技，你的手牌上限等于你的体力上限；你的摸牌阶段额外摸X-Y张牌且至少为0，X为你的体力值，Y为你的手牌数。]],
+  [":jy_yali"] = [[锁定技，你的手牌上限等于你的体力上限；你的摸牌阶段改为摸X-Y张牌且至少为0，X为你的体力值，Y为你的手牌数。]],
 
 }
 
@@ -2287,8 +2295,8 @@ Fk:loadTranslationTable {
   ["@jy_jinghua"] = [[<font color="skyblue">泷廻鉴花</font>]],
   ["$jy_jinghua1"] = "苍流水影。",
   ["$jy_jinghua2"] = "剑影。",
-  ["#jy_jinghua_use"] = "镜花：你可以使用两张不计入使用次数的【杀】，第一张",
-  ["#jy_jinghua_use_again"] = "镜花：你可以使用两张不计入使用次数的【杀】，第二张",
+  ["#jy_jinghua_use"] = "镜花：你可以使用两张不计入使用次数的【杀】：第一张",
+  ["#jy_jinghua_use_again"] = "镜花：你可以使用两张不计入使用次数的【杀】：第二张",
 
   ["jy_jianying"] = "渐盈",
   [":jy_jianying"] = [[锁定技，所有角色的结束阶段，若你的手牌数小于体力值，你摸一张牌。]],
@@ -2313,11 +2321,11 @@ local jy_jieyin = fk.CreateActiveSkill {
     -- 判断目标是否不能成为【顺手牵羊】的目标
     local s = Fk:currentRoom():getPlayerById(to_select)
 
-    return to_select ~= Self.id and      -- 如果目标不是自己
-        s.gender == General.Male and     -- 而且是男的
-        s:getMark("@jy_jieyin") == 0 and -- 而且没被结姻过
-        s.maxHp ~= s.hp and              -- 而且受了伤
-        #selected < 1                    -- 而且只选了一个
+    return to_select ~= Self.id and  -- 如果目标不是自己
+        s.gender == General.Male and -- 而且是男的
+        -- s:getMark("@jy_jieyin") == 0 and -- 而且没被结姻过
+        s.maxHp ~= s.hp and          -- 而且受了伤
+        #selected < 1                -- 而且只选了一个
   end,
   target_num = 1,
   on_use = function(self, room, use)
@@ -2326,10 +2334,12 @@ local jy_jieyin = fk.CreateActiveSkill {
     for _, to in ipairs(use.tos) do
       local p = room:getPlayerById(to)
 
+      -- room:changeMaxHp(player, -1)
+
       -- 治疗其
       room:recover({
         who = p,
-        num = 2,
+        num = p.maxHp - p.hp,
         recoverBy = player,
         skillName = self.name,
       })
@@ -2354,7 +2364,7 @@ local jy_jieyin = fk.CreateActiveSkill {
       end
 
       -- 已被结姻了
-      room:setPlayerMark(p, "@jy_jieyin", "")
+      -- room:setPlayerMark(p, "@jy_jieyin", "")
     end
   end,
 }
@@ -2367,16 +2377,17 @@ local jy_lihun = fk.CreateActiveSkill {
     if player:usedSkillTimes("jy_jieyin", Player.HistoryGame) == 0 then return false end
     if player:usedSkillTimes(self.name, Player.HistoryGame) ~= 0 then return false end
 
-    -- 看有没有没被结姻的人，有就能亮
-    local all_players = true
-    for _, p in ipairs(Fk:currentRoom().alive_players) do
-      if p:getMark("@jy_jieyin") == 0 then
-        all_players = false
-        break
-      end
-    end
+    -- -- 看有没有没被结姻的人，有就能亮
+    -- local all_players = true
+    -- for _, p in ipairs(Fk:currentRoom().alive_players) do
+    --   if p:getMark("@jy_jieyin") == 0 then
+    --     all_players = false
+    --     break
+    --   end
+    -- end
 
-    return not all_players
+    -- return not all_players
+    return true
   end,
   card_filter = function(self, card)
     return false
@@ -2387,7 +2398,7 @@ local jy_lihun = fk.CreateActiveSkill {
   end,
   on_use = function(self, room, effect)
     local from = room:getPlayerById(effect.from)
-    room:changeMaxHp(from, -1)
+    room:changeMaxHp(from, -from.hp)
     from:setSkillUseHistory("jy_jieyin", 0, Player.HistoryGame)
   end,
 }
@@ -2399,11 +2410,11 @@ Fk:loadTranslationTable {
   ["tym__liuxian"] = [[刘仙]],
 
   ["jy_jieyin"] = "结姻",
-  [":jy_jieyin"] = [[限定技，出牌阶段，你令一名未被【结姻】过且已受伤的男性角色回复2点体力，然后你获得其所有牌并拥有其所有技能。]],
-  ["@jy_jieyin"] = "结姻过",
+  [":jy_jieyin"] = [[限定技，出牌阶段，你可以令一名已受伤的男性角色回复体力至上限，然后你获得其所有牌并拥有其所有技能。]],
+  -- ["@jy_jieyin"] = "结姻过",
 
   ["jy_lihun"] = "离婚",
-  [":jy_lihun"] = [[限定技，出牌阶段，你可以减少1点体力上限使得【结姻】视为未发动过。]],
+  [":jy_lihun"] = [[限定技，出牌阶段，你可以减少X点体力上限使〖结姻〗视为未发动过，X为你的体力值。]],
 }
 
 -- for k, v in pairs(Fk.translations["zh_CN"]) do
