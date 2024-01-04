@@ -2468,9 +2468,9 @@ Fk:loadTranslationTable {
   [":jy_lihun"] = [[出牌阶段，你可以减少一点体力上限使〖结姻〗视为未发动过。]],
 }
 
-local tym__zhafu = General(extension, "tym__zhafu", "qun", 8)
+local tym__zhafu = General(extension, "tym__zhafu", "qun", 3)
 tym__zhafu:addSkill("jy_kaiju")
-tym__zhafu:addSkill("jy_yuyu")
+tym__zhafu:addSkill("guixin")
 
 Fk:loadTranslationTable {
   ["tym__zhafu"] = [[炸服专家]],
