@@ -2318,7 +2318,6 @@ local jy_jieyin = fk.CreateActiveSkill {
   end,
   card_num = 0,
   target_filter = function(self, to_select, selected)
-    -- 判断目标是否不能成为【顺手牵羊】的目标
     local s = Fk:currentRoom():getPlayerById(to_select)
 
     return to_select ~= Self.id and  -- 如果目标不是自己
@@ -2399,30 +2398,74 @@ local jy_lihun = fk.CreateActiveSkill {
     local from = room:getPlayerById(effect.from)
     room:changeMaxHp(from, -1)
 
-    -- 弃所有牌
-    if not from:isNude() then
-      local cards_id = from:getCardIds { Player.Hand, Player.Equip }
-      local dummy = Fk:cloneCard 'slash'
-      dummy:addSubcards(cards_id)
-      room:throwCard(dummy, self.name, from, from)
-    end
+    -- -- 弃所有手牌
+    -- if not from:isNude() then
+    --   local card_ids = from:getCardIds(Player.Hand)
+    --   room:moveCards({
+    --     ids = card_ids,
+    --     toArea = Card.DiscardPile,
+    --     moveReason = fk.ReasonPutIntoDiscardPile,
+    --   })
+    -- end
 
     from:setSkillUseHistory("jy_jieyin", 0, Player.HistoryGame)
   end,
 }
 
+local jy_xiannu = fk.CreateActiveSkill {
+  frequency = Skill.Limited,
+  name = "jy_xiannu",
+  anim_type = "support",
+  can_use = function(self, player)
+    return player:usedSkillTimes(self.name, Player.HistoryGame) == 0
+  end,
+  card_filter = function(self, card)
+    return false
+  end,
+  card_num = 0,
+  target_filter = function(self, to_select, selected)
+    local s = Fk:currentRoom():getPlayerById(to_select)
+
+    return to_select ~= Self.id and  -- 如果目标不是自己
+        s.gender == General.Male and -- 而且是男的
+        s.maxHp == s.hp and          -- 而且未受伤
+        #selected < 1                -- 而且只选了一个
+  end,
+  target_num = 1,
+  on_use = function(self, room, use)
+    local player = room:getPlayerById(use.from)
+
+    for _, to in ipairs(use.tos) do
+      local p = room:getPlayerById(to)
+      room:loseHp(player, 3)
+
+      room:damage({
+        from = player,
+        to = p,
+        damage = 1,
+        damageType = fk.NormalDamage,
+        skillName = self.name,
+      })
+    end
+  end,
+}
+
+tym__liuxian:addSkill(jy_xiannu)
 tym__liuxian:addSkill(jy_jieyin)
 tym__liuxian:addSkill(jy_lihun)
 
 Fk:loadTranslationTable {
   ["tym__liuxian"] = [[刘仙]],
 
+  ["jy_xiannu"] = "仙怒",
+  [":jy_xiannu"] = [[限定技，出牌阶段，你可以失去3点体力对一名未受伤的男性角色造成1点伤害。]],
+
   ["jy_jieyin"] = "结姻",
   [":jy_jieyin"] = [[限定技，出牌阶段，你可以令一名已受伤的男性角色回复3点体力，然后你获得其所有牌并拥有其所有技能。]],
   -- ["@jy_jieyin"] = "结姻过",
 
   ["jy_lihun"] = "离婚",
-  [":jy_lihun"] = [[出牌阶段，你可以弃所有牌并减少一点体力上限使〖结姻〗视为未发动过。]],
+  [":jy_lihun"] = [[出牌阶段，你可以减少一点体力上限使〖结姻〗视为未发动过。]],
 }
 
 -- for k, v in pairs(Fk.translations["zh_CN"]) do
