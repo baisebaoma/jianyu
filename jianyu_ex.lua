@@ -178,7 +178,7 @@ Fk:loadTranslationTable {
 local zer__yangfan = General(extension, "zer__ex__yangfan", "god", 4)
 
 zer__yangfan:addSkill("jy_sichi")
-zer__yangfan:addRelatedSkill("jy_jiangbei")
+zer__yangfan:addSkill("jy_jiangbei")
 
 Fk:loadTranslationTable {
   ["zer__ex__yangfan"] = "杨藩",
