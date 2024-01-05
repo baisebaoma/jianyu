@@ -1523,6 +1523,7 @@ local jy_jiangbei_club_2 = fk.CreateTriggerSkill {
   end,
 }
 -- 出牌阶段开始时把已使用打出的红桃梅花数设置成0
+-- TODO：把这个合并到别的技能里去
 local jy_jiangbei_set_0 = fk.CreateTriggerSkill {
   name = "#jy_jiangbei_set_0",
   mute = true,
@@ -1987,6 +1988,7 @@ local jy_tianling_dangxian = fk.CreateTriggerSkill {
     player:gainAnExtraPhase(Player.Play, true)
   end,
 }
+-- TODO：把这个合并到别的技能里去
 local jy_tianling_set_0 = fk.CreateTriggerSkill {
   name = "#jy_tianling_set_0",
   mute = true,
@@ -2437,7 +2439,7 @@ local jy_xiannu = fk.CreateActiveSkill {
 
     for _, to in ipairs(use.tos) do
       local p = room:getPlayerById(to)
-      room:changeMaxHp(player, -1)
+      -- room:changeMaxHp(player, -1)
 
       room:damage({
         from = player,
@@ -2458,7 +2460,7 @@ Fk:loadTranslationTable {
   ["tym__liuxian"] = [[刘仙]],
 
   ["jy_xiannu"] = "仙怒",
-  [":jy_xiannu"] = [[限定技，出牌阶段，你可以减少一点体力上限对一名未受伤的男性角色造成1点伤害。]],
+  [":jy_xiannu"] = [[限定技，你可以对一名未受伤的男性角色造成1点伤害。]],
 
   ["jy_jieyin"] = "结姻",
   [":jy_jieyin"] = [[限定技，出牌阶段，你可以令一名已受伤的男性角色回复3点体力，然后你获得其所有牌并拥有其所有技能。]],
@@ -2468,9 +2470,11 @@ Fk:loadTranslationTable {
   [":jy_lihun"] = [[出牌阶段，你可以减少一点体力上限使〖结姻〗视为未发动过。]],
 }
 
-local tym__zhafu = General(extension, "tym__zhafu", "qun", 3)
+local tym__zhafu = General(extension, "tym__zhafu", "qun", 2)
 tym__zhafu:addSkill("jy_kaiju")
+tym__zhafu:addSkill("fankui")
 tym__zhafu:addSkill("guixin")
+tym__zhafu:addSkill("wuhun")
 
 Fk:loadTranslationTable {
   ["tym__zhafu"] = [[炸服专家]],
