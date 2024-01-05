@@ -16,6 +16,7 @@ Fk:loadTranslationTable {
 
 -- 简自豪
 local tym__jianzihao = General(extension, "tym__ex__jianzihao", "god", 3)
+tym__jianzihao.visible = false
 
 tym__jianzihao:addSkill("jy_kaiju_2")
 tym__jianzihao:addSkill("jy_sanjian")
@@ -31,7 +32,7 @@ Fk:loadTranslationTable {
 }
 
 -- 李元浩
-local tym__liyuanhao = General(extension, "tym__ex__liyuanhao", "qun", 3)
+local tym__liyuanhao = General(extension, "tym__ex__liyuanhao", "god", 3)
 
 tym__liyuanhao:addSkill("jy_huxiao_2")
 tym__liyuanhao:addSkill("jy_huxiao_analeptic_2")
@@ -42,11 +43,12 @@ tym__liyuanhao:addSkill("paoxiao")
 tym__liyuanhao:addSkill("tieqi")
 
 Fk:loadTranslationTable {
-  ["tym__ex__liyuanhao"] = "界李元浩",
+  ["tym__ex__liyuanhao"] = "李元浩",
 }
 
 -- 高天亮
 local xjb__gaotianliang = General(extension, "xjb__ex__gaotianliang", "god", 8)
+xjb__gaotianliang.visible = false
 
 local jy_yuyu = fk.CreateTriggerSkill {
   name = "jy_yuyu_ex",
@@ -98,9 +100,9 @@ Fk:loadTranslationTable {
   ["xjb__ex__gaotianliang"] = "高天亮",
 
   ["jy_yuyu_ex"] = "玉玉",
-  [":jy_yuyu"] = [[1. 锁定技，当有角色对你使用【杀】造成了伤害时，其获得“致郁”标记；<br>
-  2. 受到没有“致郁”标记的角色或因本次伤害而获得“致郁”标记的角色造成的伤害时，你可以选择一项：摸4张牌；摸8张牌并翻面，然后对自己造成1点伤害。]],
-  ["#jy_yuyu_ex_draw3"] = "摸4张牌",
+  [":jy_yuyu_ex"] = [[1. 锁定技，当有角色对你使用【杀】造成了伤害时，其获得“致郁”标记；<br>
+  2. 受到没有“致郁”标记的角色或因本次伤害而获得“致郁”标记的角色造成的伤害时，你可以选择一项：摸8张牌；摸8张牌并翻面，然后对自己造成1点伤害。]],
+  ["#jy_yuyu_ex_draw3"] = "摸8张牌",
   ["#jy_yuyu_ex_draw4turnover"] = "摸8张牌并翻面，然后对自己造成1点伤害",
   ["$jy_yuyu_ex1"] = "我……我真的很想听到你们说话……",
   ["$jy_yuyu_ex2"] = "我天天被队霸欺负，他们天天骂我。",
@@ -111,21 +113,12 @@ Fk:loadTranslationTable {
 
 -- 阿威罗
 local xjb__aweiluo = General(extension, "xjb__ex__aweiluo", "god", 4)
+xjb__aweiluo.visible = false
 
 -- 玉玊
 local jy_yusu = fk.CreateTriggerSkill {
   name = "jy_yusu_ex",
   anim_type = "special",
-
-  refresh_events = { fk.EventPhaseEnd },
-  can_refresh = function(self, event, target, player, data)
-    return target == player and player:hasSkill(self)
-        and player.phase == Player.Play
-  end,
-  on_refresh = function(self, event, target, player, data)
-    local room = player.room
-    room:setPlayerMark(player, "@jy_yusu_basic_count", 0)
-  end,
 
   events = { fk.CardResponding, fk.CardUsing },
   can_trigger = function(self, event, target, player, data)
@@ -137,14 +130,11 @@ local jy_yusu = fk.CreateTriggerSkill {
   end,
   on_cost = function(self, event, target, player, data)
     local room = player.room
-    room:addPlayerMark(player, "@jy_yusu_basic_count")
     return room:askForSkillInvoke(player, self.name)
   end,
   on_use = function(self, event, target, player, data)
-    local room = player.room
     local id = data.card
     player:addToPile("xjb__aweiluo_dian", id, true, self.name)
-    room:setPlayerMark(player, "@jy_yusu_basic_count", "#jy_yusu_triggered")
   end,
 }
 
@@ -176,6 +166,7 @@ Fk:loadTranslationTable {
 -- 立即使用一张牌：诸葛恪，借刀
 
 local zer__yangfan = General(extension, "zer__ex__yangfan", "god", 4)
+zer__yangfan.visible = false
 
 zer__yangfan:addSkill("jy_sichi")
 zer__yangfan:addSkill("jy_jiangbei")
