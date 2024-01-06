@@ -257,6 +257,7 @@ local meishu_respond = fk.CreateTriggerSkill {
   events = { fk.CardUsing },
   can_trigger = function(self, event, target, player, data)
     if not player:hasSkill(self) then return false end
+    if not data.to then return false end
     return player == target and data.to:getMark("@jy_jieyin_ex") ~= 0
   end,
   on_use = function(self, event, target, player, data)
