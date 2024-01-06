@@ -137,7 +137,7 @@ local jy_kaiju = fk.CreateTriggerSkill {
 
 jy__jianzihao:addSkill(jy_kaiju)
 jy__jianzihao:addSkill(jy_hongwen)
-jy__jianzihao:addSkill(jy_zouwei)
+-- jy__jianzihao:addSkill(jy_zouwei)  -- 走位令玩家感到困惑，建议删掉
 jy__jianzihao:addSkill(jy_shengnu)
 jy__jianzihao:addSkill(jy_xizao)
 -- jy__jianzihao:addSkill("guixin")
@@ -276,10 +276,9 @@ local jy_xizao_2 = fk.CreateTriggerSkill {
 jy__jianzihao:addSkill(jy_kaiju_2)
 jy__jianzihao:addSkill(jy_sanjian)
 jy__jianzihao:addSkill("jy_hongwen")
-jy__jianzihao:addSkill("jy_zouwei")
+-- jy__jianzihao:addSkill("jy_zouwei")
 jy__jianzihao:addSkill("jy_shengnu")
 jy__jianzihao:addSkill("jy_xizao")
--- jy__jianzihao:addSkill("guixin")
 
 Fk:loadTranslationTable {
   ["jy__new__jianzihao"] = "简自豪",
@@ -540,7 +539,7 @@ local jy_yuyu = fk.CreateTriggerSkill {
     if self.choice == "#jy_yuyu_draw3" then
       player:drawCards(3)
     else
-      player:drawCards(3)
+      player:drawCards(4)
       player:turnOver()
       Fk:currentRoom():damage({
         from = player,
@@ -561,11 +560,11 @@ Fk:loadTranslationTable {
 
   ["jy_yuyu"] = "玉玉",
   [":jy_yuyu"] = [[1. 锁定技，当有角色对你使用【杀】造成了伤害时，其获得“致郁”标记；<br>
-  2. 受到没有“致郁”标记的角色或因本次伤害而获得“致郁”标记的角色造成的伤害时，你可以选择一项：摸3张牌；摸3张牌并翻面，然后对自己造成1点伤害。]],
+  2. 受到没有“致郁”标记的角色或因本次伤害而获得“致郁”标记的角色造成的伤害时，你可以选择一项：摸3张牌；摸4张牌并翻面，然后对自己造成1点伤害。]],
   ["@jy_yuyu_enemy"] = "致郁",
   ["#jy_yuyu_ask_which"] = "玉玉：请选择你要触发的效果",
-  ["#jy_yuyu_draw3"] = "摸4张牌",
-  ["#jy_yuyu_draw4turnover"] = "摸3张牌并翻面，然后对自己造成1点伤害",
+  ["#jy_yuyu_draw3"] = "摸3张牌",
+  ["#jy_yuyu_draw4turnover"] = "摸4张牌并翻面，然后对自己造成1点伤害",
   ["$jy_yuyu1"] = "我……我真的很想听到你们说话……",
   ["$jy_yuyu2"] = "我天天被队霸欺负，他们天天骂我。",
   ["$jy_yuyu3"] = "有什么话是真的不能讲的……为什么一定……每次都是……一个人在讲……",
@@ -649,6 +648,8 @@ local jy_tiaoshui = fk.CreateTriggerSkill {
 -- 罗绞主技能监视“卡牌移动前”事件，将卡牌移动前的“点”数量记录，并传给另一个关联技能，其监视“卡牌移动后”事件，也记录一次移动后“点”的数量。
 -- 如果卡牌移动之后“点”数没有变化，那么不要触发。
 -- 这样就能防止当其他人给我挂上或丢掉其他特殊区的牌时，也触发我们的技能。
+
+-- TODO：可以参考曹植落英，把这个技能写得更简洁（上面的技能也是）。但是能跑就行（
 local jy_luojiao = fk.CreateTriggerSkill {
   name = "jy_luojiao",
   anim_type = "offensive",
@@ -1375,15 +1376,15 @@ Fk:loadTranslationTable {
 
   ["jy_sichi"] = "四吃",
   [":jy_sichi"] = [[受到伤害后，你可以展示牌堆顶的4张牌，根据花色数量触发效果。<br>
-  1种：选择一名角色获得这些牌；<br>
-  2种：获得其中一张可以使用的牌并可以立即使用。若没有可以使用的牌，弃一张牌；<br>
-  3种：获得其中3张同类型的牌或2张不同类型的牌，然后所有其他角色各摸一张牌；<br>
-  4种：选择至多3名角色，你与其各失去一点体力。]],
+  1，令一名角色获得之；<br>
+  2，获得一张可以使用的牌并可以立即使用。若无，弃一张牌；<br>
+  3，获得3张同类型或2张不同类型的牌，然后其他角色各摸一张牌；<br>
+  4，你与至多3名角色各失去一点体力。]],
 
   ["#jy_sichi_suits_1"] = "四吃：1种花色，选择一个角色获得这些牌",
-  ["#jy_sichi_suits_2"] = "四吃：2种花色，获得一张可使用的牌并可以立即使用，若没有则弃牌",
-  ["#jy_sichi_suits_3"] = "四吃：3种花色，获得其中一部分牌，然后其他角色各摸一张牌",
-  ["#jy_sichi_suits_4"] = "四吃：4种花色，选择角色和自己一起失去体力",
+  ["#jy_sichi_suits_2"] = "四吃：2种花色，获得一张可使用的牌并可以立即使用",
+  ["#jy_sichi_suits_3"] = "四吃：3种花色，获得一部分牌，然后其他角色各摸一张牌",
+  ["#jy_sichi_suits_4"] = "四吃：4种花色，选择角色一起失去体力",
 
   ["#jy_sichi_1"] = "四吃：选择一个角色获得所有牌",
   ["#jy_sichi_2"] = "四吃：获得其中一张牌并可以使用",
@@ -1395,17 +1396,14 @@ Fk:loadTranslationTable {
   ["#jy_sichi_4"] = "四吃：选择至多3名角色，你和他们各失去一点体力",
 
   ["jy_huapen"] = "花盆",
-  [":jy_huapen"] = [[锁定技，其他角色使用♣非延时锦囊牌或基本牌指定了有且仅有一个不为你的目标时，
-  你进行一次判定，若为<font color="red">♥</font>，额外指定你为目标。（含【借刀杀人】）]],
+  [":jy_huapen"] = [[锁定技，其他角色使用♣非延时锦囊牌或基本牌指定了有且仅有一个不为你的目标时，你进行一次判定，若为<font color="red">♥</font>，额外指定你为目标。（含【借刀杀人】）]],
 
   ["jy_boshi"] = "搏时",
   [":jy_boshi"] = [[觉醒技，准备阶段，若你已判定过至少X次，你失去〖花盆〗、获得〖奖杯〗，X为存活玩家数。]],
   ["@jy_boshi_judge_count"] = "搏时",
 
   ["jy_jiangbei"] = "奖杯",
-  [":jy_jiangbei"] = [[锁定技，你花色为♣的基本牌和锦囊牌无视距离和防具、没有次数限制；
-  花色为<font color="red">♥</font>的基本牌和锦囊牌不可响应；
-  弃牌阶段结束时，若你出牌阶段只使用或打出过♣和<font color="red">♥</font>牌，摸等量的牌。]],
+  [":jy_jiangbei"] = [[锁定技，你的基本牌和锦囊牌花色若为：♣，无视距离、防具、次数限制；<font color="red">♥</font>，不可响应；弃牌阶段结束时，若你出牌阶段只使用或打出过♣和<font color="red">♥</font>牌，摸等量的牌。]],
   ["#jy_jiangbei_heart"] = "奖杯",
   ["#jy_jiangbei_club"] = "奖杯",
   ["#jy_jiangbei_club_2"] = "奖杯",
@@ -2200,9 +2198,9 @@ local jy_xiannu = fk.CreateActiveSkill {
   end,
 }
 
-jy__liuxian:addSkill(jy_xiannu)
+-- jy__liuxian:addSkill(jy_xiannu)
 jy__liuxian:addSkill(jy_jieyin)
--- jy__liuxian:addSkill(jy_lihun)
+jy__liuxian:addSkill(jy_lihun)
 
 Fk:loadTranslationTable {
   ["jy__liuxian"] = [[刘仙]],
@@ -2215,6 +2213,19 @@ Fk:loadTranslationTable {
 
   ["jy_lihun"] = "离婚",
   [":jy_lihun"] = [[出牌阶段限一次，你可以减少2点体力上限使〖结姻〗视为未发动过。]],
+}
+
+Fk:loadTranslationTable {
+  ["jy__nav"] = [[那维莱特 12 12]],
+
+  ["jy_shuilong"] = "水龙",
+  [":jy_shuilong"] = [[锁定技，你的所有牌均视为【杀】；你的【杀】改为：出牌阶段，对上家/下家使用。你失去5体力，对目标及其上家/下家造成共2点伤害。]],
+
+  ["jy_leihuan"] = "泪还",
+  [":jy_leihuan"] = [[出牌阶段限一次，你回复5体力，然后可以视为使用一张【杀】。]],
+
+  ["jy_chaolai"] = "潮来",
+  [":jy_chaolai"] = [[限定技，你本回合所有【杀】结算2次。]],
 }
 
 -- for k, v in pairs(Fk.translations["zh_CN"]) do

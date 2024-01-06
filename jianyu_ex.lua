@@ -39,11 +39,11 @@ local zishang_ex = fk.CreateActiveSkill {
 local jianzihao = General(extension, "jy_ex__jianzihao", "qun", 4)
 
 jianzihao:addSkill("jy_kaiju_2")
+jianzihao:addSkill("guixin")
 jianzihao:addSkill("jy_sanjian")
 jianzihao:addSkill("jy_hongwen")
 jianzihao:addSkill("jy_shengnu")
-jianzihao:addSkill("jy_zouwei")
-jianzihao:addSkill("guixin")
+jianzihao:addSkill("jy_xizao")
 
 Fk:loadTranslationTable {
   ["jy_ex__jianzihao"] = "界简自豪",
@@ -58,7 +58,6 @@ liyuanhao:addSkill("jy_huxiao_analeptic_2")
 liyuanhao:addSkill("jy_huxiao_jink_2")
 liyuanhao:addSkill("jy_erduanxiao_2")
 liyuanhao:addSkill("wusheng")
-liyuanhao:addSkill("paoxiao")
 
 Fk:loadTranslationTable {
   ["jy_ex__liyuanhao"] = "界李元浩",
@@ -72,16 +71,7 @@ local yuyu = fk.CreateTriggerSkill {
   anim_type = "masochism",
   events = { fk.Damaged },
   on_use = function(self, event, target, player, data)
-    local room = player.room
-    player:drawCards(1)
-    player:turnOver()
-    room:damage({
-      from = player,
-      to = player,
-      damage = 1,
-      damageType = fk.NormalDamage,
-      skillName = self.name,
-    })
+    player:drawCards(2)
   end,
 }
 
@@ -93,7 +83,7 @@ Fk:loadTranslationTable {
   ["jy_ex__gaotianliang"] = "界高天亮",
 
   ["jy_yuyu_ex"] = "玉玉",
-  [":jy_yuyu_ex"] = [[受到伤害时，你可以摸1张牌并翻面，然后对自己造成1点伤害。]],
+  [":jy_yuyu_ex"] = [[受到伤害时，你可以摸2张牌。]],
   ["$jy_yuyu_ex1"] = "我……我真的很想听到你们说话……",
   ["$jy_yuyu_ex2"] = "我天天被队霸欺负，他们天天骂我。",
   ["$jy_yuyu_ex3"] = "有什么话是真的不能讲的……为什么一定……每次都是……一个人在讲……",
@@ -102,14 +92,14 @@ Fk:loadTranslationTable {
 }
 
 -- 阿威罗
-local aweiluo = General(extension, "jy_ex__aweiluo", "qun", 4)
+local aweiluo = General(extension, "jy_ex__aweiluo", "qun", 2)
 
 -- 玉玊
 local jy_yusu = fk.CreateTriggerSkill {
   name = "jy_yusu_ex",
   anim_type = "special",
 
-  events = { fk.CardResponding, fk.CardUsing },
+  events = { fk.CardUsing },
   can_trigger = function(self, event, target, player, data)
     if not player:hasSkill(self) then return false end
     if data.card and
@@ -129,16 +119,15 @@ local jy_yusu = fk.CreateTriggerSkill {
 }
 
 aweiluo:addSkill(jy_yusu)
-aweiluo:addSkill("jy_youlong")
 aweiluo:addSkill("jy_tiaoshui")
-aweiluo:addSkill("jy_luojiao")
 aweiluo:addSkill("jy_zishang_ex")
+aweiluo:addSkill("jy_luojiao")
 
 Fk:loadTranslationTable {
   ["jy_ex__aweiluo"] = "界阿威罗",
 
   ["jy_yusu_ex"] = "玉玊",
-  [":jy_yusu_ex"] = "使用或打出一张非虚拟牌时，可以将其作为“点”置于武将牌上。",
+  [":jy_yusu_ex"] = "使用一张非虚拟牌时，可以将其作为“点”置于武将牌上。",
   ["$jy_yusu_ex1"] = "Siu...",
 
   ["~jy_ex__aweiluo"] = "Messi, Messi, Messi, Messi...",
@@ -147,9 +136,9 @@ Fk:loadTranslationTable {
 -- 水晶哥
 local yangfan = General(extension, "jy_ex__yangfan", "qun", 4)
 
+yangfan:addSkill("jy_zishang_ex")
 yangfan:addSkill("jy_sichi")
 yangfan:addSkill("jy_jiangbei")
-yangfan:addSkill("jy_zishang_ex")
 
 Fk:loadTranslationTable {
   ["jy_ex__yangfan"] = "界杨藩",
@@ -157,7 +146,6 @@ Fk:loadTranslationTable {
 
 
 local liuxian = General(extension, "jy_ex__liuxian", "god", 1, 1, General.Female)
-liuxian.visible = false
 
 
 local jieyin = fk.CreateActiveSkill {
@@ -233,7 +221,7 @@ local lihun = fk.CreateActiveSkill {
   end,
   on_use = function(self, room, effect)
     local from = room:getPlayerById(effect.from)
-    room:changeMaxHp(from, -2)
+    room:changeMaxHp(from, -1)
     from:setSkillUseHistory("jy_jieyin_ex", 0, Player.HistoryGame)
   end,
 }
@@ -327,6 +315,7 @@ local meishu_get_card = fk.CreateTriggerSkill {
 -- meishu:addRelatedSkill(meishu_respond)
 -- meishu:addRelatedSkill(meishu_get_card)
 
+-- liuxian:addSkill("jy_xiannu")
 liuxian:addSkill(jieyin)
 liuxian:addSkill(lihun)
 liuxian:addSkill(meishu)
@@ -337,13 +326,13 @@ Fk:loadTranslationTable {
   ["@jy_jieyin_ex"] = "结姻",
 
   ["jy_jieyin_ex"] = "结姻",
-  [":jy_jieyin_ex"] = [[限定技，出牌阶段，你可以令一名已受伤的男性角色回复3点体力、标记之，然后你获得其所有牌并拥有其所有技能。]],
+  [":jy_jieyin_ex"] = [[限定技，出牌阶段，你可以令一名已受伤的男性角色回复3点体力，然后你获得其所有牌并拥有其所有技能。]],
 
   ["jy_lihun_ex"] = "离婚",
-  [":jy_lihun_ex"] = [[出牌阶段，你可以减少2点体力上限使〖结姻〗视为未发动过。]],
+  [":jy_lihun_ex"] = [[出牌阶段，你可以减少一点体力上限使〖结姻〗视为未发动过。]],
 
   ["jy_meishu_ex"] = "美鼠",
-  [":jy_meishu_ex"] = [[锁定技，被〖结姻〗标记过的角色造成伤害后，你增加一点体力上限。]],
+  [":jy_meishu_ex"] = [[锁定技，被〖结姻〗过的角色造成伤害后，你增加一点体力上限。]],
 }
 
 return extension
