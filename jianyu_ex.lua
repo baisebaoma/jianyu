@@ -3,39 +3,40 @@ extension.extensionName = "jianyu_ex"
 
 Fk:loadTranslationTable {
   ["jy_jianyu_ex"] = [[简浴-界限突破]],
+  ["jyex"] = [[简浴界]],
 }
 
 -- 简自豪
-local jy__jianzihao = General(extension, "jy__ex__jianzihao", "qun", 4)
+local jianzihao = General(extension, "jyex__jianzihao", "qun", 4)
 
-jy__jianzihao:addSkill("jy_kaiju_2")
-jy__jianzihao:addSkill("jy_sanjian")
-jy__jianzihao:addSkill("jy_hongwen")
-jy__jianzihao:addSkill("jy_shengnu")
-jy__jianzihao:addSkill("jy_zouwei")
-jy__jianzihao:addSkill("guixin")
+jianzihao:addSkill("jy_kaiju_2")
+jianzihao:addSkill("jy_sanjian")
+jianzihao:addSkill("jy_hongwen")
+jianzihao:addSkill("jy_shengnu")
+jianzihao:addSkill("jy_zouwei")
+jianzihao:addSkill("guixin")
 
 Fk:loadTranslationTable {
-  ["jy__ex__jianzihao"] = "界简自豪",
-  ["~jy__ex__jianzihao"] = "好像又要倒下了……",
+  ["jyex__jianzihao"] = "界简自豪",
+  ["~jyex__jianzihao"] = "好像又要倒下了……",
 }
 
 -- 李元浩
-local jy__liyuanhao = General(extension, "jy__ex__liyuanhao", "qun", 4)
+local liyuanhao = General(extension, "jyex__liyuanhao", "qun", 4)
 
-jy__liyuanhao:addSkill("jy_huxiao_2")
-jy__liyuanhao:addSkill("jy_huxiao_analeptic_2")
-jy__liyuanhao:addSkill("jy_huxiao_jink_2")
-jy__liyuanhao:addSkill("jy_erduanxiao_2")
-jy__liyuanhao:addSkill("wusheng")
-jy__liyuanhao:addSkill("paoxiao")
+liyuanhao:addSkill("jy_huxiao_2")
+liyuanhao:addSkill("jy_huxiao_analeptic_2")
+liyuanhao:addSkill("jy_huxiao_jink_2")
+liyuanhao:addSkill("jy_erduanxiao_2")
+liyuanhao:addSkill("wusheng")
+liyuanhao:addSkill("paoxiao")
 
 Fk:loadTranslationTable {
-  ["jy__ex__liyuanhao"] = "界李元浩",
+  ["jyex__liyuanhao"] = "界李元浩",
 }
 
 -- 高天亮
-local jy__gaotianliang = General(extension, "jy__ex__gaotianliang", "qun", 8)
+local gaotianliang = General(extension, "jyex__gaotianliang", "qun", 8)
 
 local jy_yuyu = fk.CreateTriggerSkill {
   name = "jy_yuyu_ex",
@@ -55,11 +56,11 @@ local jy_yuyu = fk.CreateTriggerSkill {
   end,
 }
 
-jy__gaotianliang:addSkill(jy_yuyu)
-jy__gaotianliang:addSkill("jy_tianling")
+gaotianliang:addSkill(jy_yuyu)
+gaotianliang:addSkill("jy_tianling")
 
 Fk:loadTranslationTable {
-  ["jy__ex__gaotianliang"] = "界高天亮",
+  ["jyex__gaotianliang"] = "界高天亮",
 
   ["jy_yuyu_ex"] = "玉玉",
   [":jy_yuyu_ex"] = [[受到伤害时，你可以摸5张牌并翻面，然后对自己造成1点伤害。]],
@@ -67,11 +68,11 @@ Fk:loadTranslationTable {
   ["$jy_yuyu_ex2"] = "我天天被队霸欺负，他们天天骂我。",
   ["$jy_yuyu_ex3"] = "有什么话是真的不能讲的……为什么一定……每次都是……一个人在讲……",
 
-  ["~jy__ex__gaotianliang"] = "顶不住啦！我每天都活在水深火热里面。",
+  ["~jyex__gaotianliang"] = "顶不住啦！我每天都活在水深火热里面。",
 }
 
 -- 阿威罗
-local jy__aweiluo = General(extension, "jy__ex__aweiluo", "qun", 4)
+local aweiluo = General(extension, "jyex__aweiluo", "qun", 4)
 
 -- 玉玊
 local jy_yusu = fk.CreateTriggerSkill {
@@ -93,7 +94,7 @@ local jy_yusu = fk.CreateTriggerSkill {
   on_use = function(self, event, target, player, data)
     local room = player.room
     local id = data.card
-    player:addToPile("jy__aweiluo_dian", id, true, self.name)
+    player:addToPile("aweiluo_dian", id, true, self.name)
     room:damage({
       from = player,
       to = player,
@@ -104,24 +105,24 @@ local jy_yusu = fk.CreateTriggerSkill {
   end,
 }
 
-jy__aweiluo:addSkill(jy_yusu)
-jy__aweiluo:addSkill("jy_youlong")
-jy__aweiluo:addSkill("jy_tiaoshui")
-jy__aweiluo:addSkill("jy_luojiao")
+aweiluo:addSkill(jy_yusu)
+aweiluo:addSkill("jy_youlong")
+aweiluo:addSkill("jy_tiaoshui")
+aweiluo:addSkill("jy_luojiao")
 
 Fk:loadTranslationTable {
-  ["jy__ex__aweiluo"] = "界阿威罗",
+  ["jyex__aweiluo"] = "界阿威罗",
 
   ["jy_yusu_ex"] = "玉玊",
   [":jy_yusu_ex"] = "使用或打出一张非虚拟牌时，可以将其作为“点”置于武将牌上，然后对自己造成1点伤害。",
   ["$jy_yusu_ex1"] = "Siu...",
 
-  ["~jy__ex__aweiluo"] = "Messi, Messi, Messi, Messi...",
+  ["~jyex__aweiluo"] = "Messi, Messi, Messi, Messi...",
 
 }
 
 -- 水晶哥
-local jy__yangfan = General(extension, "jy__ex__yangfan", "qun", 4)
+local yangfan = General(extension, "jyex__yangfan", "qun", 4)
 
 local jy_zishang_ex = fk.CreateActiveSkill {
   name = "jy_zishang_ex",
@@ -138,9 +139,10 @@ local jy_zishang_ex = fk.CreateActiveSkill {
   end,
   target_num = 0,
   on_use = function(self, room, use)
+    local player = room:getPlayerById(use.from)
     room:damage({
-      from = use.from,
-      to = use.from,
+      from = player,
+      to = player,
       damage = 1,
       damageType = fk.NormalDamage,
       skillName = self.name,
@@ -148,12 +150,12 @@ local jy_zishang_ex = fk.CreateActiveSkill {
   end,
 }
 
-jy__yangfan:addSkill("jy_sichi")
-jy__yangfan:addSkill("jy_jiangbei")
-jy__yangfan:addSkill(jy_zishang_ex)
+yangfan:addSkill("jy_sichi")
+yangfan:addSkill("jy_jiangbei")
+yangfan:addSkill(jy_zishang_ex)
 
 Fk:loadTranslationTable {
-  ["jy__ex__yangfan"] = "界杨藩",
+  ["jyex__yangfan"] = "界杨藩",
 
   ["jy_zishang_ex"] = "自伤",
   [":jy_zishang_ex"] = "出牌阶段，你可以对自己造成1点伤害。",
