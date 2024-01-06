@@ -1,5 +1,5 @@
 local extension = Package:new("jy_jianyu")
-extension.extensionName = "jy"
+extension.extensionName = "jianyu"
 
 -- DIY真诚意见：所有你这个包的东西都加一个你自己的开头，这样防止和别人的重名。比如我的"huxiao"一开始就和别人重名了。
 

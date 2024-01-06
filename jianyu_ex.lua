@@ -1,5 +1,5 @@
 local extension = Package:new("jy_jianyu_ex")
-extension.extensionName = "jy_ex"
+extension.extensionName = "jianyu"
 
 Fk:loadTranslationTable {
   ["jy_jianyu_ex"] = [[简浴-界限突破]],
