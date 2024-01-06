@@ -184,7 +184,7 @@ local jieyin = fk.CreateActiveSkill {
     for _, to in ipairs(use.tos) do
       local p = room:getPlayerById(to)
 
-      room:setPlayerMark("#jy_jieyin_ex", "")
+      room:setPlayerMark(p, "#jy_jieyin_ex", "")
       -- room:changeMaxHp(player, -1)
       -- 治疗其
       room:recover({
@@ -344,7 +344,7 @@ Fk:loadTranslationTable {
   ["@jy_jieyin_ex"] = "结姻",
 
   ["jy_jieyin_ex"] = "结姻",
-  [":jy_jieyin_ex"] = [[限定技，出牌阶段，你可以令一名已受伤的男性角色回复3点体力，标记其，然后你获得其所有牌并拥有其所有技能。]],
+  [":jy_jieyin_ex"] = [[限定技，出牌阶段，你可以令一名已受伤的男性角色回复3点体力、标记其，然后你获得其所有牌并拥有其所有技能。]],
 
   ["jy_lihun_ex"] = "离婚",
   [":jy_lihun_ex"] = [[出牌阶段，你可以减少一点体力上限使〖结姻〗视为未发动过。]],
