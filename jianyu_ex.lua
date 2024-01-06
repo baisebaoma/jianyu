@@ -157,6 +157,7 @@ Fk:loadTranslationTable {
 
 
 local liuxian = General(extension, "jy_ex__liuxian", "god", 1, 1, General.Female)
+liuxian.visible = false
 
 
 local jieyin = fk.CreateActiveSkill {
@@ -336,17 +337,17 @@ meishu:addRelatedSkill(meishu_get_card)
 liuxian:addSkill(jieyin)
 liuxian:addSkill(lihun)
 liuxian:addSkill(meishu)
-liuxian:addSkill("xiannu")
+liuxian:addSkill("jy_xiannu")
 
 Fk:loadTranslationTable {
   ["jy_ex__liuxian"] = [[界刘仙]],
   ["@jy_jieyin_ex"] = "结姻",
 
   ["jy_jieyin_ex"] = "结姻",
-  [":jy_jieyin"] = [[限定技，出牌阶段，你可以令一名已受伤的男性角色回复3点体力，标记其，然后你获得其所有牌并拥有其所有技能。]],
+  [":jy_jieyin_ex"] = [[限定技，出牌阶段，你可以令一名已受伤的男性角色回复3点体力，标记其，然后你获得其所有牌并拥有其所有技能。]],
 
   ["jy_lihun_ex"] = "离婚",
-  [":jy_lihun"] = [[出牌阶段，你可以减少一点体力上限使〖结姻〗视为未发动过。]],
+  [":jy_lihun_ex"] = [[出牌阶段，你可以减少一点体力上限使〖结姻〗视为未发动过。]],
 
   ["jy_meishu_ex"] = "美鼠",
   [":jy_meishu_ex"] = [[锁定技，被〖结姻〗标记过的角色：无法响应你的牌；其的牌进入弃牌堆后，你获得之；造成伤害后，你增加一点体力上限。]],

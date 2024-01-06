@@ -2084,7 +2084,7 @@ Fk:loadTranslationTable {
   ["$jy_jianying2"] = "呵……余兴节目。",
 }
 
-local jy__liuxian = General(extension, "jy__liuxian", "god", 3, 3, General.Female)
+local jy__liuxian = General(extension, "jy__liuxian", "god", 2, 2, General.Female)
 
 local jy_jieyin = fk.CreateActiveSkill {
   frequency = Skill.Limited,
