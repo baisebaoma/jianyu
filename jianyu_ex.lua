@@ -176,6 +176,7 @@ local jieyin = fk.CreateActiveSkill {
 
     return to_select ~= Self.id and  -- 如果目标不是自己
         s.gender == General.Male and -- 而且是男的
+        s.maxHp ~= s.hp and          -- 而且受了伤
         #selected < 1                -- 而且只选了一个
   end,
   target_num = 1,
@@ -243,7 +244,7 @@ local meishu = fk.CreateTriggerSkill {
   anim_type = "support",
   events = { fk.Damaged },
   can_trigger = function(self, event, target, player, data)
-    return player:hasSkill(self) and data.from and target:getMark("@jy_jieyin_ex") ~= 0
+    return player:hasSkill(self) and data.from and data.from:getMark("@jy_jieyin_ex") ~= 0
   end,
   on_use = function(self, event, target, player, data)
     local room = player.room
@@ -350,7 +351,7 @@ meishu:addRelatedSkill(meishu_get_card)
 liuxian:addSkill(jieyin)
 liuxian:addSkill(lihun)
 liuxian:addSkill(meishu)
-liuxian:addSkill("jy_xiannu")
+-- liuxian:addSkill("jy_xiannu")
 
 Fk:loadTranslationTable {
   ["jy_ex__liuxian"] = [[界刘仙]],

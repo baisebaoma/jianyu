@@ -2198,7 +2198,7 @@ local jy_xiannu = fk.CreateActiveSkill {
   end,
 }
 
-jy__liuxian:addSkill(jy_xiannu)
+-- jy__liuxian:addSkill(jy_xiannu)
 jy__liuxian:addSkill(jy_jieyin)
 jy__liuxian:addSkill(jy_lihun)
 
