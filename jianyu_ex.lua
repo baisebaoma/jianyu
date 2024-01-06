@@ -4,9 +4,12 @@ extension.extensionName = "jianyu"
 Fk:loadTranslationTable {
   ["jianyu_ex"] = [[简浴-界限突破]],
   ["jy_ex"] = [[简浴界]],
+
+  ["jy_zishang_ex"] = "反噬",
+  [":jy_zishang_ex"] = "出牌阶段，你可以对自己造成1点伤害。",
 }
 
-local jy_zishang_ex = fk.CreateActiveSkill {
+local zishang_ex = fk.CreateActiveSkill {
   name = "jy_zishang_ex",
   anim_type = "masochism",
   can_use = function(self, player)
@@ -64,7 +67,7 @@ Fk:loadTranslationTable {
 -- 高天亮
 local gaotianliang = General(extension, "jy_ex__gaotianliang", "qun", 4)
 
-local jy_yuyu = fk.CreateTriggerSkill {
+local yuyu = fk.CreateTriggerSkill {
   name = "jy_yuyu_ex",
   anim_type = "masochism",
   events = { fk.Damaged },
@@ -82,8 +85,8 @@ local jy_yuyu = fk.CreateTriggerSkill {
   end,
 }
 
-gaotianliang:addSkill(jy_zishang_ex)
-gaotianliang:addSkill(jy_yuyu)
+gaotianliang:addSkill(zishang_ex)
+gaotianliang:addSkill(yuyu)
 gaotianliang:addSkill("jy_tianling")
 
 Fk:loadTranslationTable {
@@ -139,9 +142,6 @@ Fk:loadTranslationTable {
   ["$jy_yusu_ex1"] = "Siu...",
 
   ["~jy_ex__aweiluo"] = "Messi, Messi, Messi, Messi...",
-
-  ["jy_zishang_ex"] = "自伤",
-  [":jy_zishang_ex"] = "出牌阶段，你可以对自己造成1点伤害。",
 }
 
 -- 水晶哥
@@ -153,6 +153,203 @@ yangfan:addSkill("jy_zishang_ex")
 
 Fk:loadTranslationTable {
   ["jy_ex__yangfan"] = "界杨藩",
+}
+
+
+local liuxian = General(extension, "jy_ex__liuxian", "god", 1, 1, General.Female)
+
+
+local jieyin = fk.CreateActiveSkill {
+  frequency = Skill.Limited,
+  name = "jy_jieyin_ex",
+  anim_type = "support",
+  can_use = function(self, player)
+    return player:usedSkillTimes(self.name, Player.HistoryGame) == 0
+  end,
+  card_filter = function(self, card)
+    return false
+  end,
+  card_num = 0,
+  target_filter = function(self, to_select, selected)
+    local s = Fk:currentRoom():getPlayerById(to_select)
+
+    return to_select ~= Self.id and  -- 如果目标不是自己
+        s.gender == General.Male and -- 而且是男的
+        #selected < 1                -- 而且只选了一个
+  end,
+  target_num = 1,
+  on_use = function(self, room, use)
+    local player = room:getPlayerById(use.from)
+    for _, to in ipairs(use.tos) do
+      local p = room:getPlayerById(to)
+
+      room:setPlayerMark("#jy_jieyin_ex", "")
+      -- room:changeMaxHp(player, -1)
+      -- 治疗其
+      room:recover({
+        who = p,
+        num = 3,
+        recoverBy = player,
+        skillName = self.name,
+      })
+
+      -- 获得其所有牌
+      if not p:isNude() then
+        local cards_id = p:getCardIds { Player.Hand, Player.Equip, Player.Judge }
+        local dummy = Fk:cloneCard 'slash'
+        dummy:addSubcards(cards_id)
+        room:obtainCard(player.id, dummy, false, fk.ReasonPrey)
+      end
+
+      -- 获得其所有技能
+      local skills = {}
+      for _, s in ipairs(p.player_skills) do
+        if not (s.attached_equip or s.name[#s.name] == "&") then
+          table.insertIfNeed(skills, s.name)
+        end
+      end
+      if #skills > 0 then
+        room:handleAddLoseSkills(player, table.concat(skills, "|"), nil, true, false)
+      end
+    end
+  end,
+}
+
+local lihun = fk.CreateActiveSkill {
+  name = "jy_lihun_ex",
+  anim_type = "masochism",
+  can_use = function(self, player)
+    if player:usedSkillTimes("jy_jieyin_ex", Player.HistoryGame) == 0 then return false end
+    return true
+  end,
+  card_filter = function(self, card)
+    return false
+  end,
+  card_num = 0,
+  target_filter = function(self, to_select, selected)
+    return false
+  end,
+  on_use = function(self, room, effect)
+    local from = room:getPlayerById(effect.from)
+    room:changeMaxHp(from, -1)
+    from:setSkillUseHistory("jy_jieyin", 0, Player.HistoryGame)
+  end,
+}
+
+local meishu = fk.CreateTriggerSkill {
+  frequency = fk.Compulsory,
+  name = "jy_meishu_ex",
+  anim_type = "support",
+  events = { fk.Damaged },
+  can_trigger = function(self, event, target, player, data)
+    return player:hasSkill(self) and data.from and target:getMark("@jy_jieyin_ex") ~= 0
+  end,
+  on_use = function(self, event, target, player, data)
+    local room = player.room
+    room:changeMaxHp(player, 1)
+  end,
+}
+local meishu_respond = fk.CreateTriggerSkill {
+  name = "#jy_meishu_respond",
+  mute = true,
+  frequency = Skill.Compulsory,
+  events = { fk.CardUsing },
+  can_trigger = function(self, event, target, player, data)
+    if not player:hasSkill(self) then return false end
+    return player == target and data.to:getMark("@jy_jieyin_ex") ~= 0
+  end,
+  on_use = function(self, event, target, player, data)
+    player:broadcastSkillInvoke(meishu.name)
+    data.disresponsiveList = { data.to.id }
+  end,
+}
+local meishu_get_card = fk.CreateTriggerSkill {
+  mute = true,
+  name = "#meishu_get_card",
+  anim_type = "drawcard",
+  events = { fk.AfterCardsMove },
+  can_trigger = function(self, event, target, player, data)
+    if player:hasSkill(self) then
+      for _, move in ipairs(data) do
+        if move.extra_data and move.extra_data.luoying then
+          for _, id in ipairs(move.extra_data.luoying) do
+            if player.room:getCardArea(id) == Card.DiscardPile then
+              return true
+            end
+          end
+        end
+      end
+    end
+  end,
+  on_use = function(self, event, target, player, data)
+    player:broadcastSkillInvoke(meishu.name)
+    local room = player.room
+    local ids = {}
+    for _, move in ipairs(data) do
+      if move.extra_data and move.extra_data.jieyin_ex then
+        for _, id in ipairs(move.extra_data.jieyin_ex) do
+          if room:getCardArea(id) == Card.DiscardPile then
+            table.insertIfNeed(ids, id)
+          end
+        end
+      end
+    end
+    local cards = room:askForCardsChosen(player, player, 1, #ids, { card_data = { { self.name, ids } } }, self.name)
+    if #cards > 0 then
+      local dummy = Fk:cloneCard("dilu")
+      dummy:addSubcards(cards)
+      room:obtainCard(player.id, dummy, true, fk.ReasonJustMove)
+    end
+  end,
+
+  refresh_events = { fk.BeforeCardsMove },
+  can_refresh = function(self, event, target, player, data)
+    if player:hasSkill(self) then
+      for _, move in ipairs(data) do
+        if (move.from ~= player.id and Fk:currentRoom():getPlayerById(move.from):getMark("@jy_jieyin_ex") ~= 0) and
+            (move.moveReason == fk.ReasonDiscard or move.moveReason == fk.ReasonJudge or move.moveReason == fk.ReasonUse) and
+            move.toArea == Card.DiscardPile then
+          return true
+        end
+      end
+    end
+  end,
+  on_refresh = function(self, event, target, player, data)
+    for _, move in ipairs(data) do
+      if (not move.from or move.from ~= player.id) and (move.moveReason == fk.ReasonDiscard or move.moveReason == fk.ReasonJudge) and
+          move.toArea == Card.DiscardPile then
+        local ids = {}
+        for _, info in ipairs(move.moveInfo) do
+          table.insertIfNeed(ids, info.cardId)
+        end
+        if #ids > 0 then
+          move.extra_data = move.extra_data or {}
+          move.extra_data.jieyin_ex = ids
+        end
+      end
+    end
+  end,
+}
+meishu:addRelatedSkill(meishu_respond)
+meishu:addRelatedSkill(meishu_get_card)
+
+liuxian:addSkill(jieyin)
+liuxian:addSkill(lihun)
+liuxian:addSkill(meishu)
+liuxian:addSkill("xiannu")
+
+Fk:loadTranslationTable {
+  ["jy_ex__liuxian"] = [[界刘仙]],
+  ["@jy_jieyin_ex"] = "结姻",
+
+  ["jy_jieyin_ex"] = "结姻",
+  [":jy_jieyin"] = [[限定技，出牌阶段，你可以令一名已受伤的男性角色回复3点体力，标记其，然后你获得其所有牌并拥有其所有技能。]],
+
+  ["jy_lihun_ex"] = "离婚",
+  [":jy_lihun"] = [[出牌阶段，你可以减少一点体力上限使〖结姻〗视为未发动过。]],
+
+  ["jy_meishu_ex"] = "美鼠",
+  [":jy_meishu_ex"] = [[锁定技，被〖结姻〗标记过的角色：无法响应你的牌；其的牌进入弃牌堆后，你获得之；造成伤害后，你增加一点体力上限。]],
 }
 
 return extension
