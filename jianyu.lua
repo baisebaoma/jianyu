@@ -7,15 +7,12 @@ local U = require "packages/utility/utility"
 local Q = require "packages/jianyu/question" -- 考公大学生用的题库
 
 Fk:loadTranslationTable {
-  ["jy_jianyu"] = [[简浴-经典]],
-  ["xjb"] = "简浴",
-  ["tym"] = "简浴",
-  ["skl"] = "简浴",
-  ["zer"] = "简浴",
+  ["jy_jianyu"] = [[简浴]],
+  ["jy"] = "简浴",
 }
 
 -- 简自豪
-local xjb__jianzihao = General(extension, "xjb__jianzihao", "qun", 8)
+local jy__jianzihao = General(extension, "jy__jianzihao", "qun", 8)
 
 -- 红温
 local jy_hongwen = fk.CreateFilterSkill {
@@ -137,16 +134,16 @@ local jy_kaiju = fk.CreateTriggerSkill {
 
 -- local id = room:askForCardChosen(player, p, "hej", self.name)  -- 我选他一张牌
 
-xjb__jianzihao:addSkill(jy_kaiju)
-xjb__jianzihao:addSkill(jy_hongwen)
-xjb__jianzihao:addSkill(jy_zouwei)
-xjb__jianzihao:addSkill(jy_shengnu)
-xjb__jianzihao:addSkill(jy_xizao)
--- xjb__jianzihao:addSkill("guixin")
+jy__jianzihao:addSkill(jy_kaiju)
+jy__jianzihao:addSkill(jy_hongwen)
+jy__jianzihao:addSkill(jy_zouwei)
+jy__jianzihao:addSkill(jy_shengnu)
+jy__jianzihao:addSkill(jy_xizao)
+-- jy__jianzihao:addSkill("guixin")
 
 
 Fk:loadTranslationTable {
-  ["xjb__jianzihao"] = "简自豪",
+  ["jy__jianzihao"] = "简自豪",
 
   ["jy_kaiju"] = "开局",
   [":jy_kaiju"] = [[锁定技，准备阶段，所有其他有牌的角色需要交给你一张牌，并视为对你使用一张【杀】。<br>
@@ -186,12 +183,12 @@ Fk:loadTranslationTable {
   ["$jy_xizao2"] = "也不是稳赢吧，我觉得赢了！",
   ["$jy_xizao3"] = "真的我是真玩不了，这跟变态没关系，我好他妈的气！",
 
-  ["~xjb__jianzihao"] = "好像又要倒下了……",
+  ["~jy__jianzihao"] = "好像又要倒下了……",
 }
 
 
 -- 第二代简自豪
-local tym__jianzihao = General(extension, "tym__jianzihao", "qun", 3)
+local jy__jianzihao = General(extension, "jy__new__jianzihao", "qun", 3)
 
 local jy_sanjian = fk.CreateTriggerSkill {
   name = "jy_sanjian",
@@ -275,16 +272,16 @@ local jy_xizao_2 = fk.CreateTriggerSkill {
   end,
 }
 
-tym__jianzihao:addSkill(jy_kaiju_2)
-tym__jianzihao:addSkill(jy_sanjian)
-tym__jianzihao:addSkill("jy_hongwen")
-tym__jianzihao:addSkill("jy_zouwei")
-tym__jianzihao:addSkill("jy_shengnu")
-tym__jianzihao:addSkill("jy_xizao")
--- tym__jianzihao:addSkill("guixin")
+jy__jianzihao:addSkill(jy_kaiju_2)
+jy__jianzihao:addSkill(jy_sanjian)
+jy__jianzihao:addSkill("jy_hongwen")
+jy__jianzihao:addSkill("jy_zouwei")
+jy__jianzihao:addSkill("jy_shengnu")
+jy__jianzihao:addSkill("jy_xizao")
+-- jy__jianzihao:addSkill("guixin")
 
 Fk:loadTranslationTable {
-  ["tym__jianzihao"] = "简自豪",
+  ["jy__new__jianzihao"] = "简自豪",
 
   ["jy_kaiju_2"] = "开局",
   [":jy_kaiju_2"] = "出牌阶段限一次，你选择若干名角色，依次视为你对其使用一张【顺手牵羊】，然后被其使用一张【杀】。",
@@ -307,12 +304,12 @@ Fk:loadTranslationTable {
   ["$jy_xizao_22"] = "也不是稳赢吧，我觉得赢了！",
   ["$jy_xizao_23"] = "真的我是真玩不了，这跟变态没关系，我好他妈的气！",
 
-  ["~tym__jianzihao"] = "好像又要倒下了……",
+  ["~jy__jianzihao"] = "好像又要倒下了……",
 }
 
 -- 李元浩
 -- 在活动服环境里没那么强。
-local tym__liyuanhao = General(extension, "tym__liyuanhao", "qun", 4)
+local jy__liyuanhao = General(extension, "jy__liyuanhao", "qun", 4)
 
 -- 界虎啸
 -- 参考自铁骑，屯田，脑洞包明哲，克己（原来克己已经监视了使用和打出了，不用写那么复杂）
@@ -330,7 +327,7 @@ local jy_huxiao_2 = fk.CreateTriggerSkill {
     local room = player.room
     local dummy = Fk:cloneCard("dilu")
     dummy:addSubcards(room:getNCards(1))
-    player:addToPile("tym__liyuanhao_xiao", dummy, true, self.name)
+    player:addToPile("jy__liyuanhao_xiao", dummy, true, self.name)
   end,
 }
 
@@ -339,12 +336,12 @@ local jy_huxiao_analeptic_2 = fk.CreateViewAsSkill {
   name = "jy_huxiao_analeptic_2",
   anim_type = "defensive",
   pattern = "analeptic",
-  expand_pile = "tym__liyuanhao_xiao",
+  expand_pile = "jy__liyuanhao_xiao",
   card_filter = function(self, to_select, selected)
     if #selected == 1 then return false end
-    local xiaos = Self:getPile("tym__liyuanhao_xiao")
+    local xiaos = Self:getPile("jy__liyuanhao_xiao")
     if #xiaos == 0 then return false end
-    return Self:getPileNameOfId(to_select) == "tym__liyuanhao_xiao"
+    return Self:getPileNameOfId(to_select) == "jy__liyuanhao_xiao"
   end,
   view_as = function(self, cards)
     if #cards ~= 1 then
@@ -362,12 +359,12 @@ local jy_huxiao_jink_2 = fk.CreateViewAsSkill {
   name = "jy_huxiao_jink_2",
   anim_type = "defensive",
   pattern = "jink",
-  expand_pile = "tym__liyuanhao_xiao",
+  expand_pile = "jy__liyuanhao_xiao",
   card_filter = function(self, to_select, selected)
     if #selected == 1 then return false end
-    local xiaos = Self:getPile("tym__liyuanhao_xiao")
+    local xiaos = Self:getPile("jy__liyuanhao_xiao")
     if #xiaos == 0 then return false end
-    return Self:getPileNameOfId(to_select) == "tym__liyuanhao_xiao"
+    return Self:getPileNameOfId(to_select) == "jy__liyuanhao_xiao"
   end,
   view_as = function(self, cards)
     if #cards ~= 1 then
@@ -395,7 +392,7 @@ local jy_erduanxiao_2 = fk.CreateTriggerSkill {
   can_trigger = function(self, event, target, player, data)
     if not player:hasSkill(self) then return end -- 如果我自己没有这个技能，那就算了
 
-    local xiaos = player:getPile("tym__liyuanhao_xiao")
+    local xiaos = player:getPile("jy__liyuanhao_xiao")
     player.is_xiao_changing = nil
 
     -- 判断是否有牌出去
@@ -421,7 +418,7 @@ local jy_erduanxiao_2 = fk.CreateTriggerSkill {
     if #xiaos == 1 then -- 如果啸是1
       for _, move in ipairs(data) do
         if move.to == player.id and move.toArea == Card.PlayerSpecial and
-            move.specialName == "tym__liyuanhao_xiao" then
+            move.specialName == "jy__liyuanhao_xiao" then
           return true
         end
       end
@@ -429,7 +426,7 @@ local jy_erduanxiao_2 = fk.CreateTriggerSkill {
   end,
 
   on_trigger = function(self, event, target, player, data)
-    local xiaos = player:getPile("skl__liyuanhao_xiao")
+    local xiaos = player:getPile("jy__liyuanhao_xiao")
     player.is_xiao_changing = #xiaos
   end,
 }
@@ -439,10 +436,10 @@ local jy_erduanxiao_trigger_2 = fk.CreateTriggerSkill {
   events = { fk.AfterCardsMove },
   frequency = Skill.Compulsory,
   can_trigger = function(self, event, target, player, data)
-    local xiaos = player:getPile("skl__liyuanhao_xiao")
+    local xiaos = player:getPile("jy__liyuanhao_xiao")
     if #xiaos == player.is_xiao_changing then return false end
-    return player:hasSkill(self) and                -- 如果是有二段啸的角色
-        #player:getPile("tym__liyuanhao_xiao") == 2 -- 如果啸为2
+    return player:hasSkill(self) and               -- 如果是有二段啸的角色
+        #player:getPile("jy__liyuanhao_xiao") == 2 -- 如果啸为2
   end,
 
   on_cost = function(self, event, target, player, data)
@@ -458,11 +455,11 @@ local jy_erduanxiao_trigger_2 = fk.CreateTriggerSkill {
   end,
 
   on_use = function(self, event, target, player, data)
-    local xiaos = player:getPile("tym__liyuanhao_xiao")
+    local xiaos = player:getPile("jy__liyuanhao_xiao")
     local room = player.room
     if self.choice == "#lose_xiao_2" then
       -- 将所有“啸”纳入自己的手牌
-      room:moveCardTo(xiaos, Card.PlayerHand, player, fk.ReasonJustMove, self.name, "tym__liyuanhao_xiao", true,
+      room:moveCardTo(xiaos, Card.PlayerHand, player, fk.ReasonJustMove, self.name, "jy__liyuanhao_xiao", true,
         player.id)
     elseif self.choice == "#lose_hp_1_2" then
       -- 弃置所有“啸”
@@ -479,15 +476,15 @@ local jy_erduanxiao_trigger_2 = fk.CreateTriggerSkill {
 }
 jy_erduanxiao_2:addRelatedSkill(jy_erduanxiao_trigger_2)
 
-tym__liyuanhao:addSkill(jy_huxiao_2)
-tym__liyuanhao:addSkill(jy_huxiao_analeptic_2)
-tym__liyuanhao:addSkill(jy_huxiao_jink_2)
-tym__liyuanhao:addSkill(jy_erduanxiao_2)
-tym__liyuanhao:addSkill("wusheng")
+jy__liyuanhao:addSkill(jy_huxiao_2)
+jy__liyuanhao:addSkill(jy_huxiao_analeptic_2)
+jy__liyuanhao:addSkill(jy_huxiao_jink_2)
+jy__liyuanhao:addSkill(jy_erduanxiao_2)
+jy__liyuanhao:addSkill("wusheng")
 
 Fk:loadTranslationTable {
-  ["tym__liyuanhao"] = "李元浩",
-  ["tym__liyuanhao_xiao"] = "<font color=\"gold\">啸</font>",
+  ["jy__liyuanhao"] = "李元浩",
+  ["jy__liyuanhao_xiao"] = "<font color=\"gold\">啸</font>",
 
   ["jy_huxiao_2"] = "虎啸",
   [":jy_huxiao_2"] = [[当你使用或打出一张【杀】时，可以将牌堆顶的一张牌置于武将牌上，称为“啸”。
@@ -510,7 +507,7 @@ Fk:loadTranslationTable {
 }
 
 -- 高天亮
-local xjb__gaotianliang = General(extension, "xjb__gaotianliang", "qun", 4)
+local jy__gaotianliang = General(extension, "jy__gaotianliang", "qun", 4)
 
 local jy_yuyu = fk.CreateTriggerSkill {
   name = "jy_yuyu",
@@ -540,9 +537,9 @@ local jy_yuyu = fk.CreateTriggerSkill {
   end,
   on_use = function(self, event, target, player, data)
     if self.choice == "#jy_yuyu_draw3" then
-      player:drawCards(4)
+      player:drawCards(3)
     else
-      player:drawCards(4)
+      player:drawCards(3)
       player:turnOver()
       Fk:currentRoom():damage({
         from = player,
@@ -556,14 +553,14 @@ local jy_yuyu = fk.CreateTriggerSkill {
   end,
 }
 
-xjb__gaotianliang:addSkill(jy_yuyu)
+jy__gaotianliang:addSkill(jy_yuyu)
 
 Fk:loadTranslationTable {
-  ["xjb__gaotianliang"] = "高天亮",
+  ["jy__gaotianliang"] = "高天亮",
 
   ["jy_yuyu"] = "玉玉",
   [":jy_yuyu"] = [[1. 锁定技，当有角色对你使用【杀】造成了伤害时，其获得“致郁”标记；<br>
-  2. 受到没有“致郁”标记的角色或因本次伤害而获得“致郁”标记的角色造成的伤害时，你可以选择一项：摸4张牌；摸4张牌并翻面，然后对自己造成1点伤害。]],
+  2. 受到没有“致郁”标记的角色或因本次伤害而获得“致郁”标记的角色造成的伤害时，你可以选择一项：摸3张牌；摸3张牌并翻面，然后对自己造成1点伤害。]],
   ["@jy_yuyu_enemy"] = "致郁",
   ["#jy_yuyu_ask_which"] = "玉玉：请选择你要触发的效果",
   ["#jy_yuyu_draw3"] = "摸4张牌",
@@ -572,11 +569,11 @@ Fk:loadTranslationTable {
   ["$jy_yuyu2"] = "我天天被队霸欺负，他们天天骂我。",
   ["$jy_yuyu3"] = "有什么话是真的不能讲的……为什么一定……每次都是……一个人在讲……",
 
-  ["~xjb__gaotianliang"] = "顶不住啦！我每天都活在水深火热里面。",
+  ["~jy__gaotianliang"] = "顶不住啦！我每天都活在水深火热里面。",
 }
 
 -- 阿威罗
-local xjb__aweiluo = General(extension, "xjb__aweiluo", "qun", 4)
+local jy__aweiluo = General(extension, "jy__aweiluo", "qun", 4)
 
 -- 游龙
 local jy_youlong = fk.CreateTriggerSkill {
@@ -616,7 +613,7 @@ local jy_hebao = fk.CreateTriggerSkill {
   on_cost = function(self, event, target, player, data)
     local room = player.room
     local id = room:askForCard(player, 1, 1, false, self.name, true, nil, "#jy_hebao-choose")
-    player:addToPile("xjb__aweiluo_dian", id, true, self.name)
+    player:addToPile("jy__aweiluo_dian", id, true, self.name)
   end,
 }
 
@@ -626,19 +623,19 @@ local jy_tiaoshui = fk.CreateTriggerSkill {
   anim_type = "special",
   events = { fk.Damaged },
   can_trigger = function(self, event, target, player, data)
-    local dians = player:getPile("xjb__aweiluo_dian")
+    local dians = player:getPile("jy__aweiluo_dian")
     return target == player and target:hasSkill(self.name) and
         #dians ~= 0
   end,
   on_use = function(self, event, target, player, data)
     local room = player.room
-    local dians = player:getPile("xjb__aweiluo_dian")
+    local dians = player:getPile("jy__aweiluo_dian")
     -- 以后“选择一张特殊区的牌并且弃置”这个要求就这么写。
-    local id = room:askForCard(player, 1, 1, false, self.name, true, ".|.|.|xjb__aweiluo_dian|.|.|.", "#jy_tiaoshui",
-      "xjb__aweiluo_dian", true)
+    local id = room:askForCard(player, 1, 1, false, self.name, true, ".|.|.|jy__aweiluo_dian|.|.|.", "#jy_tiaoshui",
+      "jy__aweiluo_dian", true)
     room:throwCard(id, self.id, player, player)
     -- askForDiscard 函数是不能对特殊区的牌生效的
-    -- local id = room:askForDiscard(player, 1, 1, false, self.name, true, ".|.|.|xjb__aweiluo_dian|.|.|.", "#jy_tiaoshui", false, true)
+    -- local id = room:askForDiscard(player, 1, 1, false, self.name, true, ".|.|.|jy__aweiluo_dian|.|.|.", "#jy_tiaoshui", false, true)
   end,
 }
 
@@ -664,7 +661,7 @@ local jy_luojiao = fk.CreateTriggerSkill {
     player.is_luojiao_archery_attack_may_be_triggered = false
     player.is_dian_may_changing = nil
 
-    local dians = player:getPile("xjb__aweiluo_dian") -- dians是“点”的牌
+    local dians = player:getPile("jy__aweiluo_dian") -- dians是“点”的牌
 
     -- 判断是否有牌进出特殊区
     -- 为什么不用data传参数，因为这里是BeforeCardsMove，后面是AfterCardsMove，两个不是同一个事件，data不一样。用player
@@ -686,7 +683,7 @@ local jy_luojiao = fk.CreateTriggerSkill {
 
     -- 判断是否有牌进来
     for _, move in ipairs(data) do
-      if move.to == player.id and move.toArea == Card.PlayerSpecial and move.specialName == "xjb__aweiluo_dian" then
+      if move.to == player.id and move.toArea == Card.PlayerSpecial and move.specialName == "jy__aweiluo_dian" then
         -- 如果点是3，那么有可能可以触发万箭齐发
         if #dians == 3 then player.is_luojiao_archery_attack_may_be_triggered = true end
         return true
@@ -696,7 +693,7 @@ local jy_luojiao = fk.CreateTriggerSkill {
 
   on_refresh = function(self, event, target, player, data)
     -- 触发之后，设置变量，告诉下一个函数有没有可能在发生变化
-    local dians = player:getPile("xjb__aweiluo_dian")
+    local dians = player:getPile("jy__aweiluo_dian")
     player.is_dian_may_changing = #dians
     -- 必须使用player来储存该变量，因为后面的事件使用的是另一个函数jy_luojiao_after，如果你用self，那个函数是看不到的
   end,
@@ -711,7 +708,7 @@ local jy_luojiao_after = fk.CreateTriggerSkill {
     if not player:hasSkill(self) then return false end
     if not player.is_dian_may_changing then return false end -- 如果“点”有可能在变化
 
-    local dians = player:getPile("xjb__aweiluo_dian")
+    local dians = player:getPile("jy__aweiluo_dian")
     -- 如果卡牌移动前和移动后“点”相同，那就证明是其他的特殊区的牌，直接return
     if player.is_dian_may_changing == #dians then return false end
 
@@ -733,7 +730,7 @@ local jy_luojiao_after = fk.CreateTriggerSkill {
     -- 万箭需要满足的条件：点数为4，且之前已经告诉我有可能触发
     player.is_archery_attack =
         player.is_luojiao_archery_attack_may_be_triggered and
-        #player:getPile("xjb__aweiluo_dian") == 4
+        #player:getPile("jy__aweiluo_dian") == 4
 
     -- 南蛮需要满足的条件：花色全部不同
     -- 且本回合未使用过（目前已删除）
@@ -868,20 +865,20 @@ local jy_yusu = fk.CreateTriggerSkill {
   on_use = function(self, event, target, player, data)
     local room = player.room
     local id = data.card
-    player:addToPile("xjb__aweiluo_dian", id, true, self.name)
+    player:addToPile("jy__aweiluo_dian", id, true, self.name)
     room:setPlayerMark(player, "@jy_yusu_basic_count", "#jy_yusu_triggered")
   end,
 }
 
-xjb__aweiluo:addSkill(jy_youlong)
-xjb__aweiluo:addSkill(jy_hebao)
-xjb__aweiluo:addSkill(jy_tiaoshui)
-xjb__aweiluo:addSkill(jy_yusu)
-xjb__aweiluo:addSkill(jy_luojiao)
+jy__aweiluo:addSkill(jy_youlong)
+jy__aweiluo:addSkill(jy_hebao)
+jy__aweiluo:addSkill(jy_tiaoshui)
+jy__aweiluo:addSkill(jy_yusu)
+jy__aweiluo:addSkill(jy_luojiao)
 
 Fk:loadTranslationTable {
-  ["xjb__aweiluo"] = "阿威罗",
-  ["xjb__aweiluo_dian"] = "点",
+  ["jy__aweiluo"] = "阿威罗",
+  ["jy__aweiluo_dian"] = "点",
 
   ["jy_youlong"] = "游龙",
   ["#jy_youlong-choose"] = "游龙：选择一张手牌交给下家",
@@ -917,7 +914,7 @@ Fk:loadTranslationTable {
   ["$jy_yusu1"] = "Siu...",
   ["#jy_yusu_triggered"] = "已触发",
 
-  ["~xjb__aweiluo"] = "Messi, Messi, Messi, Messi...",
+  ["~jy__aweiluo"] = "Messi, Messi, Messi, Messi...",
 
 }
 
@@ -930,7 +927,7 @@ Fk:loadTranslationTable {
 -- 无法被响应：tenyear_huicui1 #gonghu_delay
 -- 立即使用一张牌：诸葛恪，借刀
 
-local zer__yangfan = General(extension, "zer__yangfan", "qun", 4)
+local jy__yangfan = General(extension, "jy__yangfan", "qun", 4)
 
 -- 四吃3的选牌规则
 Fk:addPoxiMethod {
@@ -1366,13 +1363,13 @@ jy_jiangbei:addRelatedSkill(jy_jiangbei_set_0)
 jy_jiangbei:addRelatedSkill(jy_jiangbei_draw_count)
 jy_jiangbei:addRelatedSkill(jy_jiangbei_draw)
 
-zer__yangfan:addSkill(jy_sichi)
-zer__yangfan:addSkill(jy_huapen)
-zer__yangfan:addSkill(jy_boshi)
-zer__yangfan:addRelatedSkill(jy_jiangbei)
+jy__yangfan:addSkill(jy_sichi)
+jy__yangfan:addSkill(jy_huapen)
+jy__yangfan:addSkill(jy_boshi)
+jy__yangfan:addRelatedSkill(jy_jiangbei)
 
 Fk:loadTranslationTable {
-  ["zer__yangfan"] = "杨藩",
+  ["jy__yangfan"] = "杨藩",
 
   ["jy_sichi"] = "四吃",
   [":jy_sichi"] = [[受到伤害后，你可以展示牌堆顶的4张牌，根据花色数量触发效果。<br>
@@ -1415,7 +1412,7 @@ Fk:loadTranslationTable {
   -- TODO：改一下这里，按照sp公孙瓒义从改，只提示触发了义从。
 }
 
-local tym__kgdxs = General(extension, "tym__kgdxs", "qun", 5)
+local jy__kgdxs = General(extension, "jy__kgdxs", "qun", 5)
 
 -- 获得一张牌：谋徐盛cheat
 -- 还可以继续发动：甄姬洛神
@@ -1644,18 +1641,18 @@ local jy_jieju_fail = fk.CreateTriggerSkill {
 jy_jieju:addRelatedSkill(jy_jieju_success)
 jy_jieju:addRelatedSkill(jy_jieju_fail)
 
-tym__kgdxs:addSkill(jy_zuoti)
-tym__kgdxs:addSkill(jy_jieju)
-tym__kgdxs:addRelatedSkill("jizhi")
-tym__kgdxs:addRelatedSkill("kanpo")
-tym__kgdxs:addRelatedSkill("xiangle")
-tym__kgdxs:addRelatedSkill("jy_yuyu")
-tym__kgdxs:addRelatedSkill("jy_hongwen")
+jy__kgdxs:addSkill(jy_zuoti)
+jy__kgdxs:addSkill(jy_jieju)
+jy__kgdxs:addRelatedSkill("jizhi")
+jy__kgdxs:addRelatedSkill("kanpo")
+jy__kgdxs:addRelatedSkill("xiangle")
+jy__kgdxs:addRelatedSkill("jy_yuyu")
+jy__kgdxs:addRelatedSkill("jy_hongwen")
 
 local total_papers, total_questions = Q.questionCount()
 
 Fk:loadTranslationTable {
-  ["tym__kgdxs"] = "考公大学生",
+  ["jy__kgdxs"] = "考公大学生",
 
   ["jy_zuoti"] = "做题",
   [":jy_zuoti"] = [[出牌阶段限一次，你做一道行测真题。若正确，你可以获得一张想要的牌。<br>
@@ -1681,7 +1678,7 @@ Fk:loadTranslationTable {
 }
 
 -- 参考：廖化，英姿，蛊惑，血裔
-local skl__mou__gaotianliang = General(extension, "skl__mou__gaotianliang", "qun", 4)
+local jy__mou__gaotianliang = General(extension, "jy__mou__gaotianliang", "qun", 4)
 
 
 local jy_tianling = fk.CreateViewAsSkill {
@@ -1808,11 +1805,11 @@ local jy_yali_maxcards = fk.CreateMaxCardsSkill {
 }
 jy_yali:addRelatedSkill(jy_yali_maxcards)
 
-skl__mou__gaotianliang:addSkill(jy_tianling)
-skl__mou__gaotianliang:addSkill(jy_yali)
+jy__mou__gaotianliang:addSkill(jy_tianling)
+jy__mou__gaotianliang:addSkill(jy_yali)
 
 Fk:loadTranslationTable {
-  ["skl__mou__gaotianliang"] = "高天亮",
+  ["jy__mou__gaotianliang"] = "高天亮",
 
   ["jy_tianling"] = "天灵",
   [":jy_tianling"] = [[弃牌阶段开始时，你可以弃置两张牌或失去一点体力。若如此做，你的下一个回合：准备阶段后执行一个额外的出牌阶段；判定阶段结束前，你的手牌可当作除【无中生有】外所有锦囊牌使用。]],
@@ -1827,7 +1824,7 @@ Fk:loadTranslationTable {
 
 }
 
-local tym__raiden = General(extension, "tym__raiden", "god", 3, 3, General.Female)
+local jy__raiden = General(extension, "jy__raiden", "god", 3, 3, General.Female)
 
 local jy_leiyan = fk.CreateActiveSkill {
   name = "jy_leiyan",
@@ -1956,12 +1953,12 @@ local jy_zhenshuo = fk.CreateActiveSkill {
   end,
 }
 
-tym__raiden:addSkill(jy_leiyan)
-tym__raiden:addSkill(jy_zhenshuo)
+jy__raiden:addSkill(jy_leiyan)
+jy__raiden:addSkill(jy_zhenshuo)
 
 Fk:loadTranslationTable {
-  ["tym__raiden"] = [[雷电将军]],
-  ["~tym__raiden"] = "浮世一梦……",
+  ["jy__raiden"] = [[雷电将军]],
+  ["~jy__raiden"] = "浮世一梦……",
 
   ["jy_leiyan"] = "雷眼",
   [":jy_leiyan"] = [[出牌阶段，你令至少一名角色获得<font color="Fuchsia">雷罚恶曜之眼</font>标记。<br><font color="Fuchsia">雷罚恶曜之眼</font>：拥有该标记的角色造成伤害后，你进行一次判定，若为：红色，你获得1枚<font color="Fuchsia">愿力</font>标记；黑色，你对伤害目标造成1点雷电伤害（不会触发〖雷眼〗）。]],
@@ -1980,7 +1977,7 @@ Fk:loadTranslationTable {
   ["$jy_zhenshuo3"] = "无念，断绝！",
 }
 
-local tym__ayato = General(extension, "tym__ayato", "qun", 4)
+local jy__ayato = General(extension, "jy__ayato", "qun", 4)
 
 local jy_jinghua = fk.CreateTriggerSkill {
   -- frequency = Skill.Compulsory,
@@ -2060,8 +2057,8 @@ local jy_jianying = fk.CreateTriggerSkill {
   end,
 }
 
-tym__ayato:addSkill(jy_jinghua)
-tym__ayato:addSkill(jy_jianying)
+jy__ayato:addSkill(jy_jinghua)
+jy__ayato:addSkill(jy_jianying)
 
 --[[
   获取原神配音方法：去下面网站找到你的角色的页面，然后查看源文件，搜索配音即可。
@@ -2069,8 +2066,8 @@ tym__ayato:addSkill(jy_jianying)
 ]]
 
 Fk:loadTranslationTable {
-  ["tym__ayato"] = [[神里绫人]],
-  ["~tym__ayato"] = "世事无常……",
+  ["jy__ayato"] = [[神里绫人]],
+  ["~jy__ayato"] = "世事无常……",
 
   ["jy_jinghua"] = "镜花",
   [":jy_jinghua"] = [[使用或打出基本牌后，你可以进入<font color="skyblue">泷廻鉴花</font>状态，直到当前回合结束。<br><font color="skyblue">泷廻鉴花</font>：获得2攻击距离、2体力上限、2体力，并可以立即使用2张不计入使用次数的【杀】。因<font color="skyblue">泷廻鉴花</font>状态结束而失去体力时，至多使体力降至2。]],
@@ -2086,7 +2083,7 @@ Fk:loadTranslationTable {
   ["$jy_jianying2"] = "呵……余兴节目。",
 }
 
-local tym__liuxian = General(extension, "tym__liuxian", "god", 3, 3, General.Female)
+local jy__liuxian = General(extension, "jy__liuxian", "god", 3, 3, General.Female)
 
 local jy_jieyin = fk.CreateActiveSkill {
   frequency = Skill.Limited,
@@ -2200,12 +2197,12 @@ local jy_xiannu = fk.CreateActiveSkill {
   end,
 }
 
-tym__liuxian:addSkill(jy_xiannu)
-tym__liuxian:addSkill(jy_jieyin)
-tym__liuxian:addSkill(jy_lihun)
+jy__liuxian:addSkill(jy_xiannu)
+jy__liuxian:addSkill(jy_jieyin)
+jy__liuxian:addSkill(jy_lihun)
 
 Fk:loadTranslationTable {
-  ["tym__liuxian"] = [[刘仙]],
+  ["jy__liuxian"] = [[刘仙]],
 
   ["jy_xiannu"] = "仙怒",
   [":jy_xiannu"] = [[限定技，出牌阶段，你可以对一名未受伤的男性角色造成1点伤害。]],
