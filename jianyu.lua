@@ -613,7 +613,7 @@ local jy_hebao = fk.CreateTriggerSkill {
   on_cost = function(self, event, target, player, data)
     local room = player.room
     local id = room:askForCard(player, 1, 1, false, self.name, true, nil, "#jy_hebao-choose")
-    player:addToPile("jy__aweiluo_dian", id, true, self.name)
+    player:addToPile("jy_aweiluo_dian", id, true, self.name)
   end,
 }
 
@@ -623,19 +623,19 @@ local jy_tiaoshui = fk.CreateTriggerSkill {
   anim_type = "special",
   events = { fk.Damaged },
   can_trigger = function(self, event, target, player, data)
-    local dians = player:getPile("jy__aweiluo_dian")
+    local dians = player:getPile("jy_aweiluo_dian")
     return target == player and target:hasSkill(self.name) and
         #dians ~= 0
   end,
   on_use = function(self, event, target, player, data)
     local room = player.room
-    local dians = player:getPile("jy__aweiluo_dian")
+    local dians = player:getPile("jy_aweiluo_dian")
     -- 以后“选择一张特殊区的牌并且弃置”这个要求就这么写。
-    local id = room:askForCard(player, 1, 1, false, self.name, true, ".|.|.|jy__aweiluo_dian|.|.|.", "#jy_tiaoshui",
-      "jy__aweiluo_dian", true)
+    local id = room:askForCard(player, 1, 1, false, self.name, true, ".|.|.|jy_aweiluo_dian|.|.|.", "#jy_tiaoshui",
+      "jy_aweiluo_dian", true)
     room:throwCard(id, self.id, player, player)
     -- askForDiscard 函数是不能对特殊区的牌生效的
-    -- local id = room:askForDiscard(player, 1, 1, false, self.name, true, ".|.|.|jy__aweiluo_dian|.|.|.", "#jy_tiaoshui", false, true)
+    -- local id = room:askForDiscard(player, 1, 1, false, self.name, true, ".|.|.|jy_aweiluo_dian|.|.|.", "#jy_tiaoshui", false, true)
   end,
 }
 
@@ -661,7 +661,7 @@ local jy_luojiao = fk.CreateTriggerSkill {
     player.is_luojiao_archery_attack_may_be_triggered = false
     player.is_dian_may_changing = nil
 
-    local dians = player:getPile("jy__aweiluo_dian") -- dians是“点”的牌
+    local dians = player:getPile("jy_aweiluo_dian") -- dians是“点”的牌
 
     -- 判断是否有牌进出特殊区
     -- 为什么不用data传参数，因为这里是BeforeCardsMove，后面是AfterCardsMove，两个不是同一个事件，data不一样。用player
@@ -683,7 +683,7 @@ local jy_luojiao = fk.CreateTriggerSkill {
 
     -- 判断是否有牌进来
     for _, move in ipairs(data) do
-      if move.to == player.id and move.toArea == Card.PlayerSpecial and move.specialName == "jy__aweiluo_dian" then
+      if move.to == player.id and move.toArea == Card.PlayerSpecial and move.specialName == "jy_aweiluo_dian" then
         -- 如果点是3，那么有可能可以触发万箭齐发
         if #dians == 3 then player.is_luojiao_archery_attack_may_be_triggered = true end
         return true
@@ -693,7 +693,7 @@ local jy_luojiao = fk.CreateTriggerSkill {
 
   on_refresh = function(self, event, target, player, data)
     -- 触发之后，设置变量，告诉下一个函数有没有可能在发生变化
-    local dians = player:getPile("jy__aweiluo_dian")
+    local dians = player:getPile("jy_aweiluo_dian")
     player.is_dian_may_changing = #dians
     -- 必须使用player来储存该变量，因为后面的事件使用的是另一个函数jy_luojiao_after，如果你用self，那个函数是看不到的
   end,
@@ -708,7 +708,7 @@ local jy_luojiao_after = fk.CreateTriggerSkill {
     if not player:hasSkill(self) then return false end
     if not player.is_dian_may_changing then return false end -- 如果“点”有可能在变化
 
-    local dians = player:getPile("jy__aweiluo_dian")
+    local dians = player:getPile("jy_aweiluo_dian")
     -- 如果卡牌移动前和移动后“点”相同，那就证明是其他的特殊区的牌，直接return
     if player.is_dian_may_changing == #dians then return false end
 
@@ -730,7 +730,7 @@ local jy_luojiao_after = fk.CreateTriggerSkill {
     -- 万箭需要满足的条件：点数为4，且之前已经告诉我有可能触发
     player.is_archery_attack =
         player.is_luojiao_archery_attack_may_be_triggered and
-        #player:getPile("jy__aweiluo_dian") == 4
+        #player:getPile("jy_aweiluo_dian") == 4
 
     -- 南蛮需要满足的条件：花色全部不同
     -- 且本回合未使用过（目前已删除）
@@ -865,7 +865,7 @@ local jy_yusu = fk.CreateTriggerSkill {
   on_use = function(self, event, target, player, data)
     local room = player.room
     local id = data.card
-    player:addToPile("jy__aweiluo_dian", id, true, self.name)
+    player:addToPile("jy_aweiluo_dian", id, true, self.name)
     room:setPlayerMark(player, "@jy_yusu_basic_count", "#jy_yusu_triggered")
   end,
 }
@@ -878,7 +878,7 @@ jy__aweiluo:addSkill(jy_luojiao)
 
 Fk:loadTranslationTable {
   ["jy__aweiluo"] = "阿威罗",
-  ["jy__aweiluo_dian"] = "点",
+  ["jy_aweiluo_dian"] = "点",
 
   ["jy_youlong"] = "游龙",
   ["#jy_youlong-choose"] = "游龙：选择一张手牌交给下家",

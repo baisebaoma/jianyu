@@ -36,7 +36,7 @@ Fk:loadTranslationTable {
 }
 
 -- 高天亮
-local gaotianliang = General(extension, "jy_ex__gaotianliang", "qun", 8)
+local gaotianliang = General(extension, "jy_ex__gaotianliang", "qun", 4)
 
 local jy_yuyu = fk.CreateTriggerSkill {
   name = "jy_yuyu_ex",
@@ -94,35 +94,9 @@ local jy_yusu = fk.CreateTriggerSkill {
   on_use = function(self, event, target, player, data)
     local room = player.room
     local id = data.card
-    player:addToPile("aweiluo_dian", id, true, self.name)
-    room:damage({
-      from = player,
-      to = player,
-      damage = 1,
-      damageType = fk.NormalDamage,
-      skillName = self.name,
-    })
+    player:addToPile("jy_aweiluo_dian", id, true, self.name)
   end,
 }
-
-aweiluo:addSkill(jy_yusu)
-aweiluo:addSkill("jy_youlong")
-aweiluo:addSkill("jy_tiaoshui")
-aweiluo:addSkill("jy_luojiao")
-
-Fk:loadTranslationTable {
-  ["jy_ex__aweiluo"] = "界阿威罗",
-
-  ["jy_yusu_ex"] = "玉玊",
-  [":jy_yusu_ex"] = "使用或打出一张非虚拟牌时，可以将其作为“点”置于武将牌上，然后对自己造成1点伤害。",
-  ["$jy_yusu_ex1"] = "Siu...",
-
-  ["~jy_ex__aweiluo"] = "Messi, Messi, Messi, Messi...",
-
-}
-
--- 水晶哥
-local yangfan = General(extension, "jy_ex__yangfan", "qun", 4)
 
 local jy_zishang_ex = fk.CreateActiveSkill {
   name = "jy_zishang_ex",
@@ -150,15 +124,34 @@ local jy_zishang_ex = fk.CreateActiveSkill {
   end,
 }
 
-yangfan:addSkill("jy_sichi")
-yangfan:addSkill("jy_jiangbei")
-yangfan:addSkill(jy_zishang_ex)
+aweiluo:addSkill(jy_yusu)
+aweiluo:addSkill("jy_youlong")
+aweiluo:addSkill("jy_tiaoshui")
+aweiluo:addSkill("jy_luojiao")
+aweiluo:addSkill(jy_zishang_ex)
 
 Fk:loadTranslationTable {
-  ["jy_ex__yangfan"] = "界杨藩",
+  ["jy_ex__aweiluo"] = "界阿威罗",
+
+  ["jy_yusu_ex"] = "玉玊",
+  [":jy_yusu_ex"] = "使用或打出一张非虚拟牌时，可以将其作为“点”置于武将牌上。",
+  ["$jy_yusu_ex1"] = "Siu...",
+
+  ["~jy_ex__aweiluo"] = "Messi, Messi, Messi, Messi...",
 
   ["jy_zishang_ex"] = "自伤",
   [":jy_zishang_ex"] = "出牌阶段，你可以对自己造成1点伤害。",
+}
+
+-- 水晶哥
+local yangfan = General(extension, "jy_ex__yangfan", "qun", 4)
+
+yangfan:addSkill("jy_sichi")
+yangfan:addSkill("jy_jiangbei")
+yangfan:addSkill("jy_zishang_ex")
+
+Fk:loadTranslationTable {
+  ["jy_ex__yangfan"] = "界杨藩",
 }
 
 return extension
