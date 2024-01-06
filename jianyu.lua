@@ -1,4 +1,4 @@
-local extension = Package:new("jy_jianyu")
+local extension = Package:new("jianyu")
 extension.extensionName = "jianyu"
 
 -- DIY真诚意见：所有你这个包的东西都加一个你自己的开头，这样防止和别人的重名。比如我的"huxiao"一开始就和别人重名了。
@@ -7,7 +7,7 @@ local U = require "packages/utility/utility"
 local Q = require "packages/jianyu/question" -- 考公大学生用的题库
 
 Fk:loadTranslationTable {
-  ["jy_jianyu"] = [[简浴]],
+  ["jianyu"] = [[简浴]],
   ["jy"] = "简浴",
 }
 

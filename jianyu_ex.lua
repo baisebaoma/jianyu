@@ -1,10 +1,35 @@
-local extension = Package:new("jy_jianyu_ex")
+local extension = Package:new("jianyu_ex")
 extension.extensionName = "jianyu"
 
 Fk:loadTranslationTable {
-  ["jy_jianyu_ex"] = [[简浴-界限突破]],
   ["jianyu_ex"] = [[简浴-界限突破]],
   ["jy_ex"] = [[简浴界]],
+}
+
+local jy_zishang_ex = fk.CreateActiveSkill {
+  name = "jy_zishang_ex",
+  anim_type = "masochism",
+  can_use = function(self, player)
+    return true
+  end,
+  card_filter = function(self, card)
+    return false
+  end,
+  card_num = 0,
+  target_filter = function(self, to_select, selected)
+    return false
+  end,
+  target_num = 0,
+  on_use = function(self, room, use)
+    local player = room:getPlayerById(use.from)
+    room:damage({
+      from = player,
+      to = player,
+      damage = 1,
+      damageType = fk.NormalDamage,
+      skillName = self.name,
+    })
+  end,
 }
 
 -- 简自豪
@@ -45,7 +70,7 @@ local jy_yuyu = fk.CreateTriggerSkill {
   events = { fk.Damaged },
   on_use = function(self, event, target, player, data)
     local room = player.room
-    player:drawCards(5)
+    player:drawCards(1)
     player:turnOver()
     room:damage({
       from = player,
@@ -57,6 +82,7 @@ local jy_yuyu = fk.CreateTriggerSkill {
   end,
 }
 
+gaotianliang:addSkill(jy_zishang_ex)
 gaotianliang:addSkill(jy_yuyu)
 gaotianliang:addSkill("jy_tianling")
 
@@ -64,7 +90,7 @@ Fk:loadTranslationTable {
   ["jy_ex__gaotianliang"] = "界高天亮",
 
   ["jy_yuyu_ex"] = "玉玉",
-  [":jy_yuyu_ex"] = [[受到伤害时，你可以摸5张牌并翻面，然后对自己造成1点伤害。]],
+  [":jy_yuyu_ex"] = [[受到伤害时，你可以摸1张牌并翻面，然后对自己造成1点伤害。]],
   ["$jy_yuyu_ex1"] = "我……我真的很想听到你们说话……",
   ["$jy_yuyu_ex2"] = "我天天被队霸欺负，他们天天骂我。",
   ["$jy_yuyu_ex3"] = "有什么话是真的不能讲的……为什么一定……每次都是……一个人在讲……",
@@ -99,37 +125,11 @@ local jy_yusu = fk.CreateTriggerSkill {
   end,
 }
 
-local jy_zishang_ex = fk.CreateActiveSkill {
-  name = "jy_zishang_ex",
-  anim_type = "masochism",
-  can_use = function(self, player)
-    return true
-  end,
-  card_filter = function(self, card)
-    return false
-  end,
-  card_num = 0,
-  target_filter = function(self, to_select, selected)
-    return false
-  end,
-  target_num = 0,
-  on_use = function(self, room, use)
-    local player = room:getPlayerById(use.from)
-    room:damage({
-      from = player,
-      to = player,
-      damage = 1,
-      damageType = fk.NormalDamage,
-      skillName = self.name,
-    })
-  end,
-}
-
 aweiluo:addSkill(jy_yusu)
 aweiluo:addSkill("jy_youlong")
 aweiluo:addSkill("jy_tiaoshui")
 aweiluo:addSkill("jy_luojiao")
-aweiluo:addSkill(jy_zishang_ex)
+aweiluo:addSkill("jy_zishang_ex")
 
 Fk:loadTranslationTable {
   ["jy_ex__aweiluo"] = "界阿威罗",
