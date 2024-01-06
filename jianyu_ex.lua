@@ -184,7 +184,7 @@ local jieyin = fk.CreateActiveSkill {
     for _, to in ipairs(use.tos) do
       local p = room:getPlayerById(to)
 
-      room:setPlayerMark(p, "#jy_jieyin_ex", "")
+      room:setPlayerMark(p, "@jy_jieyin_ex", "")
       -- room:changeMaxHp(player, -1)
       -- 治疗其
       room:recover({
@@ -233,7 +233,7 @@ local lihun = fk.CreateActiveSkill {
   on_use = function(self, room, effect)
     local from = room:getPlayerById(effect.from)
     room:changeMaxHp(from, -1)
-    from:setSkillUseHistory("jy_jieyin", 0, Player.HistoryGame)
+    from:setSkillUseHistory("jy_jieyin_ex", 0, Player.HistoryGame)
   end,
 }
 
