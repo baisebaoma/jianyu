@@ -257,12 +257,25 @@ local meishu_respond = fk.CreateTriggerSkill {
   events = { fk.CardUsing },
   can_trigger = function(self, event, target, player, data)
     if not player:hasSkill(self) then return false end
-    if not data.to then return false end
-    return player == target and data.to:getMark("@jy_jieyin_ex") ~= 0
+    if not data.tos then return false end
+    local is_someone_jieyin = false
+    for _, p in ipairs(data.tos) do
+      if p:getMark("@jy_jieyin_ex") then
+        is_someone_jieyin = true
+        break
+      end
+    end
+    return player == target and is_someone_jieyin
   end,
   on_use = function(self, event, target, player, data)
     player:broadcastSkillInvoke(meishu.name)
-    data.disresponsiveList = { data.to.id }
+    local jieyins = {}
+    for _, p in ipairs(data.tos) do
+      if p:getMark("@jy_jieyin_ex") ~= 0 then
+        table.insert(jieyins, p)
+      end
+    end
+    data.disresponsiveList = table.map(jieyins, Util.IdMapper)
   end,
 }
 local meishu_get_card = fk.CreateTriggerSkill {
@@ -273,8 +286,8 @@ local meishu_get_card = fk.CreateTriggerSkill {
   can_trigger = function(self, event, target, player, data)
     if player:hasSkill(self) then
       for _, move in ipairs(data) do
-        if move.extra_data and move.extra_data.luoying then
-          for _, id in ipairs(move.extra_data.luoying) do
+        if move.extra_data and move.extra_data.jieyin_ex then
+          for _, id in ipairs(move.extra_data.jieyin_ex) do
             if player.room:getCardArea(id) == Card.DiscardPile then
               return true
             end
