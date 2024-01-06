@@ -307,8 +307,7 @@ local meishu_get_card = fk.CreateTriggerSkill {
   can_refresh = function(self, event, target, player, data)
     if player:hasSkill(self) then
       for _, move in ipairs(data) do
-        if (move.from ~= player.id and Fk:currentRoom():getPlayerById(move.from):getMark("@jy_jieyin_ex") ~= 0) and
-            (move.moveReason == fk.ReasonDiscard or move.moveReason == fk.ReasonJudge or move.moveReason == fk.ReasonUse) and
+        if (move.from and move.from ~= player.id and Fk:currentRoom():getPlayerById(move.from):getMark("@jy_jieyin_ex") ~= 0) and
             move.toArea == Card.DiscardPile then
           return true
         end
