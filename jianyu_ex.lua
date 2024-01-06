@@ -233,7 +233,7 @@ local lihun = fk.CreateActiveSkill {
   end,
   on_use = function(self, room, effect)
     local from = room:getPlayerById(effect.from)
-    room:changeMaxHp(from, -1)
+    room:changeMaxHp(from, -2)
     from:setSkillUseHistory("jy_jieyin_ex", 0, Player.HistoryGame)
   end,
 }
@@ -246,6 +246,9 @@ local meishu = fk.CreateTriggerSkill {
   can_trigger = function(self, event, target, player, data)
     return player:hasSkill(self) and data.from and data.from:getMark("@jy_jieyin_ex") ~= 0
   end,
+  on_cost = function(self, event, target, player, data)
+    return true
+  end,
   on_use = function(self, event, target, player, data)
     local room = player.room
     room:changeMaxHp(player, 1)
@@ -253,31 +256,7 @@ local meishu = fk.CreateTriggerSkill {
 }
 local meishu_respond = fk.CreateTriggerSkill {
   name = "#jy_meishu_respond",
-  mute = true,
-  frequency = Skill.Compulsory,
-  events = { fk.CardUsing },
-  can_trigger = function(self, event, target, player, data)
-    if not player:hasSkill(self) then return false end
-    if not data.tos then return false end
-    local is_someone_jieyin = false
-    for _, p in ipairs(data.tos) do
-      if p:getMark("@jy_jieyin_ex") then
-        is_someone_jieyin = true
-        break
-      end
-    end
-    return player == target and is_someone_jieyin
-  end,
-  on_use = function(self, event, target, player, data)
-    player:broadcastSkillInvoke(meishu.name)
-    local jieyins = {}
-    for _, p in ipairs(data.tos) do
-      if p:getMark("@jy_jieyin_ex") ~= 0 then
-        table.insert(jieyins, p)
-      end
-    end
-    data.disresponsiveList = table.map(jieyins, Util.IdMapper)
-  end,
+  -- TODO
 }
 local meishu_get_card = fk.CreateTriggerSkill {
   mute = true,
@@ -345,8 +324,8 @@ local meishu_get_card = fk.CreateTriggerSkill {
     end
   end,
 }
-meishu:addRelatedSkill(meishu_respond)
-meishu:addRelatedSkill(meishu_get_card)
+-- meishu:addRelatedSkill(meishu_respond)
+-- meishu:addRelatedSkill(meishu_get_card)
 
 liuxian:addSkill(jieyin)
 liuxian:addSkill(lihun)
@@ -358,13 +337,13 @@ Fk:loadTranslationTable {
   ["@jy_jieyin_ex"] = "结姻",
 
   ["jy_jieyin_ex"] = "结姻",
-  [":jy_jieyin_ex"] = [[限定技，出牌阶段，你可以令一名已受伤的男性角色回复3点体力、标记其，然后你获得其所有牌并拥有其所有技能。]],
+  [":jy_jieyin_ex"] = [[限定技，出牌阶段，你可以令一名已受伤的男性角色回复3点体力、标记之，然后你获得其所有牌并拥有其所有技能。]],
 
   ["jy_lihun_ex"] = "离婚",
-  [":jy_lihun_ex"] = [[出牌阶段，你可以减少一点体力上限使〖结姻〗视为未发动过。]],
+  [":jy_lihun_ex"] = [[出牌阶段，你可以减少2点体力上限使〖结姻〗视为未发动过。]],
 
   ["jy_meishu_ex"] = "美鼠",
-  [":jy_meishu_ex"] = [[锁定技，被〖结姻〗标记过的角色：无法响应你的牌；其的牌进入弃牌堆后，你获得之；造成伤害后，你增加一点体力上限。]],
+  [":jy_meishu_ex"] = [[锁定技，被〖结姻〗标记过的角色造成伤害后，你增加一点体力上限。]],
 }
 
 return extension

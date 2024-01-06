@@ -1281,6 +1281,7 @@ local jy_jiangbei_club = fk.CreateTargetModSkill {
   end,
 }
 -- ♣无视防具
+-- 注意：targetSpecified事件只有一个data.to，因为是对每个target做一次。
 local jy_jiangbei_club_2 = fk.CreateTriggerSkill {
   name = "#jy_jiangbei_club_2",
   frequency = Skill.Compulsory,
@@ -2084,7 +2085,7 @@ Fk:loadTranslationTable {
   ["$jy_jianying2"] = "呵……余兴节目。",
 }
 
-local jy__liuxian = General(extension, "jy__liuxian", "god", 2, 2, General.Female)
+local jy__liuxian = General(extension, "jy__liuxian", "god", 3, 3, General.Female)
 
 local jy_jieyin = fk.CreateActiveSkill {
   frequency = Skill.Limited,
@@ -2146,6 +2147,7 @@ local jy_lihun = fk.CreateActiveSkill {
   anim_type = "masochism",
   can_use = function(self, player)
     if player:usedSkillTimes("jy_jieyin", Player.HistoryGame) == 0 then return false end
+    if player:usedSkillTimes(self.name) ~= 0 then return false end
     return true
   end,
   card_filter = function(self, card)
@@ -2157,7 +2159,7 @@ local jy_lihun = fk.CreateActiveSkill {
   end,
   on_use = function(self, room, effect)
     local from = room:getPlayerById(effect.from)
-    room:changeMaxHp(from, -1)
+    room:changeMaxHp(from, -2)
     from:setSkillUseHistory("jy_jieyin", 0, Player.HistoryGame)
   end,
 }
@@ -2198,9 +2200,9 @@ local jy_xiannu = fk.CreateActiveSkill {
   end,
 }
 
--- jy__liuxian:addSkill(jy_xiannu)
+jy__liuxian:addSkill(jy_xiannu)
 jy__liuxian:addSkill(jy_jieyin)
-jy__liuxian:addSkill(jy_lihun)
+-- jy__liuxian:addSkill(jy_lihun)
 
 Fk:loadTranslationTable {
   ["jy__liuxian"] = [[刘仙]],
@@ -2212,7 +2214,7 @@ Fk:loadTranslationTable {
   [":jy_jieyin"] = [[限定技，出牌阶段，你可以令一名已受伤的男性角色回复3点体力，然后你获得其所有牌并拥有其所有技能。]],
 
   ["jy_lihun"] = "离婚",
-  [":jy_lihun"] = [[出牌阶段，你可以减少一点体力上限使〖结姻〗视为未发动过。]],
+  [":jy_lihun"] = [[出牌阶段限一次，你可以减少2点体力上限使〖结姻〗视为未发动过。]],
 }
 
 -- for k, v in pairs(Fk.translations["zh_CN"]) do
