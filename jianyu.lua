@@ -2228,16 +2228,33 @@ Fk:loadTranslationTable {
   [":jy_lihun"] = [[限定技，你可以减少一点体力上限使〖结姻〗视为未发动过。]],
 }
 
-local jy__nav = General(extension, "jy__nav", "god", 12)
+local jy__nav = General(extension, "jy__nav", "god", 16)
+jy__nav.visible = false
+
+local jy_shuilong = fk.CreateViewAsSkill {
+  name = "jy_shuilong",
+}
+
+local jy_leihuan = fk.CreateViewAsSkill {
+  name = "jy_leihuan",
+}
+
+local jy_chaolai = fk.CreateViewAsSkill {
+  name = "jy_chaolai",
+}
+
+jy__nav:addSkill(jy_shuilong)
+jy__nav:addSkill(jy_leihuan)
+jy__nav:addSkill(jy_chaolai)
 
 Fk:loadTranslationTable {
-  ["jy__nav"] = [[那维莱特 16 16]],
+  ["jy__nav"] = [[那维莱特（未完成）]],
 
   ["jy_shuilong"] = "水龙",
-  [":jy_shuilong"] = [[锁定技，你的牌均视为【重击】。<br>【重击】：出牌阶段限一次，对上家或下家使用。你失去8次共8体力，在第1、4、7次失去体力时对目标造成1点伤害。]],
+  [":jy_shuilong"] = [[锁定技，你的牌均视为【重击】。<br>【重击】：基本牌。出牌阶段限一次，对上家或下家使用。你失去8次共8体力，在第1、4、7次失去体力时对目标造成1点伤害。]],
 
   ["jy_leihuan"] = "泪还",
-  [":jy_leihuan"] = [[每轮限一次，你回复9体力，然后可以使用一张不计入次数的【重击】。]],
+  [":jy_leihuan"] = [[每轮限一次，你回复9体力，然后使用一张不计入次数的【重击】。]],
 
   ["jy_chaolai"] = "潮来",
   [":jy_chaolai"] = [[限定技，出牌阶段，你使〖泪还〗视为未发动过。]],
