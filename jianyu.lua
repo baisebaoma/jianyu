@@ -1957,6 +1957,9 @@ local jy_zhenshuo_game_start = fk.CreateTriggerSkill {
   anim_type = "support",
   frequency = Skill.Compulsory,
   events = { fk.GameStart },
+  can_trigger = function(self, event, target, player, data)
+    return player:hasSkill(self)
+  end,
   on_use = function(self, event, target, player, data)
     local room = player.room
     room:addPlayerMark(player, "@jy_raiden_leiyan")
@@ -1973,7 +1976,7 @@ Fk:loadTranslationTable {
   ["~jy__raiden"] = "浮世一梦……",
 
   ["jy_leiyan"] = "雷眼",
-  [":jy_leiyan"] = [[出牌阶段，你令至少一名角色获得<font color="Fuchsia">雷罚恶曜之眼</font>标记。<br><font color="Fuchsia">雷罚恶曜之眼</font>：拥有该标记的角色造成伤害后，你进行一次判定，若为：黑色，你对伤害目标造成1点雷电伤害，该伤害可以继续触发〖雷眼〗；红色，所有持有<font color="Fuchsia">雷罚恶曜之眼</font>的角色各摸X张牌，然后你获得1枚<font color="Fuchsia">愿力</font>标记，X为伤害值。]],
+  [":jy_leiyan"] = [[出牌阶段，你令至少一名角色获得<font color="Fuchsia">雷罚恶曜之眼</font>标记。<br><font color="Fuchsia">雷罚恶曜之眼</font>：拥有该标记的角色造成伤害后，你进行一次判定，若为：黑色，你对伤害目标造成1点雷电伤害，该伤害可以继续触发〖雷眼〗；红色，持有<font color="Fuchsia">雷罚恶曜之眼</font>的角色各摸X张牌，然后你获得1枚<font color="Fuchsia">愿力</font>标记，X为伤害值。]],
   ["@jy_raiden_leiyan"] = [[<font color="Fuchsia">雷罚恶曜之眼</font>]],
   ["@jy_raiden_yuanli"] = [[<font color="Fuchsia">愿力</font>]],
   ["#jy_leiyan_trigger"] = "雷眼",
@@ -1983,7 +1986,7 @@ Fk:loadTranslationTable {
   ["#jy_yuanli_full"] = [[<font color="Fuchsia">愿力</font>已满！]],
 
   ["jy_zhenshuo"] = "真说",
-  [":jy_zhenshuo"] = [[①出牌阶段限一次，你弃所有<font color="Fuchsia">愿力</font>标记来对一名攻击范围内的角色造成X点雷电伤害，X为所弃<font color="Fuchsia">愿力</font>标记数；②锁定技，游戏开始时，你获得<font color="Fuchsia">雷罚恶曜之眼</font>标记和一枚<font color="Fuchsia">愿力</font>标记。]],
+  [":jy_zhenshuo"] = [[①出牌阶段限一次，你弃所有<font color="Fuchsia">愿力</font>来对一名攻击范围内的角色造成X点雷电伤害，X为<font color="Fuchsia">愿力</font>数；②锁定技，游戏开始时，你获得<font color="Fuchsia">雷罚恶曜之眼</font>和一枚<font color="Fuchsia">愿力</font>。]],
   ["$jy_zhenshuo1"] = "此刻，寂灭之时！",
   ["$jy_zhenshuo2"] = "稻光，亦是永恒！",
   ["$jy_zhenshuo3"] = "无念，断绝！",
@@ -2248,7 +2251,7 @@ jy__nav:addSkill(jy_leihuan)
 jy__nav:addSkill(jy_chaolai)
 
 Fk:loadTranslationTable {
-  ["jy__nav"] = [[那维莱特（未完成）]],
+  ["jy__nav"] = [[未完成]],
 
   ["jy_shuilong"] = "水龙",
   [":jy_shuilong"] = [[锁定技，你的牌均视为【重击】。<br>【重击】：基本牌。出牌阶段限一次，对上家或下家使用。你失去8次共8体力，在第1、4、7次失去体力时对目标造成1点伤害。]],
