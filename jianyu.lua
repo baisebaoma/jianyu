@@ -2231,15 +2231,15 @@ Fk:loadTranslationTable {
 local jy__nav = General(extension, "jy__nav", "god", 16)
 jy__nav.visible = false
 
-local jy_shuilong = fk.CreateViewAsSkill {
+local jy_shuilong = fk.CreateTriggerSkill {
   name = "jy_shuilong",
 }
 
-local jy_leihuan = fk.CreateViewAsSkill {
+local jy_leihuan = fk.CreateTriggerSkill {
   name = "jy_leihuan",
 }
 
-local jy_chaolai = fk.CreateViewAsSkill {
+local jy_chaolai = fk.CreateTriggerSkill {
   name = "jy_chaolai",
 }
 
