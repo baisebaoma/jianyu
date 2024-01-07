@@ -559,8 +559,8 @@ Fk:loadTranslationTable {
   ["jy__gaotianliang"] = "高天亮",
 
   ["jy_yuyu"] = "玉玉",
-  [":jy_yuyu"] = [[1. 锁定技，当有角色对你使用【杀】造成了伤害时，其获得“致郁”标记；<br>
-  2. 受到没有“致郁”标记的角色或因本次伤害而获得“致郁”标记的角色造成的伤害时，你可以选择一项：摸3张牌；摸4张牌并翻面，然后对自己造成1点伤害。]],
+  [":jy_yuyu"] = [[①锁定技，当有角色对你使用【杀】造成了伤害时，其获得“致郁”标记；<br>
+  ②受到没有“致郁”标记的角色或因本次伤害而获得“致郁”标记的角色造成的伤害时，你可以选择一项：摸3张牌；摸4张牌并翻面，然后对自己造成1点伤害。]],
   ["@jy_yuyu_enemy"] = "致郁",
   ["#jy_yuyu_ask_which"] = "玉玉：请选择你要触发的效果",
   ["#jy_yuyu_draw3"] = "摸3张牌",
@@ -899,8 +899,8 @@ Fk:loadTranslationTable {
 
   ["jy_luojiao"] = "罗绞",
   [":jy_luojiao"] = [[当“点”数量变化后：<br>
-  1. 若你没有两张及以上相同花色的“点”，可以视为立即使用一张【南蛮入侵】；<br>
-  2. 若你有4张“点”，可以视为立即使用一张【万箭齐发】。]],
+  若你没有两张及以上相同花色的“点”，可以视为立即使用一张【南蛮入侵】；<br>
+  若你有4张“点”，可以视为立即使用一张【万箭齐发】。]],
   ["$jy_luojiao1"] = "Muchas gracias afición, esto es para vosotros, Siuuu!!",
   ["#jy_luojiao_after"] = "罗绞",
   ["#jy_luojiao_archery_attack"] = "罗绞·万箭",
@@ -1824,7 +1824,7 @@ Fk:loadTranslationTable {
 
 }
 
-local jy__raiden = General(extension, "jy__raiden", "god", 3, 3, General.Female)
+local jy__raiden = General(extension, "jy__raiden", "god", 4, 4, General.Female)
 
 local jy_leiyan = fk.CreateActiveSkill {
   name = "jy_leiyan",
@@ -1874,7 +1874,7 @@ local jy_leiyan_trigger = fk.CreateTriggerSkill {
     if not data.from then return false end -- 如果这次伤害没有伤害来源，就不用看了
     local from = data.from
     return from:getMark("@jy_raiden_leiyan") ~= 0 and player:hasSkill(self)
-        and not data.is_leiyan
+    -- and not data.is_leiyan
   end,
   on_use = function(self, event, target, player, data)
     local room = player.room
@@ -1892,6 +1892,11 @@ local jy_leiyan_trigger = fk.CreateTriggerSkill {
       room:doIndicate(from.id, { player.id }) -- 播放指示线，意思是“令我获得了一点愿力”
       player:broadcastSkillInvoke("jy_leiyan")
       room:addPlayerMark(player, "@jy_raiden_yuanli")
+      for _, p in ipairs(room:getAlivePlayers()) do
+        if p:getMark("@jy_raiden_leiyan") ~= 0 and not p.dead then
+          p:drawCards(data.damage)
+        end
+      end
     elseif judge.card.color == Card.Black then
       if not target.dead then
         player:broadcastSkillInvoke("jy_leiyan")
@@ -1902,7 +1907,7 @@ local jy_leiyan_trigger = fk.CreateTriggerSkill {
           damage = 1,
           damageType = fk.ThunderDamage,
           skillName = "jy_leiyan",
-          is_leiyan = true,
+          -- is_leiyan = true,
         })
       end
     end
@@ -1935,23 +1940,30 @@ local jy_zhenshuo = fk.CreateActiveSkill {
 
     -- TODO:参考mobile_effect，写一个超牛逼的动画
     -- room:doSuperLightBox("packages/jianyu/qml/FirstBlood.qml")
-    room:delay(700)
+    room:delay(500)
 
     room:damage({
       from = player,
       to = to,
-      damage = 1,
+      damage = dmg,
       damageType = fk.ThunderDamage,
-      skillName = "jy_leiyan",
+      skillName = self.name,
     })
-
-    for _, p in ipairs(room:getAlivePlayers()) do
-      if p:getMark("@jy_raiden_leiyan") ~= 0 and not p.dead then
-        p:drawCards(2 * dmg)
-      end
-    end
   end,
 }
+local jy_zhenshuo_game_start = fk.CreateTriggerSkill {
+  name = "#jy_zhenshuo_game_start",
+  mute = true,
+  anim_type = "support",
+  frequency = Skill.Compulsory,
+  events = { fk.GameStart },
+  on_use = function(self, event, target, player, data)
+    local room = player.room
+    room:addPlayerMark(player, "@jy_raiden_leiyan")
+    room:addPlayerMark(player, "@jy_raiden_yuanli")
+  end,
+}
+jy_zhenshuo:addRelatedSkill(jy_zhenshuo_game_start)
 
 jy__raiden:addSkill(jy_leiyan)
 jy__raiden:addSkill(jy_zhenshuo)
@@ -1961,7 +1973,7 @@ Fk:loadTranslationTable {
   ["~jy__raiden"] = "浮世一梦……",
 
   ["jy_leiyan"] = "雷眼",
-  [":jy_leiyan"] = [[出牌阶段，你令至少一名角色获得<font color="Fuchsia">雷罚恶曜之眼</font>标记。<br><font color="Fuchsia">雷罚恶曜之眼</font>：拥有该标记的角色造成伤害后，你进行一次判定，若为：红色，你获得1枚<font color="Fuchsia">愿力</font>标记；黑色，你对伤害目标造成1点雷电伤害（不会触发〖雷眼〗）。]],
+  [":jy_leiyan"] = [[出牌阶段，你令至少一名角色获得<font color="Fuchsia">雷罚恶曜之眼</font>标记。<br><font color="Fuchsia">雷罚恶曜之眼</font>：拥有该标记的角色造成伤害后，你进行一次判定，若为：黑色，你对伤害目标造成1点雷电伤害，该伤害可以继续触发〖雷眼〗；红色，所有持有<font color="Fuchsia">雷罚恶曜之眼</font>的角色各摸X张牌，然后你获得1枚<font color="Fuchsia">愿力</font>标记，X为伤害值。]],
   ["@jy_raiden_leiyan"] = [[<font color="Fuchsia">雷罚恶曜之眼</font>]],
   ["@jy_raiden_yuanli"] = [[<font color="Fuchsia">愿力</font>]],
   ["#jy_leiyan_trigger"] = "雷眼",
@@ -1971,7 +1983,7 @@ Fk:loadTranslationTable {
   ["#jy_yuanli_full"] = [[<font color="Fuchsia">愿力</font>已满！]],
 
   ["jy_zhenshuo"] = "真说",
-  [":jy_zhenshuo"] = [[出牌阶段限一次，你弃所有<font color="Fuchsia">愿力</font>标记来对一名攻击范围内的角色造成1点雷电伤害，然后所有持有<font color="Fuchsia">雷罚恶曜之眼</font>的角色摸2X张牌，X等同于所弃<font color="Fuchsia">愿力</font>标记数。]],
+  [":jy_zhenshuo"] = [[①出牌阶段限一次，你弃所有<font color="Fuchsia">愿力</font>标记来对一名攻击范围内的角色造成X点雷电伤害，X为所弃<font color="Fuchsia">愿力</font>标记数；②锁定技，游戏开始时，你获得<font color="Fuchsia">雷罚恶曜之眼</font>标记和一枚<font color="Fuchsia">愿力</font>标记。]],
   ["$jy_zhenshuo1"] = "此刻，寂灭之时！",
   ["$jy_zhenshuo2"] = "稻光，亦是永恒！",
   ["$jy_zhenshuo3"] = "无念，断绝！",
