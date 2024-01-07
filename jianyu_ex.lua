@@ -92,14 +92,14 @@ Fk:loadTranslationTable {
 }
 
 -- 阿威罗
-local aweiluo = General(extension, "jy_ex__aweiluo", "qun", 4)
+local aweiluo = General(extension, "jy_ex__aweiluo", "qun", 3)
 
 -- 玉玊
 local jy_yusu = fk.CreateTriggerSkill {
   name = "jy_yusu_ex",
   anim_type = "special",
 
-  events = { fk.CardUsing },
+  events = { fk.CardUsing, fk.CardResponding },
   can_trigger = function(self, event, target, player, data)
     if not player:hasSkill(self) then return false end
     if data.card and
@@ -122,12 +122,13 @@ aweiluo:addSkill(jy_yusu)
 aweiluo:addSkill("jy_tiaoshui")
 aweiluo:addSkill("jy_zishang_ex")
 aweiluo:addSkill("jy_luojiao")
+aweiluo:addSkill("jy_youlong")
 
 Fk:loadTranslationTable {
   ["jy_ex__aweiluo"] = "界阿威罗",
 
   ["jy_yusu_ex"] = "玉玊",
-  [":jy_yusu_ex"] = "使用一张非虚拟牌时，可以将其作为“点”置于武将牌上。",
+  [":jy_yusu_ex"] = "使用或打出一张非虚拟牌时，可以将其作为“点”置于武将牌上。",
   ["$jy_yusu_ex1"] = "Siu...",
 
   ["~jy_ex__aweiluo"] = "Messi, Messi, Messi, Messi...",
