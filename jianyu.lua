@@ -2109,7 +2109,7 @@ local jy_jieyin = fk.CreateActiveSkill {
     local player = room:getPlayerById(use.from)
     for _, to in ipairs(use.tos) do
       local p = room:getPlayerById(to)
-      -- room:changeMaxHp(player, -1)
+      room:changeMaxHp(player, -1)
       -- 治疗其
       room:recover({
         who = p,
@@ -2143,9 +2143,10 @@ local jy_jieyin = fk.CreateActiveSkill {
 local jy_lihun = fk.CreateActiveSkill {
   name = "jy_lihun",
   anim_type = "masochism",
+  frequency = fk.Limited,
   can_use = function(self, player)
     if player:usedSkillTimes("jy_jieyin", Player.HistoryGame) == 0 then return false end
-    if player:usedSkillTimes(self.name) ~= 0 then return false end
+    if player:usedSkillTimes(self.name, Player.HistoryGame) ~= 0 then return false end
     return true
   end,
   card_filter = function(self, card)
@@ -2157,7 +2158,7 @@ local jy_lihun = fk.CreateActiveSkill {
   end,
   on_use = function(self, room, effect)
     local from = room:getPlayerById(effect.from)
-    room:changeMaxHp(from, -2)
+    room:changeMaxHp(from, -1)
     from:setSkillUseHistory("jy_jieyin", 0, Player.HistoryGame)
   end,
 }
@@ -2209,23 +2210,25 @@ Fk:loadTranslationTable {
   [":jy_xiannu"] = [[限定技，出牌阶段，你可以对一名未受伤的男性角色造成1点伤害。]],
 
   ["jy_jieyin"] = "结姻",
-  [":jy_jieyin"] = [[限定技，出牌阶段，你可以令一名已受伤的男性角色回复3点体力，然后你获得其所有牌并拥有其所有技能。]],
+  [":jy_jieyin"] = [[限定技，出牌阶段，你可以减少一点体力上限、令一名已受伤的男性角色回复3点体力，然后你获得其所有牌并拥有其所有技能。]],
 
   ["jy_lihun"] = "离婚",
-  [":jy_lihun"] = [[出牌阶段限一次，你可以减少2点体力上限使〖结姻〗视为未发动过。]],
+  [":jy_lihun"] = [[限定技，你可以减少一点体力上限使〖结姻〗视为未发动过。]],
 }
 
+local jy__nav = General(extension, "jy__nav", "god", 12)
+
 Fk:loadTranslationTable {
-  ["jy__nav"] = [[那维莱特 12 12]],
+  ["jy__nav"] = [[那维莱特 16 16]],
 
   ["jy_shuilong"] = "水龙",
-  [":jy_shuilong"] = [[锁定技，你的所有牌均视为【杀】；你的【杀】改为：出牌阶段，对上家/下家使用。你失去5体力，对目标及其上家/下家造成共2点伤害。]],
+  [":jy_shuilong"] = [[锁定技，你的牌均视为【重击】。<br>【重击】：出牌阶段限一次，对上家或下家使用。你失去8次共8体力，在第1、4、7次失去体力时对目标造成1点伤害。]],
 
   ["jy_leihuan"] = "泪还",
-  [":jy_leihuan"] = [[出牌阶段限一次，你回复5体力，然后可以视为使用一张【杀】。]],
+  [":jy_leihuan"] = [[每轮限一次，你回复9体力，然后可以使用一张不计入次数的【重击】。]],
 
   ["jy_chaolai"] = "潮来",
-  [":jy_chaolai"] = [[限定技，你本回合所有【杀】结算2次。]],
+  [":jy_chaolai"] = [[限定技，出牌阶段，你使〖泪还〗视为未发动过。]],
 }
 
 -- for k, v in pairs(Fk.translations["zh_CN"]) do

@@ -92,7 +92,7 @@ Fk:loadTranslationTable {
 }
 
 -- 阿威罗
-local aweiluo = General(extension, "jy_ex__aweiluo", "qun", 2)
+local aweiluo = General(extension, "jy_ex__aweiluo", "qun", 4)
 
 -- 玉玊
 local jy_yusu = fk.CreateTriggerSkill {
@@ -145,7 +145,7 @@ Fk:loadTranslationTable {
 }
 
 
-local liuxian = General(extension, "jy_ex__liuxian", "god", 1, 1, General.Female)
+local liuxian = General(extension, "jy_ex__liuxian", "god", 3, 3, General.Female)
 
 
 local jieyin = fk.CreateActiveSkill {
@@ -174,7 +174,7 @@ local jieyin = fk.CreateActiveSkill {
       local p = room:getPlayerById(to)
 
       room:setPlayerMark(p, "@jy_jieyin_ex", "")
-      -- room:changeMaxHp(player, -1)
+      room:changeMaxHp(player, -1)
       -- 治疗其
       room:recover({
         who = p,
@@ -221,7 +221,7 @@ local lihun = fk.CreateActiveSkill {
   end,
   on_use = function(self, room, effect)
     local from = room:getPlayerById(effect.from)
-    room:changeMaxHp(from, -1)
+    room:changeMaxHp(from, -2)
     from:setSkillUseHistory("jy_jieyin_ex", 0, Player.HistoryGame)
   end,
 }
@@ -319,17 +319,16 @@ local meishu_get_card = fk.CreateTriggerSkill {
 liuxian:addSkill(jieyin)
 liuxian:addSkill(lihun)
 liuxian:addSkill(meishu)
--- liuxian:addSkill("jy_xiannu")
 
 Fk:loadTranslationTable {
   ["jy_ex__liuxian"] = [[界刘仙]],
   ["@jy_jieyin_ex"] = "结姻",
 
   ["jy_jieyin_ex"] = "结姻",
-  [":jy_jieyin_ex"] = [[限定技，出牌阶段，你可以令一名已受伤的男性角色回复3点体力，然后你获得其所有牌并拥有其所有技能。]],
+  [":jy_jieyin_ex"] = [[限定技，出牌阶段，你可以减少一点体力上限、令一名已受伤的男性角色回复3点体力，然后你获得其所有牌并拥有其所有技能。]],
 
   ["jy_lihun_ex"] = "离婚",
-  [":jy_lihun_ex"] = [[出牌阶段，你可以减少一点体力上限使〖结姻〗视为未发动过。]],
+  [":jy_lihun_ex"] = [[出牌阶段，你可以减少2点体力上限使〖结姻〗视为未发动过。]],
 
   ["jy_meishu_ex"] = "美鼠",
   [":jy_meishu_ex"] = [[锁定技，被〖结姻〗过的角色造成伤害后，你增加一点体力上限。]],
