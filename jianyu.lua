@@ -137,7 +137,7 @@ local jy_kaiju = fk.CreateTriggerSkill {
 
 jy__jianzihao:addSkill(jy_kaiju)
 jy__jianzihao:addSkill(jy_hongwen)
-jy__jianzihao:addSkill(jy_zouwei)  -- 走位令玩家感到困惑，建议删掉
+jy__jianzihao:addSkill(jy_zouwei) -- 走位令玩家感到困惑，建议删掉
 jy__jianzihao:addSkill(jy_shengnu)
 jy__jianzihao:addSkill(jy_xizao)
 -- jy__jianzihao:addSkill("guixin")
@@ -1824,7 +1824,7 @@ Fk:loadTranslationTable {
 
 }
 
-local jy__raiden = General(extension, "jy__raiden", "god", 4, 4, General.Female)
+local jy__raiden = General(extension, "jy__raiden", "god", 3, 3, General.Female)
 
 local jy_leiyan = fk.CreateActiveSkill {
   name = "jy_leiyan",
@@ -1888,10 +1888,7 @@ local jy_leiyan_trigger = fk.CreateTriggerSkill {
     room:judge(judge)
 
     if judge.card.color == Card.Red then
-      local marks = player:getMark("@jy_raiden_yuanli")
-      room:doIndicate(from.id, { player.id }) -- 播放指示线，意思是“令我获得了一点愿力”
       player:broadcastSkillInvoke("jy_leiyan")
-      room:addPlayerMark(player, "@jy_raiden_yuanli")
       for _, p in ipairs(room:getAlivePlayers()) do
         if p:getMark("@jy_raiden_leiyan") ~= 0 and not p.dead then
           p:drawCards(data.damage)
@@ -1915,67 +1912,60 @@ local jy_leiyan_trigger = fk.CreateTriggerSkill {
 }
 jy_leiyan:addRelatedSkill(jy_leiyan_trigger)
 
-local jy_zhenshuo = fk.CreateActiveSkill {
-  name = "jy_zhenshuo",
-  anim_type = "offensive",
-  can_use = function(self, player)
-    return player:getMark("@jy_raiden_yuanli") ~= 0
-        and player:usedSkillTimes(self.name, Player.HistoryPhase) == 0
-  end,
-  card_filter = function(self, to_select, selected, selected_targets)
-    return false
-  end,
-  card_num = 0,
-  target_filter = function(self, to_select, selected)
-    return to_select ~= Self.id and Self:inMyAttackRange(Fk:currentRoom():getPlayerById(to_select))
-  end,
-  target_num = 1,
-  on_use = function(self, room, use)
-    local player = room:getPlayerById(use.from)
-    local to = room:getPlayerById(use.tos[1])
-    local dmg = player:getMark("@jy_raiden_yuanli")
-    room:setPlayerMark(player, "@jy_raiden_yuanli", 0)
+-- local jy_zhenshuo = fk.CreateActiveSkill {
+--   name = "jy_zhenshuo",
+--   anim_type = "offensive",
+--   can_use = function(self, player)
+--     return player:usedSkillTimes(self.name, Player.HistoryPhase) == 0
+--   end,
+--   card_filter = function(self, to_select, selected, selected_targets)
+--     return false
+--   end,
+--   card_num = 0,
+--   target_filter = function(self, to_select, selected)
+--     return to_select ~= Self.id and Self:inMyAttackRange(Fk:currentRoom():getPlayerById(to_select))
+--   end,
+--   target_num = 1,
+--   on_use = function(self, room, use)
+--     local player = room:getPlayerById(use.from)
+--     local to = room:getPlayerById(use.tos[1])
+--     local dmg = 1
+--     room:delay(500)
 
-    -- room:throwCard(use.cards, self.name, player, player)  -- 因为现在不需要弃牌，所以不需要这一行（当然加上了也没关系）
-
-    -- TODO:参考mobile_effect，写一个超牛逼的动画
-    -- room:doSuperLightBox("packages/jianyu/qml/FirstBlood.qml")
-    room:delay(500)
-
-    room:damage({
-      from = player,
-      to = to,
-      damage = dmg,
-      damageType = fk.ThunderDamage,
-      skillName = self.name,
-    })
-  end,
-}
-local jy_zhenshuo_game_start = fk.CreateTriggerSkill {
-  name = "#jy_zhenshuo_game_start",
-  mute = true,
-  anim_type = "support",
-  frequency = Skill.Compulsory,
-  events = { fk.GameStart },
-  can_trigger = function(self, event, target, player, data)
-    return player:hasSkill(self)
-  end,
-  on_use = function(self, event, target, player, data)
-    local room = player.room
-    room:addPlayerMark(player, "@jy_raiden_yuanli")
-  end,
-}
-jy_zhenshuo:addRelatedSkill(jy_zhenshuo_game_start)
+--     room:damage({
+--       from = player,
+--       to = to,
+--       damage = dmg,
+--       damageType = fk.ThunderDamage,
+--       skillName = self.name,
+--     })
+--   end,
+-- }
+-- local jy_zhenshuo_game_start = fk.CreateTriggerSkill {
+--   name = "#jy_zhenshuo_game_start",
+--   mute = true,
+--   anim_type = "support",
+--   frequency = Skill.Compulsory,
+--   events = { fk.GameStart },
+--   can_trigger = function(self, event, target, player, data)
+--     return player:hasSkill(self)
+--   end,
+--   on_use = function(self, event, target, player, data)
+--     local room = player.room
+--     room:addPlayerMark(player, "@jy_raiden_yuanli")
+--   end,
+-- }
+-- jy_zhenshuo:addRelatedSkill(jy_zhenshuo_game_start)
 
 jy__raiden:addSkill(jy_leiyan)
-jy__raiden:addSkill(jy_zhenshuo)
+-- jy__raiden:addSkill(jy_zhenshuo)
 
 Fk:loadTranslationTable {
   ["jy__raiden"] = [[雷电将军]],
   ["~jy__raiden"] = "浮世一梦……",
 
   ["jy_leiyan"] = "雷眼",
-  [":jy_leiyan"] = [[出牌阶段，你令至少一名角色获得<font color="Fuchsia">雷罚恶曜之眼</font>标记。<br><font color="Fuchsia">雷罚恶曜之眼</font>：拥有该标记的角色造成伤害后，你进行一次判定，若为：黑色，你对伤害目标造成1点雷电伤害，该伤害可以继续触发〖雷眼〗；红色，持有<font color="Fuchsia">雷罚恶曜之眼</font>的角色各摸X张牌，然后你获得一枚<font color="Fuchsia">愿力</font>标记，X为伤害值。]],
+  [":jy_leiyan"] = [[出牌阶段，你令至少一名角色获得<font color="Fuchsia">雷罚恶曜之眼</font>标记。拥有该标记的角色造成伤害后，你进行一次判定，若为：黑色，你对伤害目标造成1点雷电伤害（可以触发〖雷眼〗）；红色，持有<font color="Fuchsia">雷罚恶曜之眼</font>的角色各摸X张牌，X为伤害值。]],
   ["@jy_raiden_leiyan"] = [[<font color="Fuchsia">雷罚恶曜之眼</font>]],
   ["@jy_raiden_yuanli"] = [[<font color="Fuchsia">愿力</font>]],
   ["#jy_leiyan_trigger"] = "雷眼",
@@ -1985,7 +1975,7 @@ Fk:loadTranslationTable {
   ["#jy_yuanli_full"] = [[<font color="Fuchsia">愿力</font>已满！]],
 
   ["jy_zhenshuo"] = "真说",
-  [":jy_zhenshuo"] = [[①出牌阶段限一次，你弃所有<font color="Fuchsia">愿力</font>来对一名攻击范围内的角色造成X点雷电伤害，X为<font color="Fuchsia">愿力</font>数；②锁定技，游戏开始时，你获得一枚<font color="Fuchsia">愿力</font>。]],
+  [":jy_zhenshuo"] = [[出牌阶段限一次，你对一名攻击范围内的角色造成1点雷电伤害。]],
   ["$jy_zhenshuo1"] = "此刻，寂灭之时！",
   ["$jy_zhenshuo2"] = "稻光，亦是永恒！",
   ["$jy_zhenshuo3"] = "无念，断绝！",
