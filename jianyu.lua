@@ -137,7 +137,7 @@ local jy_kaiju = fk.CreateTriggerSkill {
 
 jy__jianzihao:addSkill(jy_kaiju)
 jy__jianzihao:addSkill(jy_hongwen)
--- jy__jianzihao:addSkill(jy_zouwei)  -- 走位令玩家感到困惑，建议删掉
+jy__jianzihao:addSkill(jy_zouwei)  -- 走位令玩家感到困惑，建议删掉
 jy__jianzihao:addSkill(jy_shengnu)
 jy__jianzihao:addSkill(jy_xizao)
 -- jy__jianzihao:addSkill("guixin")
@@ -276,7 +276,7 @@ local jy_xizao_2 = fk.CreateTriggerSkill {
 jy__jianzihao:addSkill(jy_kaiju_2)
 jy__jianzihao:addSkill(jy_sanjian)
 jy__jianzihao:addSkill("jy_hongwen")
--- jy__jianzihao:addSkill("jy_zouwei")
+jy__jianzihao:addSkill("jy_zouwei")
 jy__jianzihao:addSkill("jy_shengnu")
 jy__jianzihao:addSkill("jy_xizao")
 

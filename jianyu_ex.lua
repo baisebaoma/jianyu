@@ -41,9 +41,7 @@ local jianzihao = General(extension, "jy_ex__jianzihao", "qun", 4)
 jianzihao:addSkill("jy_kaiju_2")
 jianzihao:addSkill("guixin")
 jianzihao:addSkill("jy_sanjian")
-jianzihao:addSkill("jy_hongwen")
 jianzihao:addSkill("jy_shengnu")
-jianzihao:addSkill("jy_xizao")
 
 Fk:loadTranslationTable {
   ["jy_ex__jianzihao"] = "界简自豪",
@@ -243,80 +241,7 @@ local meishu = fk.CreateTriggerSkill {
     room:changeMaxHp(player, 1)
   end,
 }
-local meishu_respond = fk.CreateTriggerSkill {
-  name = "#jy_meishu_respond",
-  -- TODO
-}
-local meishu_get_card = fk.CreateTriggerSkill {
-  mute = true,
-  name = "#meishu_get_card",
-  anim_type = "drawcard",
-  events = { fk.AfterCardsMove },
-  can_trigger = function(self, event, target, player, data)
-    if player:hasSkill(self) then
-      for _, move in ipairs(data) do
-        if move.extra_data and move.extra_data.jieyin_ex then
-          for _, id in ipairs(move.extra_data.jieyin_ex) do
-            if player.room:getCardArea(id) == Card.DiscardPile then
-              return true
-            end
-          end
-        end
-      end
-    end
-  end,
-  on_use = function(self, event, target, player, data)
-    player:broadcastSkillInvoke(meishu.name)
-    local room = player.room
-    local ids = {}
-    for _, move in ipairs(data) do
-      if move.extra_data and move.extra_data.jieyin_ex then
-        for _, id in ipairs(move.extra_data.jieyin_ex) do
-          if room:getCardArea(id) == Card.DiscardPile then
-            table.insertIfNeed(ids, id)
-          end
-        end
-      end
-    end
-    local cards = room:askForCardsChosen(player, player, 1, #ids, { card_data = { { self.name, ids } } }, self.name)
-    if #cards > 0 then
-      local dummy = Fk:cloneCard("dilu")
-      dummy:addSubcards(cards)
-      room:obtainCard(player.id, dummy, true, fk.ReasonJustMove)
-    end
-  end,
 
-  refresh_events = { fk.BeforeCardsMove },
-  can_refresh = function(self, event, target, player, data)
-    if player:hasSkill(self) then
-      for _, move in ipairs(data) do
-        if (move.from and move.from ~= player.id and Fk:currentRoom():getPlayerById(move.from):getMark("@jy_jieyin_ex") ~= 0) and
-            move.toArea == Card.DiscardPile then
-          return true
-        end
-      end
-    end
-  end,
-  on_refresh = function(self, event, target, player, data)
-    for _, move in ipairs(data) do
-      if (not move.from or move.from ~= player.id) and (move.moveReason == fk.ReasonDiscard or move.moveReason == fk.ReasonJudge) and
-          move.toArea == Card.DiscardPile then
-        local ids = {}
-        for _, info in ipairs(move.moveInfo) do
-          table.insertIfNeed(ids, info.cardId)
-        end
-        if #ids > 0 then
-          move.extra_data = move.extra_data or {}
-          move.extra_data.jieyin_ex = ids
-        end
-      end
-    end
-  end,
-}
--- meishu:addRelatedSkill(meishu_respond)
--- meishu:addRelatedSkill(meishu_get_card)
-
--- liuxian:addSkill("jy_xiannu")
 liuxian:addSkill(jieyin)
 liuxian:addSkill(lihun)
 liuxian:addSkill(meishu)
