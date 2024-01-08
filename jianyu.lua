@@ -1824,7 +1824,7 @@ Fk:loadTranslationTable {
 
 }
 
-local jy__raiden = General(extension, "jy__raiden", "god", 3, 3, General.Female)
+local jy__raiden = General(extension, "jy__raiden", "god", 4, 4, General.Female)
 
 local jy_leiyan = fk.CreateActiveSkill {
   name = "jy_leiyan",
