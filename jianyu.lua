@@ -1689,7 +1689,8 @@ local jy_tianling = fk.CreateViewAsSkill {
     local names = {}
     for _, id in ipairs(Fk:getAllCardIds()) do
       local card = Fk:getCardById(id)
-      if card:isCommonTrick() and card.trueName ~= "ex_nihilo" -- and card.trueName ~= "snatch"
+      if card:isCommonTrick() and card.trueName ~= "ex_nihilo"
+          and card.trueName ~= "snatch" and card.trueName ~= "amazing_grace"
           and not card.is_derived and
           ((Fk.currentResponsePattern == nil and Self:canUse(card)) or
             (Fk.currentResponsePattern and Exppattern:Parse(Fk.currentResponsePattern):match(card))) then
@@ -1812,7 +1813,7 @@ Fk:loadTranslationTable {
   ["jy__mou__gaotianliang"] = "高天亮",
 
   ["jy_tianling"] = "天灵",
-  [":jy_tianling"] = [[弃牌阶段开始时，你可以弃置两张牌或失去一点体力。若如此做，你的下一个回合：准备阶段后执行一个额外的出牌阶段；判定阶段结束前，你的手牌可当作除【无中生有】外所有锦囊牌使用。]],
+  [":jy_tianling"] = [[弃牌阶段开始时，你可以弃置两张牌或失去一点体力。若如此做，你的下一个回合：准备阶段后执行一个额外的出牌阶段；判定阶段结束前，你的手牌可当作除【无中生有】、【顺手牵羊】、【五谷丰登】外所有锦囊牌使用。]],
   ["@jy_tianling"] = "天灵",
   ["#jy_tianling_1hp"] = "失去一点体力",
   ["#jy_tianling_2cards"] = "弃置2张牌",
@@ -2205,7 +2206,7 @@ local jy_xiannu = fk.CreateActiveSkill {
 
 -- jy__liuxian:addSkill(jy_xiannu)
 jy__liuxian:addSkill(jy_jieyin)
-jy__liuxian:addSkill(jy_lihun)
+-- jy__liuxian:addSkill(jy_lihun)
 
 Fk:loadTranslationTable {
   ["jy__liuxian"] = [[刘仙]],
