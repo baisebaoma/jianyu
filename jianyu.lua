@@ -2230,6 +2230,7 @@ local jy_budeng = fk.CreateTriggerSkill {
 }
 -- 不能受到伤害
 local jy_budeng_damaged = fk.CreateTriggerSkill {
+  mute = true,
   name = "#jy_budeng_damaged",
   frequency = Skill.Compulsory,
   events = { fk.DamageInflicted },
@@ -2238,11 +2239,13 @@ local jy_budeng_damaged = fk.CreateTriggerSkill {
     return target == player
   end,
   on_use = function(self, event, target, player, data)
+    player:broadcastSkillInvoke("jy_budeng")
     data.damage = 0
   end,
 }
 -- 跳过弃牌阶段
 local jy_budeng_discard = fk.CreateTriggerSkill {
+  mute = true,
   frequency = Skill.Compulsory,
   name = "#jy_budeng_discard",
   anim_type = "defensive",
@@ -2257,11 +2260,13 @@ local jy_budeng_discard = fk.CreateTriggerSkill {
     end
   end,
   on_use = function(self, event, target, player, data)
+    player:broadcastSkillInvoke("jy_budeng")
     return true
   end
 }
 -- 对救了你的造成伤害
 local jy_budeng_heal = fk.CreateTriggerSkill {
+  mute = true,
   frequency = Skill.Compulsory,
   name = "#jy_budeng_heal",
   anim_type = "defensive",
@@ -2270,6 +2275,7 @@ local jy_budeng_heal = fk.CreateTriggerSkill {
     return data.to == player and player:hasSkill(self) and data.from ~= player
   end,
   on_use = function(self, event, target, player, data)
+    player:broadcastSkillInvoke("jy_budeng")
     local room = player.room
     room:damage({
       from = player,
@@ -2280,16 +2286,24 @@ local jy_budeng_heal = fk.CreateTriggerSkill {
     })
   end
 }
--- 对救了你的造成伤害
+-- 对回合内使你摸了牌的造成伤害
 local jy_budeng_card = fk.CreateTriggerSkill {
+  mute = true,
   frequency = Skill.Compulsory,
   name = "#jy_budeng_card",
   anim_type = "offensive",
   events = { fk.AfterCardsMove },
   can_trigger = function(self, event, target, player, data)
-    return player:hasSkill(self) and data.to == player and player.phase == Player.NotActive
+    if not player:hasSkill(self) then return end
+    if player.phase ~= Player.NotActive then return end
+    for _, move in ipairs(data) do
+      if move.to == player.id then
+        return true
+      end
+    end
   end,
   on_use = function(self, event, target, player, data)
+    player:broadcastSkillInvoke("jy_budeng")
     local room = player.room
     room:damage({
       from = player,
@@ -2298,6 +2312,7 @@ local jy_budeng_card = fk.CreateTriggerSkill {
       damageType = fk.NormalDamage,
       skillName = "jy_budeng",
     })
+    room:loseHp(player, 1)
   end
 }
 jy_budeng:addRelatedSkill(jy_budeng_damaged)
@@ -2311,7 +2326,7 @@ Fk:loadTranslationTable {
   ["jy__tangniu"] = [[唐妞]],
 
   ["jy_budeng"] = "不等",
-  [":jy_budeng"] = [[锁定技：<br>受到伤害≠我扣血：你受到伤害时，防止之；<br>牌比血多≠我要弃：你跳过弃牌阶段；<br>你救了我≠你是友：其他角色使你回复体力时，你对其造成一点伤害；<br>接受礼物≠我同意：你于其他角色的回合内获得牌时，你对其造成一点伤害。]],
+  [":jy_budeng"] = [[锁定技：<br>受到伤害≠我扣血：你受到伤害时，防止之；<br>牌比血多≠我要弃：你跳过弃牌阶段；<br>你救了我≠你是友：其他角色使你回复体力时，你对其造成一点伤害；<br>接受礼物≠我同意：你于其他角色的回合内获得牌时，你对其造成一点伤害，然后你失去一点体力。]],
 }
 
 -- for k, v in pairs(Fk.translations["zh_CN"]) do
