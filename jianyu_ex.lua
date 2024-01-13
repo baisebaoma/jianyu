@@ -64,7 +64,7 @@ local jieyin = fk.CreateActiveSkill {
       local p = room:getPlayerById(to)
 
       room:setPlayerMark(p, "@jy_jieyin_ex", "")
-      room:changeMaxHp(player, -1)
+      -- room:changeMaxHp(player, -1)
       -- 治疗其
       room:recover({
         who = p,
@@ -131,7 +131,7 @@ liuxian:addSkill(lihun)
 liuxian:addSkill(meishu)
 
 Fk:loadTranslationTable {
-  ["jy_ex__liuxian"] = [[界刘仙]],
+  ["jy_ex__liuxian"] = [[刘仙]],
   ["@jy_jieyin_ex"] = "结姻",
 
   ["jy_jieyin_ex"] = "结姻",
