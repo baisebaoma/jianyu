@@ -2240,6 +2240,12 @@ local jy_budeng_damaged = fk.CreateTriggerSkill {
   end,
   on_use = function(self, event, target, player, data)
     player:broadcastSkillInvoke("jy_budeng")
+    player.room:doAnimate("InvokeSkill", {
+      name = "jy_budeng",
+      player = player.id,
+      skill_type = "defensive",
+    })
+
     data.damage = 0
   end,
 }
@@ -2261,6 +2267,12 @@ local jy_budeng_discard = fk.CreateTriggerSkill {
   end,
   on_use = function(self, event, target, player, data)
     player:broadcastSkillInvoke("jy_budeng")
+    player.room:doAnimate("InvokeSkill", {
+      name = "jy_budeng",
+      player = player.id,
+      skill_type = "defensive",
+    })
+
     return true
   end
 }
@@ -2276,6 +2288,12 @@ local jy_budeng_heal = fk.CreateTriggerSkill {
   end,
   on_use = function(self, event, target, player, data)
     player:broadcastSkillInvoke("jy_budeng")
+    player.room:doAnimate("InvokeSkill", {
+      name = "jy_budeng",
+      player = player.id,
+      skill_type = "offensive",
+    })
+
     local room = player.room
     room:damage({
       from = player,
@@ -2305,14 +2323,13 @@ local jy_budeng_card = fk.CreateTriggerSkill {
   end,
   on_use = function(self, event, target, player, data)
     player:broadcastSkillInvoke("jy_budeng")
-    local room = player.room
-    room:damage({
-      from = player,
-      to = room.current,
-      damage = 1,
-      damageType = fk.NormalDamage,
-      skillName = "jy_budeng",
+    player.room:doAnimate("InvokeSkill", {
+      name = "jy_budeng",
+      player = player.id,
+      skill_type = "offensive",
     })
+
+    local room = player.room
     room:loseHp(player, 1)
   end
 }
@@ -2327,7 +2344,7 @@ Fk:loadTranslationTable {
   ["jy__tangniu"] = [[唐妞]],
 
   ["jy_budeng"] = "不等",
-  [":jy_budeng"] = [[锁定技：<br><strong>受到伤害≠我扣血</strong>。你受到伤害时，防止之；<br><strong>牌比血多≠我要弃</strong>。你跳过弃牌阶段；<br><strong>你救了我≠你是友</strong>。其他角色使你回复体力时，你对其造成一点伤害；<br><strong>接受礼物≠我同意</strong>。你于其他角色的回合内获得牌时，你对其造成一点伤害，然后你失去一点体力。]],
+  [":jy_budeng"] = [[锁定技：<br><strong>受到伤害≠我扣血</strong>。你受到伤害时，防止之；<br><strong>弃牌阶段≠我要弃</strong>。你跳过弃牌阶段；<br><strong>你救了我≠你是友</strong>。其他角色使你回复体力时，你对其造成一点伤害；<br><strong>接受礼物≠我同意</strong>。你于回合外获得牌时，你失去一点体力。]],
 }
 
 -- for k, v in pairs(Fk.translations["zh_CN"]) do
