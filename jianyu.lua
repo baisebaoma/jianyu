@@ -2222,7 +2222,6 @@ Fk:loadTranslationTable {
 }
 
 local jy__tangniu = General(extension, "jy__tangniu", "qun", 1, 1, General.Female)
-jy__tangniu.hidden = true
 
 -- 主函数啥也不做，只是为了承载下面的
 local jy_budeng = fk.CreateTriggerSkill {
