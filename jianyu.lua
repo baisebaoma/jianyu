@@ -2300,6 +2300,12 @@ local jy_budeng_card = fk.CreateTriggerSkill {
     })
   end
 }
+jy_budeng:addRelatedSkill(jy_budeng_damaged)
+jy_budeng:addRelatedSkill(jy_budeng_discard)
+jy_budeng:addRelatedSkill(jy_budeng_heal)
+jy_budeng:addRelatedSkill(jy_budeng_card)
+
+jy__tangniu:addSkill(jy_budeng)
 
 Fk:loadTranslationTable {
   ["jy__tangniu"] = [[唐妞]],
