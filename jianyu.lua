@@ -2272,14 +2272,14 @@ local jy_budeng_heal = fk.CreateTriggerSkill {
   anim_type = "defensive",
   events = { fk.HpRecover },
   can_trigger = function(self, event, target, player, data)
-    return data.to == player and player:hasSkill(self) and data.from ~= player
+    return target == player and player:hasSkill(self) and data.recoverBy and data.recoverBy ~= player
   end,
   on_use = function(self, event, target, player, data)
     player:broadcastSkillInvoke("jy_budeng")
     local room = player.room
     room:damage({
       from = player,
-      to = data.from,
+      to = data.recoverBy,
       damage = 1,
       damageType = fk.NormalDamage,
       skillName = "jy_budeng",
@@ -2295,10 +2295,11 @@ local jy_budeng_card = fk.CreateTriggerSkill {
   events = { fk.AfterCardsMove },
   can_trigger = function(self, event, target, player, data)
     if not player:hasSkill(self) then return end
-    if player.phase ~= Player.NotActive then return end
-    for _, move in ipairs(data) do
-      if move.to == player.id then
-        return true
+    if player.phase == Player.NotActive then
+      for _, move in ipairs(data) do
+        if move.to == player.id then
+          return true
+        end
       end
     end
   end,
@@ -2326,7 +2327,7 @@ Fk:loadTranslationTable {
   ["jy__tangniu"] = [[唐妞]],
 
   ["jy_budeng"] = "不等",
-  [":jy_budeng"] = [[锁定技：<br>受到伤害≠我扣血：你受到伤害时，防止之；<br>牌比血多≠我要弃：你跳过弃牌阶段；<br>你救了我≠你是友：其他角色使你回复体力时，你对其造成一点伤害；<br>接受礼物≠我同意：你于其他角色的回合内获得牌时，你对其造成一点伤害，然后你失去一点体力。]],
+  [":jy_budeng"] = [[锁定技：<br><strong>受到伤害≠我扣血</strong>。你受到伤害时，防止之；<br><strong>牌比血多≠我要弃</strong>。你跳过弃牌阶段；<br><strong>你救了我≠你是友</strong>。其他角色使你回复体力时，你对其造成一点伤害；<br><strong>接受礼物≠我同意</strong>。你于其他角色的回合内获得牌时，你对其造成一点伤害，然后你失去一点体力。]],
 }
 
 -- for k, v in pairs(Fk.translations["zh_CN"]) do
