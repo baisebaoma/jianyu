@@ -2343,7 +2343,7 @@ Fk:loadTranslationTable {
   ["jy__tangniu"] = [[唐妞]],
 
   ["jy_budeng"] = "不等",
-  [":jy_budeng"] = [[锁定技：<br><strong>受到伤害≠我扣血</strong>。你受到伤害时，防止之；<br><strong>弃牌阶段≠我要弃</strong>。你跳过弃牌阶段；<br><strong>你救了我≠你是友</strong>。其他角色使你回复体力时，你对其造成一点伤害；<br><strong>接受礼物≠我同意</strong>。你于回合外获得牌时，你失去一点体力。]],
+  [":jy_budeng"] = [[锁定技：<br><strong>受到伤害≠我扣血</strong> 你受到伤害时，防止之；<br><strong>弃牌阶段≠我要弃</strong> 你跳过弃牌阶段；<br><strong>你救了我≠你是友</strong> 其他角色令你回复体力时，你对其造成一点伤害；<br><strong>接受礼物≠我同意</strong> 你于其他角色的回合内获得牌（含判定区）时，你失去一点体力。]],
 }
 
 -- for k, v in pairs(Fk.translations["zh_CN"]) do

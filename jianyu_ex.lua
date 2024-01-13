@@ -199,6 +199,7 @@ local meishu = fk.CreateTriggerSkill {
     local room = player.room
     -- room:changeMaxHp(player, 1)
     data.from:drawCards(1)
+    player:drawCards(1)
   end,
 }
 
@@ -217,7 +218,7 @@ Fk:loadTranslationTable {
   [":jy_lihun_ex"] = [[出牌阶段，你可以减少6点体力上限使〖结姻〗视为未发动过。]],
 
   ["jy_meishu_ex"] = "美鼠",
-  [":jy_meishu_ex"] = [[锁定技，被〖结姻〗过的角色造成伤害后，其摸一张牌。]],
+  [":jy_meishu_ex"] = [[锁定技，被〖结姻〗过的角色造成伤害后，你与其各摸一张牌。]],
 }
 
 return extension
