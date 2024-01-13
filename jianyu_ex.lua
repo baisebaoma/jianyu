@@ -111,7 +111,7 @@ local lihun = fk.CreateActiveSkill {
 
 local meishu = fk.CreateTriggerSkill {
   frequency = fk.Compulsory,
-  name = "jy_meishu_ex",
+  name = "jy_meishu",
   anim_type = "support",
   events = { fk.Damaged },
   can_trigger = function(self, event, target, player, data)
@@ -137,11 +137,11 @@ Fk:loadTranslationTable {
   ["jy_jieyin_ex"] = "结姻",
   [":jy_jieyin_ex"] = [[限定技，出牌阶段，你可以令一名已受伤的男性角色回复1点体力，然后你拥有其所有技能。]],
 
-  ["jy_lihun_ex"] = "离婚",
-  [":jy_lihun_ex"] = [[出牌阶段，你可以减少X点体力上限使〖结姻〗视为未发动过，X为存活角色数。]],
+  ["jy_lihun"] = "离婚",
+  [":jy_lihun"] = [[出牌阶段，你可以减少X点体力上限使〖结姻〗视为未发动过，X为存活角色数。]],
 
-  ["jy_meishu_ex"] = "美鼠",
-  [":jy_meishu_ex"] = [[锁定技，被〖结姻〗过的角色造成伤害后，你增加一点体力上限。]],
+  ["jy_meishu"] = "美鼠",
+  [":jy_meishu"] = [[锁定技，被〖结姻〗过的角色造成伤害后，你增加一点体力上限。]],
 }
 
 return extension

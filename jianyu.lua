@@ -2145,80 +2145,13 @@ local jy_jieyin = fk.CreateActiveSkill {
   end,
 }
 
-local jy_lihun = fk.CreateActiveSkill {
-  name = "jy_lihun",
-  anim_type = "masochism",
-  frequency = fk.Limited,
-  can_use = function(self, player)
-    if player:usedSkillTimes("jy_jieyin", Player.HistoryGame) == 0 then return false end
-    if player:usedSkillTimes(self.name, Player.HistoryGame) ~= 0 then return false end
-    return true
-  end,
-  card_filter = function(self, card)
-    return false
-  end,
-  card_num = 0,
-  target_filter = function(self, to_select, selected)
-    return false
-  end,
-  on_use = function(self, room, effect)
-    local from = room:getPlayerById(effect.from)
-    room:changeMaxHp(from, -1)
-    from:setSkillUseHistory("jy_jieyin", 0, Player.HistoryGame)
-  end,
-}
-
-local jy_xiannu = fk.CreateActiveSkill {
-  frequency = Skill.Limited,
-  name = "jy_xiannu",
-  anim_type = "support",
-  can_use = function(self, player)
-    return player:usedSkillTimes(self.name, Player.HistoryGame) == 0
-  end,
-  card_filter = function(self, card)
-    return false
-  end,
-  card_num = 0,
-  target_filter = function(self, to_select, selected)
-    local s = Fk:currentRoom():getPlayerById(to_select)
-
-    return to_select ~= Self.id and  -- 如果目标不是自己
-        s.gender == General.Male and -- 而且是男的
-        s.maxHp == s.hp and          -- 而且未受伤
-        #selected < 1                -- 而且只选了一个
-  end,
-  target_num = 1,
-  on_use = function(self, room, use)
-    local player = room:getPlayerById(use.from)
-
-    for _, to in ipairs(use.tos) do
-      local p = room:getPlayerById(to)
-      room:damage({
-        from = player,
-        to = p,
-        damage = 1,
-        damageType = fk.NormalDamage,
-        skillName = self.name,
-      })
-    end
-  end,
-}
-
--- jy__liuxian:addSkill(jy_xiannu)
 jy__liuxian:addSkill(jy_jieyin)
--- jy__liuxian:addSkill(jy_lihun)
 
 Fk:loadTranslationTable {
   ["jy__liuxian"] = [[刘仙]],
 
-  ["jy_xiannu"] = "仙怒",
-  [":jy_xiannu"] = [[限定技，出牌阶段，你可以对一名未受伤的男性角色造成1点伤害。]],
-
   ["jy_jieyin"] = "结姻",
   [":jy_jieyin"] = [[限定技，出牌阶段，你可以令一名已受伤的男性角色回复2点体力，然后你获得其所有牌并拥有其所有技能。]],
-
-  ["jy_lihun"] = "离婚",
-  [":jy_lihun"] = [[限定技，你可以减少一点体力上限使〖结姻〗视为未发动过。]],
 }
 
 local jy__tangniu = General(extension, "jy__tangniu", "qun", 1, 1, General.Female)
