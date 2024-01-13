@@ -2114,11 +2114,11 @@ local jy_jieyin = fk.CreateActiveSkill {
     local player = room:getPlayerById(use.from)
     for _, to in ipairs(use.tos) do
       local p = room:getPlayerById(to)
-      room:changeMaxHp(player, -1)
+      -- room:changeMaxHp(player, -1)
       -- 治疗其
       room:recover({
         who = p,
-        num = 3,
+        num = 2,
         recoverBy = player,
         skillName = self.name,
       })
@@ -2215,7 +2215,7 @@ Fk:loadTranslationTable {
   [":jy_xiannu"] = [[限定技，出牌阶段，你可以对一名未受伤的男性角色造成1点伤害。]],
 
   ["jy_jieyin"] = "结姻",
-  [":jy_jieyin"] = [[限定技，出牌阶段，你可以减少一点体力上限、令一名已受伤的男性角色回复3点体力，然后你获得其所有牌并拥有其所有技能。]],
+  [":jy_jieyin"] = [[限定技，出牌阶段，你可以令一名已受伤的男性角色回复2点体力，然后你获得其所有牌并拥有其所有技能。]],
 
   ["jy_lihun"] = "离婚",
   [":jy_lihun"] = [[限定技，你可以减少一点体力上限使〖结姻〗视为未发动过。]],
@@ -2245,7 +2245,7 @@ local jy_budeng_damaged = fk.CreateTriggerSkill {
       skill_type = "defensive",
     })
 
-    data.damage = 0
+    return true
   end,
 }
 -- 跳过弃牌阶段
@@ -2303,7 +2303,7 @@ local jy_budeng_heal = fk.CreateTriggerSkill {
     })
   end
 }
--- 对回合内使你摸了牌的造成伤害
+-- 回合外有人使你摸了牌时你流失体力
 local jy_budeng_card = fk.CreateTriggerSkill {
   mute = true,
   frequency = Skill.Compulsory,
@@ -2343,7 +2343,7 @@ Fk:loadTranslationTable {
   ["jy__tangniu"] = [[唐妞]],
 
   ["jy_budeng"] = "不等",
-  [":jy_budeng"] = [[锁定技：<br><strong>受到伤害≠我扣血</strong> 你受到伤害时，防止之；<br><strong>弃牌阶段≠我要弃</strong> 你跳过弃牌阶段；<br><strong>你救了我≠你是友</strong> 其他角色令你回复体力时，你对其造成一点伤害；<br><strong>接受礼物≠我同意</strong> 你于其他角色的回合内获得牌（含判定区）时，你失去一点体力。]],
+  [":jy_budeng"] = [[锁定技：<br><strong>受到伤害≠我掉血</strong> 你受到伤害时，防止之；<br><strong>弃牌阶段≠我要弃</strong> 你跳过弃牌阶段；<br><strong>你救了我≠是队友</strong> 其他角色令你回复体力时，你对其造成一点伤害；<br><strong>接受礼物≠我同意</strong> 你于其他角色的回合内获得牌（含判定区）时，你失去一点体力。]],
 }
 
 -- for k, v in pairs(Fk.translations["zh_CN"]) do
