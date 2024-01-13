@@ -2221,6 +2221,93 @@ Fk:loadTranslationTable {
   [":jy_lihun"] = [[限定技，你可以减少一点体力上限使〖结姻〗视为未发动过。]],
 }
 
+local jy__tangniu = General(extension, "jy__tangniu", "qun", 1, 1, General.Female)
+jy__tangniu.hidden = true
+
+-- 主函数啥也不做，只是为了承载下面的
+local jy_budeng = fk.CreateTriggerSkill {
+  name = "jy_budeng",
+}
+-- 不能受到伤害
+local jy_budeng_damaged = fk.CreateTriggerSkill {
+  name = "#jy_budeng_damaged",
+  frequency = Skill.Compulsory,
+  events = { fk.DamageInflicted },
+  can_trigger = function(self, event, target, player, data)
+    if not player:hasSkill(self) then return false end
+    return target == player
+  end,
+  on_use = function(self, event, target, player, data)
+    data.damage = 0
+  end,
+}
+-- 跳过弃牌阶段
+local jy_budeng_discard = fk.CreateTriggerSkill {
+  frequency = Skill.Compulsory,
+  name = "#jy_budeng_discard",
+  anim_type = "defensive",
+  events = { fk.EventPhaseChanging },
+  can_trigger = function(self, event, target, player, data)
+    if target == player and player:hasSkill(self) and data.to == Player.Discard then
+      local room = player.room
+      local logic = room.logic
+      local e = logic:getCurrentEvent():findParent(GameEvent.Turn, true)
+      if e == nil then return false end
+      return true
+    end
+  end,
+  on_use = function(self, event, target, player, data)
+    return true
+  end
+}
+-- 对救了你的造成伤害
+local jy_budeng_heal = fk.CreateTriggerSkill {
+  frequency = Skill.Compulsory,
+  name = "#jy_budeng_heal",
+  anim_type = "defensive",
+  events = { fk.HpRecover },
+  can_trigger = function(self, event, target, player, data)
+    return data.to == player and player:hasSkill(self) and data.from ~= player
+  end,
+  on_use = function(self, event, target, player, data)
+    local room = player.room
+    room:damage({
+      from = player,
+      to = data.from,
+      damage = 1,
+      damageType = fk.NormalDamage,
+      skillName = "jy_budeng",
+    })
+  end
+}
+-- 对救了你的造成伤害
+local jy_budeng_card = fk.CreateTriggerSkill {
+  frequency = Skill.Compulsory,
+  name = "#jy_budeng_card",
+  anim_type = "offensive",
+  events = { fk.AfterCardsMove },
+  can_trigger = function(self, event, target, player, data)
+    return player:hasSkill(self) and data.to == player and player.phase == Player.NotActive
+  end,
+  on_use = function(self, event, target, player, data)
+    local room = player.room
+    room:damage({
+      from = player,
+      to = room.current,
+      damage = 1,
+      damageType = fk.NormalDamage,
+      skillName = "jy_budeng",
+    })
+  end
+}
+
+Fk:loadTranslationTable {
+  ["jy__tangniu"] = [[唐妞]],
+
+  ["jy_budeng"] = "不等",
+  [":jy_budeng"] = [[锁定技：<br>受到伤害≠我扣血：你受到伤害时，防止之；<br>牌比血多≠我要弃：你跳过弃牌阶段；<br>你救了我≠你是友：其他角色使你回复体力时，你对其造成一点伤害；<br>接受礼物≠我同意：你于其他角色的回合内获得牌时，你对其造成一点伤害。]],
+}
+
 -- for k, v in pairs(Fk.translations["zh_CN"]) do
 --   v = string.gsub(v, "雷电将军", "<font color=\"Fuchsia\">雷电将军</font>")
 --   v = string.gsub(v, "神里绫人", "<font color=\"skyblue\">神里绫人</font>")
