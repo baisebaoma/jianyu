@@ -138,7 +138,6 @@ jy__jianzihao:addSkill(jy_hongwen)
 jy__jianzihao:addSkill(jy_zouwei) -- 走位令玩家感到困惑，建议删掉
 jy__jianzihao:addSkill(jy_shengnu)
 jy__jianzihao:addSkill(jy_xizao)
--- jy__jianzihao:addSkill("guixin")
 
 
 Fk:loadTranslationTable {
@@ -478,7 +477,6 @@ jy__liyuanhao:addSkill(jy_huxiao_2)
 jy__liyuanhao:addSkill(jy_huxiao_analeptic_2)
 jy__liyuanhao:addSkill(jy_huxiao_jink_2)
 jy__liyuanhao:addSkill(jy_erduanxiao_2)
-jy__liyuanhao:addSkill("wusheng")
 
 Fk:loadTranslationTable {
   ["jy__liyuanhao"] = "李元浩",
@@ -557,8 +555,7 @@ Fk:loadTranslationTable {
   ["jy__gaotianliang"] = "高天亮",
 
   ["jy_yuyu"] = "玉玉",
-  [":jy_yuyu"] = [[①锁定技，当有角色对你使用【杀】造成了伤害时，其获得“致郁”标记；<br>
-  ②受到没有“致郁”标记的角色或因本次伤害而获得“致郁”标记的角色造成的伤害时，你可以选择一项：摸3张牌；摸4张牌并翻面，然后对自己造成1点伤害。]],
+  [":jy_yuyu"] = [[①锁定技，当有角色对你使用【杀】造成了伤害时，其获得“致郁”标记；②受到没有“致郁”标记的角色或因本次伤害而获得“致郁”标记的角色造成的伤害时，你可以选择一项：摸3张牌；摸4张牌并翻面，然后对自己造成1点伤害。]],
   ["@jy_yuyu_enemy"] = "致郁",
   ["#jy_yuyu_ask_which"] = "玉玉：请选择你要触发的效果",
   ["#jy_yuyu_draw3"] = "摸3张牌",
@@ -1373,7 +1370,7 @@ Fk:loadTranslationTable {
   ["jy__yangfan"] = "杨藩",
 
   ["jy_sichi"] = "四吃",
-  [":jy_sichi"] = [[受到伤害后，你可以展示牌堆顶的4张牌，根据花色数量触发效果。<br>
+  [":jy_sichi"] = [[受到伤害后，你可以展示牌堆顶的4张牌。若花色数量为：<br>
   1，令一名角色获得之；<br>
   2，获得一张可以使用的牌并可以立即使用。若无，弃一张牌；<br>
   3，获得3张同类型或2张不同类型的牌，然后其他角色各摸一张牌；<br>
@@ -1394,10 +1391,10 @@ Fk:loadTranslationTable {
   ["#jy_sichi_4"] = "四吃：选择至多3名角色，你和他们各失去一点体力",
 
   ["jy_huapen"] = "花盆",
-  [":jy_huapen"] = [[锁定技，其他角色使用♣非延时锦囊牌或基本牌指定了有且仅有一个不为你的目标时，你进行一次判定，若为<font color="red">♥</font>，额外指定你为目标。（含【借刀杀人】）]],
+  [":jy_huapen"] = [[锁定技，其他角色使用♣非延时锦囊牌或基本牌指定了有且仅有一个不为你的目标时，你判定，若为<font color="red">♥</font>，额外指定你为目标。（含【借刀杀人】）]],
 
   ["jy_boshi"] = "搏时",
-  [":jy_boshi"] = [[觉醒技，准备阶段，若你已判定过至少X次，你失去〖花盆〗、获得〖奖杯〗，X为存活玩家数。]],
+  [":jy_boshi"] = [[觉醒技，准备阶段，若你已判定过至少X次，你失去〖花盆〗、获得〖奖杯〗，X为存活角色数。]],
   ["@jy_boshi_judge_count"] = "搏时",
 
   ["jy_jiangbei"] = "奖杯",
@@ -1811,7 +1808,7 @@ Fk:loadTranslationTable {
   ["jy__mou__gaotianliang"] = "高天亮",
 
   ["jy_tianling"] = "天灵",
-  [":jy_tianling"] = [[弃牌阶段开始时，你可以弃置两张牌或失去一点体力。若如此做，你的下一个回合：准备阶段后执行一个额外的出牌阶段；判定阶段结束前，你的手牌可当作除【无中生有】、【顺手牵羊】、【五谷丰登】外所有锦囊牌使用。]],
+  [":jy_tianling"] = [[弃牌阶段开始时，你可以弃两张牌或失去一点体力。若如此做，你的下一个回合：准备阶段后执行一个额外的出牌阶段；判定阶段结束前，你的手牌可当作除【无中生有】、【顺手牵羊】、【五谷丰登】外所有锦囊牌使用。]],
   ["@jy_tianling"] = "天灵",
   ["#jy_tianling_1hp"] = "失去一点体力",
   ["#jy_tianling_2cards"] = "弃置2张牌",
@@ -1873,7 +1870,7 @@ local jy_leiyan_trigger = fk.CreateTriggerSkill {
     if not data.from then return false end -- 如果这次伤害没有伤害来源，就不用看了
     local from = data.from
     return from:getMark("@jy_raiden_leiyan") ~= 0 and player:hasSkill(self)
-    -- and not data.is_leiyan
+        and not data.is_leiyan
   end,
   on_use = function(self, event, target, player, data)
     local room = player.room
@@ -1903,7 +1900,7 @@ local jy_leiyan_trigger = fk.CreateTriggerSkill {
           damage = 1,
           damageType = fk.ThunderDamage,
           skillName = "jy_leiyan",
-          -- is_leiyan = true,
+          is_leiyan = true,
         })
       end
     end
@@ -1918,9 +1915,9 @@ local jy_zhenshuo = fk.CreateActiveSkill {
     return player:usedSkillTimes(self.name, Player.HistoryPhase) == 0
   end,
   card_filter = function(self, to_select, selected, selected_targets)
-    return #selected ~= 4 and not Self:prohibitDiscard(Fk:getCardById(to_select))
+    return #selected ~= 3 and not Self:prohibitDiscard(Fk:getCardById(to_select))
   end,
-  card_num = 4,
+  card_num = 3,
   target_filter = function(self, to_select, selected)
     return to_select ~= Self.id and Self:inMyAttackRange(Fk:currentRoom():getPlayerById(to_select))
   end,
@@ -1950,7 +1947,7 @@ Fk:loadTranslationTable {
   ["~jy__raiden"] = "浮世一梦……",
 
   ["jy_leiyan"] = "雷眼",
-  [":jy_leiyan"] = [[出牌阶段，你令至少一名角色获得<font color="Fuchsia">雷罚恶曜之眼</font>标记。拥有该标记的角色造成伤害后，你进行一次判定，若为：黑色，你对伤害目标造成1点雷电伤害（可以触发〖雷眼〗）；红色，持有<font color="Fuchsia">雷罚恶曜之眼</font>的角色各摸X张牌，X为伤害值。]],
+  [":jy_leiyan"] = [[出牌阶段，你可以令至少一名角色获得<font color="Fuchsia">雷罚恶曜之眼</font>标记。其造成伤害后你判定，若为黑色，你对目标造成1点雷电伤害（不会触发〖雷眼〗）；若为红色，持有该标记的角色摸等同于伤害值的牌。]],
   ["@jy_raiden_leiyan"] = [[<font color="Fuchsia">雷罚恶曜之眼</font>]],
   ["@jy_raiden_yuanli"] = [[<font color="Fuchsia">愿力</font>]],
   ["#jy_leiyan_trigger"] = "雷眼",
@@ -1960,7 +1957,7 @@ Fk:loadTranslationTable {
   ["#jy_yuanli_full"] = [[<font color="Fuchsia">愿力</font>已满！]],
 
   ["jy_zhenshuo"] = "真说",
-  [":jy_zhenshuo"] = [[出牌阶段限一次，你弃4张牌对一名攻击范围内的角色造成1点雷电伤害。]],
+  [":jy_zhenshuo"] = [[出牌阶段限一次，你可以弃3张牌对一名攻击范围内的角色造成1点雷电伤害。]],
   ["$jy_zhenshuo1"] = "此刻，寂灭之时！",
   ["$jy_zhenshuo2"] = "稻光，亦是永恒！",
   ["$jy_zhenshuo3"] = "无念，断绝！",
@@ -2262,11 +2259,5 @@ Fk:loadTranslationTable {
   ["jy_budeng"] = "不等",
   [":jy_budeng"] = [[锁定技：<br><strong>受到伤害≠我掉血</strong> 你受到伤害时，防止之；<br><strong>弃牌阶段≠我要弃</strong> 你跳过弃牌阶段；<br><strong>你救了我≠是队友</strong> 其他角色令你回复体力时，你对其造成一点伤害；<br><strong>接受礼物≠我同意</strong> 你于其他角色的回合内获得牌（含判定区）时，你失去一点体力。]],
 }
-
--- for k, v in pairs(Fk.translations["zh_CN"]) do
---   v = string.gsub(v, "雷电将军", "<font color=\"Fuchsia\">雷电将军</font>")
---   v = string.gsub(v, "神里绫人", "<font color=\"skyblue\">神里绫人</font>")
---   Fk.translations["zh_CN"][k] = v
--- end
 
 return extension

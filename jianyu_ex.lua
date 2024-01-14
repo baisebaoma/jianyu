@@ -131,7 +131,7 @@ liuxian:addSkill(lihun)
 liuxian:addSkill(meishu)
 
 Fk:loadTranslationTable {
-  ["jy_ex__liuxian"] = [[刘仙]],
+  ["jy_ex__liuxian"] = [[界刘仙]],
   ["@jy_jieyin_ex"] = "结姻",
 
   ["jy_jieyin_ex"] = "结姻",
