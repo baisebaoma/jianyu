@@ -1,8 +1,6 @@
 local extension = Package:new("jianyu_standard")
 extension.extensionName = "jianyu"
 
--- DIY真诚意见：所有你这个包的东西都加一个你自己的开头，这样防止和别人的重名。比如我的"huxiao"一开始就和别人重名了。
-
 local U = require "packages/utility/utility"
 local Q = require "packages/jianyu/question" -- 考公大学生用的题库
 
@@ -1913,53 +1911,39 @@ local jy_leiyan_trigger = fk.CreateTriggerSkill {
 }
 jy_leiyan:addRelatedSkill(jy_leiyan_trigger)
 
--- local jy_zhenshuo = fk.CreateActiveSkill {
---   name = "jy_zhenshuo",
---   anim_type = "offensive",
---   can_use = function(self, player)
---     return player:usedSkillTimes(self.name, Player.HistoryPhase) == 0
---   end,
---   card_filter = function(self, to_select, selected, selected_targets)
---     return false
---   end,
---   card_num = 0,
---   target_filter = function(self, to_select, selected)
---     return to_select ~= Self.id and Self:inMyAttackRange(Fk:currentRoom():getPlayerById(to_select))
---   end,
---   target_num = 1,
---   on_use = function(self, room, use)
---     local player = room:getPlayerById(use.from)
---     local to = room:getPlayerById(use.tos[1])
---     local dmg = 1
---     room:delay(500)
+local jy_zhenshuo = fk.CreateActiveSkill {
+  name = "jy_zhenshuo",
+  anim_type = "offensive",
+  can_use = function(self, player)
+    return player:usedSkillTimes(self.name, Player.HistoryPhase) == 0
+  end,
+  card_filter = function(self, to_select, selected, selected_targets)
+    return #selected ~= 4 and not Self:prohibitDiscard(Fk:getCardById(to_select))
+  end,
+  card_num = 4,
+  target_filter = function(self, to_select, selected)
+    return to_select ~= Self.id and Self:inMyAttackRange(Fk:currentRoom():getPlayerById(to_select))
+  end,
+  target_num = 1,
+  on_use = function(self, room, use)
+    local player = room:getPlayerById(use.from)
+    local to = room:getPlayerById(use.tos[1])
+    room:delay(500)
 
---     room:damage({
---       from = player,
---       to = to,
---       damage = dmg,
---       damageType = fk.ThunderDamage,
---       skillName = self.name,
---     })
---   end,
--- }
--- local jy_zhenshuo_game_start = fk.CreateTriggerSkill {
---   name = "#jy_zhenshuo_game_start",
---   mute = true,
---   anim_type = "support",
---   frequency = Skill.Compulsory,
---   events = { fk.GameStart },
---   can_trigger = function(self, event, target, player, data)
---     return player:hasSkill(self)
---   end,
---   on_use = function(self, event, target, player, data)
---     local room = player.room
---     room:addPlayerMark(player, "@jy_raiden_yuanli")
---   end,
--- }
--- jy_zhenshuo:addRelatedSkill(jy_zhenshuo_game_start)
+    room:throwCard(use.cards, self.name, player, player)
+
+    room:damage({
+      from = player,
+      to = to,
+      damage = 1,
+      damageType = fk.ThunderDamage,
+      skillName = self.name,
+    })
+  end,
+}
 
 jy__raiden:addSkill(jy_leiyan)
--- jy__raiden:addSkill(jy_zhenshuo)
+jy__raiden:addSkill(jy_zhenshuo)
 
 Fk:loadTranslationTable {
   ["jy__raiden"] = [[雷电将军]],
@@ -1976,7 +1960,7 @@ Fk:loadTranslationTable {
   ["#jy_yuanli_full"] = [[<font color="Fuchsia">愿力</font>已满！]],
 
   ["jy_zhenshuo"] = "真说",
-  [":jy_zhenshuo"] = [[出牌阶段限一次，你对一名攻击范围内的角色造成1点雷电伤害。]],
+  [":jy_zhenshuo"] = [[出牌阶段限一次，你弃4张牌对一名攻击范围内的角色造成1点雷电伤害。]],
   ["$jy_zhenshuo1"] = "此刻，寂灭之时！",
   ["$jy_zhenshuo2"] = "稻光，亦是永恒！",
   ["$jy_zhenshuo3"] = "无念，断绝！",
