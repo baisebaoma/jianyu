@@ -1928,9 +1928,9 @@ local jy_zhenshuo = fk.CreateActiveSkill {
   on_use = function(self, room, use)
     local player = room:getPlayerById(use.from)
     local to = room:getPlayerById(use.tos[1])
-    room:delay(500)
-
     room:throwCard(use.cards, self.name, player, player)
+
+    room:delay(900)
 
     room:damage({
       from = player,
