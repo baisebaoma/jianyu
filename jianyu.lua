@@ -2056,7 +2056,7 @@ Fk:loadTranslationTable {
   ["~jy__ayato"] = "世事无常……",
 
   ["jy_jinghua"] = "镜花",
-  [":jy_jinghua"] = [[使用或打出基本牌后，你可以进入<font color="skyblue">泷廻鉴花</font>状态，直到当前回合结束。<br><font color="skyblue">泷廻鉴花</font>：获得2攻击距离、2体力上限、2体力，并可以立即使用2张不计入使用次数的【杀】。因<font color="skyblue">泷廻鉴花</font>状态结束而失去体力时，至多使体力降至2。]],
+  [":jy_jinghua"] = [[使用或打出基本牌后，你可以进入<font color="skyblue">泷廻鉴花</font>状态，直到当前回合结束。<font color="skyblue">泷廻鉴花</font>状态下，你获得2攻击距离、2体力上限、2体力，并可以立即使用2张不计入使用次数的【杀】。因<font color="skyblue">泷廻鉴花</font>状态结束而失去体力时，至多使体力降至2。]],
   ["@jy_jinghua"] = [[<font color="skyblue">泷廻鉴花</font>]],
   ["$jy_jinghua1"] = "苍流水影。",
   ["$jy_jinghua2"] = "剑影。",
@@ -2099,7 +2099,15 @@ local jy_jieyin = fk.CreateActiveSkill {
       -- 治疗其
       room:recover({
         who = p,
-        num = 2,
+        num = 1,
+        recoverBy = player,
+        skillName = self.name,
+      })
+
+      -- 治疗自己
+      room:recover({
+        who = player,
+        num = 1,
         recoverBy = player,
         skillName = self.name,
       })
@@ -2132,7 +2140,7 @@ Fk:loadTranslationTable {
   ["jy__liuxian"] = [[刘仙]],
 
   ["jy_jieyin"] = "结姻",
-  [":jy_jieyin"] = [[限定技，出牌阶段，你可以令一名已受伤的男性角色回复2点体力，然后你获得其所有牌并拥有其所有技能。]],
+  [":jy_jieyin"] = [[限定技，出牌阶段，你可以令一名已受伤的男性角色与你各回复1点体力，然后你获得其所有牌并拥有其所有技能。]],
 }
 
 local jy__tangniu = General(extension, "jy__tangniu", "qun", 1, 1, General.Female)
@@ -2228,7 +2236,7 @@ local jy_budeng_card = fk.CreateTriggerSkill {
     if not player:hasSkill(self) then return end
     if player.phase == Player.NotActive then
       for _, move in ipairs(data) do
-        if move.to == player.id then
+        if move.to == player.id and move.from ~= player.id then
           return true
         end
       end
@@ -2244,6 +2252,7 @@ local jy_budeng_card = fk.CreateTriggerSkill {
 
     local room = player.room
     room:loseHp(player, 1)
+    room:loseHp(room.current, 1)
   end
 }
 jy_budeng:addRelatedSkill(jy_budeng_damaged)
@@ -2257,7 +2266,7 @@ Fk:loadTranslationTable {
   ["jy__tangniu"] = [[唐妞]],
 
   ["jy_budeng"] = "不等",
-  [":jy_budeng"] = [[锁定技：<br><strong>受到伤害≠我掉血</strong> 你受到伤害时，防止之；<br><strong>弃牌阶段≠我要弃</strong> 你跳过弃牌阶段；<br><strong>你救了我≠是队友</strong> 其他角色令你回复体力时，你对其造成一点伤害；<br><strong>接受礼物≠我同意</strong> 你于其他角色的回合内获得牌（含判定区）时，你失去一点体力。]],
+  [":jy_budeng"] = [[锁定技，你受到伤害时，防止之；你跳过弃牌阶段；其他角色令你回复体力时，你对其造成一点伤害；你于其他角色的回合内获得牌（含判定区）时，你与其各失去一点体力。<br><font size="1">受到伤害≠我掉血，弃牌阶段≠我要弃，你救了我≠是队友，接受礼物≠我同意。</font>]],
 }
 
 return extension
