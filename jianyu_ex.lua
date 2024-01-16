@@ -77,9 +77,8 @@ local lihun = fk.CreateActiveSkill {
   name = "jy_lihun", -- 为了方便这个技能在将魂斗场模式被禁，所以使用这个名字
   anim_type = "masochism",
   can_use = function(self, player)
-    local room = player.room
     if player:usedSkillTimes("jy_jieyin_ex", Player.HistoryGame) == 0 then return false end
-    return player.hp > math.max(#room.alive_players, 4) -- 不允许紫砂
+    return true -- 建议加不准紫砂
   end,
   card_filter = function(self, card)
     return false
