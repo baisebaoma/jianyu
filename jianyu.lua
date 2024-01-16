@@ -6,7 +6,6 @@ local Q = require "packages/jianyu/question" -- 考公大学生用的题库
 
 Fk:loadTranslationTable {
   ["jianyu_standard"] = [[简浴]],
-  ["jianyu"] = [[简浴]],
   ["jy"] = "简浴",
 }
 
@@ -194,14 +193,12 @@ local jy_sanjian = fk.CreateTriggerSkill {
   frequency = Skill.Compulsory,
   events = { fk.EventPhaseStart },                    -- 事件开始时
   can_trigger = function(self, event, target, player, data)
-    return target == player and player:hasSkill(self) -- 如果是我这个角色，如果是有这个技能的角色，如果是出牌阶段，如果这个角色的装备数是3
+    return target == player and player:hasSkill(self) -- 如果是我这名角色，如果是有这个技能的角色，如果是出牌阶段，如果这名角色的装备数是3
         and player.phase == Player.Play and #player:getCardIds(Player.Equip) == 3
   end,
   on_use = function(self, event, target, player, data)
     local room = player.room
-    -- room:useVirtualCard("analeptic", nil, player, player, self.name, false)
-    room:useVirtualCard("ex_nihilo", nil, player, player, self.name, false)
-    room:useVirtualCard("ex_nihilo", nil, player, player, self.name, false)
+    room:useVirtualCard("analeptic", nil, player, player, self.name, false)
     room:useVirtualCard("ex_nihilo", nil, player, player, self.name, false)
   end,
 }
@@ -292,7 +289,7 @@ Fk:loadTranslationTable {
   ["$jy_kaiju_28"] = "Oh my God，我要珍惜这段时光，我要好好地将它珍惜！",
 
   ["jy_sanjian"] = "三件",
-  [":jy_sanjian"] = [[锁定技，出牌阶段开始时，若装备区有且仅有三张牌，你视为使用三张【无中生有】。]],
+  [":jy_sanjian"] = [[锁定技，出牌阶段开始时，若装备区有且仅有三张牌，你视为使用一张【酒】和一张【无中生有】。]],
   ["$jy_sanjian1"] = "也不是稳赢吧，我觉得赢了！",
 
   ["jy_xizao_2"] = "洗澡",
@@ -1130,7 +1127,7 @@ local jy_sichi = fk.CreateTriggerSkill {
         end
       end
 
-      -- 4种花色：选择至多3个角色，你和他们各失去一点体力
+      -- 4种花色：选择至多3名角色，你和他们各失去一点体力
     elseif suit_count == 4 then
       -- 业炎
       -- 这里只能选择除了自己以外的角色，因为自己肯定是要掉血的
@@ -1158,7 +1155,6 @@ local jy_sichi = fk.CreateTriggerSkill {
 }
 
 -- ol_sp1 sheyan
--- TODO：如果别人用♣借刀杀人指定了另外两个目标，并且判定为♥指定我为目标，借自己的刀杀自己，杀出不出去，只能给刀
 local jy_huapen = fk.CreateTriggerSkill {
   name = "jy_huapen",
   anim_type = "control",
@@ -1170,7 +1166,7 @@ local jy_huapen = fk.CreateTriggerSkill {
         (data.card:isCommonTrick() or data.card.type == Card.TypeBasic) then
       local previous_targets = AimGroup:getAllTargets(data.tos)
       if #AimGroup:getAllTargets(data.tos) ~= 1 then return false end -- 如果目标不是一个，那就不用管了
-      -- 借刀杀人也被判定为单体卡牌。也许本来就是？
+      -- 借刀杀人也被判定为单体卡牌
       -- 如果目标里面已经有我自己了，那就不要判定了
       for _, v in pairs(previous_targets) do
         if v == player.id then
@@ -1216,7 +1212,7 @@ local jy_boshi = fk.CreateTriggerSkill {
   end,
   on_use = function(self, event, target, player, data)
     local room = player.room
-    -- room:changeMaxHp(player, 1)
+    room:changeMaxHp(player, -1)
     -- room:recover({
     --   who = player,
     --   num = 1,
@@ -1299,21 +1295,6 @@ local jy_jiangbei_club_2 = fk.CreateTriggerSkill {
     end)
   end,
 }
--- 出牌阶段开始时把已使用打出的红桃梅花数设置成0
--- TODO：把这个合并到别的技能里去
-local jy_jiangbei_set_0 = fk.CreateTriggerSkill {
-  name = "#jy_jiangbei_set_0",
-  mute = true,
-  frequency = Skill.Compulsory,
-  refresh_events = { fk.EventPhaseStart },
-  can_refresh = function(self, event, target, player, data)
-    return player:hasSkill(self) and target == player and
-        player.phase == Player.Play -- 在我的出牌阶段
-  end,
-  on_refresh = function(self, event, target, player, data)
-    player.room:setPlayerMark(player, "@jy_jiangbei_draw", 0)
-  end,
-}
 -- 计算出牌阶段使用打出了多少张红桃梅花。一旦使用打出了别的牌，就变为字符串。
 -- TargetSpecified对每个目标都会执行一次，所以改成CardUsing。前面的虎啸也一并改了已经。
 local jy_jiangbei_draw_count = fk.CreateTriggerSkill {
@@ -1341,6 +1322,17 @@ local jy_jiangbei_draw_count = fk.CreateTriggerSkill {
 local jy_jiangbei_draw = fk.CreateTriggerSkill {
   name = "#jy_jiangbei_draw",
   anim_type = "special",
+
+  -- 出牌阶段开始时把已使用打出的红桃梅花数设置成0
+  refresh_events = { fk.EventPhaseStart },
+  can_refresh = function(self, event, target, player, data)
+    return player:hasSkill(self) and target == player and
+        player.phase == Player.Play -- 在我的出牌阶段
+  end,
+  on_refresh = function(self, event, target, player, data)
+    player.room:setPlayerMark(player, "@jy_jiangbei_draw", 0)
+  end,
+
   events = { fk.EventPhaseEnd }, -- 包括了使用和打出
   can_trigger = function(self, event, target, player, data)
     return target == player and player:hasSkill(self)
@@ -1357,7 +1349,6 @@ local jy_jiangbei_draw = fk.CreateTriggerSkill {
 jy_jiangbei:addRelatedSkill(jy_jiangbei_heart)
 jy_jiangbei:addRelatedSkill(jy_jiangbei_club)
 jy_jiangbei:addRelatedSkill(jy_jiangbei_club_2)
-jy_jiangbei:addRelatedSkill(jy_jiangbei_set_0)
 jy_jiangbei:addRelatedSkill(jy_jiangbei_draw_count)
 jy_jiangbei:addRelatedSkill(jy_jiangbei_draw)
 
@@ -1376,12 +1367,12 @@ Fk:loadTranslationTable {
   3，获得3张同类型或2张不同类型的牌，然后其他角色各摸一张牌；<br>
   4，你与至多3名角色各失去一点体力。]],
 
-  ["#jy_sichi_suits_1"] = "四吃：1种花色，选择一个角色获得这些牌",
+  ["#jy_sichi_suits_1"] = "四吃：1种花色，选择一名角色获得这些牌",
   ["#jy_sichi_suits_2"] = "四吃：2种花色，获得一张可使用的牌并可以立即使用",
   ["#jy_sichi_suits_3"] = "四吃：3种花色，获得一部分牌，然后其他角色各摸一张牌",
   ["#jy_sichi_suits_4"] = "四吃：4种花色，选择角色一起失去体力",
 
-  ["#jy_sichi_1"] = "四吃：选择一个角色获得所有牌",
+  ["#jy_sichi_1"] = "四吃：选择一名角色获得所有牌",
   ["#jy_sichi_2"] = "四吃：获得其中一张牌并可以使用",
   ["#jy_sichi_2_use"] = "四吃：你可以立即使用这张牌",
   ["#jy_sichi_2_failed_toast"] = "四吃：2种花色，没有可使用的牌，弃一张牌",
@@ -1394,7 +1385,7 @@ Fk:loadTranslationTable {
   [":jy_huapen"] = [[锁定技，其他角色使用♣非延时锦囊牌或基本牌指定了有且仅有一个不为你的目标时，你判定，若为<font color="red">♥</font>，额外指定你为目标。（含【借刀杀人】）]],
 
   ["jy_boshi"] = "搏时",
-  [":jy_boshi"] = [[觉醒技，准备阶段，若你已判定过至少X次，你失去〖花盆〗、获得〖奖杯〗，X为存活角色数。]],
+  [":jy_boshi"] = [[觉醒技，准备阶段，若你已判定过至少X次，你减一点体力上限、失去〖花盆〗，然后获得〖奖杯〗，X为存活角色数。]],
   ["@jy_boshi_judge_count"] = "搏时",
 
   ["jy_jiangbei"] = "奖杯",
@@ -1666,7 +1657,7 @@ Fk:loadTranslationTable {
   ["jy_jieju"] = "熬夜",
   [":jy_jieju"] = [[使命技，出牌阶段，你失去1点体力使〖做题〗视为未发动过。<br>
   成功：回合结束时，若你〖做题〗答对比答错至少多3，你摸3张牌，然后获得技能〖集智〗、〖看破〗、〖享乐〗；<br>
-  失败：回合结束时，若你〖做题〗答错比答对至少多3，你翻面、减两点体力上限，然后获得技能〖玉玉〗、〖红温〗。]],
+  失败：回合结束时，若你〖做题〗答错比答对至少多3，你翻面、减2点体力上限，然后获得技能〖玉玉〗、〖红温〗。]],
   ["#jy_jieju_success"] = "结局：成功",
   ["#jy_jieju_fail"] = "结局：失败",
 
@@ -1718,11 +1709,21 @@ local jy_tianling = fk.CreateViewAsSkill {
     return player:getMark("@jy_tianling") ~= 0 and player.phase ~= Player.NotActive and not response and
         not player:isKongcheng()
   end,
-  -- TODO:自己的回合濒死的时候也会亮，但实际上没用
 }
 local jy_tianling_yuyu = fk.CreateTriggerSkill {
   name = "#jy_tianling_yuyu",
   anim_type = "masochism",
+
+  refresh_events = { fk.EventPhaseEnd },
+  can_refresh = function(self, event, target, player, data)
+    return player:hasSkill(self) and target == player and
+        target.phase == Player.Judge and
+        player:getMark("@jy_tianling") ~= 0
+  end,
+  on_refresh = function(self, event, target, player, data)
+    player.room:setPlayerMark(player, "@jy_tianling", 0)
+  end,
+
   events = { fk.EventPhaseStart },
   can_trigger = function(self, event, target, player, data)
     return player:hasSkill(self) and player == target and player.phase == Player.Discard
@@ -1761,25 +1762,8 @@ local jy_tianling_dangxian = fk.CreateTriggerSkill {
     player:gainAnExtraPhase(Player.Play, true)
   end,
 }
--- TODO：把这个合并到别的技能里去
-local jy_tianling_set_0 = fk.CreateTriggerSkill {
-  name = "#jy_tianling_set_0",
-  mute = true,
-  frequency = Skill.Compulsory,
-  visible = false,
-  refresh_events = { fk.EventPhaseEnd },
-  can_refresh = function(self, event, target, player, data)
-    return player:hasSkill(self) and target == player and
-        target.phase == Player.Judge and
-        player:getMark("@jy_tianling") ~= 0
-  end,
-  on_refresh = function(self, event, target, player, data)
-    player.room:setPlayerMark(player, "@jy_tianling", 0)
-  end,
-}
 jy_tianling:addRelatedSkill(jy_tianling_yuyu)
 jy_tianling:addRelatedSkill(jy_tianling_dangxian)
-jy_tianling:addRelatedSkill(jy_tianling_set_0)
 
 local jy_yali = fk.CreateTriggerSkill {
   name = "jy_yali",
@@ -1954,7 +1938,7 @@ Fk:loadTranslationTable {
   ["$jy_leiyan1"] = "泡影看破！",
   ["$jy_leiyan2"] = "无处遁逃！",
   ["$jy_leiyan3"] = "威光无赦！",
-  ["#jy_yuanli_full"] = [[<font color="Fuchsia">愿力</font>已满！]],
+  -- ["#jy_yuanli_full"] = [[<font color="Fuchsia">愿力</font>已满！]],
 
   ["jy_zhenshuo"] = "真说",
   [":jy_zhenshuo"] = [[出牌阶段限一次，你可以弃3张牌对一名攻击范围内的角色造成1点雷电伤害。]],
@@ -2060,8 +2044,8 @@ Fk:loadTranslationTable {
   ["@jy_jinghua"] = [[<font color="skyblue">泷廻鉴花</font>]],
   ["$jy_jinghua1"] = "苍流水影。",
   ["$jy_jinghua2"] = "剑影。",
-  ["#jy_jinghua_use"] = "镜花：你可以使用两张不计入使用次数的【杀】：第一张",
-  ["#jy_jinghua_use_again"] = "镜花：你可以使用两张不计入使用次数的【杀】：第二张",
+  ["#jy_jinghua_use"] = "镜花：你可以使用两张不计入使用次数的【杀】，第一张",
+  ["#jy_jinghua_use_again"] = "镜花：你可以使用两张不计入使用次数的【杀】，第二张",
 
   ["jy_jianying"] = "渐盈",
   [":jy_jianying"] = [[锁定技，所有角色的结束阶段，若你的手牌数小于体力值，你摸一张牌。]],
@@ -2197,34 +2181,6 @@ local jy_budeng_discard = fk.CreateTriggerSkill {
     return true
   end
 }
--- 对救了你的造成伤害
-local jy_budeng_heal = fk.CreateTriggerSkill {
-  mute = true,
-  frequency = Skill.Compulsory,
-  name = "#jy_budeng_heal",
-  anim_type = "defensive",
-  events = { fk.HpRecover },
-  can_trigger = function(self, event, target, player, data)
-    return target == player and player:hasSkill(self) and data.recoverBy and data.recoverBy ~= player
-  end,
-  on_use = function(self, event, target, player, data)
-    player:broadcastSkillInvoke("jy_budeng")
-    player.room:doAnimate("InvokeSkill", {
-      name = "jy_budeng",
-      player = player.id,
-      skill_type = "offensive",
-    })
-
-    local room = player.room
-    room:damage({
-      from = player,
-      to = data.recoverBy,
-      damage = 1,
-      damageType = fk.NormalDamage,
-      skillName = "jy_budeng",
-    })
-  end
-}
 -- 回合外有人使你摸了牌时你流失体力
 local jy_budeng_card = fk.CreateTriggerSkill {
   mute = true,
@@ -2257,7 +2213,6 @@ local jy_budeng_card = fk.CreateTriggerSkill {
 }
 jy_budeng:addRelatedSkill(jy_budeng_damaged)
 jy_budeng:addRelatedSkill(jy_budeng_discard)
-jy_budeng:addRelatedSkill(jy_budeng_heal)
 jy_budeng:addRelatedSkill(jy_budeng_card)
 
 jy__tangniu:addSkill(jy_budeng)
@@ -2266,7 +2221,7 @@ Fk:loadTranslationTable {
   ["jy__tangniu"] = [[唐妞]],
 
   ["jy_budeng"] = "不等",
-  [":jy_budeng"] = [[锁定技，你受到伤害时，防止之；你跳过弃牌阶段；其他角色令你回复体力时，你对其造成一点伤害；你于其他角色的回合内获得牌（含判定区）时，你与其各失去一点体力。<br><font size="1">受到伤害≠我掉血，弃牌阶段≠我要弃，你救了我≠是队友，接受礼物≠我同意。</font>]],
+  [":jy_budeng"] = [[锁定技，防止你受到的伤害；你跳过弃牌阶段；你于其他角色的回合内获得牌（含判定区）时，你与其各失去一点体力。<br><font size="1">受到伤害≠我掉血，弃牌阶段≠我要弃，接受礼物≠我同意。</font>]],
 }
 
 return extension

@@ -53,7 +53,7 @@ local jieyin = fk.CreateActiveSkill {
 
       -- 获得其所有装备区和判定区的牌
       if not p:isNude() then
-        local cards_id = p:getCardIds { Player.Card, Player.Equip, Player.Judge }
+        local cards_id = p:getCardIds { Player.Hand, Player.Equip, Player.Judge }
         local dummy = Fk:cloneCard 'slash'
         dummy:addSubcards(cards_id)
         room:obtainCard(player.id, dummy, false, fk.ReasonPrey)
@@ -77,8 +77,9 @@ local lihun = fk.CreateActiveSkill {
   name = "jy_lihun", -- 为了方便这个技能在将魂斗场模式被禁，所以使用这个名字
   anim_type = "masochism",
   can_use = function(self, player)
+    local room = player.room
     if player:usedSkillTimes("jy_jieyin_ex", Player.HistoryGame) == 0 then return false end
-    return true
+    return player.hp > math.max(#room.alive_players, 4) -- 不允许紫砂
   end,
   card_filter = function(self, card)
     return false
