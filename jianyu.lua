@@ -2279,7 +2279,8 @@ local jy_lingfu = fk.CreateActiveSkill {
     return #selected < 5
   end,
   target_filter = function(self, to_select, selected, selected_cards)
-    return #selected < #selected_cards - 2
+    local to = Fk.currentRoom:getPlayerById(to_select)
+    return #selected < #selected_cards - 2 and to.hp ~= to.maxHp
   end,
   on_use = function(self, room, effect)
     local player = room:getPlayerById(effect.from)
@@ -2306,7 +2307,7 @@ Fk:loadTranslationTable {
   [":jy_yingji"] = [[锁定技，你的黑色【杀】均视为【闪】；你使用或打出基本牌后，摸一张牌。]],
 
   ["jy_lingfu"] = "灵符",
-  [":jy_lingfu"] = [[出牌阶段，你可以弃X+2张牌令至多X名角色回复一点体力，然后你摸一张牌，X至少为0且至多为3。]],
+  [":jy_lingfu"] = [[出牌阶段，你可以弃X+2张牌令至多X名已受伤的角色回复一点体力，然后你摸一张牌，X至少为0且至多为3。]],
 }
 
 return extension
