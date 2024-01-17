@@ -2231,7 +2231,7 @@ local jy_qieju = fk.CreateFilterSkill {
   mute = true, -- 不需要播放语音，因为使用基本牌的时候就会摸牌，摸牌会播放语音
   frequency = Skill.Compulsory,
   card_filter = function(self, to_select, player)
-    return player:hasSkill(self) and player.phase == Player.NotActive and
+    return player:hasSkill(self) and -- and player.phase == Player.NotActive
         to_select.trueName == "slash" and
         table.contains(player.player_cards[Player.Hand], to_select.id)
   end,
@@ -2260,7 +2260,7 @@ local jy_qieju_draw = fk.CreateTriggerSkill {
       skill_type = "offensive",
     })
 
-    player:drawCards(1)
+    player:drawCards(2)
   end
 }
 jy_qieju:addRelatedSkill(jy_qieju_draw)
@@ -2273,7 +2273,7 @@ local jy_lingfu = fk.CreateActiveSkill {
   min_card_num = 3,
   max_card_num = 5,
   can_use = function(self, player)
-    return #player:getCardIds { Player.Hand, Player.Equip } >= 2 -- and player:usedSkillTimes(self.name) == 0
+    return #player:getCardIds { Player.Hand, Player.Equip } >= 2 and player:usedSkillTimes(self.name) == 0
   end,
   card_filter = function(self, to_select, selected)
     if Self:prohibitDiscard(Fk:getCardById(to_select)) then return end
@@ -2307,14 +2307,14 @@ Fk:loadTranslationTable {
   ["~jy__huohuo"] = [[藿藿：投……投降……]],
 
   ["jy_qieju"] = "怯惧",
-  [":jy_qieju"] = [[锁定技，你的回合外，你的【杀】均视为【闪】；你使用或打出基本牌后，摸一张牌。]],
+  [":jy_qieju"] = [[锁定技，你的【杀】均视为【闪】；你使用或打出基本牌后，摸2张牌。]],
   ["$jy_qieju1"] = "尾巴：走你。 藿藿：啊啊啊——",
   ["$jy_qieju2"] = "藿藿：不要啊救命啊——",
   ["$jy_qieju3"] = "藿藿：怎么还没结束……",
   ["$jy_qieju4"] = "藿藿：说不定我也能做到……",
 
   ["jy_lingfu"] = "灵符",
-  [":jy_lingfu"] = [[出牌阶段，你可以弃X+2张牌令至多X名已受伤的角色回复一点体力，X至少为1且至多为3。若以此法为自己回复体力，则改为回复2点。]],
+  [":jy_lingfu"] = [[出牌阶段限一次，你可以弃X+2张牌令至多X名已受伤的角色回复一点体力，X至少为1且至多为3。若以此法为自己回复体力，则改为回复2点。]],
   ["$jy_lingfu1"] = [[藿藿：驱邪……缚魅……]],
   ["$jy_lingfu2"] = [[藿藿：灵符……保命……]],
 
