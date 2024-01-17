@@ -185,7 +185,7 @@ Fk:loadTranslationTable {
 
 
 -- 第二代简自豪
-local jy__jianzihao = General(extension, "jy__new__jianzihao", "qun", 3)
+local jy__jianzihao = General(extension, "jy__new__jianzihao", "god", 3)
 
 local jy_sanjian = fk.CreateTriggerSkill {
   name = "jy_sanjian",
@@ -500,7 +500,7 @@ Fk:loadTranslationTable {
 }
 
 -- 高天亮
-local jy__gaotianliang = General(extension, "jy__gaotianliang", "qun", 4)
+local jy__gaotianliang = General(extension, "jy__gaotianliang", "shu", 4)
 
 local jy_yuyu = fk.CreateTriggerSkill {
   name = "jy_yuyu",
@@ -2224,7 +2224,7 @@ Fk:loadTranslationTable {
   [":jy_budeng"] = [[锁定技，防止你受到的伤害；你跳过弃牌阶段；你于其他角色的回合内获得牌（含判定区）时，你与其各失去一点体力。<br><font size="1">受到伤害≠我掉血，弃牌阶段≠我要弃，接受礼物≠我同意。</font>]],
 }
 
-local jy__huohuo = General(extension, "jy__huohuo", "qun", 3, 3, General.Female)
+local jy__huohuo = General(extension, "jy__huohuo", "wu", 3, 3, General.Female)
 jy__huohuo.hidden = true
 
 local jy_yingji = fk.CreateFilterSkill {
