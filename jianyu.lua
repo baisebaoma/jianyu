@@ -2279,7 +2279,7 @@ local jy_lingfu = fk.CreateActiveSkill {
     return #selected < 5
   end,
   target_filter = function(self, to_select, selected, selected_cards)
-    local to = Fk.currentRoom:getPlayerById(to_select)
+    local to = Fk:currentRoom():getPlayerById(to_select)
     return #selected < #selected_cards - 2 and to.hp ~= to.maxHp
   end,
   on_use = function(self, room, effect)
