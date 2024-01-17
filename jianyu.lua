@@ -2231,7 +2231,7 @@ local jy_yingji = fk.CreateFilterSkill {
   name = "jy_yingji",
   frequency = Skill.Compulsory,
   card_filter = function(self, to_select, player)
-    return player:hasSkill(self) and to_select.trueName == "slash" and
+    return player:hasSkill(self) and to_select.trueName == "slash" and to_select.color == Card.Black and
         table.contains(player.player_cards[Player.Hand], to_select.id)
   end,
   view_as = function(self, to_select)
@@ -2249,7 +2249,7 @@ local jy_yingji_draw = fk.CreateTriggerSkill {
   events = { fk.CardUsing, fk.CardResponding },
   can_trigger = function(self, event, target, player, data)
     if not player:hasSkill(self) then return end
-    return data.card.type == Card.TypeBasic
+    return target == player and data.card.type == Card.TypeBasic
   end,
   on_use = function(self, event, target, player, data)
     player:broadcastSkillInvoke("jy_budeng")
@@ -2267,20 +2267,19 @@ jy_yingji:addRelatedSkill(jy_yingji_draw)
 local jy_lingfu = fk.CreateActiveSkill {
   name = "jy_lingfu",
   anim_type = "offensive",
-  min_target_num = 1,
+  min_target_num = 0,
   max_target_num = 3,
-  min_card_num = 1,
-  max_card_num = 4,
-  frequency = Skill.Limited,
+  min_card_num = 2,
+  max_card_num = 5,
   can_use = function(self, player)
-    return true
+    return #player:getCardIds { Player.Hand, Player.Equip } >= 2
   end,
   card_filter = function(self, to_select, selected)
     if Self:prohibitDiscard(Fk:getCardById(to_select)) then return end
-    return #selected < 4
+    return #selected < 5
   end,
   target_filter = function(self, to_select, selected, selected_cards)
-    return #selected < #selected_cards - 1
+    return #selected < #selected_cards - 2
   end,
   on_use = function(self, room, effect)
     local player = room:getPlayerById(effect.from)
@@ -2293,6 +2292,7 @@ local jy_lingfu = fk.CreateActiveSkill {
         skillName = self.name,
       })
     end
+    player:drawCards(1)
   end,
 }
 
@@ -2303,10 +2303,10 @@ Fk:loadTranslationTable {
   ["jy__huohuo"] = [[藿藿]],
 
   ["jy_yingji"] = "应激",
-  [":jy_budeng"] = [[锁定技，你的【杀】均视为【闪】；你使用或打出基本牌后，摸一张牌。]],
+  [":jy_yingji"] = [[锁定技，你的黑色【杀】均视为【闪】；你使用或打出基本牌后，摸一张牌。]],
 
   ["jy_lingfu"] = "灵符",
-  [":jy_lingfu"] = [[出牌阶段，你可以弃X+1张牌令至多X名角色回复一点体力，X至多为3。]],
+  [":jy_lingfu"] = [[出牌阶段，你可以弃X+2张牌令至多X名角色回复一点体力，然后你摸一张牌，X至少为0且至多为3。]],
 }
 
 return extension
