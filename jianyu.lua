@@ -2224,4 +2224,89 @@ Fk:loadTranslationTable {
   [":jy_budeng"] = [[锁定技，防止你受到的伤害；你跳过弃牌阶段；你于其他角色的回合内获得牌（含判定区）时，你与其各失去一点体力。<br><font size="1">受到伤害≠我掉血，弃牌阶段≠我要弃，接受礼物≠我同意。</font>]],
 }
 
+local jy__huohuo = General(extension, "jy__huohuo", "qun", 3, 3, General.Female)
+jy__huohuo.hidden = true
+
+local jy_yingji = fk.CreateFilterSkill {
+  name = "jy_yingji",
+  frequency = Skill.Compulsory,
+  card_filter = function(self, to_select, player)
+    return player:hasSkill(self) and to_select.trueName == "slash" and
+        table.contains(player.player_cards[Player.Hand], to_select.id)
+  end,
+  view_as = function(self, to_select)
+    local card = Fk:cloneCard("jink", to_select.suit, to_select.number)
+    card.skillName = self.name
+    return card
+  end,
+}
+local jy_yingji_draw = fk.CreateTriggerSkill {
+  name = "#jy_yingji_draw",
+  frequency = Skill.Compulsory,
+  mute = true,
+  anim_type = "offensive",
+
+  events = { fk.CardUsing, fk.CardResponding },
+  can_trigger = function(self, event, target, player, data)
+    if not player:hasSkill(self) then return end
+    return data.card.type == Card.TypeBasic
+  end,
+  on_use = function(self, event, target, player, data)
+    player:broadcastSkillInvoke("jy_budeng")
+    player.room:doAnimate("InvokeSkill", {
+      name = "jy_yingji",
+      player = player.id,
+      skill_type = "offensive",
+    })
+
+    player:drawCards(1)
+  end
+}
+jy_yingji:addRelatedSkill(jy_yingji_draw)
+
+local jy_lingfu = fk.CreateActiveSkill {
+  name = "jy_lingfu",
+  anim_type = "offensive",
+  min_target_num = 1,
+  max_target_num = 3,
+  min_card_num = 1,
+  max_card_num = 4,
+  frequency = Skill.Limited,
+  can_use = function(self, player)
+    return true
+  end,
+  card_filter = function(self, to_select, selected)
+    if Self:prohibitDiscard(Fk:getCardById(to_select)) then return end
+    return #selected < 4
+  end,
+  target_filter = function(self, to_select, selected, selected_cards)
+    return #selected < #selected_cards - 1
+  end,
+  on_use = function(self, room, effect)
+    local player = room:getPlayerById(effect.from)
+    room:throwCard(effect.cards, self.name, player, player)
+    for _, id in ipairs(effect.tos) do
+      room:recover({
+        who = room:getPlayerById(id),
+        num = 1,
+        recoverBy = player,
+        skillName = self.name,
+      })
+    end
+  end,
+}
+
+jy__huohuo:addSkill(jy_yingji)
+jy__huohuo:addSkill(jy_lingfu)
+
+Fk:loadTranslationTable {
+  ["jy__huohuo"] = [[藿藿]],
+
+  ["jy_yingji"] = "应激",
+  [":jy_budeng"] = [[锁定技，你的【杀】均视为【闪】；你使用或打出基本牌后，摸一张牌。]],
+
+  ["jy_lingfu"] = "灵符",
+  [":jy_lingfu"] = [[出牌阶段，你可以弃X+1张牌令至多X名角色回复一点体力，X至多为3。]],
+}
+
 return extension
