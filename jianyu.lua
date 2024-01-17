@@ -2224,24 +2224,29 @@ Fk:loadTranslationTable {
   [":jy_budeng"] = [[锁定技，防止你受到的伤害；你跳过弃牌阶段；你于其他角色的回合内获得牌（含判定区）时，你与其各失去一点体力。<br><font size="1">受到伤害≠我掉血，弃牌阶段≠我要弃，接受礼物≠我同意。</font>]],
 }
 
-local jy__huohuo = General(extension, "jy__huohuo", "wu", 3, 3, General.Female)
-jy__huohuo.hidden = true
+local jy__huohuo = General(extension, "jy__huohuo", "wu", 5, 5, General.Female)
+-- jy__huohuo.hidden = true
 
-local jy_yingji = fk.CreateFilterSkill {
-  name = "jy_yingji",
+local jy_qieju = fk.CreateFilterSkill {
+  name = "jy_qieju",
   frequency = Skill.Compulsory,
   card_filter = function(self, to_select, player)
-    return player:hasSkill(self) and to_select.trueName == "slash" and to_select.color == Card.Black and
+    return player:hasSkill(self) and to_select.trueName == "slash" and
         table.contains(player.player_cards[Player.Hand], to_select.id)
   end,
   view_as = function(self, to_select)
-    local card = Fk:cloneCard("jink", to_select.suit, to_select.number)
+    local card
+    if to_select.color == Card.Black then
+      card = Fk:cloneCard("jink", to_select.suit, to_select.number)
+    else
+      card = Fk:cloneCard("peach", to_select.suit, to_select.number)
+    end
     card.skillName = self.name
     return card
   end,
 }
-local jy_yingji_draw = fk.CreateTriggerSkill {
-  name = "#jy_yingji_draw",
+local jy_qieju_draw = fk.CreateTriggerSkill {
+  name = "#jy_qieju_draw",
   frequency = Skill.Compulsory,
   mute = true,
   anim_type = "offensive",
@@ -2252,27 +2257,39 @@ local jy_yingji_draw = fk.CreateTriggerSkill {
     return target == player and data.card.type == Card.TypeBasic
   end,
   on_use = function(self, event, target, player, data)
-    player:broadcastSkillInvoke("jy_budeng")
+    player:broadcastSkillInvoke("jy_qieju")
     player.room:doAnimate("InvokeSkill", {
-      name = "jy_yingji",
+      name = "jy_qieju",
       player = player.id,
       skill_type = "offensive",
     })
 
-    player:drawCards(1)
+    player:drawCards(2)
   end
 }
-jy_yingji:addRelatedSkill(jy_yingji_draw)
+local jy_qieju_losehp = fk.CreateTriggerSkill {
+  name = "#jy_qieju_losehp",
+  frequency = Skill.Compulsory,
+  mute = true,
+  anim_type = "offensive",
+
+  events = { fk.Damaged },
+  on_use = function(self, event, target, player, data)
+    room:loseHp(player, 1)
+  end
+}
+jy_qieju:addRelatedSkill(jy_qieju_draw)
+jy_qieju:addRelatedSkill(jy_qieju_losehp)
 
 local jy_lingfu = fk.CreateActiveSkill {
   name = "jy_lingfu",
   anim_type = "offensive",
-  min_target_num = 0,
+  min_target_num = 1,
   max_target_num = 3,
-  min_card_num = 2,
+  min_card_num = 3,
   max_card_num = 5,
   can_use = function(self, player)
-    return #player:getCardIds { Player.Hand, Player.Equip } >= 2
+    return #player:getCardIds { Player.Hand, Player.Equip } >= 2 -- and player:usedSkillTimes(self.name) == 0
   end,
   card_filter = function(self, to_select, selected)
     if Self:prohibitDiscard(Fk:getCardById(to_select)) then return end
@@ -2293,21 +2310,30 @@ local jy_lingfu = fk.CreateActiveSkill {
         skillName = self.name,
       })
     end
-    player:drawCards(1)
   end,
 }
 
-jy__huohuo:addSkill(jy_yingji)
+jy__huohuo:addSkill(jy_qieju)
 jy__huohuo:addSkill(jy_lingfu)
 
 Fk:loadTranslationTable {
   ["jy__huohuo"] = [[藿藿]],
+  ["~jy__huohuo"] = [[藿藿：投……投降……]],
 
-  ["jy_yingji"] = "应激",
-  [":jy_yingji"] = [[锁定技，你的黑色【杀】均视为【闪】；你使用或打出基本牌后，摸一张牌。]],
+  ["jy_qieju"] = "怯惧",
+  [":jy_qieju"] = [[锁定技，你的黑色【杀】均视为【闪】，你的红色【杀】均视为【桃】；你使用或打出基本牌后，摸两张牌；你受到伤害后，失去一点体力。]],
+  ["$jy_qieju1"] = "尾巴：走你。 藿藿：啊啊啊——",
+  ["$jy_qieju2"] = "藿藿：不要啊救命啊——",
+  ["$jy_qieju3"] = "藿藿：怎么还没结束……",
+  ["$jy_qieju4"] = "藿藿：说不定我也能做到……",
 
   ["jy_lingfu"] = "灵符",
-  [":jy_lingfu"] = [[出牌阶段，你可以弃X+2张牌令至多X名已受伤的角色回复一点体力，然后你摸一张牌，X至少为0且至多为3。]],
+  [":jy_lingfu"] = [[出牌阶段，你可以弃X+2张牌令至多X名已受伤的角色回复一点体力，X至少为1且至多为3。]],
+  ["$jy_lingfu1"] = [[藿藿：驱邪……缚魅……]],
+  ["$jy_lingfu2"] = [[藿藿：灵符……保命……]],
+
+  ["jy_qiangui"] = "遣鬼",
+  [":jy_qiangui"] = [[限定技，出牌阶段，你可以弃所有牌并失去2点体力，令至多4名角色摸一张牌并且下次造成的伤害+1。这个效果每次被触发时，你回复一点体力并摸两张牌。]],
 }
 
 return extension
