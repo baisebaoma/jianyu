@@ -2264,7 +2264,7 @@ local jy_qieju_draw = fk.CreateTriggerSkill {
       skill_type = "offensive",
     })
 
-    player:drawCards(2)
+    player:drawCards(1)
   end
 }
 local jy_qieju_losehp = fk.CreateTriggerSkill {
@@ -2275,6 +2275,7 @@ local jy_qieju_losehp = fk.CreateTriggerSkill {
 
   events = { fk.Damaged },
   on_use = function(self, event, target, player, data)
+    local room = player.room
     room:loseHp(player, 1)
   end
 }
@@ -2321,7 +2322,7 @@ Fk:loadTranslationTable {
   ["~jy__huohuo"] = [[藿藿：投……投降……]],
 
   ["jy_qieju"] = "怯惧",
-  [":jy_qieju"] = [[锁定技，你的黑色【杀】均视为【闪】，你的红色【杀】均视为【桃】；你使用或打出基本牌后，摸两张牌；你受到伤害后，失去一点体力。]],
+  [":jy_qieju"] = [[锁定技，你的黑色【杀】均视为【闪】，你的红色【杀】均视为【桃】；你使用或打出基本牌后，摸一张牌；你受到伤害后，失去一点体力。]],
   ["$jy_qieju1"] = "尾巴：走你。 藿藿：啊啊啊——",
   ["$jy_qieju2"] = "藿藿：不要啊救命啊——",
   ["$jy_qieju3"] = "藿藿：怎么还没结束……",
