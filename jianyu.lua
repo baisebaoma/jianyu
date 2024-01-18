@@ -2225,6 +2225,7 @@ Fk:loadTranslationTable {
 }
 
 local jy__huohuo = General(extension, "jy__huohuo", "wu", 3, 3, General.Female)
+jy__huohuo.hidden = true
 
 local jy_qieju = fk.CreateFilterSkill {
   name = "jy_qieju",
@@ -2299,8 +2300,32 @@ local jy_lingfu = fk.CreateActiveSkill {
   end,
 }
 
+local jy_qiangui = fk.CreateTriggerSkill {
+  frequency = Skill.Compulsory,
+  name = "jy_qiangui",
+  anim_type = "offensive",
+  events = { fk.EventPhaseProceeding },
+  can_trigger = function(self, event, target, player, data)
+    return player:hasSkill(self) and target == player and player.phase == Player.Start
+  end,
+  on_cost = function(self, event, target, player, data)
+    local room = player.room
+    data.targets = room:askForChoosePlayers(player, room.alive_players, 1, 4, "#jy_qiangui_prompt", self.name, true)
+    if data.targets then return true else return false end
+  end,
+  on_use = function(self, event, target, player, data)
+    local room = player.room
+
+    for _, p in ipairs(data.targets) do
+      room:getPlayerById(p):drawCards(2)
+    end
+    room:loseHp(player, #data.targets)
+  end
+}
+
 jy__huohuo:addSkill(jy_qieju)
 jy__huohuo:addSkill(jy_lingfu)
+jy__huohuo:addSkill(jy_qiangui)
 
 Fk:loadTranslationTable {
   ["jy__huohuo"] = [[藿藿]],
@@ -2314,12 +2339,13 @@ Fk:loadTranslationTable {
   ["$jy_qieju4"] = "藿藿：说不定我也能做到……",
 
   ["jy_lingfu"] = "灵符",
-  [":jy_lingfu"] = [[出牌阶段限一次，你可以弃X+2张牌令至多X名已受伤的角色回复一点体力，X至少为1且至多为3。若以此法为自己回复体力，则改为回复2点。]],
+  [":jy_lingfu"] = [[出牌阶段限一次，你可以弃X+2张牌，令至多X名已受伤的角色回复一点体力，X至多为3。以此法为自己回复体力时，额外回复一点。]],
   ["$jy_lingfu1"] = [[藿藿：驱邪……缚魅……]],
   ["$jy_lingfu2"] = [[藿藿：灵符……保命……]],
 
   ["jy_qiangui"] = "遣鬼",
-  [":jy_qiangui"] = [[限定技，出牌阶段，你可以弃所有牌并失去2点体力，令至多4名角色摸一张牌并且下次造成的伤害+1。这个效果每次被触发时，你回复一点体力并摸两张牌。]],
+  [":jy_qiangui"] = [[准备阶段，你可以令X名角色各摸两张牌，然后你失去X点体力，X至多为4。]],
+  ["#jy_qiangui_prompt"] = "遣鬼：你可以令X名角色各摸两张牌，然后你失去X点体力，X至多为4"
 }
 
 return extension
