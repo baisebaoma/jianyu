@@ -279,7 +279,7 @@ Fk:loadTranslationTable {
   ["jy__new__jianzihao"] = "简自豪",
 
   ["jy_kaiju_2"] = "开局",
-  [":jy_kaiju_2"] = "出牌阶段限一次，你可以指定若干名角色，依次视为你对其使用一张【顺手牵羊】，然后其对你使用一张【杀】。",
+  [":jy_kaiju_2"] = "出牌阶段限一次，你可以指定至少一名角色，视为你对其使用一张【顺手牵羊】，然后其对你使用一张【杀】，依次结算。",
   ["$jy_kaiju_21"] = "不是啊，我炸一对鬼的时候我在打什么，打一对10。一对10，他四个9炸我，我不输了吗？",
   ["$jy_kaiju_22"] = "怎么赢啊？你别瞎说啊！",
   ["$jy_kaiju_23"] = "打这牌怎么打？兄弟们快教我，我看着头晕！",
@@ -552,7 +552,7 @@ Fk:loadTranslationTable {
   ["jy__gaotianliang"] = "高天亮",
 
   ["jy_yuyu"] = "玉玉",
-  [":jy_yuyu"] = [[①锁定技，当有角色对你使用【杀】造成了伤害时，其获得“致郁”标记；②受到没有“致郁”标记的角色，或因本次伤害而获得“致郁”标记的角色造成的伤害时，你可以选择一项：摸3张牌；摸2张牌并翻面，然后对自己造成1点伤害。]],
+  [":jy_yuyu"] = [[①锁定技，当有角色对你使用【杀】造成了伤害时，令其获得“致郁”标记；②受到没有“致郁”标记的角色，或因本次伤害而获得“致郁”标记的角色造成的伤害时，你可以选择一项：摸3张牌；摸2张牌并翻面，然后对自己造成1点伤害。]],
   ["@jy_yuyu_enemy"] = "致郁",
   ["#jy_yuyu_ask_which"] = "玉玉：请选择你要触发的效果",
   ["#jy_yuyu_draw3"] = "摸3张牌",
@@ -1360,7 +1360,7 @@ Fk:loadTranslationTable {
 
   ["jy_sichi"] = "四吃",
   [":jy_sichi"] = [[你受到伤害后，可以展示牌堆顶的4张牌。根据这些牌的花色总数，你：<br>
-  1，令一名角色获得之；<br>
+  1，令一名角色获得这些牌；<br>
   2，选择其中一张可以使用的牌获得，并可以立即使用之。若4张牌都无法使用，你需要弃一张牌；<br>
   3，选择其中3张同类型或2张不同类型的牌获得，然后其他角色各摸一张牌；<br>
   4，选择至多3名角色，你与其分别失去一点体力。]],
@@ -1639,10 +1639,10 @@ Fk:loadTranslationTable {
   ["jy__kgdxs"] = "考公大学生",
 
   ["jy_zuoti"] = "做题",
-  [":jy_zuoti"] = [[出牌阶段限一次，你可以做一道从题库中随机抽取的行测真题。若你回答正确，你可以指定一个牌名，并从场上获得一张该牌名的牌。<br>
-  <font size="1">推荐操作时长：60秒；自备纸笔以应对数学题。<br>
-  收录试卷：]] .. total_papers .. [[套，题量：]] .. total_questions .. [[，经人工筛选，不含图形推理、资料分析，全部取自2018-2023国家公务员录用考试和上海市《行测》真题。<br>
-  你选择的这张牌可能来自于任何位置，包括其他角色的区域、你自己的手牌。建议先把同牌名的牌使用掉。</font>]],
+  [":jy_zuoti"] = [[出牌阶段限一次，你可以从题库中随机抽取一道行测真题，然后你在操作时长内尝试正确回答它。若你回答正确，你可以指定一个牌名，并从场上获得一张该牌名的牌。<br>
+  <font size="1">推荐房间操作时长：60秒；自备纸笔以应对数学题。<br>
+  收录试卷：]] .. total_papers .. [[套，题量：]] .. total_questions .. [[，经人工筛选，不含图形推理（应该显示不出）、资料分析（应该不方便做），全部取自2018-2023国家公务员录用考试和上海市《行测》真题。<br>
+  建议你先把手牌中同牌名的牌使用掉！因为你选择的这张牌可能来自于任何位置，包括其他角色的区域、你自己的手牌。</font>]],
   ["#jy_zuoti_see_log"] = [[做题：请在战报中查看完整题干]],
   ["#jy_zuoti_ob"] = [[正在做题！请在战报中查看这道题目的完整题干和选项。]],
   ["#jy_zuoti_correct"] = [[答对了！可以从场上随机位置获取一张想要的牌！<br>你可以在战报中查看正确答案。]],
@@ -1869,7 +1869,7 @@ local jy_leiyan_trigger = fk.CreateTriggerSkill {
       player:broadcastSkillInvoke("jy_leiyan")
       for _, p in ipairs(room:getAlivePlayers()) do
         if p:getMark("@jy_raiden_leiyan") ~= 0 and not p.dead then
-          p:drawCards(data.damage)
+          p:drawCards(1)
         end
       end
     elseif judge.card.color == Card.Black then
@@ -1929,8 +1929,8 @@ Fk:loadTranslationTable {
   ["~jy__raiden"] = "浮世一梦……",
 
   ["jy_leiyan"] = "雷眼",
-  [":jy_leiyan"] = [[出牌阶段限一次，你可以令至少一名角色获得<font color="Fuchsia">雷罚恶曜之眼</font>。持有该标记的角色造成伤害后，你判定：若为黑色，你对目标造成1点雷电伤害（不会触发〖雷眼〗）；若为红色，所有持有该标记的角色摸X张牌，X等同于伤害值。]],
-  ["@jy_raiden_leiyan"] = [[<font color="Fuchsia">雷罚恶曜之眼</font>]],
+  [":jy_leiyan"] = [[出牌阶段限一次，你可以令至少一名角色获得<font color="Fuchsia">雷眼</font>。持有该标记的角色造成伤害后，你判定：若为黑色，你对目标造成1点雷电伤害（不会触发〖雷眼〗）；若为红色，所有持有该标记的角色摸一张牌。]],
+  ["@jy_raiden_leiyan"] = [[<font color="Fuchsia">雷眼</font>]],
   ["@jy_raiden_yuanli"] = [[<font color="Fuchsia">愿力</font>]],
   ["#jy_leiyan_trigger"] = "雷眼",
   ["$jy_leiyan1"] = "泡影看破！",
@@ -2038,7 +2038,7 @@ Fk:loadTranslationTable {
   ["~jy__ayato"] = "世事无常……",
 
   ["jy_jinghua"] = "镜花",
-  [":jy_jinghua"] = [[你使用或打出一张基本牌后，你可以获得2额外攻击距离、增加2体力上限、回复2体力，并可以立即使用2张不计入使用次数的【杀】；若如此做，当前角色的回合结束时，你减少2点体力上限并失去2点体力（不会使你的体力降至2以下）。]],
+  [":jy_jinghua"] = [[你使用或打出一张基本牌后，你可以增加2攻击距离、增加2体力上限、回复2体力，并可以立即使用2张不计入使用次数的【杀】；若如此做，当前角色的回合结束时，你减少2攻击距离、减少2点体力上限、失去2点体力（不会使你的体力降至2以下）。]],
   ["@jy_jinghua"] = [[<font color="skyblue">镜花/font>]],
   ["$jy_jinghua1"] = "苍流水影。",
   ["$jy_jinghua2"] = "剑影。",
@@ -2077,7 +2077,6 @@ local jy_jieyin = fk.CreateActiveSkill {
     local player = room:getPlayerById(use.from)
     for _, to in ipairs(use.tos) do
       local p = room:getPlayerById(to)
-      -- room:changeMaxHp(player, -1)
       -- 治疗其
       room:recover({
         who = p,
@@ -2123,6 +2122,8 @@ Fk:loadTranslationTable {
 
   ["jy_jieyin"] = "结姻",
   [":jy_jieyin"] = [[限定技，出牌阶段，你可以令一名已受伤的男性角色与你各回复1点体力，然后你获得其所有牌并拥有其所有技能。]],
+  ["$jy_jieyin1"] = [[夫君，身体要紧。]],
+  ["$jy_jieyin2"] = [[他好，我也好。]],
 }
 
 local jy__tangniu = General(extension, "jy__tangniu", "qun", 1, 1, General.Female)
@@ -2310,14 +2311,14 @@ Fk:loadTranslationTable {
   ["~jy__huohuo"] = [[藿藿：投……投降……]],
 
   ["jy_qieju"] = "怯惧",
-  [":jy_qieju"] = [[锁定技，你的【杀】均视为【闪】；当你使用或打出非转化的基本牌时，摸一张牌。]],
+  [":jy_qieju"] = [[锁定技，你的【杀】均<strong>视为</strong>【闪】；当你使用或打出一张<strong>非转化</strong>的基本牌时，摸一张牌。<br><font size="1">强调“非转化”是为了防止同时拥有其他技能时无限摸牌。因本技能视为的【闪】可以触发摸牌。</font>]],
   ["$jy_qieju1"] = "尾巴：走你。 藿藿：啊啊啊——",
   ["$jy_qieju2"] = "藿藿：不要啊救命啊——",
   ["$jy_qieju3"] = "藿藿：怎么还没结束……",
   ["$jy_qieju4"] = "藿藿：说不定我也能做到……",
 
   ["jy_lingfu"] = "灵符",
-  [":jy_lingfu"] = [[出牌阶段，你可以弃置X（X由你选择，X不小于3且不大于5）张牌，令X-2名已受伤的角色回复一点体力并摸一张牌。]],
+  [":jy_lingfu"] = [[出牌阶段，你可以弃置X（X的值由你选择，X不能小于3且不能大于5）张牌，令X-2名已受伤的角色回复一点体力并摸一张牌。]],
   ["$jy_lingfu1"] = [[藿藿：驱邪……缚魅……]],
   ["$jy_lingfu2"] = [[藿藿：灵符……保命……]],
 }
