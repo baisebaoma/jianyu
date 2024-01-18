@@ -2303,14 +2303,14 @@ local jy_lingfu = fk.CreateActiveSkill {
 local jy_qiangui = fk.CreateTriggerSkill {
   frequency = Skill.Compulsory,
   name = "jy_qiangui",
-  anim_type = "offensive",
+  anim_type = "support",
   events = { fk.EventPhaseProceeding },
   can_trigger = function(self, event, target, player, data)
     return player:hasSkill(self) and target == player and player.phase == Player.Start
   end,
   on_cost = function(self, event, target, player, data)
     local room = player.room
-    local targets = room.alive_players
+    local targets = room:getAlivePlayers()
 
     local result = room:askForChoosePlayers(player, targets, 1, 4, "#jy_qiangui_prompt", self.name)
     if #result > 0 then
