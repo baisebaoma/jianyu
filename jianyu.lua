@@ -2261,7 +2261,7 @@ local jy_qieju_draw = fk.CreateTriggerSkill {
       skill_type = "offensive",
     })
 
-    player:drawCards(2)
+    player:drawCards(3)
   end
 }
 jy_qieju:addRelatedSkill(jy_qieju_draw)
@@ -2300,48 +2300,15 @@ local jy_lingfu = fk.CreateActiveSkill {
   end,
 }
 
-local jy_qiangui = fk.CreateTriggerSkill {
-  frequency = Skill.Compulsory,
-  name = "jy_qiangui",
-  anim_type = "support",
-  events = { fk.EventPhaseProceeding },
-  can_trigger = function(self, event, target, player, data)
-    return player:hasSkill(self) and target == player and player.phase == Player.Start
-  end,
-  on_cost = function(self, event, target, player, data)
-    local room = player.room
-    local targets = room:getAlivePlayers()
-
-    local result = room:askForChoosePlayers(player, targets, 1, 4, "#jy_qiangui_prompt", self.name)
-    if #result > 0 then
-      self.cost_data = result
-      return true
-    end
-  end,
-  on_use = function(self, event, target, player, data)
-    local room = player.room
-    for _, id in ipairs(self.cost_data) do
-      if player.dead then return end
-      local p = room:getPlayerById(id)
-      if not p.dead then
-        p:drawCards(2)
-      end
-    end
-    room:loseHp(player, #self.cost_data)
-    return true
-  end,
-}
-
 jy__huohuo:addSkill(jy_qieju)
 jy__huohuo:addSkill(jy_lingfu)
-jy__huohuo:addSkill(jy_qiangui)
 
 Fk:loadTranslationTable {
   ["jy__huohuo"] = [[藿藿]],
   ["~jy__huohuo"] = [[藿藿：投……投降……]],
 
   ["jy_qieju"] = "怯惧",
-  [":jy_qieju"] = [[锁定技，你的【杀】均视为【闪】；你使用或打出基本牌后，摸2张牌。]],
+  [":jy_qieju"] = [[锁定技，你的【杀】均视为【闪】；你使用或打出基本牌后，摸3张牌。]],
   ["$jy_qieju1"] = "尾巴：走你。 藿藿：啊啊啊——",
   ["$jy_qieju2"] = "藿藿：不要啊救命啊——",
   ["$jy_qieju3"] = "藿藿：怎么还没结束……",
@@ -2351,10 +2318,6 @@ Fk:loadTranslationTable {
   [":jy_lingfu"] = [[出牌阶段限一次，你可以弃X+2张牌，令至多X名已受伤的角色回复一点体力，X至多为3。以此法为自己回复体力时，额外回复一点。]],
   ["$jy_lingfu1"] = [[藿藿：驱邪……缚魅……]],
   ["$jy_lingfu2"] = [[藿藿：灵符……保命……]],
-
-  ["jy_qiangui"] = "遣鬼",
-  [":jy_qiangui"] = [[准备阶段，你可以令X名角色各摸两张牌，然后你失去X点体力，X至多为4。]],
-  ["#jy_qiangui_prompt"] = "遣鬼：你可以令X名角色各摸两张牌，然后你失去X点体力，X至多为4"
 }
 
 return extension
