@@ -135,7 +135,7 @@ local jy_kaiju = fk.CreateTriggerSkill {
 
 jy__jianzihao:addSkill(jy_kaiju)
 jy__jianzihao:addSkill(jy_hongwen)
-jy__jianzihao:addSkill(jy_zouwei) -- 走位令玩家感到困惑，建议删掉
+-- jy__jianzihao:addSkill(jy_zouwei) -- 走位令玩家感到困惑，建议删掉
 jy__jianzihao:addSkill(jy_shengnu)
 jy__jianzihao:addSkill(jy_xizao)
 
@@ -271,7 +271,7 @@ local jy_xizao_2 = fk.CreateTriggerSkill {
 jy__jianzihao:addSkill(jy_kaiju_2)
 jy__jianzihao:addSkill(jy_sanjian)
 jy__jianzihao:addSkill("jy_hongwen")
-jy__jianzihao:addSkill("jy_zouwei")
+-- jy__jianzihao:addSkill("jy_zouwei")
 jy__jianzihao:addSkill("jy_shengnu")
 -- jy__jianzihao:addSkill("jy_xizao")
 
@@ -1380,7 +1380,7 @@ Fk:loadTranslationTable {
   ["#jy_sichi_4"] = "四吃：选择至多3名角色，你和他们各失去一点体力",
 
   ["jy_huapen"] = "花盆",
-  [":jy_huapen"] = [[锁定技，其他角色使用♣非延时锦囊牌或基本牌、指定了有且仅有一个不为你的目标时，你判定，若为<font color="red">♥</font>，额外指定你为目标。（含【借刀杀人】）]],
+  [":jy_huapen"] = [[锁定技，其他角色使用♣非延时锦囊牌或基本牌、指定了有且仅有一个不为你的目标时，你判定，若为<font color="red">♥</font>，该牌额外指定你为目标。（含【借刀杀人】）]],
 
   ["jy_boshi"] = "搏时",
   [":jy_boshi"] = [[觉醒技，准备阶段，若你已判定过至少X次，你减一点体力上限、失去〖花盆〗，然后获得〖奖杯〗，X等于存活角色数。]],
@@ -2310,14 +2310,14 @@ Fk:loadTranslationTable {
   ["~jy__huohuo"] = [[藿藿：投……投降……]],
 
   ["jy_qieju"] = "怯惧",
-  [":jy_qieju"] = [[锁定技，你的回合外，你的【杀】均视为【闪】；当你使用或打出非转化的基本牌时，摸一张牌。]],
+  [":jy_qieju"] = [[锁定技，你的【杀】均视为【闪】；当你使用或打出非转化的基本牌时，摸一张牌。]],
   ["$jy_qieju1"] = "尾巴：走你。 藿藿：啊啊啊——",
   ["$jy_qieju2"] = "藿藿：不要啊救命啊——",
   ["$jy_qieju3"] = "藿藿：怎么还没结束……",
   ["$jy_qieju4"] = "藿藿：说不定我也能做到……",
 
   ["jy_lingfu"] = "灵符",
-  [":jy_lingfu"] = [[出牌阶段，你可以弃置X（X由你自己选择，3<=X<=5）张牌，令X-2名已受伤的角色回复一点体力并摸一张牌。]],
+  [":jy_lingfu"] = [[出牌阶段，你可以弃置X（X由你选择，X不小于3且不大于5）张牌，令X-2名已受伤的角色回复一点体力并摸一张牌。]],
   ["$jy_lingfu1"] = [[藿藿：驱邪……缚魅……]],
   ["$jy_lingfu2"] = [[藿藿：灵符……保命……]],
 }
