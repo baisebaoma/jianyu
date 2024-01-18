@@ -565,7 +565,7 @@ Fk:loadTranslationTable {
 }
 
 -- 阿威罗
-local jy__aweiluo = General(extension, "jy__aweiluo", "qun", 4)
+local jy__aweiluo = General(extension, "jy__aweiluo", "qun", 3)
 
 -- 游龙
 local jy_youlong = fk.CreateTriggerSkill {
@@ -2225,14 +2225,13 @@ Fk:loadTranslationTable {
 }
 
 local jy__huohuo = General(extension, "jy__huohuo", "wu", 3, 3, General.Female)
-jy__huohuo.hidden = true
 
 local jy_qieju = fk.CreateFilterSkill {
   name = "jy_qieju",
   mute = true, -- 不需要播放语音，因为使用基本牌的时候就会摸牌，摸牌会播放语音
   frequency = Skill.Compulsory,
   card_filter = function(self, to_select, player)
-    return player:hasSkill(self) and -- and player.phase == Player.NotActive
+    return player:hasSkill(self) and player.phase == Player.NotActive and
         to_select.trueName == "slash" and
         table.contains(player.player_cards[Player.Hand], to_select.id)
   end,
@@ -2261,7 +2260,7 @@ local jy_qieju_draw = fk.CreateTriggerSkill {
       skill_type = "offensive",
     })
 
-    player:drawCards(3)
+    player:drawCards(1)
   end
 }
 jy_qieju:addRelatedSkill(jy_qieju_draw)
@@ -2274,7 +2273,7 @@ local jy_lingfu = fk.CreateActiveSkill {
   min_card_num = 3,
   max_card_num = 5,
   can_use = function(self, player)
-    return #player:getCardIds { Player.Hand, Player.Equip } >= 2 and player:usedSkillTimes(self.name) == 0
+    return #player:getCardIds { Player.Hand, Player.Equip } >= 2 -- and player:usedSkillTimes(self.name) == 0
   end,
   card_filter = function(self, to_select, selected)
     if Self:prohibitDiscard(Fk:getCardById(to_select)) then return end
@@ -2284,18 +2283,22 @@ local jy_lingfu = fk.CreateActiveSkill {
     local to = Fk:currentRoom():getPlayerById(to_select)
     return #selected < #selected_cards - 2 and to.hp ~= to.maxHp
   end,
+  feasible = function(self, selected, selected_cards)
+    return #selected + 2 == #selected_cards
+  end,
   on_use = function(self, room, effect)
     local player = room:getPlayerById(effect.from)
     room:throwCard(effect.cards, self.name, player, player)
+    room:delay(600)
     for _, id in ipairs(effect.tos) do
-      local num = 1
-      if player.id == id then num = 2 end
+      local to = room:getPlayerById(id)
       room:recover({
-        who = room:getPlayerById(id),
-        num = num,
+        who = to,
+        num = 1,
         recoverBy = player,
         skillName = self.name,
       })
+      if player.id == id then room:changeMaxHp(to, 1) else to:drawCards(1) end
     end
   end,
 }
@@ -2308,14 +2311,14 @@ Fk:loadTranslationTable {
   ["~jy__huohuo"] = [[藿藿：投……投降……]],
 
   ["jy_qieju"] = "怯惧",
-  [":jy_qieju"] = [[锁定技，你的【杀】均视为【闪】；你使用或打出基本牌后，摸3张牌。]],
+  [":jy_qieju"] = [[锁定技，你的回合外，你的【杀】均视为【闪】；你使用或打出基本牌后，摸一张牌。]],
   ["$jy_qieju1"] = "尾巴：走你。 藿藿：啊啊啊——",
   ["$jy_qieju2"] = "藿藿：不要啊救命啊——",
   ["$jy_qieju3"] = "藿藿：怎么还没结束……",
   ["$jy_qieju4"] = "藿藿：说不定我也能做到……",
 
   ["jy_lingfu"] = "灵符",
-  [":jy_lingfu"] = [[出牌阶段限一次，你可以弃X+2张牌，令至多X名已受伤的角色回复一点体力，X至多为3。以此法为自己回复体力时，额外回复一点。]],
+  [":jy_lingfu"] = [[出牌阶段，你可以弃X+2张牌，令X名已受伤的角色回复一点体力并摸一张牌，X至多为3。以此法为自己回复体力时，将摸牌改为增加一点体力上限。]],
   ["$jy_lingfu1"] = [[藿藿：驱邪……缚魅……]],
   ["$jy_lingfu2"] = [[藿藿：灵符……保命……]],
 }
