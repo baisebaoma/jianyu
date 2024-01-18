@@ -50,9 +50,10 @@ local jy_shengnu = fk.CreateTriggerSkill {
   name = "jy_shengnu",
   anim_type = 'drawcard',
   events = { fk.AfterCardsMove },
-  -- frequency = Skill.Compulsory,  -- 我觉得还是把这个关掉比较好，因为多个简自豪的时候会混乱。
+  frequency = Skill.Limited,
   can_trigger = function(self, event, target, player, data)
     if not player:hasSkill(self) then return false end
+    if player:usedSkillTimes(self.name, Player.HistoryGame) ~= 0 then return false end
     for _, move in ipairs(data) do
       if move.to ~= player.id and (move.toArea == Card.PlayerEquip or move.toArea == Card.DiscardPile) then
         for _, info in ipairs(move.moveInfo) do
@@ -164,18 +165,18 @@ Fk:loadTranslationTable {
   -- ["$jy_hongwen5"] = "这是咋想的呀？",  -- 这条语音太吵了
 
   ["jy_zouwei"] = "走位",
-  [":jy_zouwei"] = "锁定技，当装备区没有牌时，其他角色计算与你的距离时，始终+1；当装备区有牌时，你计算与其他角色的距离时，始终-1。",
+  [":jy_zouwei"] = "锁定技，当你的装备区没有牌时，其他角色计算与你的距离+1；当你的装备区有牌时，你计算与其他角色的距离-1。",
   ["$jy_zouwei1"] = "玩一下，不然我是不是一张牌没有出啊兄弟？",
   ["$jy_zouwei2"] = "完了呀！",
 
   ["jy_shengnu"] = "圣弩",
-  [":jy_shengnu"] = "当【诸葛连弩】移至弃牌堆或其他角色的装备区时，你可以获得之。",
+  [":jy_shengnu"] = "限定技，当【诸葛连弩】移至弃牌堆或其他角色的装备区时，你可以获得之。",
   ["$jy_shengnu1"] = "哎兄弟们我这个牌不能拆吧？",
   ["$jy_shengnu2"] = "补刀瞬间回来了！",
   ["$jy_shengnu3"] = "恶心我，我也恶心你啊，互恶心呗！",
 
   ["jy_xizao"] = "洗澡",
-  [":jy_xizao"] = "限定技，处于濒死状态时，你可以将体力恢复至1，摸三张牌，然后翻面。",
+  [":jy_xizao"] = "限定技，你处于濒死状态时，可以将体力恢复至1点、摸三张牌，然后翻面。",
   ["$jy_xizao1"] = "呃啊啊啊啊啊啊啊！！",
   ["$jy_xizao2"] = "也不是稳赢吧，我觉得赢了！",
   ["$jy_xizao3"] = "真的我是真玩不了，这跟变态没关系，我好他妈的气！",
@@ -272,13 +273,13 @@ jy__jianzihao:addSkill(jy_sanjian)
 jy__jianzihao:addSkill("jy_hongwen")
 jy__jianzihao:addSkill("jy_zouwei")
 jy__jianzihao:addSkill("jy_shengnu")
-jy__jianzihao:addSkill("jy_xizao")
+-- jy__jianzihao:addSkill("jy_xizao")
 
 Fk:loadTranslationTable {
   ["jy__new__jianzihao"] = "简自豪",
 
   ["jy_kaiju_2"] = "开局",
-  [":jy_kaiju_2"] = "出牌阶段限一次，你选择若干名角色，依次视为你对其使用一张【顺手牵羊】，然后被其使用一张【杀】。",
+  [":jy_kaiju_2"] = "出牌阶段限一次，你可以指定若干名角色，依次视为你对其使用一张【顺手牵羊】，然后其对你使用一张【杀】。",
   ["$jy_kaiju_21"] = "不是啊，我炸一对鬼的时候我在打什么，打一对10。一对10，他四个9炸我，我不输了吗？",
   ["$jy_kaiju_22"] = "怎么赢啊？你别瞎说啊！",
   ["$jy_kaiju_23"] = "打这牌怎么打？兄弟们快教我，我看着头晕！",
@@ -289,11 +290,11 @@ Fk:loadTranslationTable {
   ["$jy_kaiju_28"] = "Oh my God，我要珍惜这段时光，我要好好地将它珍惜！",
 
   ["jy_sanjian"] = "三件",
-  [":jy_sanjian"] = [[锁定技，出牌阶段开始时，若装备区有且仅有三张牌，你视为使用一张【酒】和一张【无中生有】。]],
+  [":jy_sanjian"] = [[锁定技，出牌阶段开始时，若你的装备区有且仅有三张牌，你视为使用一张【酒】和一张【无中生有】。]],
   ["$jy_sanjian1"] = "也不是稳赢吧，我觉得赢了！",
 
   ["jy_xizao_2"] = "洗澡",
-  [":jy_xizao_2"] = "限定技，处于濒死状态且装备区有牌时，你可以弃置所有装备区的牌、将体力恢复至1，然后每以此法弃置一张牌，你摸三张牌。",
+  [":jy_xizao_2"] = "限定技，你处于濒死状态且装备区有牌时，你可以弃置所有装备区的牌、将体力恢复至1，然后每以此法弃置一张牌，你摸三张牌。",
   ["$jy_xizao_21"] = "呃啊啊啊啊啊啊啊！！",
   ["$jy_xizao_22"] = "也不是稳赢吧，我觉得赢了！",
   ["$jy_xizao_23"] = "真的我是真玩不了，这跟变态没关系，我好他妈的气！",
@@ -492,8 +493,7 @@ Fk:loadTranslationTable {
   <br><font size="1"><i>“……唯我虎大将军！”——钱晨</i></font>]],
 
   ["jy_erduanxiao_2"] = "二段",
-  [":jy_erduanxiao_2"] = [[锁定技，有且仅有两张“啸”时，
-  选择：弃置所有“啸”并恢复一点体力；将所有“啸”纳入手牌。]],
+  [":jy_erduanxiao_2"] = [[锁定技，每当你的武将牌上有且仅有两张“啸”时，你需要选择一项：弃置所有“啸”并恢复一点体力；将所有“啸”纳入手牌。]],
   ["#jy_erduanxiao_trigger_2"] = "二段",
   ["#lose_xiao_2"] = [[将所有“啸”纳入手牌]],
   ["#lose_hp_1_2"] = [[弃置所有“啸”并恢复一点体力]],
@@ -532,7 +532,7 @@ local jy_yuyu = fk.CreateTriggerSkill {
     if self.choice == "#jy_yuyu_draw3" then
       player:drawCards(3)
     else
-      player:drawCards(4)
+      player:drawCards(2)
       player:turnOver()
       Fk:currentRoom():damage({
         from = player,
@@ -552,11 +552,11 @@ Fk:loadTranslationTable {
   ["jy__gaotianliang"] = "高天亮",
 
   ["jy_yuyu"] = "玉玉",
-  [":jy_yuyu"] = [[①锁定技，当有角色对你使用【杀】造成了伤害时，其获得“致郁”标记；②受到没有“致郁”标记的角色或因本次伤害而获得“致郁”标记的角色造成的伤害时，你可以选择一项：摸3张牌；摸4张牌并翻面，然后对自己造成1点伤害。]],
+  [":jy_yuyu"] = [[①锁定技，当有角色对你使用【杀】造成了伤害时，其获得“致郁”标记；②受到没有“致郁”标记的角色，或因本次伤害而获得“致郁”标记的角色造成的伤害时，你可以选择一项：摸3张牌；摸2张牌并翻面，然后对自己造成1点伤害。]],
   ["@jy_yuyu_enemy"] = "致郁",
   ["#jy_yuyu_ask_which"] = "玉玉：请选择你要触发的效果",
   ["#jy_yuyu_draw3"] = "摸3张牌",
-  ["#jy_yuyu_draw4turnover"] = "摸4张牌并翻面，然后对自己造成1点伤害",
+  ["#jy_yuyu_draw4turnover"] = "摸2张牌并翻面，然后对自己造成1点伤害",
   ["$jy_yuyu1"] = "我……我真的很想听到你们说话……",
   ["$jy_yuyu2"] = "我天天被队霸欺负，他们天天骂我。",
   ["$jy_yuyu3"] = "有什么话是真的不能讲的……为什么一定……每次都是……一个人在讲……",
@@ -876,23 +876,21 @@ Fk:loadTranslationTable {
 
   ["jy_youlong"] = "游龙",
   ["#jy_youlong-choose"] = "游龙：选择一张手牌交给下家",
-  [":jy_youlong"] = "锁定技，准备阶段，有手牌的角色依次将一张手牌交给下家。",
+  [":jy_youlong"] = "锁定技，准备阶段，从你开始，有手牌的角色依次将一张手牌交给下家。",
   ["$jy_youlong1"] = "翩若惊鸿！婉若游龙！",
 
   ["jy_hebao"] = "核爆",
-  [":jy_hebao"] = "准备阶段，可以将一张手牌置于武将牌上，称为“点”。",
+  [":jy_hebao"] = "准备阶段，你可以将一张手牌作为“点”置于武将牌上。",
   ["#jy_hebao-choose"] = "核爆：选择一张手牌成为“点”",
   ["$jy_hebao1"] = "Siu~",
 
   ["jy_tiaoshui"] = "跳水",
-  [":jy_tiaoshui"] = "受到伤害时，可以弃置一张“点”。",
+  [":jy_tiaoshui"] = "你受到伤害时，可以弃置一张“点”。",
   ["#jy_tiaoshui"] = "弃置一张“点”",
   ["$jy_tiaoshui1"] = "Siu, hahahaha!",
 
   ["jy_luojiao"] = "罗绞",
-  [":jy_luojiao"] = [[当“点”数量变化后：<br>
-  若你没有两张及以上相同花色的“点”，可以视为立即使用一张【南蛮入侵】；<br>
-  若你有4张“点”，可以视为立即使用一张【万箭齐发】。]],
+  [":jy_luojiao"] = [[每当你的武将牌上的“点”的数量变化后：若没有两张及以上相同花色的“点”，你可以视为使用一张【南蛮入侵】；若“点”有4张，你可以视为使用一张【万箭齐发】。]],
   ["$jy_luojiao1"] = "Muchas gracias afición, esto es para vosotros, Siuuu!!",
   ["#jy_luojiao_after"] = "罗绞",
   ["#jy_luojiao_archery_attack"] = "罗绞·万箭",
@@ -903,7 +901,7 @@ Fk:loadTranslationTable {
   ["#jy_luojiao_ask_which"] = "罗绞 两个条件同时达成并发动，请选择要先视为使用的牌",
 
   ["jy_yusu"] = "玉玊",
-  [":jy_yusu"] = "你的回合内，使用或打出第二张基本牌时，可以将其作为“点”置于武将牌上。",
+  [":jy_yusu"] = "你的回合内，使用或打出第二张基本牌时，你可以将其作为“点”置于武将牌上。",
   ["@jy_yusu_basic_count"] = "玉玊",
   ["$jy_yusu1"] = "Siu...",
   ["#jy_yusu_triggered"] = "已触发",
@@ -1333,7 +1331,7 @@ local jy_jiangbei_draw = fk.CreateTriggerSkill {
     player.room:setPlayerMark(player, "@jy_jiangbei_draw", 0)
   end,
 
-  events = { fk.EventPhaseEnd }, -- 包括了使用和打出
+  events = { fk.EventPhaseStart }, -- 包括了使用和打出
   can_trigger = function(self, event, target, player, data)
     return target == player and player:hasSkill(self)
         and player.phase == Player.Discard
@@ -1361,11 +1359,11 @@ Fk:loadTranslationTable {
   ["jy__yangfan"] = "杨藩",
 
   ["jy_sichi"] = "四吃",
-  [":jy_sichi"] = [[受到伤害后，你可以展示牌堆顶的4张牌。若花色数量为：<br>
+  [":jy_sichi"] = [[你受到伤害后，可以展示牌堆顶的4张牌。根据这些牌的花色总数，你：<br>
   1，令一名角色获得之；<br>
-  2，获得一张可以使用的牌并可以立即使用。若无，弃一张牌；<br>
-  3，获得3张同类型或2张不同类型的牌，然后其他角色各摸一张牌；<br>
-  4，你与至多3名角色各失去一点体力。]],
+  2，选择其中一张可以使用的牌获得，并可以立即使用之。若4张牌都无法使用，你需要弃一张牌；<br>
+  3，选择其中3张同类型或2张不同类型的牌获得，然后其他角色各摸一张牌；<br>
+  4，选择至多3名角色，你与其分别失去一点体力。]],
 
   ["#jy_sichi_suits_1"] = "四吃：1种花色，选择一名角色获得这些牌",
   ["#jy_sichi_suits_2"] = "四吃：2种花色，获得一张可使用的牌并可以立即使用",
@@ -1382,14 +1380,14 @@ Fk:loadTranslationTable {
   ["#jy_sichi_4"] = "四吃：选择至多3名角色，你和他们各失去一点体力",
 
   ["jy_huapen"] = "花盆",
-  [":jy_huapen"] = [[锁定技，其他角色使用♣非延时锦囊牌或基本牌指定了有且仅有一个不为你的目标时，你判定，若为<font color="red">♥</font>，额外指定你为目标。（含【借刀杀人】）]],
+  [":jy_huapen"] = [[锁定技，其他角色使用♣非延时锦囊牌或基本牌、指定了有且仅有一个不为你的目标时，你判定，若为<font color="red">♥</font>，额外指定你为目标。（含【借刀杀人】）]],
 
   ["jy_boshi"] = "搏时",
-  [":jy_boshi"] = [[觉醒技，准备阶段，若你已判定过至少X次，你减一点体力上限、失去〖花盆〗，然后获得〖奖杯〗，X为存活角色数。]],
+  [":jy_boshi"] = [[觉醒技，准备阶段，若你已判定过至少X次，你减一点体力上限、失去〖花盆〗，然后获得〖奖杯〗，X等于存活角色数。]],
   ["@jy_boshi_judge_count"] = "搏时",
 
   ["jy_jiangbei"] = "奖杯",
-  [":jy_jiangbei"] = [[锁定技，你的基本牌和锦囊牌花色若为：♣，无视距离、防具、次数限制；<font color="red">♥</font>，不可响应；弃牌阶段结束时，若你出牌阶段只使用或打出过♣和<font color="red">♥</font>牌，摸等量的牌。]],
+  [":jy_jiangbei"] = [[锁定技，你的基本牌和锦囊牌花色若为：♣，无视距离、防具、次数限制；<font color="red">♥</font>，不可响应；弃牌阶段开始时，若你出牌阶段只使用或打出过♣和<font color="red">♥</font>牌，摸等量的牌。]],
   ["#jy_jiangbei_heart"] = "奖杯",
   ["#jy_jiangbei_club"] = "奖杯",
   ["#jy_jiangbei_club_2"] = "奖杯",
@@ -1641,7 +1639,7 @@ Fk:loadTranslationTable {
   ["jy__kgdxs"] = "考公大学生",
 
   ["jy_zuoti"] = "做题",
-  [":jy_zuoti"] = [[出牌阶段限一次，你做一道行测真题。若正确，你可以获得一张想要的牌。<br>
+  [":jy_zuoti"] = [[出牌阶段限一次，你可以做一道从题库中随机抽取的行测真题。若你回答正确，你可以指定一个牌名，并从场上获得一张该牌名的牌。<br>
   <font size="1">推荐操作时长：60秒；自备纸笔以应对数学题。<br>
   收录试卷：]] .. total_papers .. [[套，题量：]] .. total_questions .. [[，经人工筛选，不含图形推理、资料分析，全部取自2018-2023国家公务员录用考试和上海市《行测》真题。<br>
   你选择的这张牌可能来自于任何位置，包括其他角色的区域、你自己的手牌。建议先把同牌名的牌使用掉。</font>]],
@@ -1655,9 +1653,9 @@ Fk:loadTranslationTable {
   ["#jy_zuoti_incorrect_log"] = "%from 选择了：%arg，正确答案：%arg2。",
 
   ["jy_jieju"] = "熬夜",
-  [":jy_jieju"] = [[使命技，出牌阶段，你失去1点体力使〖做题〗视为未发动过。<br>
-  成功：回合结束时，若你〖做题〗答对比答错至少多3，你摸3张牌，然后获得技能〖集智〗、〖看破〗、〖享乐〗；<br>
-  失败：回合结束时，若你〖做题〗答错比答对至少多3，你翻面、减2点体力上限，然后获得技能〖玉玉〗、〖红温〗。]],
+  [":jy_jieju"] = [[使命技，出牌阶段，你可以失去一点体力使〖做题〗视为未发动过。<br>
+  成功：回合结束时，若你〖做题〗答对比答错至少多3，你摸3张牌，然后获得〖集智〗、〖看破〗、〖享乐〗；<br>
+  失败：回合结束时，若你〖做题〗答错比答对至少多3，你翻面、减2点体力上限，然后获得〖玉玉〗、〖红温〗。]],
   ["#jy_jieju_success"] = "结局：成功",
   ["#jy_jieju_fail"] = "结局：失败",
 
@@ -1785,8 +1783,8 @@ local jy_yali_maxcards = fk.CreateMaxCardsSkill {
 }
 jy_yali:addRelatedSkill(jy_yali_maxcards)
 
-jy__mou__gaotianliang:addSkill(jy_tianling)
 jy__mou__gaotianliang:addSkill(jy_yali)
+jy__mou__gaotianliang:addSkill(jy_tianling)
 
 Fk:loadTranslationTable {
   ["jy__mou__gaotianliang"] = "高天亮",
@@ -1800,7 +1798,7 @@ Fk:loadTranslationTable {
   ["#jy_tianling_yuyu"] = "天灵",
 
   ["jy_yali"] = "压力",
-  [":jy_yali"] = [[锁定技，你的手牌上限等于你的体力上限；你的摸牌阶段改为摸X-Y张牌且至少为0，X为你的体力值，Y为你的手牌数。]],
+  [":jy_yali"] = [[锁定技，你的摸牌阶段改为摸X-Y张牌且至少为0，X为你的体力值，Y为你的手牌数；你的手牌上限等于你的体力上限。]],
 
 }
 
@@ -1825,8 +1823,8 @@ local jy_leiyan = fk.CreateActiveSkill {
       end
     end
 
-    return not all_players
-    -- player:usedSkillTimes(self.name, Player.HistoryPhase) == 0 and
+    return not all_players and
+        player:usedSkillTimes(self.name, Player.HistoryPhase) == 0
   end,
   card_filter = function(self, card)
     return false
@@ -1931,7 +1929,7 @@ Fk:loadTranslationTable {
   ["~jy__raiden"] = "浮世一梦……",
 
   ["jy_leiyan"] = "雷眼",
-  [":jy_leiyan"] = [[出牌阶段，你可以令至少一名角色获得<font color="Fuchsia">雷罚恶曜之眼</font>标记。其造成伤害后你判定，若为黑色，你对目标造成1点雷电伤害（不会触发〖雷眼〗）；若为红色，持有该标记的角色摸等同于伤害值的牌。]],
+  [":jy_leiyan"] = [[出牌阶段限一次，你可以令至少一名角色获得<font color="Fuchsia">雷罚恶曜之眼</font>。持有该标记的角色造成伤害后，你判定：若为黑色，你对目标造成1点雷电伤害（不会触发〖雷眼〗）；若为红色，所有持有该标记的角色摸X张牌，X等同于伤害值。]],
   ["@jy_raiden_leiyan"] = [[<font color="Fuchsia">雷罚恶曜之眼</font>]],
   ["@jy_raiden_yuanli"] = [[<font color="Fuchsia">愿力</font>]],
   ["#jy_leiyan_trigger"] = "雷眼",
@@ -2040,8 +2038,8 @@ Fk:loadTranslationTable {
   ["~jy__ayato"] = "世事无常……",
 
   ["jy_jinghua"] = "镜花",
-  [":jy_jinghua"] = [[使用或打出基本牌后，你可以进入<font color="skyblue">泷廻鉴花</font>状态，直到当前回合结束。<font color="skyblue">泷廻鉴花</font>状态下，你获得2攻击距离、2体力上限、2体力，并可以立即使用2张不计入使用次数的【杀】。因<font color="skyblue">泷廻鉴花</font>状态结束而失去体力时，至多使体力降至2。]],
-  ["@jy_jinghua"] = [[<font color="skyblue">泷廻鉴花</font>]],
+  [":jy_jinghua"] = [[你使用或打出一张基本牌后，你可以获得2额外攻击距离、增加2体力上限、回复2体力，并可以立即使用2张不计入使用次数的【杀】；若如此做，当前角色的回合结束时，你减少2点体力上限并失去2点体力（不会使你的体力降至2以下）。]],
+  ["@jy_jinghua"] = [[<font color="skyblue">镜花/font>]],
   ["$jy_jinghua1"] = "苍流水影。",
   ["$jy_jinghua2"] = "剑影。",
   ["#jy_jinghua_use"] = "镜花：你可以使用两张不计入使用次数的【杀】，第一张",
@@ -2221,7 +2219,7 @@ Fk:loadTranslationTable {
   ["jy__tangniu"] = [[唐妞]],
 
   ["jy_budeng"] = "不等",
-  [":jy_budeng"] = [[锁定技，防止你受到的伤害；你跳过弃牌阶段；你于其他角色的回合内获得牌（含判定区）时，你与其各失去一点体力。<br><font size="1">受到伤害≠我掉血，弃牌阶段≠我要弃，接受礼物≠我同意。</font>]],
+  [":jy_budeng"] = [[锁定技，防止你受到的伤害；你跳过弃牌阶段；你于其他角色的回合内获得牌（包括有牌进入你的判定区）时，你与其各失去一点体力。<br><font size="1">受到伤害≠我掉血，弃牌阶段≠我要弃，接受礼物≠我同意。</font>]],
 }
 
 local jy__huohuo = General(extension, "jy__huohuo", "wu", 3, 3, General.Female)
@@ -2231,7 +2229,7 @@ local jy_qieju = fk.CreateFilterSkill {
   mute = true, -- 不需要播放语音，因为使用基本牌的时候就会摸牌，摸牌会播放语音
   frequency = Skill.Compulsory,
   card_filter = function(self, to_select, player)
-    return player:hasSkill(self) and player.phase == Player.NotActive and
+    return player:hasSkill(self) and -- player.phase == Player.NotActive and
         to_select.trueName == "slash" and
         table.contains(player.player_cards[Player.Hand], to_select.id)
   end,
@@ -2250,7 +2248,8 @@ local jy_qieju_draw = fk.CreateTriggerSkill {
   events = { fk.CardUsing, fk.CardResponding },
   can_trigger = function(self, event, target, player, data)
     if not player:hasSkill(self) then return end
-    return target == player and data.card.type == Card.TypeBasic
+    return target == player and data.card.type == Card.TypeBasic and
+        (not data.card:isVirtual() or #data.card.subcards == 0) -- 非转化的牌
   end,
   on_use = function(self, event, target, player, data)
     player:broadcastSkillInvoke("jy_qieju")
@@ -2298,7 +2297,7 @@ local jy_lingfu = fk.CreateActiveSkill {
         recoverBy = player,
         skillName = self.name,
       })
-      if player.id == id then room:changeMaxHp(to, 1) else to:drawCards(1) end
+      to:drawCards(1)
     end
   end,
 }
@@ -2311,14 +2310,14 @@ Fk:loadTranslationTable {
   ["~jy__huohuo"] = [[藿藿：投……投降……]],
 
   ["jy_qieju"] = "怯惧",
-  [":jy_qieju"] = [[锁定技，你的回合外，你的【杀】均视为【闪】；你使用或打出基本牌后，摸一张牌。]],
+  [":jy_qieju"] = [[锁定技，你的回合外，你的【杀】均视为【闪】；当你使用或打出非转化的基本牌时，摸一张牌。]],
   ["$jy_qieju1"] = "尾巴：走你。 藿藿：啊啊啊——",
   ["$jy_qieju2"] = "藿藿：不要啊救命啊——",
   ["$jy_qieju3"] = "藿藿：怎么还没结束……",
   ["$jy_qieju4"] = "藿藿：说不定我也能做到……",
 
   ["jy_lingfu"] = "灵符",
-  [":jy_lingfu"] = [[出牌阶段，你可以弃X+2张牌，令X名已受伤的角色回复一点体力并摸一张牌，X至多为3。以此法为自己回复体力时，将摸牌改为增加一点体力上限。]],
+  [":jy_lingfu"] = [[出牌阶段，你可以弃置X（X由你自己选择，3<=X<=5）张牌，令X-2名已受伤的角色回复一点体力并摸一张牌。]],
   ["$jy_lingfu1"] = [[藿藿：驱邪……缚魅……]],
   ["$jy_lingfu2"] = [[藿藿：灵符……保命……]],
 }
