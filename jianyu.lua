@@ -2310,17 +2310,26 @@ local jy_qiangui = fk.CreateTriggerSkill {
   end,
   on_cost = function(self, event, target, player, data)
     local room = player.room
-    data.ts = room:askForChoosePlayers(player, room.alive_players, 1, 4, "#jy_qiangui_prompt", self.name, true)
-    if #data.ts ~= 0 then return true else return false end
+    local targets = room.alive_players
+
+    local result = room:askForChoosePlayers(player, targets, 1, 4, "#jy_qiangui_prompt", self.name)
+    if #result > 0 then
+      self.cost_data = result
+      return true
+    end
   end,
   on_use = function(self, event, target, player, data)
     local room = player.room
-
-    for _, p in ipairs(data.ts) do
-      room:getPlayerById(p):drawCards(2)
+    for _, id in ipairs(self.cost_data) do
+      if player.dead then return end
+      local p = room:getPlayerById(id)
+      if not p.dead then
+        p:drawCards(2)
+      end
     end
-    room:loseHp(player, #data.ts)
-  end
+    room:loseHp(player, #self.cost_data)
+    return true
+  end,
 }
 
 jy__huohuo:addSkill(jy_qieju)
