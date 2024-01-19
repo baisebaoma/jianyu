@@ -1984,7 +1984,7 @@ Fk:loadTranslationTable {
 
   ["jy_jinghua"] = "镜花",
   [":jy_jinghua"] = [[每回合限一次，你使用或打出一张基本牌后，可以立即使用2张【杀】，以此法使用的【杀】不计入使用次数且无距离限制。]],
-  ["@jy_jinghua"] = [[<font color="skyblue">镜花/font>]],
+  ["@jy_jinghua"] = [[<font color="skyblue">镜花</font>]],
   ["$jy_jinghua1"] = "苍流水影。",
   ["$jy_jinghua2"] = "剑影。",
   ["#jy_jinghua_use"] = "镜花：你可以使用两张不计入使用次数的【杀】，第一张",
