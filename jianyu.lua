@@ -500,7 +500,7 @@ local jy_yuyu = fk.CreateTriggerSkill {
     if self.choice == "#jy_yuyu_draw3" then
       player:drawCards(3)
     else
-      player:drawCards(2)
+      player:drawCards(3)
       player:turnOver()
       Fk:currentRoom():damage({
         from = player,
@@ -520,7 +520,7 @@ Fk:loadTranslationTable {
   ["jy__gaotianliang"] = "高天亮",
 
   ["jy_yuyu"] = "玉玉",
-  [":jy_yuyu"] = [[①锁定技，当有角色对你使用【杀】造成了伤害时，令其获得“致郁”标记；②受到没有“致郁”标记的角色，或因本次伤害而获得“致郁”标记的角色造成的伤害时，你可以选择一项：摸3张牌；摸2张牌并翻面，然后对自己造成1点伤害。]],
+  [":jy_yuyu"] = [[①锁定技，当有角色对你使用【杀】造成了伤害时，令其获得“致郁”标记；②受到没有“致郁”标记的角色，或因本次伤害而获得“致郁”标记的角色造成的伤害时，你可以选择一项：摸3张牌；摸3张牌并翻面，然后对自己造成1点伤害。]],
   ["@jy_yuyu_enemy"] = "致郁",
   ["#jy_yuyu_ask_which"] = "玉玉：请选择你要触发的效果",
   ["#jy_yuyu_draw3"] = "摸3张牌",
@@ -1560,8 +1560,13 @@ local jy_jieju_success = fk.CreateTriggerSkill {
   on_use = function(self, event, target, player)
     local room = player.room
     room:updateQuestSkillState(player, "jy_jieju")
-    -- room:changeMaxHp(player, 1)
     player:drawCards(3)
+    room:recover({
+      who = player,
+      num = 3,
+      recoverBy = player,
+      skillName = self.name,
+    })
     room:handleAddLoseSkills(player, "jizhi", nil, true, false)
     room:handleAddLoseSkills(player, "kanpo", nil, true, false)
     room:handleAddLoseSkills(player, "xiangle", nil, true, false)
@@ -1584,7 +1589,6 @@ local jy_jieju_fail = fk.CreateTriggerSkill {
   on_use = function(self, event, target, player)
     local room = player.room
     room:updateQuestSkillState(player, "jy_jieju", true)
-    room:changeMaxHp(player, -2)
     player:turnOver()
     room:handleAddLoseSkills(player, "jy_yuyu", nil, true, false)
     room:handleAddLoseSkills(player, "jy_hongwen", nil, true, false)
@@ -1609,7 +1613,7 @@ Fk:loadTranslationTable {
   ["jy_zuoti"] = "做题",
   [":jy_zuoti"] = [[出牌阶段限一次，你可以尝试回答一道从题库中随机抽取的行测真题。若你回答正确，你可以指定一个牌名，然后从场上获得一张该牌名的牌。<br>
   <font size="1">推荐房间操作时长：60秒；自备纸笔以应对数学题。<br>
-  收录试卷：]] .. total_papers .. [[套，题量：]] .. total_questions .. [[，经人工筛选，不含图形推理（应该显示不出）、资料分析（应该不方便做），全部取自2018-2023国家公务员录用考试和上海市《行测》真题。<br>
+  收录试卷：]] .. total_papers .. [[套，题量：]] .. total_questions .. [[，经人工筛选，不含图形推理（显示不出）、资料分析（不方便做），全部取自2018-2023国家公务员录用考试和上海市《行测》真题。<br>
   建议你先把手牌中同牌名的牌使用掉！因为你选择的这张牌可能来自于任何位置，包括其他角色的区域、你自己的手牌。</font>]],
   ["#jy_zuoti_see_log"] = [[做题：请在战报中查看完整题干]],
   ["#jy_zuoti_ob"] = [[正在做题！请在战报中查看这道题目的完整题干和选项。]],
@@ -1622,8 +1626,8 @@ Fk:loadTranslationTable {
 
   ["jy_jieju"] = "熬夜",
   [":jy_jieju"] = [[使命技，出牌阶段，你可以失去一点体力使〖做题〗视为未发动过。<br>
-  成功：回合结束时，若你〖做题〗答对比答错至少多3，你摸3张牌，然后获得〖集智〗、〖看破〗、〖享乐〗；<br>
-  失败：回合结束时，若你〖做题〗答错比答对至少多3，你翻面、减2点体力上限，然后获得〖玉玉〗、〖红温〗。]],
+  成功：回合结束时，若你〖做题〗答对比答错至少多3次，你摸3张牌、回复3点体力，然后获得〖集智〗、〖看破〗、〖享乐〗；<br>
+  失败：回合结束时，若你〖做题〗答错比答对至少多3次，你翻面，然后获得〖玉玉〗、〖红温〗。]],
   ["#jy_jieju_success"] = "结局：成功",
   ["#jy_jieju_fail"] = "结局：失败",
 
@@ -2159,13 +2163,41 @@ jy_budeng:addRelatedSkill(jy_budeng_damaged)
 jy_budeng:addRelatedSkill(jy_budeng_discard)
 jy_budeng:addRelatedSkill(jy_budeng_card)
 
+local jy_duili = fk.CreateTriggerSkill {
+  name = "jy_duili",
+  events = { fk.TargetSpecified },
+  can_trigger = function(self, event, target, player, data)
+    if target == player and player:hasSkill(self) and
+        data.card and data.card.trueName == "slash" then
+      local target = player.room:getPlayerById(data.to)
+      return target.gender == General.Male
+    end
+  end,
+  on_use = function(self, event, target, player, data)
+    local room = player.room
+    local to = player.room:getPlayerById(data.to)
+    if to:isKongcheng() then
+      player:drawCards(1, self.name)
+    else
+      local result = room:askForDiscard(to, 1, 1, false, self.name, true, ".", "#double_swords-invoke:" .. player.id)
+      if #result == 0 then
+        player:drawCards(1, self.name)
+      end
+    end
+  end,
+}
+
 jy__tangniu:addSkill(jy_budeng)
+jy__tangniu:addSkill(jy_duili)
 
 Fk:loadTranslationTable {
   ["jy__tangniu"] = [[唐妞]],
 
   ["jy_budeng"] = "不等",
   [":jy_budeng"] = [[锁定技，防止你受到的伤害；你跳过弃牌阶段；你于其他角色的回合内获得牌（包括有牌进入你的判定区）时，你与其各失去一点体力。<br><font size="1">受到伤害≠我掉血；弃牌阶段≠我要弃；接受礼物≠我同意。</font>]],
+
+  ["jy_duili"] = "对立",
+  [":jy_duili"] = [[当你指定男性角色为【杀】的目标后，你可以令其选择一项：弃置一张手牌，或令你摸一张牌。]],
 }
 
 local jy__huohuo = General(extension, "jy__huohuo", "wu", 3, 3, General.Female)
@@ -2221,21 +2253,21 @@ local jy_lingfu = fk.CreateActiveSkill {
   anim_type = "offensive",
   min_target_num = 1,
   max_target_num = 3,
-  min_card_num = 3,
-  max_card_num = 5,
+  min_card_num = 2,
+  max_card_num = 4,
   can_use = function(self, player)
-    return #player:getCardIds { Player.Hand, Player.Equip } >= 3 -- and player:usedSkillTimes(self.name) == 0
+    return #player:getCardIds { Player.Hand, Player.Equip } >= 2 and player:usedSkillTimes(self.name) == 0
   end,
   card_filter = function(self, to_select, selected)
     if Self:prohibitDiscard(Fk:getCardById(to_select)) then return end
-    return #selected < 5
+    return #selected < 4
   end,
   target_filter = function(self, to_select, selected, selected_cards)
     local to = Fk:currentRoom():getPlayerById(to_select)
-    return #selected < #selected_cards - 2 -- and to.hp ~= to.maxHp
+    return #selected < #selected_cards - 1 -- and to.hp ~= to.maxHp
   end,
   feasible = function(self, selected, selected_cards)
-    return #selected + 2 == #selected_cards
+    return #selected + 1 == #selected_cards
   end,
   on_use = function(self, room, effect)
     local player = room:getPlayerById(effect.from)
@@ -2269,7 +2301,7 @@ Fk:loadTranslationTable {
   ["$jy_bazhen4"] = "说不定我也能做到……",
 
   ["jy_lingfu"] = "灵符",
-  [":jy_lingfu"] = [[出牌阶段，你可以弃置X（X的值由你选择，X不能小于3且不能大于5）张牌，令X-2名角色回复一点体力并摸一张牌。]],
+  [":jy_lingfu"] = [[出牌阶段限一次，你可以弃置X（X的值由你选择，X不能小于2且不能大于4）张牌，令X-1名角色回复一点体力并摸一张牌。]],
   ["$jy_lingfu1"] = [[驱邪……缚魅……]],
   ["$jy_lingfu2"] = [[灵符……保命……]],
 }

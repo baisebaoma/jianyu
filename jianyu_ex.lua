@@ -7,6 +7,7 @@ Fk:loadTranslationTable {
 }
 
 local liuxian = General(extension, "jy_ex__liuxian", "god", 3, 3, General.Female)
+liuxian.hidden = true
 
 local jieyin = fk.CreateActiveSkill {
   frequency = Skill.Limited,
@@ -78,7 +79,7 @@ local lihun = fk.CreateActiveSkill {
   anim_type = "masochism",
   can_use = function(self, player)
     if player:usedSkillTimes("jy_jieyin_ex", Player.HistoryGame) == 0 then return false end
-    return true -- 建议加不准紫砂
+    return player.maxHp > math.max(#Fk:currentRoom().alive_players, 4)
   end,
   card_filter = function(self, card)
     return false
@@ -99,11 +100,11 @@ local meishu = fk.CreateTriggerSkill {
   frequency = fk.Compulsory,
   name = "jy_meishu",
   anim_type = "support",
-  events = { fk.Damaged },
+  events = { fk.Damage },
   can_trigger = function(self, event, target, player, data)
     local is_jieyin = (data.from and data.from:getMark("@jy_jieyin_ex") ~= 0) or
         (data.to and data.to:getMark("@jy_jieyin_ex") ~= 0)
-    return player:hasSkill(self) and is_jieyin
+    return player:hasSkill(self) and is_jieyin and player.maxHp < 8
   end,
   on_cost = function(self, event, target, player, data)
     return true
@@ -123,13 +124,14 @@ Fk:loadTranslationTable {
   ["@jy_jieyin_ex"] = "结姻",
 
   ["jy_jieyin_ex"] = "结姻",
-  [":jy_jieyin_ex"] = [[限定技，出牌阶段，你可以令一名已受伤的男性角色与你各回复1点体力，然后你获得其所有牌并拥有其所有技能。]],
+  [":jy_jieyin_ex"] = [[（这个武将正在进行强度测试，所以不会出现在选将框）<br>限定技，出牌阶段，你可以令一名已受伤的男性角色与你各回复1点体力，然后你获得其所有牌并拥有其所有技能。]],
 
   ["jy_lihun"] = "离婚",
-  [":jy_lihun"] = [[出牌阶段，你可以减少X点体力上限使〖结姻〗视为未发动过，X为存活角色数且至少为4。]],
+  [":jy_lihun"] = [[出牌阶段，若你的体力上限大于X，你可以减少X点体力上限使〖结姻〗视为未发动过，X为存活角色数且至少为4。]],
+  -- 锁定技，若你的体力上限不小于5且未发动过〖结姻〗，你减少4点体力上限使〖结姻〗视为未发动过。
 
   ["jy_meishu"] = "美鼠",
-  [":jy_meishu"] = [[锁定技，被〖结姻〗过的角色造成或受到伤害后，你增加一点体力上限。]],
+  [":jy_meishu"] = [[锁定技，被〖结姻〗过的角色造成或受到伤害时，若你的体力上限小于8，你增加一点体力上限。]],
 }
 
 return extension
