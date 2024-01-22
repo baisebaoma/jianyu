@@ -284,6 +284,14 @@ local jy_huxiao = fk.CreateViewAsSkill {
   pattern = "jink,analeptic",
 
   expand_pile = "jy__liyuanhao_xiao",
+
+  enabled_at_play = function(self, player)
+    return player:getMark("jy__liyuanhao_xiao") ~= 0
+  end,
+  enabled_at_response = function(self, player, response)
+    return not response and player:getMark("jy__liyuanhao_xiao") ~= 0
+  end,
+
   card_filter = function(self, to_select, selected)
     if #selected == 1 then return false end
     if #Self:getPile("jy__liyuanhao_xiao") == 0 then return false end
@@ -291,25 +299,25 @@ local jy_huxiao = fk.CreateViewAsSkill {
     return true
   end,
   view_as = function(self, cards)
-    if #cards ~= 1 then
-      return nil
+    if #cards ~= 1 then return nil end
+
+    -- TODO: BUG HERE
+
+    local c = Fk:cloneCard("jink")
+    if (Fk.currentResponsePattern == nil and Self:canUse(c) and not Self:prohibitUse(c)) or
+        (Fk.currentResponsePattern and Exppattern:Parse(Fk.currentResponsePattern):match(c)) then
+      c.skillName = self.name
+      c:addSubcards(cards)
+      return c
     end
-    local jink = Fk:cloneCard("jink")
-    local anal = Fk:cloneCard("analeptic")
-    local c
-    -- TODO：BUG HERE
-    if (Fk.currentResponsePattern == nil and anal.skill:canUse(Self, anal)) or
-        (Fk.currentResponsePattern and Exppattern:Parse(Fk.currentResponsePattern):match(anal)) then
-      c = anal
-    elseif (Fk.currentResponsePattern == nil and jink.skill:canUse(Self, jink)) or
-        (Fk.currentResponsePattern and Exppattern:Parse(Fk.currentResponsePattern):match(jink)) then
-      c = jink
-    else
-      return nil
-    end -- 坏了，两个都没匹配上
-    c.skillName = self.name
-    c:addSubcards(cards)
-    return c
+
+    c = Fk:cloneCard("analeptic")
+    if (Fk.currentResponsePattern == nil and Self:canUse(c) and not Self:prohibitUse(c)) or
+        (Fk.currentResponsePattern and Exppattern:Parse(Fk.currentResponsePattern):match(c)) then
+      c.skillName = self.name
+      c:addSubcards(cards)
+      return c
+    end
   end,
 }
 
