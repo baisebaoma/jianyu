@@ -297,12 +297,13 @@ local jy_huxiao = fk.CreateViewAsSkill {
     local jink = Fk:cloneCard("jink")
     local anal = Fk:cloneCard("analeptic")
     local c
-    if (Fk.currentResponsePattern == nil and jink.skill:canUse(Self, jink)) or
-        (Fk.currentResponsePattern and Exppattern:Parse(Fk.currentResponsePattern):match(jink)) then
-      c = jink
-    elseif (Fk.currentResponsePattern == nil and anal.skill:canUse(Self, anal)) or
+    -- TODO：BUG HERE
+    if (Fk.currentResponsePattern == nil and anal.skill:canUse(Self, anal)) or
         (Fk.currentResponsePattern and Exppattern:Parse(Fk.currentResponsePattern):match(anal)) then
       c = anal
+    elseif (Fk.currentResponsePattern == nil and jink.skill:canUse(Self, jink)) or
+        (Fk.currentResponsePattern and Exppattern:Parse(Fk.currentResponsePattern):match(jink)) then
+      c = jink
     else
       return nil
     end -- 坏了，两个都没匹配上
