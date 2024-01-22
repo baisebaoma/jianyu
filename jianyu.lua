@@ -285,14 +285,10 @@ local jy_huxiao = fk.CreateViewAsSkill {
 
   expand_pile = "jy__liyuanhao_xiao",
   card_filter = function(self, to_select, selected)
-    if #selected == 1 then
-      return false
-    else
-      if #selected == 1 then return false end
-      if #Self:getPile("jy__liyuanhao_xiao") == 0 then return false end
-      if Self:getPileNameOfId(to_select) ~= "jy__liyuanhao_xiao" then return false end
-      return true
-    end
+    if #selected == 1 then return false end
+    if #Self:getPile("jy__liyuanhao_xiao") == 0 then return false end
+    if Self:getPileNameOfId(to_select) ~= "jy__liyuanhao_xiao" then return false end
+    return true
   end,
   view_as = function(self, cards)
     if #cards ~= 1 then
