@@ -11,6 +11,7 @@ Fk:loadTranslationTable {
 
 -- 简自豪
 local jy__jianzihao = General(extension, "jy__jianzihao", "qun", 8)
+jy__jianzihao.hidden = true -- 测完强度和bug再放出来
 
 -- 红温
 local jy_hongwen = fk.CreateFilterSkill {
@@ -124,8 +125,10 @@ local jy_kaiju = fk.CreateTriggerSkill {
     for _, p in ipairs(room:getOtherPlayers(player, true)) do
       if not p:isAllNude() and not player.dead then -- 如果我自己死了，那就不要继续了
         local id = room:askForCard(p, 1, 1, true, self.name, false, nil, "#jy_kaiju-choose")
-        room:moveCardTo(id, Card.PlayerHand, player, fk.ReasonJustMove, self.name, nil, false, nil)
-        room:useVirtualCard("slash", nil, p, player, self.name, true) -- 杀
+        if id then
+          room:moveCardTo(id, Card.PlayerHand, player, fk.ReasonJustMove, self.name, nil, false, nil)
+          room:useVirtualCard("slash", nil, p, player, self.name, true) -- 杀
+        end
       end
     end
   end,
@@ -143,7 +146,7 @@ Fk:loadTranslationTable {
   ["jy__jianzihao"] = "简自豪",
 
   ["jy_kaiju"] = "开局",
-  [":jy_kaiju"] = [[锁定技，准备阶段，所有其他有牌的角色需要交给你一张牌，并视为对你使用一张【杀】。<br>
+  [":jy_kaiju"] = [[（本武将正在重做，所以不会出现在选将框）锁定技，准备阶段，其他角色可以交给你一张牌，视为对你使用一张【杀】。<br>
   <font size="1"><i>“从未如此美妙的开局！”</i></font>]],
   ["$jy_kaiju1"] = "不是啊，我炸一对鬼的时候我在打什么，打一对10。一对10，他四个9炸我，我不输了吗？",
   ["$jy_kaiju2"] = "怎么赢啊？你别瞎说啊！",
@@ -153,7 +156,7 @@ Fk:loadTranslationTable {
   ["$jy_kaiju6"] = "从未如此美妙的开局！请为我欢呼，为我喝，喝，喝彩，OK？",
   ["$jy_kaiju7"] = "如此美妙的开局，这是我近两天来第一次啊！",
   ["$jy_kaiju8"] = "Oh my God，我要珍惜这段时光，我要好好地将它珍惜！",
-  ["#jy_kaiju-choose"] = "交给简自豪一张牌，视为对他使用【杀】",
+  ["#jy_kaiju-choose"] = "开局：你可以交给简自豪一张牌，视为对他使用一张【杀】",
 
   ["jy_hongwen"] = "红温",
   [":jy_hongwen"] = "锁定技，你的♠牌视为<font color='red'>♥</font>牌，你的♣牌视为<font color='red'>♦</font>牌。",
@@ -222,9 +225,11 @@ local jy_kaiju_2 = fk.CreateActiveSkill {
     end
 
     return to_select ~= Self.id and -- 如果目标不是自己
-        not s:isAllNude()           -- 而且不是啥也没有，那就可以对他用这个技能
+        not s:isAllNude() and       -- 而且不是啥也没有，那就可以对他用这个技能
+        #selected < 2
   end,
   min_target_num = 1,
+  max_target_num = 2,
   on_use = function(self, room, use)
     local player = room:getPlayerById(use.from)
     -- TODO：sort use.tos
@@ -233,7 +238,6 @@ local jy_kaiju_2 = fk.CreateActiveSkill {
 
       if not player.dead then
         room:useVirtualCard("snatch", nil, player, p, self.name, true) -- 顺
-        room:useVirtualCard("slash", nil, p, player, self.name, true)  -- 杀
       end
     end
   end,
@@ -247,7 +251,7 @@ Fk:loadTranslationTable {
   ["jy__new__jianzihao"] = "简自豪",
 
   ["jy_kaiju_2"] = "开局",
-  [":jy_kaiju_2"] = "出牌阶段限一次，你可以指定至少一名角色，视为你对其使用一张【顺手牵羊】，然后其对你使用一张【杀】，依次结算。",
+  [":jy_kaiju_2"] = "出牌阶段限一次，你可以指定至多2名角色，视为你对其使用一张【顺手牵羊】。",
   ["$jy_kaiju_21"] = "不是啊，我炸一对鬼的时候我在打什么，打一对10。一对10，他四个9炸我，我不输了吗？",
   ["$jy_kaiju_22"] = "怎么赢啊？你别瞎说啊！",
   ["$jy_kaiju_23"] = "打这牌怎么打？兄弟们快教我，我看着头晕！",
@@ -271,15 +275,54 @@ Fk:loadTranslationTable {
 }
 
 -- 李元浩
--- 在活动服环境里没那么强。
 local jy__liyuanhao = General(extension, "jy__liyuanhao", "qun", 4)
+jy__liyuanhao.hidden = true -- 测完强度和bug再放出来
 
--- 界虎啸
--- 参考自铁骑，屯田，脑洞包明哲，克己
--- 新版本的克己换了个写法了
-local jy_huxiao_2 = fk.CreateTriggerSkill {
-  name = "jy_huxiao_2",
-  anim_type = "special",
+local jy_huxiao = fk.CreateViewAsSkill {
+  name = "jy_huxiao",
+  mute = true,
+  pattern = "jink,analeptic",
+
+  expand_pile = "jy__liyuanhao_xiao",
+  card_filter = function(self, to_select, selected)
+    if #selected == 1 then
+      return false
+    else
+      if #selected == 1 then return false end
+      local xiaos = Self:getPile("jy__liyuanhao_xiao")
+      if #xiaos == 0 then return false end
+      if Self:getPileNameOfId(to_select) ~= "jy__liyuanhao_xiao" then return false end
+      local jink = Fk:cloneCard("jink")
+      local anal = Fk:cloneCard("analeptic")
+      return ((Fk.currentResponsePattern == nil and jink.skill:canUse(Self, jink)) or
+            (Fk.currentResponsePattern and Exppattern:Parse(Fk.currentResponsePattern):match(jink)))
+          or
+          ((Fk.currentResponsePattern == nil and anal.skill:canUse(Self, anal)) or
+            (Fk.currentResponsePattern and Exppattern:Parse(Fk.currentResponsePattern):match(anal)))
+    end
+  end,
+  view_as = function(self, cards)
+    if #cards ~= 1 then
+      return nil
+    end
+    local jink = Fk:cloneCard("jink")
+    local anal = Fk:cloneCard("analeptic")
+    local c
+    if (Fk.currentResponsePattern == nil and jink.skill:canUse(Self, jink)) or
+        (Fk.currentResponsePattern and Exppattern:Parse(Fk.currentResponsePattern):match(jink)) then
+      c = jink
+    else
+      c = anal
+    end
+    c.skillName = self.name
+    c:addSubcards(cards)
+    return c
+  end,
+}
+
+local jy_huxiao_xiao = fk.CreateTriggerSkill {
+  name = "#jy_huxiao_xiao",
+  mute = true,
   events = { fk.CardResponding, fk.CardUsing }, -- 包括了使用和打出
   can_trigger = function(self, event, target, player, data)
     if player:hasSkill(self) and data.card and data.card.trueName == "slash" then
@@ -288,71 +331,31 @@ local jy_huxiao_2 = fk.CreateTriggerSkill {
   end,
   on_use = function(self, event, target, player, data)
     local room = player.room
+    player:broadcastSkillInvoke("jy_huxiao")
+    room:doAnimate("InvokeSkill", {
+      name = "jy_huxiao",
+      player = player.id,
+      skill_type = "offensive",
+    })
     local dummy = Fk:cloneCard("dilu")
     dummy:addSubcards(room:getNCards(1))
     player:addToPile("jy__liyuanhao_xiao", dummy, true, self.name)
   end,
 }
 
--- 界啸酒
-local jy_huxiao_analeptic_2 = fk.CreateViewAsSkill {
-  name = "jy_huxiao_analeptic_2",
-  anim_type = "defensive",
-  pattern = "analeptic",
-  expand_pile = "jy__liyuanhao_xiao",
-  card_filter = function(self, to_select, selected)
-    if #selected == 1 then return false end
-    local xiaos = Self:getPile("jy__liyuanhao_xiao")
-    if #xiaos == 0 then return false end
-    return Self:getPileNameOfId(to_select) == "jy__liyuanhao_xiao"
-  end,
-  view_as = function(self, cards)
-    if #cards ~= 1 then
-      return nil
-    end
-    local c = Fk:cloneCard("analeptic")
-    c.skillName = self.name
-    c:addSubcard(cards[1])
-    return c
-  end,
-}
-
--- 界啸闪
-local jy_huxiao_jink_2 = fk.CreateViewAsSkill {
-  name = "jy_huxiao_jink_2",
-  anim_type = "defensive",
-  pattern = "jink",
-  expand_pile = "jy__liyuanhao_xiao",
-  card_filter = function(self, to_select, selected)
-    if #selected == 1 then return false end
-    local xiaos = Self:getPile("jy__liyuanhao_xiao")
-    if #xiaos == 0 then return false end
-    return Self:getPileNameOfId(to_select) == "jy__liyuanhao_xiao"
-  end,
-  view_as = function(self, cards)
-    if #cards ~= 1 then
-      return nil
-    end
-    local c = Fk:cloneCard("jink")
-    c.skillName = self.name
-    c:addSubcard(cards[1])
-    return c
-  end,
-}
-
+jy_huxiao:addRelatedSkill(jy_huxiao_xiao)
 
 -- 界二段
-local jy_erduanxiao_2 = fk.CreateTriggerSkill {
-  name = "jy_erduanxiao_2",
+local jy_erduanxiao = fk.CreateTriggerSkill {
+  name = "jy_erduanxiao",
   anim_type = "support",
-  events = { fk.BeforeCardsMove }, -- 理论上来说每次牌的移动只有同一个方向的
-  -- frequency = Skill.Compulsory,
-  mute = true,
+  refresh_events = { fk.BeforeCardsMove }, -- 理论上来说每次牌的移动只有同一个方向的
+  frequency = Skill.Compulsory,
 
   -- 测试通过。1-2，3-2都可以顺利触发。
   -- 我猜想原因是1-2的时候可能有多张牌进出，而3-2的时候只会有一张牌出去。但我搞不懂这个数据结构，
   -- 不知道为什么有一个是两层循环，有一个是一层循环。
-  can_trigger = function(self, event, target, player, data)
+  can_refresh = function(self, event, target, player, data)
     if not player:hasSkill(self) then return end -- 如果我自己没有这个技能，那就算了
 
     local xiaos = player:getPile("jy__liyuanhao_xiao")
@@ -388,16 +391,12 @@ local jy_erduanxiao_2 = fk.CreateTriggerSkill {
     end
   end,
 
-  on_trigger = function(self, event, target, player, data)
+  on_refresh = function(self, event, target, player, data)
     local xiaos = player:getPile("jy__liyuanhao_xiao")
     player.is_xiao_changing = #xiaos
   end,
-}
 
-local jy_erduanxiao_trigger_2 = fk.CreateTriggerSkill {
-  name = "#jy_erduanxiao_trigger_2",
   events = { fk.AfterCardsMove },
-  frequency = Skill.Compulsory,
   can_trigger = function(self, event, target, player, data)
     local xiaos = player:getPile("jy__liyuanhao_xiao")
     if #xiaos == player.is_xiao_changing then return false end
@@ -437,32 +436,21 @@ local jy_erduanxiao_trigger_2 = fk.CreateTriggerSkill {
     end
   end,
 }
-jy_erduanxiao_2:addRelatedSkill(jy_erduanxiao_trigger_2)
 
-jy__liyuanhao:addSkill(jy_huxiao_2)
-jy__liyuanhao:addSkill(jy_huxiao_analeptic_2)
-jy__liyuanhao:addSkill(jy_huxiao_jink_2)
-jy__liyuanhao:addSkill(jy_erduanxiao_2)
+jy__liyuanhao:addSkill(jy_huxiao)
+jy__liyuanhao:addSkill(jy_erduanxiao)
 
 Fk:loadTranslationTable {
   ["jy__liyuanhao"] = "李元浩",
   ["jy__liyuanhao_xiao"] = "<font color=\"gold\">啸</font>",
 
-  ["jy_huxiao_2"] = "虎啸",
-  [":jy_huxiao_2"] = [[当你使用或打出一张【杀】时，可以将牌堆顶的一张牌置于武将牌上，称为“啸”。
+  ["jy_huxiao"] = "虎啸",
+  [":jy_huxiao"] = [[（本武将正在重做，所以不会出现在选将框）当你使用或打出一张【杀】时，可以将牌堆顶的一张牌置于武将牌上，称为“啸”；你可以将“啸”当【酒】或【闪】使用或打出。
   <br><font size="1"><i>“我希望我的后辈们能够记住，在你踏上职业道路的这一刻开始，你的目标就只有，冠军。”</i></font>]],
 
-  ["jy_huxiao_analeptic_2"] = "横刀",
-  [":jy_huxiao_analeptic_2"] = [[你可以将“啸”当作【酒】使用或打出。
-  <br><font size="1"><i>“谁敢横刀立马……”——钱晨</i></font>]],
-
-  ["jy_huxiao_jink_2"] = "立马",
-  [":jy_huxiao_jink_2"] = [[你可以将“啸”当作【闪】使用或打出。
-  <br><font size="1"><i>“……唯我虎大将军！”——钱晨</i></font>]],
-
-  ["jy_erduanxiao_2"] = "二段",
-  [":jy_erduanxiao_2"] = [[锁定技，每当你的武将牌上有且仅有两张“啸”时，你需要选择一项：弃置所有“啸”并恢复一点体力；将所有“啸”纳入手牌。]],
-  ["#jy_erduanxiao_trigger_2"] = "二段",
+  ["jy_erduanxiao"] = "二段",
+  [":jy_erduanxiao"] = [[锁定技，每当你的武将牌上有且仅有两张“啸”时，你需要选择一项：弃置所有“啸”并恢复一点体力；将所有“啸”纳入手牌。]],
+  ["#jy_erduanxiao_trigger"] = "二段",
   ["#lose_xiao_2"] = [[将所有“啸”纳入手牌]],
   ["#lose_hp_1_2"] = [[弃置所有“啸”并恢复一点体力]],
 }
@@ -524,7 +512,7 @@ Fk:loadTranslationTable {
   ["@jy_yuyu_enemy"] = "致郁",
   ["#jy_yuyu_ask_which"] = "玉玉：请选择你要触发的效果",
   ["#jy_yuyu_draw3"] = "摸3张牌",
-  ["#jy_yuyu_draw4turnover"] = "摸2张牌并翻面，然后对自己造成1点伤害",
+  ["#jy_yuyu_draw4turnover"] = "摸3张牌并翻面，然后对自己造成1点伤害",
   ["$jy_yuyu1"] = "我……我真的很想听到你们说话……",
   ["$jy_yuyu2"] = "我天天被队霸欺负，他们天天骂我。",
   ["$jy_yuyu3"] = "有什么话是真的不能讲的……为什么一定……每次都是……一个人在讲……",
@@ -589,7 +577,7 @@ local jy_tiaoshui = fk.CreateTriggerSkill {
   end,
   on_use = function(self, event, target, player, data)
     local room = player.room
-    local dians = player:getPile("jy_aweiluo_dian")
+    -- local dians = player:getPile("jy_aweiluo_dian")
     -- 以后“选择一张特殊区的牌并且弃置”这个要求就这么写。
     local id = room:askForCard(player, 1, 1, false, self.name, true, ".|.|.|jy_aweiluo_dian|.|.|.", "#jy_tiaoshui",
       "jy_aweiluo_dian", true)
@@ -1742,7 +1730,7 @@ local jy_yali = fk.CreateTriggerSkill {
   events = { fk.DrawNCards },
   on_cost = Util.TrueFunc,
   on_use = function(self, event, target, player, data)
-    data.n = math.max(player.hp - #player:getCardIds(Player.Hand), 0)
+    data.n = math.max(player.hp - #player:getCardIds(Player.Hand), 1)
   end,
 }
 local jy_yali_maxcards = fk.CreateMaxCardsSkill {
@@ -1770,7 +1758,7 @@ Fk:loadTranslationTable {
   ["#jy_tianling_yuyu"] = "天灵",
 
   ["jy_yali"] = "压力",
-  [":jy_yali"] = [[锁定技，你的摸牌阶段改为摸X张牌，X为你的体力值与手牌数之差且至少为0；你的手牌上限等于你的体力上限。]],
+  [":jy_yali"] = [[锁定技，你的摸牌阶段改为摸X张牌，X为你的体力值与手牌数之差且至少为1；你的手牌上限等于你的体力上限。]],
 
 }
 
@@ -1991,8 +1979,8 @@ Fk:loadTranslationTable {
   ["@jy_jinghua"] = [[<font color="skyblue">镜花</font>]],
   ["$jy_jinghua1"] = "苍流水影。",
   ["$jy_jinghua2"] = "剑影。",
-  ["#jy_jinghua_use"] = "镜花：你可以使用两张不计入使用次数的【杀】，第一张",
-  ["#jy_jinghua_use_again"] = "镜花：你可以使用两张不计入使用次数的【杀】，第二张",
+  ["#jy_jinghua_use"] = "镜花：使用两张不计入使用次数且无距离限制的【杀】，第一张",
+  ["#jy_jinghua_use_again"] = "镜花：使用两张不计入使用次数且无距离限制的【杀】，第二张",
 
   ["jy_jianying"] = "渐盈",
   [":jy_jianying"] = [[锁定技，所有角色的结束阶段，若你的手牌数小于体力值，你摸一张牌。]],
@@ -2201,7 +2189,6 @@ Fk:loadTranslationTable {
 }
 
 local jy__huohuo = General(extension, "jy__huohuo", "wu", 3, 3, General.Female)
-jy__huohuo.hidden = true
 
 local jy_bazhen = fk.CreateTriggerSkill {
   name = "jy_bazhen",
