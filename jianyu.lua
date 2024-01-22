@@ -289,16 +289,9 @@ local jy_huxiao = fk.CreateViewAsSkill {
       return false
     else
       if #selected == 1 then return false end
-      local xiaos = Self:getPile("jy__liyuanhao_xiao")
-      if #xiaos == 0 then return false end
+      if #Self:getPile("jy__liyuanhao_xiao") == 0 then return false end
       if Self:getPileNameOfId(to_select) ~= "jy__liyuanhao_xiao" then return false end
-      local jink = Fk:cloneCard("jink")
-      local anal = Fk:cloneCard("analeptic")
-      return ((Fk.currentResponsePattern == nil and jink.skill:canUse(Self, jink)) or
-            (Fk.currentResponsePattern and Exppattern:Parse(Fk.currentResponsePattern):match(jink)))
-          or
-          ((Fk.currentResponsePattern == nil and anal.skill:canUse(Self, anal)) or
-            (Fk.currentResponsePattern and Exppattern:Parse(Fk.currentResponsePattern):match(anal)))
+      return true
     end
   end,
   view_as = function(self, cards)
@@ -311,9 +304,11 @@ local jy_huxiao = fk.CreateViewAsSkill {
     if (Fk.currentResponsePattern == nil and jink.skill:canUse(Self, jink)) or
         (Fk.currentResponsePattern and Exppattern:Parse(Fk.currentResponsePattern):match(jink)) then
       c = jink
-    else
+    elseif (Fk.currentResponsePattern == nil and anal.skill:canUse(Self, anal)) or
+        (Fk.currentResponsePattern and Exppattern:Parse(Fk.currentResponsePattern):match(anal)) then
       c = anal
     end
+    if not c then return nil end -- 坏了，两个都没匹配上
     c.skillName = self.name
     c:addSubcards(cards)
     return c
@@ -328,6 +323,9 @@ local jy_huxiao_xiao = fk.CreateTriggerSkill {
     if player:hasSkill(self) and data.card and data.card.trueName == "slash" then
       return target == player
     end
+  end,
+  on_cost = function(self, event, target, player, data)
+    return player.room:askForSkillInvoke(player, "jy_huxiao")
   end,
   on_use = function(self, event, target, player, data)
     local room = player.room
@@ -359,7 +357,7 @@ local jy_erduanxiao = fk.CreateTriggerSkill {
     if not player:hasSkill(self) then return end -- 如果我自己没有这个技能，那就算了
 
     local xiaos = player:getPile("jy__liyuanhao_xiao")
-    player.is_xiao_changing = nil
+    player.is_xiao_changing = nil -- TODO：建议改成data.is_xiao_changing
 
     -- 判断是否有牌出去
     for _, move in ipairs(data) do -- 第一层循环，不知道为啥
