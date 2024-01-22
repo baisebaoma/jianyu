@@ -286,10 +286,10 @@ local jy_huxiao = fk.CreateViewAsSkill {
   expand_pile = "jy__liyuanhao_xiao",
 
   enabled_at_play = function(self, player)
-    return player:getMark("jy__liyuanhao_xiao") ~= 0
+    return #player:getPile("jy__liyuanhao_xiao") ~= 0
   end,
   enabled_at_response = function(self, player, response)
-    return not response and player:getMark("jy__liyuanhao_xiao") ~= 0
+    return not response and #player:getPile("jy__liyuanhao_xiao") ~= 0
   end,
 
   card_filter = function(self, to_select, selected)
