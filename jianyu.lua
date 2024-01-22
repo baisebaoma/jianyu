@@ -292,32 +292,30 @@ local jy_huxiao = fk.CreateViewAsSkill {
     return not response and #player:getPile("jy__liyuanhao_xiao") ~= 0
   end,
 
+  interaction = function()
+    local names = {}
+    for _, name in ipairs({ "jink", "analeptic" }) do
+      local to_use = Fk:cloneCard(name)
+      if ((Fk.currentResponsePattern == nil and Self:canUse(to_use) and not Self:prohibitUse(to_use)) or
+            (Fk.currentResponsePattern and Exppattern:Parse(Fk.currentResponsePattern):match(to_use))) then
+        table.insertIfNeed(names, name)
+      end
+    end
+    return UI.ComboBox { choices = names }
+  end,
+
   card_filter = function(self, to_select, selected)
     if #selected == 1 then return false end
     if #Self:getPile("jy__liyuanhao_xiao") == 0 then return false end
     if Self:getPileNameOfId(to_select) ~= "jy__liyuanhao_xiao" then return false end
     return true
   end,
+
   view_as = function(self, cards)
-    if #cards ~= 1 then return nil end
-
-    -- TODO: BUG HERE
-
-    local c = Fk:cloneCard("jink")
-    if (Fk.currentResponsePattern == nil and Self:canUse(c) and not Self:prohibitUse(c)) or
-        (Fk.currentResponsePattern and Exppattern:Parse(Fk.currentResponsePattern):match(c)) then
-      c.skillName = self.name
-      c:addSubcards(cards)
-      return c
-    end
-
-    c = Fk:cloneCard("analeptic")
-    if (Fk.currentResponsePattern == nil and Self:canUse(c) and not Self:prohibitUse(c)) or
-        (Fk.currentResponsePattern and Exppattern:Parse(Fk.currentResponsePattern):match(c)) then
-      c.skillName = self.name
-      c:addSubcards(cards)
-      return c
-    end
+    if not self.interaction.data then return nil end
+    local card = Fk:cloneCard(self.interaction.data)
+    card.skillName = self.name
+    return card
   end,
 }
 
