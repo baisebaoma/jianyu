@@ -307,8 +307,9 @@ local jy_huxiao = fk.CreateViewAsSkill {
     elseif (Fk.currentResponsePattern == nil and anal.skill:canUse(Self, anal)) or
         (Fk.currentResponsePattern and Exppattern:Parse(Fk.currentResponsePattern):match(anal)) then
       c = anal
-    end
-    if not c then return nil end -- 坏了，两个都没匹配上
+    else
+      return nil
+    end -- 坏了，两个都没匹配上
     c.skillName = self.name
     c:addSubcards(cards)
     return c
