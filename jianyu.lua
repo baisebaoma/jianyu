@@ -10,7 +10,7 @@ Fk:loadTranslationTable {
 }
 
 -- 简自豪
-local jy__jianzihao = General(extension, "jy__jianzihao", "qun", 8)
+-- local jy__jianzihao = General(extension, "jy__jianzihao", "qun", 8)
 
 -- 红温
 local jy_hongwen = fk.CreateFilterSkill {
@@ -123,7 +123,7 @@ local jy_kaiju = fk.CreateTriggerSkill {
     local room = player.room
     for _, p in ipairs(room:getOtherPlayers(player, true)) do
       if not p:isAllNude() and not player.dead then -- 如果我自己死了，那就不要继续了
-        local id = room:askForCard(p, 1, 1, true, self.name, false, nil, "#jy_kaiju-choose")
+        local id = room:askForCard(p, 1, 1, true, self.name, true, nil, "#jy_kaiju-choose")
         if id then
           room:moveCardTo(id, Card.PlayerHand, player, fk.ReasonJustMove, self.name, nil, false, nil)
           room:useVirtualCard("slash", nil, p, player, self.name, true) -- 杀
@@ -135,10 +135,10 @@ local jy_kaiju = fk.CreateTriggerSkill {
 
 -- local id = room:askForCardChosen(player, p, "hej", self.name)  -- 我选他一张牌
 
-jy__jianzihao:addSkill(jy_kaiju)
-jy__jianzihao:addSkill(jy_hongwen)
-jy__jianzihao:addSkill(jy_shengnu)
-jy__jianzihao:addSkill(jy_xizao)
+-- jy__jianzihao:addSkill(jy_kaiju)
+-- jy__jianzihao:addSkill(jy_hongwen)
+-- jy__jianzihao:addSkill(jy_shengnu)
+-- jy__jianzihao:addSkill(jy_xizao)
 
 
 Fk:loadTranslationTable {
@@ -177,7 +177,7 @@ Fk:loadTranslationTable {
   ["$jy_shengnu3"] = "恶心我，我也恶心你啊，互恶心呗！",
 
   ["jy_xizao"] = "洗澡",
-  [":jy_xizao"] = "限定技，你处于濒死状态时，可以将体力恢复至1点、摸三张牌，然后翻面。",
+  [":jy_xizao"] = "限定技，你处于濒死状态时，可以将体力恢复至1点、摸3张牌，然后翻面。",
   ["$jy_xizao1"] = "呃啊啊啊啊啊啊啊！！",
   ["$jy_xizao2"] = "也不是稳赢吧，我觉得赢了！",
   ["$jy_xizao3"] = "真的我是真玩不了，这跟变态没关系，我好他妈的气！",
@@ -244,7 +244,7 @@ local jy_kaiju_2 = fk.CreateActiveSkill {
 
 jy__jianzihao:addSkill(jy_kaiju_2)
 jy__jianzihao:addSkill(jy_sanjian)
-jy__jianzihao:addSkill("jy_shengnu")
+jy__jianzihao:addSkill(jy_shengnu)
 
 Fk:loadTranslationTable {
   ["jy__new__jianzihao"] = "简自豪",
@@ -439,7 +439,7 @@ Fk:loadTranslationTable {
   <br><font size="1"><i>“我希望我的后辈们能够记住，在你踏上职业道路的这一刻开始，你的目标就只有，冠军。”</i></font>]],
 
   ["jy_erduanxiao"] = "二段",
-  [":jy_erduanxiao"] = [[锁定技，每当你的武将牌上有且仅有两张“啸”时，你将所有“啸”纳入手牌并恢复一点体力。]],
+  [":jy_erduanxiao"] = [[锁定技，每当你的武将牌上有且仅有两张“啸”时，你将所有“啸”收入手牌并恢复一点体力。]],
   ["#jy_erduanxiao_trigger"] = "二段",
   ["#lose_xiao_2"] = [[将所有“啸”纳入手牌]],
   ["#lose_hp_1_2"] = [[弃置所有“啸”并恢复一点体力]],
@@ -1612,7 +1612,7 @@ Fk:loadTranslationTable {
 }
 
 -- 参考：廖化，英姿，蛊惑，血裔
-local jy__mou__gaotianliang = General(extension, "jy__mou__gaotianliang", "qun", 4)
+local jy__mou__gaotianliang = General(extension, "jy__mou__gaotianliang", "god", 4)
 
 
 local jy_tianling = fk.CreateViewAsSkill {
