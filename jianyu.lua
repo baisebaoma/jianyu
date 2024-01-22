@@ -11,7 +11,6 @@ Fk:loadTranslationTable {
 
 -- 简自豪
 local jy__jianzihao = General(extension, "jy__jianzihao", "qun", 8)
-jy__jianzihao.hidden = true -- 测完强度和bug再放出来
 
 -- 红温
 local jy_hongwen = fk.CreateFilterSkill {
@@ -146,7 +145,7 @@ Fk:loadTranslationTable {
   ["jy__jianzihao"] = "简自豪",
 
   ["jy_kaiju"] = "开局",
-  [":jy_kaiju"] = [[（本武将正在重做，所以不会出现在选将框）锁定技，准备阶段，其他角色可以交给你一张牌，视为对你使用一张【杀】。<br>
+  [":jy_kaiju"] = [[锁定技，准备阶段，其他角色可以交给你一张牌，视为对你使用一张【杀】。<br>
   <font size="1"><i>“从未如此美妙的开局！”</i></font>]],
   ["$jy_kaiju1"] = "不是啊，我炸一对鬼的时候我在打什么，打一对10。一对10，他四个9炸我，我不输了吗？",
   ["$jy_kaiju2"] = "怎么赢啊？你别瞎说啊！",
@@ -276,7 +275,6 @@ Fk:loadTranslationTable {
 
 -- 李元浩
 local jy__liyuanhao = General(extension, "jy__liyuanhao", "qun", 4)
-jy__liyuanhao.hidden = true -- 测完强度和bug再放出来
 
 local jy_huxiao = fk.CreateViewAsSkill {
   name = "jy_huxiao",
@@ -289,7 +287,7 @@ local jy_huxiao = fk.CreateViewAsSkill {
     return #player:getPile("jy__liyuanhao_xiao") ~= 0
   end,
   enabled_at_response = function(self, player, response)
-    return not response and #player:getPile("jy__liyuanhao_xiao") ~= 0
+    return #player:getPile("jy__liyuanhao_xiao") ~= 0
   end,
 
   interaction = function()
