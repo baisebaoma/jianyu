@@ -295,9 +295,9 @@ local jy_huxiao = fk.CreateViewAsSkill {
   interaction = function()
     local names = {}
     for _, name in ipairs({ "jink", "analeptic" }) do
-      local to_use = Fk:cloneCard(name)
-      if ((Fk.currentResponsePattern == nil and Self:canUse(to_use) and not Self:prohibitUse(to_use)) or
-            (Fk.currentResponsePattern and Exppattern:Parse(Fk.currentResponsePattern):match(to_use))) then
+      local c = Fk:cloneCard(name)
+      if (Fk.currentResponsePattern == nil and c.skill:canUse(Self, c)) or
+          (Fk.currentResponsePattern and Exppattern:Parse(Fk.currentResponsePattern):match(c)) then
         table.insertIfNeed(names, name)
       end
     end
@@ -313,8 +313,12 @@ local jy_huxiao = fk.CreateViewAsSkill {
 
   view_as = function(self, cards)
     if not self.interaction.data then return nil end
+    if #cards ~= 1 then
+      return nil
+    end
     local card = Fk:cloneCard(self.interaction.data)
     card.skillName = self.name
+    card:addSubcards(cards)
     return card
   end,
 }
@@ -407,35 +411,21 @@ local jy_erduanxiao = fk.CreateTriggerSkill {
   end,
 
   on_cost = function(self, event, target, player, data)
-    local room = player.room
-    local choices = { "#lose_xiao_2", "#lose_hp_1_2" }
-    -- 如果体力不是满的，两个选项都有；如果是满的，就黑掉【恢复体力】那个按钮。
-    if player.hp ~= player.maxHp then
-      self.choice = room:askForChoice(player, choices, self.name)
-    else
-      self.choice = room:askForChoice(player, { "#lose_xiao_2" }, self.name, nil, nil, choices)
-    end
     return true
   end,
 
   on_use = function(self, event, target, player, data)
     local xiaos = player:getPile("jy__liyuanhao_xiao")
     local room = player.room
-    if self.choice == "#lose_xiao_2" then
-      -- 将所有“啸”纳入自己的手牌
-      room:moveCardTo(xiaos, Card.PlayerHand, player, fk.ReasonJustMove, self.name, "jy__liyuanhao_xiao", true,
-        player.id)
-    elseif self.choice == "#lose_hp_1_2" then
-      -- 弃置所有“啸”
-      room:throwCard(xiaos, self.name, player, player) -- 把啸全部扔掉
-      -- 回复1点体力
-      room:recover({
-        who = player,
-        num = 1,
-        recoverBy = player,
-        skillName = self.name,
-      })
-    end
+    -- 将所有“啸”纳入自己的手牌
+    room:moveCardTo(xiaos, Card.PlayerHand, player, fk.ReasonJustMove, self.name, "jy__liyuanhao_xiao", true,
+      player.id)
+    room:recover({
+      who = player,
+      num = 1,
+      recoverBy = player,
+      skillName = self.name,
+    })
   end,
 }
 
@@ -444,14 +434,14 @@ jy__liyuanhao:addSkill(jy_erduanxiao)
 
 Fk:loadTranslationTable {
   ["jy__liyuanhao"] = "李元浩",
-  ["jy__liyuanhao_xiao"] = "<font color=\"gold\">啸</font>",
+  ["jy__liyuanhao_xiao"] = "啸",
 
   ["jy_huxiao"] = "虎啸",
-  [":jy_huxiao"] = [[（本武将正在重做，所以不会出现在选将框）当你使用或打出一张【杀】时，可以将牌堆顶的一张牌置于武将牌上，称为“啸”；你可以将“啸”当【酒】或【闪】使用或打出。
+  [":jy_huxiao"] = [[当你使用或打出一张【杀】时，可以将牌堆顶的一张牌置于武将牌上，称为“啸”；你可以将“啸”当【酒】或【闪】使用或打出。
   <br><font size="1"><i>“我希望我的后辈们能够记住，在你踏上职业道路的这一刻开始，你的目标就只有，冠军。”</i></font>]],
 
   ["jy_erduanxiao"] = "二段",
-  [":jy_erduanxiao"] = [[锁定技，每当你的武将牌上有且仅有两张“啸”时，你需要选择一项：弃置所有“啸”并恢复一点体力；将所有“啸”纳入手牌。]],
+  [":jy_erduanxiao"] = [[锁定技，每当你的武将牌上有且仅有两张“啸”时，你将所有“啸”纳入手牌并恢复一点体力。]],
   ["#jy_erduanxiao_trigger"] = "二段",
   ["#lose_xiao_2"] = [[将所有“啸”纳入手牌]],
   ["#lose_hp_1_2"] = [[弃置所有“啸”并恢复一点体力]],
