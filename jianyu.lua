@@ -476,9 +476,9 @@ local jy_yuyu = fk.CreateTriggerSkill {
   end,
   on_use = function(self, event, target, player, data)
     if self.choice == "#jy_yuyu_draw3" then
-      player:drawCards(3)
+      player:drawCards(3, self.name)
     else
-      player:drawCards(3)
+      player:drawCards(3, self.name)
       player:turnOver()
       Fk:currentRoom():damage({
         from = player,
@@ -1538,7 +1538,7 @@ local jy_jieju_success = fk.CreateTriggerSkill {
   on_use = function(self, event, target, player)
     local room = player.room
     room:updateQuestSkillState(player, "jy_jieju")
-    player:drawCards(3)
+    player:drawCards(3, "jy_jieju")
     room:recover({
       who = player,
       num = 3,
@@ -1948,7 +1948,7 @@ local jy_jianying = fk.CreateTriggerSkill {
         #player:getCardIds(Player.Hand) < player.hp
   end,
   on_use = function(self, event, target, player, data)
-    player:drawCards(1)
+    player:drawCards(1, self.name)
   end,
 }
 
@@ -2258,7 +2258,13 @@ local jy_lingfu = fk.CreateActiveSkill {
         recoverBy = player,
         skillName = self.name,
       })
-      to:drawCards(1)
+      to:drawCards(1, self.name)
+      if #to:getCardIds(Player.Judge) ~= 0 then
+        local cards_id = to:getCardIds(Player.Judge)
+        local dummy = Fk:cloneCard 'slash'
+        dummy:addSubcards(cards_id)
+        room:obtainCard(player.id, dummy, false, fk.ReasonPrey)
+      end
     end
   end,
 }
@@ -2278,7 +2284,7 @@ Fk:loadTranslationTable {
   ["$jy_bazhen4"] = "说不定我也能做到……",
 
   ["jy_lingfu"] = "灵符",
-  [":jy_lingfu"] = [[出牌阶段限一次，你可以弃置X（X的值由你选择，X不能小于2且不能大于4）张牌，令X-1名角色回复一点体力并摸一张牌。]],
+  [":jy_lingfu"] = [[出牌阶段限一次，你可以弃置X张牌并指定X-1名角色。你令其回复一点体力并摸一张牌，然后你获得其判定区的牌（X由你选择，X不能小于2且不能大于4）。]],
   ["$jy_lingfu1"] = [[驱邪……缚魅……]],
   ["$jy_lingfu2"] = [[灵符……保命……]],
 }
