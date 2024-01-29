@@ -55,16 +55,9 @@ GraphicsBox {
           font.pixelSize: 20
         }
 
-        TextField {
+        TextEdit {
             id: word
-            placeholderText: "技能名，如：paoxiao"
-            clip: true
             verticalAlignment: Qt.AlignVCenter
-            background: Rectangle {
-                implicitHeight: 16
-                implicitWidth: 120
-                color: "transparent"
-            }
         }
 
         MetroButton {
@@ -76,7 +69,7 @@ GraphicsBox {
             width: 400
             height: 40
             enabled: word.text !== ""
-            
+
             onClicked: {
                 close();
                 ClientInstance.replyToServer("", JSON.stringify(word.text));
