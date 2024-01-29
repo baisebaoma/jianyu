@@ -67,9 +67,16 @@ GraphicsBox {
             }
         }
 
-        ToolButton {
-            text: luatr("确定")
+        MetroButton {
+            Layout.alignment: Qt.AlignHCenter
+            id: ok
+            text: "OK"
+            textFont.pixelSize: 12
+
+            width: 400
+            height: 40
             enabled: word.text !== ""
+            
             onClicked: {
                 close();
                 ClientInstance.replyToServer("", JSON.stringify(word.text));
