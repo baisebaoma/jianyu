@@ -42,7 +42,6 @@ GraphicsBox {
         id: word
         placeholderText: "技能名"
         clip: true
-        color: "#E4D5A0"
         verticalAlignment: Qt.AlignVCenter
         background: Rectangle {
           implicitHeight: 16
@@ -54,7 +53,6 @@ GraphicsBox {
       ToolButton {
         text: "确定"
         enabled: word.text !== ""
-        color: "#E4D5A0"
         onClicked: {
           close();
           roomScene.state = "notactive";
