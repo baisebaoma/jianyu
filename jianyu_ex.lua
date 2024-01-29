@@ -25,6 +25,7 @@ local jy_fuzhu = fk.CreateTriggerSkill {
         "我测", { "1", "2", "3", "4" },
         "#answer-show"
       })
+    room:doBroadcastNotify("ShowToast", Fk:translate("choose_result" .. type(choose_result)))
     room:handleAddLoseSkills(player, choose_result, nil, true, false)
   end,
 }
