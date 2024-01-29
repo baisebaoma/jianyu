@@ -57,6 +57,13 @@ GraphicsBox {
 
         TextEdit {
             id: word
+
+            textFont.pixelSize: 12
+
+            width: 400
+            height: 40
+            text: "jy_bazhen"
+
             verticalAlignment: Qt.AlignVCenter
         }
 
