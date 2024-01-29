@@ -20,12 +20,8 @@ local jy_fuzhu = fk.CreateTriggerSkill {
   on_use = function(self, event, target, player, data)
     local room = player.room
     -- 显示对话框，要求回复一个技能名字。最好能做查询，查出来是否真的是需要的技能
-    local choose_result = room:askForCustomDialog(player, self.name,
-      "packages/jianyu/qml/fuzhu.qml")
-    -- 这个就是返回的值，但未经实验，不一定能直接用
-    -- player.client_reply
-    -- 获得这个技能
-    room:handleAddLoseSkills(player, player.client_reply)
+    local result = room:askForCustomDialog(player, "simayi", "packages/test/qml/TestDialog.qml", "Hello, world. FROM LUA")
+    room:doBroadcastNotify("ShowToast", Fk:translate(result))
   end,
 }
 
