@@ -2,6 +2,7 @@
 
 import QtQuick
 import QtQuick.Layouts
+import QtQuick.Controls
 import Fk.Pages
 import Fk.RoomElement
 
@@ -58,6 +59,29 @@ GraphicsBox {
     Row {
       Layout.alignment: Qt.AlignHCenter
       spacing: 20
+
+      TextField {
+        id: word
+        placeholderText: "Search..."
+        clip: true
+        verticalAlignment: Qt.AlignVCenter
+        background: Rectangle {
+          implicitHeight: 16
+          implicitWidth: 120
+          color: "transparent"
+        }
+      }
+
+      ToolButton {
+        text: luatr("Search")
+        enabled: word.text !== ""
+        onClicked: {
+          close();
+          roomScene.state = "notactive";
+          ClientInstance.replyToServer("", JSON.stringify(word.text));
+        }
+      }
+
       MetroButton {
         Layout.alignment: Qt.AlignHCenter
         id:  answera
