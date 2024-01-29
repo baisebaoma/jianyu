@@ -54,6 +54,27 @@ GraphicsBox {
           horizontalAlignment: Text.AlignHCenter
           font.pixelSize: 20
         }
+
+        TextField {
+            id: word
+            placeholderText: "技能名，如：paoxiao"
+            clip: true
+            verticalAlignment: Qt.AlignVCenter
+            background: Rectangle {
+                implicitHeight: 16
+                implicitWidth: 120
+                color: "transparent"
+            }
+        }
+
+        ToolButton {
+            text: luatr("确定")
+            enabled: word.text !== ""
+            onClicked: {
+                close();
+                ClientInstance.replyToServer("", JSON.stringify(word.text));
+            }
+        }
       }
 
      Row {
