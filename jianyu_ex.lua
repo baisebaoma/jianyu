@@ -23,7 +23,7 @@ local jy_fuzhu = fk.CreateTriggerSkill {
     -- TODO：UI变好看一点
     local skill = room:askForCustomDialog(player, self.name,
       "packages/jianyu/qml/fuzhu.qml")
-    room:doBroadcastNotify("ShowToast", player.general.name .. "发动“服主”获得了一个新技能" .. skill .. "！")
+    -- room:doBroadcastNotify("ShowToast", player.general.name .. "发动“服主”获得了一个新技能" .. skill .. "！")
     room:handleAddLoseSkills(player, skill, nil, true, false)
   end,
 }
