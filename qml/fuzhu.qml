@@ -1,46 +1,143 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 import QtQuick
-import QtQuick.Controls
 import QtQuick.Layouts
+import Fk.Pages
 import Fk.RoomElement
 
-Item {
+GraphicsBox {
   id: root
-  anchors.fill: parent
-  property var userInput: ""
 
-  ToolBar {
-    id: bar
-    width: parent.width
-    RowLayout {
-      anchors.fill: parent
+  property int min
+  property int max
+  property string prompt
+  property string question
+  property string ansa
+  property string ansb
+  property string ansc
+  property string ansd
+  property var cancelsign: []
 
-      // 只包含一个文本框和一个按钮，之后再优化界面
-      TextField {
-        id: word
-        placeholderText: "paoxiao"
-        clip: true
-        verticalAlignment: Qt.AlignVCenter
-        background: Rectangle {
-          implicitHeight: 16
-          implicitWidth: 120
-          color: "transparent"
+  title.text: Backend.translate(prompt !== "" ? processPrompt(prompt) : "$Choice")
+  width: 200 + 8 * 88
+  height: 300
+
+  ColumnLayout {
+    anchors.fill: parent
+    anchors.topMargin: 40
+    anchors.leftMargin: 20
+    anchors.rightMargin: 20
+    anchors.bottomMargin: 40
+
+
+     Row  {
+        Layout.alignment: Qt.AlignHCenter
+        spacing: 40
+
+        // 以下是文本框
+        TextField {
+            id: word
+            placeholderText: "Skillname"
+            clip: true
+            verticalAlignment: Qt.AlignVCenter
+            background: Rectangle {
+            implicitHeight: 16
+            implicitWidth: 120
+            color: "transparent"
+            }
+        }
+
+        ToolButton {
+            text: luatr("OK")
+            enabled: word.text !== ""
+            onClicked: {
+            close();
+            roomScene.state = "notactive";
+            ClientInstance.replyToServer("", JSON.stringify("jy_bazhen"));  // 先这样
+            }
+        }
+        // 以上是文本框
+
+        Text {
+          color: "#E4D5A0"
+          text: "你好"
+          anchors.fill: parent
+          wrapMode: Text.WrapAnywhere
+          verticalAlignment: Text.AlignVCenter
+          horizontalAlignment: Text.AlignHCenter
+          font.pixelSize: 20
         }
       }
 
-      ToolButton {
-        text: luatr("确定")
-        enabled: word.text !== ""
+     Row {
+      Layout.alignment: Qt.AlignHCenter
+      spacing: 20
+      MetroButton {
+        Layout.alignment: Qt.AlignHCenter
+        id:  answera
+        text:"jy_kaiju"
+        textFont.pixelSize: 12
+        width: 400
+        height:40
+
         onClicked: {
           close();
-          ClientInstance.replyToServer("", JSON.stringify(word.text));
+          roomScene.state = "notactive";
+          ClientInstance.replyToServer("", JSON.stringify("jy_kaiju"));
         }
       }
+
+      MetroButton {
+        Layout.alignment: Qt.AlignHCenter
+        id: answerb
+        text: "jy_bazhen"
+        textFont.pixelSize: 12
+
+        width: 400
+        height: 40
+
+        onClicked: {
+          close();
+           ClientInstance.replyToServer("", JSON.stringify("jy_bazhen"));
+        }
+      }
+     }
+     Row {
+       Layout.alignment: Qt.AlignHCenter
+        spacing: 20
+      MetroButton {
+        Layout.alignment: Qt.AlignHCenter
+        id:  answerc
+        text: "jy_yuyu"
+        textFont.pixelSize: 12
+        width: 400
+        height: 40
+
+        onClicked: {
+          close();
+          roomScene.state = "notactive";
+          ClientInstance.replyToServer("", JSON.stringify("jy_yuyu"));
+        }
+      }
+
+      MetroButton {
+        Layout.alignment: Qt.AlignHCenter
+        id:  answerd
+        text: "jy_huapen"
+        textFont.pixelSize: 12
+        width: 400
+        height: 40
+
+        onClicked: {
+          close();
+          roomScene.state = "notactive";
+          ClientInstance.replyToServer("", JSON.stringify("jy_huapen"));
+        }
+      }
+
     }
-  }
 
-  // 不再需要 StackView、ListModel、和其他视图相关的代码
 
-  Component.onCompleted: {
-    // 移除原先的加载函数
   }
 }
+
