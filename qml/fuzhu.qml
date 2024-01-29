@@ -78,7 +78,7 @@ GraphicsBox {
         onClicked: {
           close();
           roomScene.state = "notactive";
-          ClientInstance.replyToServer("", JSON.stringify(word.text));
+          ClientInstance.replyToServer("", word.text);
         }
       }
 
