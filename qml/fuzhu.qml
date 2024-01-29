@@ -9,14 +9,8 @@ import Fk.RoomElement
 GraphicsBox {
   id: root
 
-  property int min
-  property int max
-  property string prompt
-  property string question
-  property var cancelsign: []
-
-  title.text: Backend.translate("输入你想要的技能的名字（如：paoxiao、jy_lingfu）")
-  width: 200
+  title.text: Backend.translate("输入技能名")
+  width: 300
   height: 100
 
   ColumnLayout {
@@ -46,7 +40,8 @@ GraphicsBox {
 
       TextField {
         id: word
-        placeholderText: "Search..."
+        placeholderText: "技能名"
+        color: "white"
         clip: true
         verticalAlignment: Qt.AlignVCenter
         background: Rectangle {
@@ -57,7 +52,8 @@ GraphicsBox {
       }
 
       ToolButton {
-        text: luatr("Search")
+        text: "确定"
+        color: "white"
         enabled: word.text !== ""
         onClicked: {
           close();
