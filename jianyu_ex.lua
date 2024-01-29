@@ -22,7 +22,7 @@ local jy_fuzhu = fk.CreateTriggerSkill {
     -- 显示对话框，要求回复一个技能名字。最好能做查询，查出来是否真的是需要的技能
     local skill = room:askForCustomDialog(player, self.name,
       "packages/jianyu/qml/fuzhu.qml")
-    room:doBroadcastNotify("ShowToast", player.name .. "发动“服主”获得了一个新技能" .. skill .. "！")
+    room:doBroadcastNotify("ShowToast", player.general.name .. "发动“服主”获得了一个新技能" .. skill .. "！")
     room:handleAddLoseSkills(player, skill, nil, true, false)
   end,
 }
