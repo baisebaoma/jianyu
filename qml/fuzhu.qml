@@ -8,19 +8,13 @@ Item {
   anchors.fill: parent
   property var userInput: ""
 
-  // 新增一个信号，用于在按下按钮时返回文本框内的信息
-  // signal submitUserInput(string userInput)
-
-  // 在按钮按下时发出信号，将文本框内的信息传递给槽函数
-  // submitUserInput(word.text);
-
   ToolBar {
     id: bar
     width: parent.width
     RowLayout {
       anchors.fill: parent
 
-      // 只包含一个文本框和一个按钮
+      // 只包含一个文本框和一个按钮，之后再优化界面
       TextField {
         id: word
         placeholderText: "paoxiao"
@@ -38,7 +32,7 @@ Item {
         enabled: word.text !== ""
         onClicked: {
           close();
-          ClientInstance.replyToServer("", word.text);
+          ClientInstance.replyToServer("", JSON.stringify(word.text));
         }
       }
     }
