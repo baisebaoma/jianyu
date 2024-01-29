@@ -53,6 +53,11 @@ GraphicsBox {
       ToolButton {
         text: "确定"
         enabled: word.text !== ""
+        background: Rectangle {
+          implicitHeight: 16
+          implicitWidth: 120
+          color: "grey"
+        }
         onClicked: {
           close();
           roomScene.state = "notactive";
