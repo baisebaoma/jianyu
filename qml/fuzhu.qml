@@ -57,9 +57,6 @@ GraphicsBox {
 
         TextEdit {
             id: word
-
-            textFont.pixelSize: 12
-
             width: 400
             height: 40
             text: "jy_bazhen"
@@ -117,38 +114,7 @@ GraphicsBox {
         }
       }
      }
-     Row {
-       Layout.alignment: Qt.AlignHCenter
-        spacing: 20
-      MetroButton {
-        Layout.alignment: Qt.AlignHCenter
-        id:  answerc
-        text:"C. "+ ansc
-        textFont.pixelSize: 12
-        width: 400
-        height: 40
-
-        onClicked: {
-          close();
-          roomScene.state = "notactive";
-          ClientInstance.replyToServer("", JSON.stringify(ansc));
-        }
-      }
-
-      MetroButton {
-        Layout.alignment: Qt.AlignHCenter
-        id:  answerd
-        text: "D. "+ansd
-        textFont.pixelSize: 12
-        width: 400
-        height: 40
-
-        onClicked: {
-          close();
-          roomScene.state = "notactive";
-          ClientInstance.replyToServer("", JSON.stringify(ansd));
-        }
-      }
+     
 
     }
 
