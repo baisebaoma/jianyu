@@ -1,41 +1,55 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 import QtQuick
-import QtQuick.Controls
 import QtQuick.Layouts
+import Fk.Pages
 import Fk.RoomElement
 
-Item {
+GraphicsBox {
   id: root
-  anchors.fill: parent
-  property var generalModel
-  property var extra_data: ({})
 
-  signal finish()
+  property int min
+  property int max
+  property string prompt
+  property string question
+  property string ansa
+  property string ansb
+  property string ansc
+  property string ansd
+  property var cancelsign: []
 
-  ToolBar {
-    id: bar
-    width: parent.width
-    RowLayout {
-      anchors.fill: parent
-      ToolButton {
-        opacity: stack.depth > 1 ? 1 : 0
-        Behavior on opacity { NumberAnimation { duration: 100 } }
-        text: luatr("Back")
-        onClicked: stack.pop()
+  title.text: Backend.translate(prompt !== "" ? processPrompt(prompt) : "$Choice")
+  width: 200 + 8 * 88
+  height: 300
+
+  ColumnLayout {
+    anchors.fill: parent
+    anchors.topMargin: 40
+    anchors.leftMargin: 20
+    anchors.rightMargin: 20
+    anchors.bottomMargin: 40
+
+
+     Row  {
+        Layout.alignment: Qt.AlignHCenter
+        spacing: 40
+        Text {
+          color: "#E4D5A0"
+          text: "你好"
+          anchors.fill: parent
+          wrapMode: Text.WrapAnywhere
+          verticalAlignment: Text.AlignVCenter
+          horizontalAlignment: Text.AlignHCenter
+          font.pixelSize: 20
+        }
       }
 
-      Label {
-        text: luatr("Enable free assign")
-        elide: Label.ElideRight
-        horizontalAlignment: Qt.AlignHCenter
-        verticalAlignment: Qt.AlignVCenter
-        Layout.fillWidth: true
-      }
-
+     Row {
+      Layout.alignment: Qt.AlignHCenter
+      spacing: 20
       TextField {
         id: word
-        placeholderText: "Search..."
+        placeholderText: "技能名，如：paoxiao"
         clip: true
         verticalAlignment: Qt.AlignVCenter
         background: Rectangle {
@@ -45,98 +59,21 @@ Item {
         }
       }
 
-      ToolButton {
-        text: luatr("Search")
-        enabled: word.text !== ""
-        onClicked: {
-          if (stack.depth > 1) stack.pop();
-          generalModel = lcall("SearchAllGenerals", word.text);
-          stack.push(generalList);
-          word.text = "";
-        }
-      }
-    }
-  }
+      MetroButton {
+        Layout.alignment: Qt.AlignHCenter
+        id: answerb
+        text: "B. "+ansb
+        textFont.pixelSize: 12
 
-  StackView {
-    id: stack
-    width: parent.width
-    height: parent.height - bar.height
-    anchors.top: bar.bottom
-    initialItem: pkgList
-  }
-
-  ListModel {
-    id: packages
-  }
-
-  Component {
-    id: pkgList
-    GridView {
-      id: listView
-      width: parent.width
-      height: stack.height
-      ScrollBar.vertical: ScrollBar {}
-      model: packages
-      clip: true
-      cellWidth: width / 5
-      cellHeight: 40
-
-      delegate: ItemDelegate {
-        width: listView.width / 5
+        width: 400
         height: 40
 
-        Text {
-          text: luatr(name)
-          color: "#E4D5A0"
-          anchors.centerIn: parent
-        }
-
         onClicked: {
-          generalModel = lcall("GetGenerals", packages.get(index).name);
-          stack.push(generalList);
+          close();
+           ClientInstance.replyToServer("", JSON.stringify(word.text));
         }
       }
-    }
-  }
-
-  Component {
-    id: generalList
-    ColumnLayout {
-      clip: true
-      width: stack.width
-      height: stack.height
-      Item { height: 6 }
-      GridView {
-        clip: true
-        Layout.preferredWidth: stack.width - stack.width % 100 + 10
-        Layout.fillHeight: true
-        Layout.alignment: Qt.AlignHCenter
-        model: generalModel
-        ScrollBar.vertical: ScrollBar {}
-
-        cellHeight: 140
-        cellWidth: 100
-
-        delegate: GeneralCardItem {
-          autoBack: false
-          name: modelData
-          onClicked: {
-            stack.pop();
-            extra_data.card.name = modelData;
-            root.finish();
-          }
-        }
-      }
-    }
-  }
-
-  function load() {
-    const packs = lcall("GetAllGeneralPack");
-    packs.forEach((name) => packages.append({ name: name }));
-  }
-
-  Component.onCompleted: {
-    load();
+     }
   }
 }
+

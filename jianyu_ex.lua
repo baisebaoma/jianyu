@@ -21,7 +21,7 @@ local jy_fuzhu = fk.CreateTriggerSkill {
     local room = player.room
     -- 显示对话框，要求回复一个技能名字。最好能做查询，查出来是否真的是需要的技能
     local choose_result = room:askForCustomDialog(player, self.name,
-      "packages/jbs/qml/answer.qml", {
+      "packages/jianyu/qml/fuzhu.qml", {
         "我测", { "1", "2", "3", "4" },
         "#answer-show"
       })
