@@ -6,8 +6,8 @@ Fk:loadTranslationTable {
   ["jy_ex"] = [[简浴测试]],
 }
 
-local jy__liaoran = General(extension, "jy_ex__liaoran", "god", 3)
-jy__liaoran.hidden = true
+local liaoran = General(extension, "jy_ex__liaoran", "god", 3)
+liaoran.hidden = true
 
 local jy_fuzhu = fk.CreateTriggerSkill {
   name = "jy_fuzhu",
@@ -17,8 +17,8 @@ local jy_fuzhu = fk.CreateTriggerSkill {
     return target == player and player:hasSkill(self)
         and player.phase == Player.Start
   end,
-  on_use = function(self, room, effect)
-    local player = room:getPlayerById(effect.from)
+  on_use = function(self, event, target, player, data)
+    local room = player.room
     -- 显示对话框，要求回复一个技能名字。最好能做查询，查出来是否真的是需要的技能
     local choose_result = room:askForCustomDialog(player, self.name,
       "packages/jianyu/qml/fuzhu.qml")
@@ -29,10 +29,10 @@ local jy_fuzhu = fk.CreateTriggerSkill {
   end,
 }
 
-jy__liaoran:addSkill(jy_fuzhu)
+liaoran:addSkill(jy_fuzhu)
 
 Fk:loadTranslationTable {
-  ["jy__liaoran"] = [[了然测试版]],
+  ["jy_ex__liaoran"] = [[了然测试版]],
 
   ["jy_fuzhu"] = "服主",
   [":jy_fuzhu"] = [[（这个武将不会出现在选将框）准备阶段，你可以获得一个服务器上的技能。<br>你需要知道这个技能的name参数（如：paoxiao、jy_lingfu）。若你输入错误，你不会获得任何技能。]],
