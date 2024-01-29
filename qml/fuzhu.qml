@@ -42,18 +42,16 @@ GraphicsBox {
         id: word
         placeholderText: "技能名"
         clip: true
-        color: "steelblue"
         verticalAlignment: Qt.AlignVCenter
         background: Rectangle {
           implicitHeight: 16
           implicitWidth: 120
-          color: "transparent"
+          color: "white"
         }
       }
 
       ToolButton {
         text: "确定"
-        color: "steelblue"
         enabled: word.text !== ""
         onClicked: {
           close();
