@@ -24,11 +24,10 @@ local jy_fuzhu = fk.CreateTriggerSkill {
       "packages/jianyu/qml/fuzhu.qml")
     local sk = Fk.skills[skill_name] -- 好像可以用 Util.Name2SkillMapper(skill_name)，但是原理和这一句是一样的
     if sk then
-      -- player.general.trueName 不可用，找一个新的方式显示玩家武将名
-      room:doBroadcastNotify("ShowToast", "发动 服主 获得了一个新技能 " .. sk.trueName .. "！")
+      room:doBroadcastNotify("ShowToast", "服主：获得了一个新技能 " .. Fk:translate(skill_name) .. "！")
       room:handleAddLoseSkills(player, skill_name, nil, true, false)
     else
-      room:doBroadcastNotify("ShowToast", "发动了 服主 ，但是因为输入错误，没有获得技能！")
+      room:doBroadcastNotify("ShowToast", "服主：因为输入错误，没有获得技能！")
     end
   end,
 }
@@ -40,9 +39,6 @@ Fk:loadTranslationTable {
 
   ["jy_fuzhu"] = "服主",
   [":jy_fuzhu"] = [[每局游戏限两次，你的回合开始时，你可以获得服务器上任意一个技能。<br><font size="1">你需要知道这个技能的name参数（如：paoxiao、jy_lingfu、mou__tieji）。若输入错误，你不会获得技能。</font>]],
-
-  ["jy_diaoxian"] = "掉线",
-  [":jy_diaoxian"] = [[锁定技，所有角色的准备阶段，其判定，若点数为：J，跳过判定阶段；Q，跳过摸牌阶段；K，跳过出牌阶段；A，跳过弃牌阶段。其获得该判定牌。]],
 }
 
 return extension
