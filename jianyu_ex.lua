@@ -15,17 +15,21 @@ local jy_fuzhu = fk.CreateTriggerSkill {
   events = { fk.EventPhaseProceeding },
   can_trigger = function(self, event, target, player, data)
     return target == player and player:hasSkill(self)
-        and player.phase == Player.Start
+        and player.phase == Player.Start and player:usedSkillTimes(self.name, Player.HistoryGame) < 2
   end,
   on_use = function(self, event, target, player, data)
     local room = player.room
-    -- room:changeMaxHp(player, -1)
     -- 显示对话框，要求回复一个技能名字。最好能做查询，查出来是否真的是需要的技能
     -- TODO：UI变好看一点
-    local skill = room:askForCustomDialog(player, self.name,
+    local skill_name = room:askForCustomDialog(player, self.name,
       "packages/jianyu/qml/fuzhu.qml")
-    room:doBroadcastNotify("ShowToast", "了然发动“服主”获得了一个新技能" .. skill .. "！")
-    room:handleAddLoseSkills(player, skill, nil, true, false)
+    local sk = Fk.skills[skill_name] -- 好像可以用 Util.Name2SkillMapper(skill_name)，但我暂时不用
+    if sk then
+      room:doBroadcastNotify("ShowToast", "了然发动“服主”获得了一个新技能" .. sk.name .. "！")
+      room:handleAddLoseSkills(player, skill_name, nil, true, false)
+    else
+      room:doBroadcastNotify("ShowToast", "了然发动“服主”，但是输入错误了，没有获得技能！")
+    end
   end,
 }
 
@@ -35,7 +39,7 @@ Fk:loadTranslationTable {
   ["jy_ex__liaoran"] = [[了然]],
 
   ["jy_fuzhu"] = "服主",
-  [":jy_fuzhu"] = [[准备阶段，你可以获得服务器上任意一个技能。<br><font size="1">你需要知道这个技能的name参数（如：标张飞的咆哮paoxiao、简浴藿藿的灵符jy_lingfu、谋马超的铁骑mou__tieji）。若输入错误，你不会获得技能。</font>]],
+  [":jy_fuzhu"] = [[每局游戏限两次，准备阶段，你可以获得服务器上任意一个技能。<br><font size="1">你需要知道这个技能的name参数（如：标张飞的咆哮paoxiao、简浴藿藿的灵符jy_lingfu、谋马超的铁骑mou__tieji）。若输入错误，你不会获得技能。</font>]],
 
   ["jy_diaoxian"] = "掉线",
   [":jy_diaoxian"] = [[锁定技，所有角色的准备阶段，其判定，若点数为：J，跳过判定阶段；Q，跳过摸牌阶段；K，跳过出牌阶段；A，跳过弃牌阶段。其获得该判定牌。]],
