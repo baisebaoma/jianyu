@@ -24,11 +24,11 @@ local jy_fuzhu = fk.CreateTriggerSkill {
       "packages/jianyu/qml/fuzhu.qml")
     local sk = Fk.skills[skill_name] -- 好像可以用 Util.Name2SkillMapper(skill_name)，但是原理和这一句是一样的
     if sk then
-      -- player.general.trueName 应该是没问题的
-      room:doBroadcastNotify("ShowToast", player.general.trueName .. " 发动 服主 获得了一个新技能 " .. sk.trueName .. "！")
+      -- player.general.trueName 不可用，找一个新的方式显示玩家武将名
+      room:doBroadcastNotify("ShowToast", "发动 服主 获得了一个新技能 " .. sk.trueName .. "！")
       room:handleAddLoseSkills(player, skill_name, nil, true, false)
     else
-      room:doBroadcastNotify("ShowToast", player.general.trueName .. " 发动了 服主 ，但是因为输入错误，没有获得技能！")
+      room:doBroadcastNotify("ShowToast", "发动了 服主 ，但是因为输入错误，没有获得技能！")
     end
   end,
 }
