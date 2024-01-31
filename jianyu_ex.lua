@@ -7,6 +7,7 @@ Fk:loadTranslationTable {
 }
 
 local liaoran = General(extension, "jy_ex__liaoran", "god", 3)
+-- liaoran.total_hidden = true
 
 local jy_fuzhu = fk.CreateTriggerSkill {
   name = "jy_fuzhu",
@@ -18,7 +19,6 @@ local jy_fuzhu = fk.CreateTriggerSkill {
   end,
   on_use = function(self, event, target, player, data)
     local room = player.room
-    -- 显示对话框，要求回复一个技能名字。最好能做查询，查出来是否真的是需要的技能
     -- TODO：UI变好看一点
     local skill_name = room:askForCustomDialog(player, self.name,
       "packages/jianyu/qml/fuzhu.qml")
