@@ -246,8 +246,8 @@ local jy_kaiju_2 = fk.CreateActiveSkill {
 
 jy__jianzihao:addSkill(jy_kaiju_2)
 jy__jianzihao:addSkill(jy_sanjian)
-jy__jianzihao:addSkill(jy_shengnu)
-jy__jianzihao:addSkill(jy_xizao)
+jy__jianzihao:addSkill("jy_shengnu")
+jy__jianzihao:addSkill("jy_xizao")
 
 Fk:loadTranslationTable {
   ["jy__new__jianzihao"] = "简自豪",
