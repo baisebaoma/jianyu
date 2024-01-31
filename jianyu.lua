@@ -125,7 +125,7 @@ local jy_kaiju = fk.CreateTriggerSkill {
     for _, p in ipairs(room:getOtherPlayers(player, true)) do
       if not p:isAllNude() and not player.dead then -- 如果我自己死了，那就不要继续了
         local id = room:askForCard(p, 1, 1, true, self.name, true, nil, "#jy_kaiju-choose")
-        if id then
+        if #id ~= 0 then
           room:moveCardTo(id, Card.PlayerHand, player, fk.ReasonJustMove, self.name, nil, false, nil)
           room:useVirtualCard("slash", nil, p, player, self.name, true) -- 杀
         end
@@ -198,7 +198,7 @@ local jy_sanjian = fk.CreateTriggerSkill {
   events = { fk.EventPhaseStart },                    -- 事件开始时
   can_trigger = function(self, event, target, player, data)
     return target == player and player:hasSkill(self) -- 如果是我这名角色，如果是有这个技能的角色，如果是出牌阶段，如果这名角色的装备数是3
-        and player.phase == Player.Play and #player:getCardIds(Player.Equip) == 3
+        and player.phase == Player.Play and #player:getCardIds(Player.Equip) >= 3
   end,
   on_use = function(self, event, target, player, data)
     local room = player.room
@@ -264,7 +264,7 @@ Fk:loadTranslationTable {
   ["$jy_kaiju_28"] = "Oh my God，我要珍惜这段时光，我要好好地将它珍惜！",
 
   ["jy_sanjian"] = "三件",
-  [":jy_sanjian"] = [[锁定技，出牌阶段开始时，若你的装备区有且仅有三张牌，你视为使用一张【酒】和一张【无中生有】。]],
+  [":jy_sanjian"] = [[锁定技，出牌阶段开始时，若你的装备区有至少三张牌，你视为使用一张【酒】和一张【无中生有】。]],
   ["$jy_sanjian1"] = "也不是稳赢吧，我觉得赢了！",
 
   ["~jy__jianzihao"] = "好像又要倒下了……",
