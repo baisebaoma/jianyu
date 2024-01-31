@@ -11,7 +11,7 @@ Fk:loadTranslationTable {
 }
 
 -- 简自豪
--- local jy__jianzihao = General(extension, "jy__jianzihao", "qun", 8)
+local jy__jianzihao = General(extension, "jy__jianzihao", "qun", 8)
 
 -- 红温
 local jy_hongwen = fk.CreateFilterSkill {
@@ -136,10 +136,11 @@ local jy_kaiju = fk.CreateTriggerSkill {
 
 -- local id = room:askForCardChosen(player, p, "hej", self.name)  -- 我选他一张牌
 
--- jy__jianzihao:addSkill(jy_kaiju)
--- jy__jianzihao:addSkill(jy_hongwen)
--- jy__jianzihao:addSkill(jy_shengnu)
--- jy__jianzihao:addSkill(jy_xizao)
+jy__jianzihao:addSkill(jy_kaiju)
+jy__jianzihao:addSkill(jy_hongwen)
+jy__jianzihao:addSkill(jy_zouwei)
+jy__jianzihao:addSkill(jy_shengnu)
+jy__jianzihao:addSkill(jy_xizao)
 
 
 Fk:loadTranslationTable {
@@ -246,6 +247,7 @@ local jy_kaiju_2 = fk.CreateActiveSkill {
 jy__jianzihao:addSkill(jy_kaiju_2)
 jy__jianzihao:addSkill(jy_sanjian)
 jy__jianzihao:addSkill(jy_shengnu)
+jy__jianzihao:addSkill(jy_xizao)
 
 Fk:loadTranslationTable {
   ["jy__new__jianzihao"] = "简自豪",
@@ -264,12 +266,6 @@ Fk:loadTranslationTable {
   ["jy_sanjian"] = "三件",
   [":jy_sanjian"] = [[锁定技，出牌阶段开始时，若你的装备区有且仅有三张牌，你视为使用一张【酒】和一张【无中生有】。]],
   ["$jy_sanjian1"] = "也不是稳赢吧，我觉得赢了！",
-
-  ["jy_xizao_2"] = "洗澡",
-  [":jy_xizao_2"] = "限定技，你处于濒死状态且装备区有牌时，你可以弃置所有装备区的牌、将体力恢复至1，然后每以此法弃置一张牌，你摸三张牌。",
-  ["$jy_xizao_21"] = "呃啊啊啊啊啊啊啊！！",
-  ["$jy_xizao_22"] = "也不是稳赢吧，我觉得赢了！",
-  ["$jy_xizao_23"] = "真的我是真玩不了，这跟变态没关系，我好他妈的气！",
 
   ["~jy__jianzihao"] = "好像又要倒下了……",
 }
@@ -1156,7 +1152,7 @@ local jy_boshi = fk.CreateTriggerSkill {
   end,
   on_use = function(self, event, target, player, data)
     local room = player.room
-    room:changeMaxHp(player, -1)
+    room:changeMaxHp(player, 1)
     -- room:recover({
     --   who = player,
     --   num = 1,
@@ -1257,12 +1253,12 @@ local jy_jiangbei_draw_count = fk.CreateTriggerSkill {
     if (data.card.suit == Card.Club or data.card.suit == Card.Heart) and
         type(player:getMark("@jy_jiangbei_draw")) == "number" then -- 并且没有使用打出过别的花色
       room:addPlayerMark(player, "@jy_jiangbei_draw")
-    else
-      room:setPlayerMark(player, "@jy_jiangbei_draw", "#jy_jiangbei_no") -- 如果设置成字符串了，代表不允许摸牌了
+      -- else
+      --   room:setPlayerMark(player, "@jy_jiangbei_draw", "#jy_jiangbei_no") -- 如果设置成字符串了，代表不允许摸牌了
     end
   end,
 }
--- 弃牌阶段结束时摸等量的牌
+-- 出牌阶段结束时摸等量的牌
 local jy_jiangbei_draw = fk.CreateTriggerSkill {
   name = "#jy_jiangbei_draw",
   anim_type = "special",
@@ -1277,16 +1273,16 @@ local jy_jiangbei_draw = fk.CreateTriggerSkill {
     player.room:setPlayerMark(player, "@jy_jiangbei_draw", 0)
   end,
 
-  events = { fk.EventPhaseStart }, -- 包括了使用和打出
+  events = { fk.EventPhaseEnd }, -- 包括了使用和打出
   can_trigger = function(self, event, target, player, data)
     return target == player and player:hasSkill(self)
-        and player.phase == Player.Discard
+        and player.phase == Player.Play
   end,
   on_cost = function(self, event, target, player, data)
     local room = player.room
-    if type(player:getMark("@jy_jiangbei_draw")) == "number" then -- 只有是数字的时候，代表可以摸牌
-      player:drawCards(player:getMark("@jy_jiangbei_draw"), self.name)
-    end
+    -- if type(player:getMark("@jy_jiangbei_draw")) == "number" then -- 只有是数字的时候，代表可以摸牌
+    player:drawCards(player:getMark("@jy_jiangbei_draw"), self.name)
+    -- end
     room:setPlayerMark(player, "@jy_jiangbei_draw", 0) -- 无论能不能摸牌，都要清理掉这个标记
   end,
 }
@@ -1313,10 +1309,10 @@ Fk:loadTranslationTable {
 
   ["#jy_sichi_suits_1"] = "四吃：1种花色，选择一名角色获得这些牌",
   ["#jy_sichi_suits_2"] = "四吃：2种花色，获得一张可使用的牌并可以立即使用",
-  ["#jy_sichi_suits_3"] = "四吃：3种花色，获得一部分牌，然后其他角色各摸一张牌",
-  ["#jy_sichi_suits_4"] = "四吃：4种花色，选择角色一起失去体力",
+  ["#jy_sichi_suits_3"] = "四吃：3种花色，获得3张同类型或2张不同类型的牌，然后其他角色各摸一张牌",
+  ["#jy_sichi_suits_4"] = "四吃：4种花色，选择至多3名角色一起失去1点体力",
 
-  ["#jy_sichi_1"] = "四吃：选择一名角色获得所有牌，点击取消可以选择自己",
+  ["#jy_sichi_1"] = "四吃：选择一名角色获得所有牌，点击取消可以直接选择自己",
   ["#jy_sichi_2"] = "四吃：获得其中一张牌并可以使用",
   ["#jy_sichi_2_use"] = "四吃：你可以立即使用这张牌",
   ["#jy_sichi_2_failed_toast"] = "四吃：2种花色，没有可使用的牌，弃一张牌",
@@ -1329,11 +1325,11 @@ Fk:loadTranslationTable {
   [":jy_huapen"] = [[锁定技，其他角色使用♣非延时锦囊牌或基本牌、指定了有且仅有一个不为你的目标时，你判定，若为<font color="red">♥</font>，该牌额外指定你为目标。（含【借刀杀人】）]],
 
   ["jy_boshi"] = "搏时",
-  [":jy_boshi"] = [[觉醒技，准备阶段，若你已判定过至少X次，你减一点体力上限、失去〖花盆〗，然后获得〖奖杯〗，X等于存活角色数。]],
+  [":jy_boshi"] = [[觉醒技，准备阶段，若你已判定过至少X次，你增加一点体力上限、失去〖花盆〗，然后获得〖奖杯〗，X等于存活角色数。]],
   ["@jy_boshi_judge_count"] = "搏时",
 
   ["jy_jiangbei"] = "奖杯",
-  [":jy_jiangbei"] = [[锁定技，你的基本牌和锦囊牌花色若为：♣，无视距离、防具、次数限制；<font color="red">♥</font>，不可响应；弃牌阶段开始时，若你出牌阶段只使用或打出过♣和<font color="red">♥</font>牌，摸等量的牌。]],
+  [":jy_jiangbei"] = [[锁定技。你的基本牌和锦囊牌花色若为：♣，无视距离、防具、次数限制；<font color="red">♥</font>，不可响应；出牌阶段结束时，你摸X张牌，X为你出牌阶段使用或打出过♣和<font color="red">♥</font>牌的数量。]],
   ["#jy_jiangbei_heart"] = "奖杯",
   ["#jy_jiangbei_club"] = "奖杯",
   ["#jy_jiangbei_club_2"] = "奖杯",
@@ -1808,23 +1804,24 @@ local jy_leiyan_trigger = fk.CreateTriggerSkill {
     local room = player.room
     local from = data.from
     local to = data.to
-    local judge = {
-      who = player,
-      reason = self.name,
-      pattern = ".|.|club,spade",
-    }
-    room:judge(judge)
 
-    -- if judge.card.color == Card.Red then
-    --   player:broadcastSkillInvoke("jy_leiyan")
-    --   for _, p in ipairs(room:getAlivePlayers()) do
-    --     if p:getMark("@jy_raiden_leiyan") ~= 0 and not p.dead then
-    --       p:drawCards(1)
-    --     end
-    --   end
-    -- else
-    if judge.card.color == Card.Black then
-      if not target.dead then
+    if not target.dead then
+      local judge = {
+        who = player,
+        reason = self.name,
+        pattern = ".|.|club,spade",
+      }
+      room:judge(judge)
+
+      -- if judge.card.color == Card.Red then
+      --   player:broadcastSkillInvoke("jy_leiyan")
+      --   for _, p in ipairs(room:getAlivePlayers()) do
+      --     if p:getMark("@jy_raiden_leiyan") ~= 0 and not p.dead then
+      --       p:drawCards(1)
+      --     end
+      --   end
+      -- else
+      if judge.card.color == Card.Black then
         player:broadcastSkillInvoke("jy_leiyan")
         room:doIndicate(player.id, { to.id }) -- 播放指示线
         room:damage({
@@ -1880,7 +1877,7 @@ Fk:loadTranslationTable {
   ["~jy__raiden"] = "浮世一梦……",
 
   ["jy_leiyan"] = "雷眼",
-  [":jy_leiyan"] = [[出牌阶段限一次，你可以令至少一名角色获得<font color="Fuchsia">雷眼</font>；持有<font color="Fuchsia">雷眼</font>的角色造成伤害后，你判定，若为黑色，你对目标造成1点雷电伤害（不会再次触发〖雷眼〗）。]],
+  [":jy_leiyan"] = [[出牌阶段限一次，你可以令至少一名角色获得<font color="Fuchsia">雷眼</font>；持有<font color="Fuchsia">雷眼</font>的角色造成伤害后，若目标未死亡，你判定，若为黑色，你对目标造成1点雷电伤害（不会再次触发〖雷眼〗）。]],
   -- ；若为红色，所有持有该标记的角色摸一张牌
   ["@jy_raiden_leiyan"] = [[<font color="Fuchsia">雷眼</font>]],
   ["@jy_raiden_yuanli"] = [[<font color="Fuchsia">愿力</font>]],
@@ -2133,8 +2130,8 @@ local jy_budeng_card = fk.CreateTriggerSkill {
     })
 
     local room = player.room
-    room:loseHp(player, 1)
     room:loseHp(room.current, 1)
+    room:loseHp(player, player.hp)
   end
 }
 jy_budeng:addRelatedSkill(jy_budeng_damaged)
@@ -2172,7 +2169,7 @@ Fk:loadTranslationTable {
   ["jy__tangniu"] = [[唐妞]],
 
   ["jy_budeng"] = "不等",
-  [":jy_budeng"] = [[锁定技，防止你受到的伤害；你跳过弃牌阶段；你于其他角色的回合内获得牌（包括有牌进入你的判定区）时，你与其各失去一点体力。<br><font size="1">受到伤害≠我掉血；弃牌阶段≠我要弃；接受礼物≠我同意。</font>]],
+  [":jy_budeng"] = [[锁定技，防止你受到的伤害；你跳过弃牌阶段；你于其他角色的回合内获得牌（包括有牌进入你的判定区）时，其失去一点体力，然后你失去所有体力。<br><font size="1">受到伤害≠我掉血；弃牌阶段≠我要弃；接受礼物≠我同意。</font>]],
 
   ["jy_duili"] = "对立",
   [":jy_duili"] = [[当你指定男性角色为【杀】的目标后，你可以令其选择一项：弃置一张手牌，或令你摸一张牌。]],
