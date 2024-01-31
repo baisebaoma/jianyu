@@ -7,7 +7,7 @@ Fk:loadTranslationTable {
 }
 
 local liaoran = General(extension, "jy_ex__liaoran", "god", 3)
--- liaoran.total_hidden = true
+liaoran.total_hidden = true
 
 local jy_fuzhu = fk.CreateTriggerSkill {
   name = "jy_fuzhu",
