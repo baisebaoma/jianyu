@@ -384,10 +384,10 @@ local jy_guina = fk.CreateActiveSkill {
 }
 local jy_guina_target = fk.CreateTriggerSkill {
   name = "#jy_guina_target",
-  refresh_events = { fk.TargetConfirmed, fk.EventPhaseEnd },
+  refresh_events = { fk.TargetSpecified, fk.EventPhaseEnd },
   can_refresh = function(self, event, target, player, data)
     if not player:hasSkill(self) then return false end
-    if event == fk.TargetConfirmed then
+    if event == fk.TargetSpecified then
       if data.card then
         return data.from == player.id and
             not ((self.type == Card.TypeTrick and self.sub_type == Card.SubtypeDelayedTrick) or data.card.type == Card.TypeEquip)
@@ -400,12 +400,13 @@ local jy_guina_target = fk.CreateTriggerSkill {
   end,
   on_refresh = function(self, event, target, player, data)
     local room = player.room
-    if event == fk.TargetConfirmed then
+    if event == fk.TargetSpecified then
       local guina_players = {}
       local targets = {}
       table.insertTable(targets, AimGroup:getAllTargets(data.tos))
       for _, p in ipairs(room:getAlivePlayers()) do
         if p:getMark("@jy_guina") ~= 0 then
+          -- TODO：一次指定多个目标的时候可能有问题，如铁索连环
           TargetGroup:pushTargets(data.targetGroup, p.id)
           table.insert(guina_players, p.id)
         end
