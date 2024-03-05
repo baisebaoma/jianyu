@@ -1586,7 +1586,7 @@ local jy_dianming = fk.CreateActiveSkill {
     return #selected == 0
   end,
   on_use = function(self, room, effect)
-    local player = room:getPlayerById(effect.to[1])
+    local player = room:getPlayerById(effect.tos[1])
     -- 随机从题库拿一道题
     local questionFull = Q.getRandomQuestion()
 
