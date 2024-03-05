@@ -384,10 +384,10 @@ local jy_guina = fk.CreateActiveSkill {
 }
 local jy_guina_refresh = fk.CreateTriggerSkill {
   name = "#jy_guina_refresh",
-  refresh_events = { fk.TargetSpecified, fk.Damaged },
+  refresh_events = { fk.TargetConfirming, fk.Damaged },
   can_refresh = function(self, event, target, player, data)
     if not player:hasSkill(self) then return false end
-    if event == fk.TargetSpecified then
+    if event == fk.TargetConfirming then
       if data.card then
         return data.from == player.id and
             not ((data.card.type == Card.TypeTrick and data.card.sub_type == Card.SubtypeDelayedTrick) or data.card.type == Card.TypeEquip)
@@ -400,29 +400,20 @@ local jy_guina_refresh = fk.CreateTriggerSkill {
     end
   end,
   on_refresh = function(self, event, target, player, data)
+    -- 还是有bug，具体表现为：1. 动画经常触发；2. 铁索连环选择两名目标时，会让被标记的人连两次。感觉可以参考大乔流离来写。
     local room = player.room
     room:doAnimate("InvokeSkill", {
       name = "jy_guina",
       player = player.id,
       skill_type = "offensive",
     })
-    if event == fk.TargetSpecified then
-      local guina_players = {}
-      local targets = {}
-      table.insertTable(targets, AimGroup:getAllTargets(data.tos))
+    if event == fk.TargetConfirming then
+      local guina_players = {} -- 用来画指示线的
+      local targets = AimGroup:getAllTargets(data.tos)
       for _, p in ipairs(room:getAlivePlayers()) do
-        local is_in = false -- 这个玩家是不是已经是目标了，如果是就不用再添加
-        if p:getMark("@jy_guina-phase") ~= 0 then
-          for _, t in ipairs(targets) do
-            if p.id == t then
-              is_in = true
-              break
-            end
-          end
-          if not is_in then
-            TargetGroup:pushTargets(data.targetGroup, p.id)
-            table.insert(guina_players, p.id)
-          end
+        if p:getMark("@jy_guina-phase") ~= 0 and not table.contains(targets, p.id) then -- 注意，这里可能不是id
+          AimGroup:addTargets(player.room, data, p.id)
+          table.insert(guina_players, p.id)                                             -- 注意，这里可能不是id
         end
         room:doIndicate(data.from, guina_players)
       end

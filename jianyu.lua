@@ -1150,6 +1150,7 @@ local jy_huapen = fk.CreateTriggerSkill {
     room:judge(judge)
     if judge.card.suit == Card.Heart then
       room:doIndicate(data.from, { player.id })      -- 播放指示线
+      -- TODO：这里写的不对吧，targets根本就没用上
       if #AimGroup:getAllTargets(data.tos) == 1 then -- 如果只有一个人，那么把我也加进去
         table.insertTable(targets, AimGroup:getAllTargets(data.tos))
       end
