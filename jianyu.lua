@@ -2286,4 +2286,89 @@ Fk:loadTranslationTable {
   ["$jy_lingfu2"] = [[灵符……保命……]],
 }
 
+local argenti = General(extension, "jy__argenti", "qun", 3)
+
+local chunmei = fk.CreateTriggerSkill {
+  frequency = Skill.Compulsory,
+  name = "jy_chunmei",
+  anim_type = "defensive",
+  events = { fk.Damage },
+  can_trigger = function(self, event, target, player, data)
+    return player:hasSkill(self) and (data.from == player or data.to == player)
+  end,
+  on_use = function(self, event, target, player, data)
+    local room = player.room
+    local judge = {
+      who = player,
+      reason = self.name,
+      pattern = ".|.|heart,diamond",
+    }
+    room:judge(judge)
+    if judge.card.color == Card.Red and not player.dead then
+      room:obtainCard(player.id, judge.card)
+    end
+  end
+}
+
+local zhuhua = fk.CreateActiveSkill {
+  name = "jy_zhuhua",
+  anim_type = "offensive",
+  min_card_num = 3,
+  max_card_num = 4,
+  can_use = function(self, player)
+    -- return #player:getCardIds(Player.Hand) >= 3
+    return true
+  end,
+  card_filter = function(self, to_select, selected)
+    if Self:prohibitDiscard(Fk:getCardById(to_select)) then return false end
+    -- if not table.contains(Self:getHandlyIds(true), to_select) then return false end
+    if #selected == 4 then return false end
+    if #selected == 0 then
+      return true
+    else
+      return Fk:getCardById(to_select).suit == Fk:getCardById(selected[1]).suit
+    end
+  end,
+  feasible = function(self, selected, selected_cards)
+    return #selected_cards == 3 or #selected_cards == 4
+  end,
+  on_use = function(self, room, effect)
+    local player = room:getPlayerById(effect.from)
+    room:throwCard(effect.cards, self.name, player, player)
+    if #effect.cards == 3 then
+      room:useVirtualCard("archery_attack", nil, player, room:getOtherPlayers(player, true), self.name, true)
+    else
+      room:doIndicate(player.id, table.map(room.alive_players, Util.IdMapper))
+      room:delay(1000)
+      for _, p in ipairs(room:getOtherPlayers(player, true)) do
+        if not player.dead then -- 如果我自己死了（因为各种乱七八糟的技能弹反），那就不要继续了
+          room:damage({
+            from = player,
+            to = p,
+            damage = 1,
+            damageType = fk.NormalDamage,
+          })
+        end
+      end
+    end
+  end,
+}
+
+argenti:addSkill(chunmei)
+argenti:addSkill(zhuhua)
+
+Fk:loadTranslationTable {
+  ["jy__argenti"] = [[银枝]],
+  ["~jy__argenti"] = [[没找到……「祂」……]],
+
+  ["jy_chunmei"] = "纯美",
+  [":jy_chunmei"] = [[锁定技，你造成或受到伤害时进行判定，若为红色，你获得该判定牌。]],
+
+  ["jy_zhuhua"] = "驻花",
+  [":jy_zhuhua"] = [[出牌阶段，你可以弃三张或四张相同花色的牌。若为三张，你视为使用一张【万箭齐发】；若为四张，你对其他所有角色造成一点伤害。]],
+  ["$jy_zhuhua1"] = [[再次见到那道光芒之前……]],
+  ["$jy_zhuhua2"] = [[银河中的一切美丽，我将捍卫至最后一刻！]],
+  ["$jy_zhuhua3"] = [[……献给伊德莉拉。]],
+}
+
 return extension
