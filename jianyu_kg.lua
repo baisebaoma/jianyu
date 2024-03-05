@@ -395,7 +395,8 @@ local jy_guina_refresh = fk.CreateTriggerSkill {
         return data.from == player.id
       end
     else
-      return data.from == player.id and room:getPlayerById(data.to):getMark("@jy_guina-phase") ~= 0
+      return data.from == player and data.to:getMark("@jy_guina-phase") ~= 0
+      -- 因为这两个事件的data.to和from对应的数据结构不一样
     end
   end,
   on_refresh = function(self, event, target, player, data)
