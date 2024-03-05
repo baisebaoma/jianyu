@@ -405,10 +405,18 @@ local jy_guina_target = fk.CreateTriggerSkill {
       local targets = {}
       table.insertTable(targets, AimGroup:getAllTargets(data.tos))
       for _, p in ipairs(room:getAlivePlayers()) do
+        local is_in = false -- 这个玩家是不是已经是目标了，如果是就不用再添加
         if p:getMark("@jy_guina") ~= 0 then
-          -- TODO：一次指定多个目标的时候可能有问题，如铁索连环
-          TargetGroup:pushTargets(data.targetGroup, p.id)
-          table.insert(guina_players, p.id)
+          for _, t in ipairs(targets) do
+            if p.id == t then
+              is_in = true
+              break
+            end
+          end
+          if is_in then
+            TargetGroup:pushTargets(data.targetGroup, p.id)
+            table.insert(guina_players, p.id)
+          end
         end
         room:doIndicate(data.from, guina_players)
       end
@@ -467,7 +475,7 @@ Fk:loadTranslationTable {
   ["~jy__kgds"] = "「庸人」么……呵……",
 
   ["jy_guina"] = "归纳",
-  [":jy_guina"] = [[出牌阶段限三次，你可以令一名角色回答一道行测真题。若其回答正确，其可以指定一个牌名并获得一张该牌名的牌；若其回答错误，本阶段你指定目标时（使用延时类锦囊牌或装备牌除外），额外指定其为目标。<br><font color="grey">自备纸笔以应对数学题。<br>收录试卷：]] .. total_papers .. [[套，题量：]] .. total_questions .. [[，经人工筛选，不含图形推理、资料分析，全部取自2018-2023国家及各地区《行测》真题。<br>这张牌可能来自于任何位置，甚至你自己的区域。若你有同名牌，建议先使用掉。<br>本技能产生的答对、答错数与〖熬夜〗共享。</font>]],
+  [":jy_guina"] = [[出牌阶段限三次，你可以令一名角色回答一道行测真题。若其回答正确，其可以指定一个牌名并获得一张该牌名的牌；若其回答错误，本阶段你指定目标时（使用延时类锦囊牌或装备牌除外），若其不是目标，额外指定其为目标。<br><font color="grey">自备纸笔以应对数学题。<br>收录试卷：]] .. total_papers .. [[套，题量：]] .. total_questions .. [[，经人工筛选，不含图形推理、资料分析，全部取自2018-2023国家及各地区《行测》真题。<br>这张牌可能来自于任何位置，甚至你自己的区域。若你有同名牌，建议先使用掉。<br>本技能产生的答对、答错数与〖熬夜〗共享。</font>]],
   ["@jy_guina"] = "归纳",
   ["#jy_guina_incorrect"] = [[答错了！本阶段你会被额外指定为目标！<br>你可以在战报中查看正确答案。]],
   ["$jy_guina1"] = [[让我来考考你。]],
