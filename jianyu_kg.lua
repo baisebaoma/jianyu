@@ -413,7 +413,7 @@ local jy_guina_target = fk.CreateTriggerSkill {
               break
             end
           end
-          if is_in then
+          if not is_in then
             TargetGroup:pushTargets(data.targetGroup, p.id)
             table.insert(guina_players, p.id)
           end
