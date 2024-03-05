@@ -1571,8 +1571,156 @@ local jy_jieju_fail = fk.CreateTriggerSkill {
 jy_jieju:addRelatedSkill(jy_jieju_success)
 jy_jieju:addRelatedSkill(jy_jieju_fail)
 
+local jy_dianming = fk.CreateActiveSkill {
+  name = "jy_dianming",
+  anim_type = "control",
+  can_use = function(self, player)
+    return player:usedSkillTimes(self.name, Player.HistoryPhase) == 0
+  end,
+  card_filter = function(self, card)
+    return false
+  end,
+  card_num = 0,
+  target_num = 1,
+  target_filter = function(self, to_select, selected)
+    return #selected == 0
+  end,
+  on_use = function(self, room, effect)
+    local player = room:getPlayerById(effect.to[1])
+    -- 随机从题库拿一道题
+    local questionFull = Q.getRandomQuestion()
+
+    local question = questionFull[1]
+    local answers = questionFull[2]
+    local correct_answer = questionFull[3]
+
+    ------------------------------------------
+    -- 插入换行符，每若干个字符一次
+    local function insert_br(str, ct)
+      local result = ""
+      local count = 0
+      local in_br = false -- 用于检测是否在原本的 <br> 之内
+
+      -- TODO：如果这是最后一个字符，那么不要添加br了
+      for char in str:gmatch("[%z\1-\127\194-\244_][\128-\191]*") do
+        if char == "<" then
+          in_br = true
+        elseif char == ">" and in_br then
+          in_br = false
+          count = 0
+        end
+
+        if not in_br then
+          result = result .. char
+          count = count + 1
+
+          -- 每ct个字符插入一个<br>
+          if count == ct then
+            result = result .. "<br>"
+            count = 0
+          end
+        else
+          result = result .. char
+        end
+      end
+
+      return result
+    end
+
+    local question_wrap = insert_br(question, 40)
+    local answers_wrap = {}
+    for _, a in ipairs(answers) do
+      table.insert(answers_wrap, insert_br(a, 30))
+    end
+    -----------------------------------------------
+
+    -- 建立输出到战报里的所有选项
+    local answers_string = ""
+    for i, a in ipairs(answers) do
+      if i ~= #answers then
+        answers_string = answers_string .. a .. "<br>"
+      else
+        answers_string = answers_string .. a
+      end
+    end
+
+    -- 做题
+    -- 不仅要让自己看到题目，还要让全场所有人看到题目。
+    room:doBroadcastNotify("ShowToast", Fk:translate("#jy_zuoti_ob"))
+    room:sendLog {
+      type = "%from 的题目：<br>%arg<br>%arg2",
+      from = player.id,
+      arg = question,
+      arg2 = answers_string,
+    }
+
+    local answers_short = {}
+    for _, a in ipairs(answers) do
+      table.insert(answers_short, a[1])
+    end
+
+    local choice = room:askForChoice(player, answers_wrap, self.name, question_wrap)
+    if choice[1] == correct_answer then -- 仅判断choice[1]，因为答案只保留正确选项的选项名字（ABCD）
+      room:addPlayerMark(player, "@jy_zuoti_correct_count")
+      room:doBroadcastNotify("ShowToast", Fk:translate("#jy_zuoti_correct"))
+      room:sendLog {
+        type = "#jy_zuoti_correct_log",
+        from = player.id,
+        arg = correct_answer[1],
+      }
+
+      -- cheat，从谋徐盛抄来的
+      local from = room:getPlayerById(effect.from)
+      local cardType = { 'basic', 'trick', 'equip' }
+      local cardTypeName = room:askForChoice(from, cardType, self.name)
+      local card_types = { Card.TypeBasic, Card.TypeTrick, Card.TypeEquip }
+      cardType = card_types[table.indexOf(cardType, cardTypeName)]
+
+      local allCardIds = Fk:getAllCardIds()
+      local allCardMapper = {}
+      local allCardNames = {}
+      for _, id in ipairs(allCardIds) do
+        local card = Fk:getCardById(id)
+        if card.type == cardType then
+          if allCardMapper[card.name] == nil then
+            table.insert(allCardNames, card.name)
+          end
+
+          allCardMapper[card.name] = allCardMapper[card.name] or {}
+          table.insert(allCardMapper[card.name], id)
+        end
+      end
+
+      if #allCardNames == 0 then
+        return
+      end
+
+      local cardName = room:askForChoice(from, allCardNames, self.name)
+      local toGain -- = room:printCard(cardName, Card.Heart, 1)
+      if #allCardMapper[cardName] > 0 then
+        toGain = allCardMapper[cardName][math.random(1, #allCardMapper[cardName])]
+      end
+
+      -- from:addToPile(self.name, toGain, true, self.name)
+      -- room:setCardMark(Fk:getCardById(toGain), "@@test_cheat-phase", 1)
+      -- room:setCardMark(Fk:getCardById(toGain), "@@test_cheat-inhand", 1)
+      room:obtainCard(effect.from, toGain, true, fk.ReasonPrey)
+    else
+      room:addPlayerMark(player, "@jy_zuoti_incorrect_count")
+      room:doBroadcastNotify("ShowToast", Fk:translate("#jy_zuoti_incorrect"))
+      room:sendLog {
+        type = "#jy_zuoti_incorrect_log",
+        from = player.id,
+        arg = choice[1],
+        arg2 = correct_answer,
+      }
+    end
+  end,
+}
+
 jy__kgdxs:addSkill(jy_zuoti)
 jy__kgdxs:addSkill(jy_jieju)
+jy__kgdxs:addSkill(jy_dianming)
 jy__kgdxs:addRelatedSkill("jizhi")
 jy__kgdxs:addRelatedSkill("kanpo")
 jy__kgdxs:addRelatedSkill("xiangle")
@@ -1605,6 +1753,8 @@ Fk:loadTranslationTable {
   ["#jy_jieju_success"] = "结局：成功",
   ["#jy_jieju_fail"] = "结局：失败",
 
+  ["jy_dianming"] = "点名",
+  [":jy_dianming"] = [[出牌阶段限一次，你可以令一名角色尝试回答一道从题库中随机抽取的行测真题。若其回答正确，其可以指定一个牌名，然后从场上获得一张该牌名的牌。]],
 }
 
 -- 参考：廖化，英姿，蛊惑，血裔
