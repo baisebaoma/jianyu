@@ -390,7 +390,7 @@ local jy_guina_target = fk.CreateTriggerSkill {
     if event == fk.TargetSpecified then
       if data.card then
         return data.from == player.id and
-            not ((self.type == Card.TypeTrick and self.sub_type == Card.SubtypeDelayedTrick) or data.card.type == Card.TypeEquip)
+            not ((data.card.type == Card.TypeTrick and data.card.sub_type == Card.SubtypeDelayedTrick) or data.card.type == Card.TypeEquip)
       else
         return data.from == player.id
       end
