@@ -148,7 +148,7 @@ Fk:loadTranslationTable {
 
   ["jy_kaiju"] = "开局",
   [":jy_kaiju"] = [[锁定技，准备阶段，其他角色可以交给你一张牌，视为对你使用一张【杀】。<br>
-  <font size="1"><i>“从未如此美妙的开局！”</i></font>]],
+  <font color="grey"><i>“从未如此美妙的开局！”</i></font>]],
   ["$jy_kaiju1"] = "不是啊，我炸一对鬼的时候我在打什么，打一对10。一对10，他四个9炸我，我不输了吗？",
   ["$jy_kaiju2"] = "怎么赢啊？你别瞎说啊！",
   ["$jy_kaiju3"] = "打这牌怎么打？兄弟们快教我，我看着头晕！",
@@ -432,7 +432,7 @@ Fk:loadTranslationTable {
   ["jy__liyuanhao_xiao"] = "啸",
 
   ["jy_huxiao"] = "虎啸",
-  [":jy_huxiao"] = [[当你使用或打出一张【杀】时，可以将牌堆顶的一张牌置于武将牌上，称为“啸”；你可以将“啸”当【酒】或【闪】使用或打出。<br><font size="1"><i>“我希望我的后辈们能够记住，在你踏上职业道路的这一刻开始，你的目标就只有，冠军。”</i></font>]],
+  [":jy_huxiao"] = [[当你使用或打出一张【杀】时，可以将牌堆顶的一张牌置于武将牌上，称为“啸”；你可以将“啸”当【酒】或【闪】使用或打出。<br><font color="grey"><i>“我希望我的后辈们能够记住，在你踏上职业道路的这一刻开始，你的目标就只有，冠军。”</i></font>]],
 
   ["jy_erduanxiao"] = "二段",
   [":jy_erduanxiao"] = [[锁定技，每当你的武将牌上有且仅有两张“啸”时，你将所有“啸”收入手牌并恢复一点体力。]],
@@ -1119,7 +1119,6 @@ local jy_huapen = fk.CreateTriggerSkill {
   on_use = function(self, event, target, player, data)
     local room = player.room
     local targets = {}
-    local previous_targets = AimGroup:getAllTargets(data.tos)
 
     local judge = {
       who = player,
@@ -1444,9 +1443,8 @@ local jy_zuoti = fk.CreateActiveSkill {
       }
 
       -- cheat，从谋徐盛抄来的
-      local from = room:getPlayerById(effect.from)
       local cardType = { 'basic', 'trick', 'equip' }
-      local cardTypeName = room:askForChoice(from, cardType, self.name)
+      local cardTypeName = room:askForChoice(player, cardType, self.name)
       local card_types = { Card.TypeBasic, Card.TypeTrick, Card.TypeEquip }
       cardType = card_types[table.indexOf(cardType, cardTypeName)]
 
@@ -1469,16 +1467,12 @@ local jy_zuoti = fk.CreateActiveSkill {
         return
       end
 
-      local cardName = room:askForChoice(from, allCardNames, self.name)
+      local cardName = room:askForChoice(player, allCardNames, self.name)
       local toGain -- = room:printCard(cardName, Card.Heart, 1)
       if #allCardMapper[cardName] > 0 then
         toGain = allCardMapper[cardName][math.random(1, #allCardMapper[cardName])]
       end
-
-      -- from:addToPile(self.name, toGain, true, self.name)
-      -- room:setCardMark(Fk:getCardById(toGain), "@@test_cheat-phase", 1)
-      -- room:setCardMark(Fk:getCardById(toGain), "@@test_cheat-inhand", 1)
-      room:obtainCard(effect.from, toGain, true, fk.ReasonPrey)
+      room:obtainCard(player, toGain, true, fk.ReasonPrey)
     else
       room:addPlayerMark(player, "@jy_zuoti_incorrect_count")
       room:doBroadcastNotify("ShowToast", Fk:translate("#jy_zuoti_incorrect"))
@@ -1575,7 +1569,7 @@ local jy_dianming = fk.CreateActiveSkill {
   name = "jy_dianming",
   anim_type = "control",
   can_use = function(self, player)
-    return player:usedSkillTimes(self.name, Player.HistoryPhase) == 0
+    return player:usedSkillTimes(self.name, Player.HistoryPhase) < 2
   end,
   card_filter = function(self, card)
     return false
@@ -1670,9 +1664,8 @@ local jy_dianming = fk.CreateActiveSkill {
       }
 
       -- cheat，从谋徐盛抄来的
-      local from = room:getPlayerById(effect.from)
       local cardType = { 'basic', 'trick', 'equip' }
-      local cardTypeName = room:askForChoice(from, cardType, self.name)
+      local cardTypeName = room:askForChoice(player, cardType, self.name)
       local card_types = { Card.TypeBasic, Card.TypeTrick, Card.TypeEquip }
       cardType = card_types[table.indexOf(cardType, cardTypeName)]
 
@@ -1695,28 +1688,59 @@ local jy_dianming = fk.CreateActiveSkill {
         return
       end
 
-      local cardName = room:askForChoice(from, allCardNames, self.name)
+      local cardName = room:askForChoice(player, allCardNames, self.name)
       local toGain -- = room:printCard(cardName, Card.Heart, 1)
       if #allCardMapper[cardName] > 0 then
         toGain = allCardMapper[cardName][math.random(1, #allCardMapper[cardName])]
       end
-
-      -- from:addToPile(self.name, toGain, true, self.name)
-      -- room:setCardMark(Fk:getCardById(toGain), "@@test_cheat-phase", 1)
-      -- room:setCardMark(Fk:getCardById(toGain), "@@test_cheat-inhand", 1)
-      room:obtainCard(effect.from, toGain, true, fk.ReasonPrey)
+      room:obtainCard(player, toGain, true, fk.ReasonPrey)
     else
       room:addPlayerMark(player, "@jy_zuoti_incorrect_count")
-      room:doBroadcastNotify("ShowToast", Fk:translate("#jy_zuoti_incorrect"))
+      room:doBroadcastNotify("ShowToast", Fk:translate("#jy_dianming_incorrect"))
       room:sendLog {
         type = "#jy_zuoti_incorrect_log",
         from = player.id,
         arg = choice[1],
         arg2 = correct_answer,
       }
+      room:setPlayerMark(player, "@jy_dianming", "") -- 给这个人上标记，标记为被点名的
     end
   end,
 }
+local jy_dianming_target = fk.CreateTriggerSkill {
+  name = "#jy_dianming_target",
+  refresh_events = { fk.TargetConfirming, fk.EventPhaseEnd },
+  can_refresh = function(self, event, target, player, data)
+    if not player:hasSkill(self) then return false end
+    if event == fk.TargetConfirming then
+      return data.from == player.id
+    else
+      return target == player and player.phase == Player.Play
+    end
+  end,
+  on_refresh = function(self, event, target, player, data)
+    local room = player.room
+    if event == fk.TargetConfirming then
+      local dianming_players = {}
+      local targets = {}
+      table.insertTable(targets, AimGroup:getAllTargets(data.tos))
+      for _, p in ipairs(room:getAlivePlayers()) do
+        if p:getMark("@jy_dianming") ~= 0 then
+          TargetGroup:pushTargets(data.targetGroup, p.id)
+          table.insert(dianming_players, p.id)
+        end
+        room:doIndicate(data.from, dianming_players)
+      end
+    else
+      for _, p in ipairs(room:getAlivePlayers()) do
+        if p:getMark("@jy_dianming") ~= 0 then
+          room:setPlayerMark(p, "@jy_dianming", 0)
+        end
+      end
+    end
+  end,
+}
+jy_dianming:addRelatedSkill(jy_dianming_target)
 
 jy__kgdxs:addSkill(jy_zuoti)
 jy__kgdxs:addSkill(jy_jieju)
@@ -1733,12 +1757,12 @@ Fk:loadTranslationTable {
   ["jy__kgdxs"] = "考公大学生",
 
   ["jy_zuoti"] = "做题",
-  [":jy_zuoti"] = [[出牌阶段限一次，你可以尝试回答一道从题库中随机抽取的行测真题。若你回答正确，你可以指定一个牌名，然后从场上获得一张该牌名的牌。<br>
-  <font size="1">推荐房间操作时长：60秒；自备纸笔以应对数学题。<br>
-  收录试卷：]] .. total_papers .. [[套，题量：]] .. total_questions .. [[，经人工筛选，不含图形推理（显示不出）、资料分析（不方便做），全部取自2018-2023国家及各地区《行测》真题。<br>
-  建议你先把手牌中同牌名的牌使用掉！因为你选择的这张牌可能来自于任何位置，包括其他角色的区域、你自己的手牌。</font>]],
+  [":jy_zuoti"] = [[出牌阶段限一次，你可以回答一道行测真题。若你回答正确，你可以指定一个牌名，然后获得一张该牌名的牌。<br>
+  <font color="grey">推荐房间操作时长：60秒；自备纸笔以应对数学题。<br>
+  收录试卷：]] .. total_papers .. [[套，题量：]] .. total_questions .. [[，经人工筛选，不含图形推理、资料分析，全部取自2018-2023国家及各地区《行测》真题。<br>
+  这张牌可能来自于任何位置，甚至你自己的区域。若你有同名牌，建议先使用掉。</font>]],
   ["#jy_zuoti_see_log"] = [[做题：请在战报中查看完整题干]],
-  ["#jy_zuoti_ob"] = [[正在做题！请在战报中查看这道题目的完整题干和选项。]],
+  ["#jy_zuoti_ob"] = [[正在做题！其他角色可以在战报中查看这道题目的完整题干和选项！]],
   ["#jy_zuoti_correct"] = [[答对了！可以从场上随机位置获取一张想要的牌！<br>你可以在战报中查看正确答案。]],
   ["#jy_zuoti_incorrect"] = [[答错了！不过没有什么惩罚，你学习到了新知识！<br>你可以在战报中查看正确答案。]],
   ["@jy_zuoti_correct_count"] = "答对",
@@ -1748,13 +1772,15 @@ Fk:loadTranslationTable {
 
   ["jy_jieju"] = "熬夜",
   [":jy_jieju"] = [[使命技，出牌阶段，你可以失去一点体力使〖做题〗视为未发动过。<br>
-  成功：回合结束时，若你〖做题〗答对比答错至少多3次，你摸3张牌、回复3点体力，然后获得〖集智〗、〖看破〗、〖享乐〗；<br>
-  失败：回合结束时，若你〖做题〗答错比答对至少多3次，你翻面，然后获得〖玉玉〗、〖红温〗。]],
+  成功：回合结束时，若你答对比答错至少多3次，你摸3张牌、回复3点体力，然后获得〖集智〗、〖看破〗、〖享乐〗；<br>
+  失败：回合结束时，若你答错比答对至少多3次，你翻面，然后获得〖玉玉〗、〖红温〗。]],
   ["#jy_jieju_success"] = "结局：成功",
   ["#jy_jieju_fail"] = "结局：失败",
 
   ["jy_dianming"] = "点名",
-  [":jy_dianming"] = [[出牌阶段限一次，你可以令一名角色尝试回答一道从题库中随机抽取的行测真题。若其回答正确，其可以指定一个牌名，然后从场上获得一张该牌名的牌。]],
+  [":jy_dianming"] = [[出牌阶段限两次，你可以令一名角色回答一道行测真题。若其回答正确，其可以指定一个牌名，然后获得一张该牌名的牌；若其回答错误，本阶段你指定其他角色为目标时，额外指定其为目标。]],
+  ["@jy_dianming"] = "点名",
+  ["#jy_dianming_incorrect"] = [[答错了！本阶段你会被额外指定为目标！<br>你可以在战报中查看正确答案。]],
 }
 
 -- 参考：廖化，英姿，蛊惑，血裔
@@ -2319,7 +2345,7 @@ Fk:loadTranslationTable {
   ["jy__tangniu"] = [[唐妞]],
 
   ["jy_budeng"] = "不等",
-  [":jy_budeng"] = [[锁定技，防止你受到的伤害；你跳过弃牌阶段；你于其他角色的回合内获得牌（包括有牌进入你的判定区）时，其失去一点体力，然后你失去所有体力。<br><font size="1">受到伤害≠我掉血；弃牌阶段≠我要弃；接受礼物≠我同意。</font>]],
+  [":jy_budeng"] = [[锁定技，防止你受到的伤害；你跳过弃牌阶段；你于其他角色的回合内获得牌（包括有牌进入你的判定区）时，其失去一点体力，然后你失去所有体力。<br><font color="grey">受到伤害≠我掉血；弃牌阶段≠我要弃；接受礼物≠我同意。</font>]],
 
   ["jy_duili"] = "对立",
   [":jy_duili"] = [[当你指定男性角色为【杀】的目标后，你可以令其选择一项：弃置一张手牌，或令你摸一张牌。]],
