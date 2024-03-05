@@ -329,7 +329,7 @@ local jy_guina = fk.CreateActiveSkill {
       me:broadcastSkillInvoke(self.name, math.random(3, 4)) -- 播放选择正确的语音
 
       room:addPlayerMark(player, "@jy_zuoti_correct_count")
-      room:doBroadcastNotify("ShowToast", Fk:translate("#jy_zuoti_correct"))
+      room:doBroadcastNotify("ShowToast", Fk:translate("#jy_guina_correct"))
       room:sendLog {
         type = "#jy_zuoti_correct_log",
         from = player.id,
@@ -382,42 +382,50 @@ local jy_guina = fk.CreateActiveSkill {
     end
   end,
 }
-local jy_guina_target = fk.CreateTriggerSkill {
-  name = "#jy_guina_target",
-  refresh_events = { fk.TargetSpecified },
+local jy_guina_refresh = fk.CreateTriggerSkill {
+  name = "#jy_guina_refresh",
+  refresh_events = { fk.TargetSpecified, fk.Damaged },
   can_refresh = function(self, event, target, player, data)
     if not player:hasSkill(self) then return false end
-    if data.card then
-      return data.from == player.id and
-          not ((data.card.type == Card.TypeTrick and data.card.sub_type == Card.SubtypeDelayedTrick) or data.card.type == Card.TypeEquip)
+    if event == fk.TargetSpecified then
+      if data.card then
+        return data.from == player.id and
+            not ((data.card.type == Card.TypeTrick and data.card.sub_type == Card.SubtypeDelayedTrick) or data.card.type == Card.TypeEquip)
+      else
+        return data.from == player.id
+      end
     else
-      return data.from == player.id
+      return data.from == player.id and room:getPlayerById(data.to):getMark("@jy_guina") ~= 0
     end
   end,
   on_refresh = function(self, event, target, player, data)
     local room = player.room
-    local guina_players = {}
-    local targets = {}
-    table.insertTable(targets, AimGroup:getAllTargets(data.tos))
-    for _, p in ipairs(room:getAlivePlayers()) do
-      local is_in = false -- 这个玩家是不是已经是目标了，如果是就不用再添加
-      if p:getMark("@jy_guina-phase") ~= 0 then
-        for _, t in ipairs(targets) do
-          if p.id == t then
-            is_in = true
-            break
+    if event == fk.TargetSpecified then
+      local guina_players = {}
+      local targets = {}
+      table.insertTable(targets, AimGroup:getAllTargets(data.tos))
+      for _, p in ipairs(room:getAlivePlayers()) do
+        local is_in = false -- 这个玩家是不是已经是目标了，如果是就不用再添加
+        if p:getMark("@jy_guina-phase") ~= 0 then
+          for _, t in ipairs(targets) do
+            if p.id == t then
+              is_in = true
+              break
+            end
+          end
+          if not is_in then
+            TargetGroup:pushTargets(data.targetGroup, p.id)
+            table.insert(guina_players, p.id)
           end
         end
-        if not is_in then
-          TargetGroup:pushTargets(data.targetGroup, p.id)
-          table.insert(guina_players, p.id)
-        end
+        room:doIndicate(data.from, guina_players)
       end
-      room:doIndicate(data.from, guina_players)
+    else
+      player:drawCards(1, "jy_guina")
     end
   end,
 }
-jy_guina:addRelatedSkill(jy_guina_target)
+jy_guina:addRelatedSkill(jy_guina_refresh)
 
 
 local jy__kgdxs = General(extension, "jy__kgdxs", "qun", 5)
@@ -471,9 +479,10 @@ Fk:loadTranslationTable {
   ["~jy__kgds"] = "「庸人」么……呵……",
 
   ["jy_guina"] = "归纳",
-  [":jy_guina"] = [[出牌阶段限三次，你可以令一名角色回答一道行测真题。若其回答正确，其可以指定一个牌名并获得一张该牌名的牌；若其回答错误，本阶段你使用牌时（延时类锦囊牌或装备牌除外），若其不是目标，额外指定其为目标。<br><font color="grey">自备纸笔以应对数学题。<br>收录试卷：]] .. total_papers .. [[套，题量：]] .. total_questions .. [[，经人工筛选，不含图形推理、资料分析，全部取自2018-2023国家及各地区《行测》真题。<br>这张牌可能来自于任何位置，甚至你自己的区域。若你有同名牌，建议先使用掉。<br>本技能产生的答对、答错数与〖熬夜〗共享。</font>]],
+  [":jy_guina"] = [[出牌阶段限三次，你可以令一名角色回答一道行测真题。若其回答正确，其可以指定一个牌名并获得一张该牌名的牌；若其回答错误，你令其获得“归纳”直到本阶段结束。你使用除延时类锦囊和装备外的牌时，若持有“归纳”的角色不是该牌的目标，额外指定其为目标；你对持有“归纳”的角色造成伤害时，摸一张牌。<br><font color="grey">自备纸笔以应对数学题。<br>收录试卷：]] .. total_papers .. [[套，题量：]] .. total_questions .. [[，经人工筛选，不含图形推理、资料分析，全部取自2018-2023国家及各地区《行测》真题。<br>这张牌可能来自于任何位置，甚至你自己的区域。若你有同名牌，建议先使用掉。<br>本技能产生的答对、答错数与〖做题〗、〖熬夜〗共享。</font>]],
   ["@jy_guina-phase"] = "归纳",
-  ["#jy_guina_incorrect"] = [[答错了！本阶段你会被额外指定为目标！<br>你可以在战报中查看正确答案。]],
+  ["#jy_guina_correct"] = [[答对了！你获得了真理医生的认可！<br>你可以在战报中查看正确答案。]],
+  ["#jy_guina_incorrect"] = [[答错了！你被真理医生标记了！<br>你可以在战报中查看正确答案。]],
   ["$jy_guina1"] = [[让我来考考你。]],
   ["$jy_guina2"] = [[由我提问了。]],
   ["$jy_guina3"] = [[不错，加五分。]],
