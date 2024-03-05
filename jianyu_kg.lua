@@ -378,54 +378,42 @@ local jy_guina = fk.CreateActiveSkill {
         arg = choice[1],
         arg2 = correct_answer,
       }
-      room:setPlayerMark(player, "@jy_guina", "") -- 给这个人上标记，标记为被点名的
+      room:setPlayerMark(player, "@jy_guina-phase", "") -- 给这个人上标记，标记为被点名的
     end
   end,
 }
 local jy_guina_target = fk.CreateTriggerSkill {
   name = "#jy_guina_target",
-  refresh_events = { fk.TargetSpecified, fk.EventPhaseEnd },
+  refresh_events = { fk.TargetSpecified },
   can_refresh = function(self, event, target, player, data)
     if not player:hasSkill(self) then return false end
-    if event == fk.TargetSpecified then
-      if data.card then
-        return data.from == player.id and
-            not ((data.card.type == Card.TypeTrick and data.card.sub_type == Card.SubtypeDelayedTrick) or data.card.type == Card.TypeEquip)
-      else
-        return data.from == player.id
-      end
+    if data.card then
+      return data.from == player.id and
+          not ((data.card.type == Card.TypeTrick and data.card.sub_type == Card.SubtypeDelayedTrick) or data.card.type == Card.TypeEquip)
     else
-      return target == player and player.phase == Player.Play
+      return data.from == player.id
     end
   end,
   on_refresh = function(self, event, target, player, data)
     local room = player.room
-    if event == fk.TargetSpecified then
-      local guina_players = {}
-      local targets = {}
-      table.insertTable(targets, AimGroup:getAllTargets(data.tos))
-      for _, p in ipairs(room:getAlivePlayers()) do
-        local is_in = false -- 这个玩家是不是已经是目标了，如果是就不用再添加
-        if p:getMark("@jy_guina") ~= 0 then
-          for _, t in ipairs(targets) do
-            if p.id == t then
-              is_in = true
-              break
-            end
-          end
-          if not is_in then
-            TargetGroup:pushTargets(data.targetGroup, p.id)
-            table.insert(guina_players, p.id)
+    local guina_players = {}
+    local targets = {}
+    table.insertTable(targets, AimGroup:getAllTargets(data.tos))
+    for _, p in ipairs(room:getAlivePlayers()) do
+      local is_in = false -- 这个玩家是不是已经是目标了，如果是就不用再添加
+      if p:getMark("@jy_guina-phase") ~= 0 then
+        for _, t in ipairs(targets) do
+          if p.id == t then
+            is_in = true
+            break
           end
         end
-        room:doIndicate(data.from, guina_players)
-      end
-    else
-      for _, p in ipairs(room:getAlivePlayers()) do
-        if p:getMark("@jy_guina") ~= 0 then
-          room:setPlayerMark(p, "@jy_guina", 0)
+        if not is_in then
+          TargetGroup:pushTargets(data.targetGroup, p.id)
+          table.insert(guina_players, p.id)
         end
       end
+      room:doIndicate(data.from, guina_players)
     end
   end,
 }
@@ -475,8 +463,8 @@ Fk:loadTranslationTable {
   ["~jy__kgds"] = "「庸人」么……呵……",
 
   ["jy_guina"] = "归纳",
-  [":jy_guina"] = [[出牌阶段限三次，你可以令一名角色回答一道行测真题。若其回答正确，其可以指定一个牌名并获得一张该牌名的牌；若其回答错误，本阶段你指定目标时（使用延时类锦囊牌或装备牌除外），若其不是目标，额外指定其为目标。<br><font color="grey">自备纸笔以应对数学题。<br>收录试卷：]] .. total_papers .. [[套，题量：]] .. total_questions .. [[，经人工筛选，不含图形推理、资料分析，全部取自2018-2023国家及各地区《行测》真题。<br>这张牌可能来自于任何位置，甚至你自己的区域。若你有同名牌，建议先使用掉。<br>本技能产生的答对、答错数与〖熬夜〗共享。</font>]],
-  ["@jy_guina"] = "归纳",
+  [":jy_guina"] = [[出牌阶段限三次，你可以令一名角色回答一道行测真题。若其回答正确，其可以指定一个牌名并获得一张该牌名的牌；若其回答错误，本阶段你使用牌时（延时类锦囊牌或装备牌除外），若其不是目标，额外指定其为目标。<br><font color="grey">自备纸笔以应对数学题。<br>收录试卷：]] .. total_papers .. [[套，题量：]] .. total_questions .. [[，经人工筛选，不含图形推理、资料分析，全部取自2018-2023国家及各地区《行测》真题。<br>这张牌可能来自于任何位置，甚至你自己的区域。若你有同名牌，建议先使用掉。<br>本技能产生的答对、答错数与〖熬夜〗共享。</font>]],
+  ["@jy_guina-phase"] = "归纳",
   ["#jy_guina_incorrect"] = [[答错了！本阶段你会被额外指定为目标！<br>你可以在战报中查看正确答案。]],
   ["$jy_guina1"] = [[让我来考考你。]],
   ["$jy_guina2"] = [[由我提问了。]],
