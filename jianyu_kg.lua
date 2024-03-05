@@ -439,6 +439,10 @@ local total_papers, total_questions = Q.questionCount()
 
 Fk:loadTranslationTable {
   ["jy__kgdxs"] = "考公大学生",
+  ["#jy__kgdxs"] = "公喜发财",
+  ["designer:jy__kgdxs"] = "考公专家",
+  ["cv:jy__kgdxs"] = "暂无",
+  ["illustrator:jy__kgdxs"] = "网络图片",
 
   ["jy_zuoti"] = "做题",
   [":jy_zuoti"] = [[出牌阶段限一次，你可以回答一道行测真题。若你回答正确，你可以指定一个牌名并获得一张该牌名的牌。<br><font color="grey">自备纸笔以应对数学题。<br>收录试卷：]] .. total_papers .. [[套，题量：]] .. total_questions .. [[，经人工筛选，不含图形推理、资料分析，全部取自2018-2023国家及各地区《行测》真题。<br>这张牌可能来自于任何位置，甚至你自己的区域。若你有同名牌，建议先使用掉。</font>]],
@@ -460,6 +464,10 @@ Fk:loadTranslationTable {
 
 
   ["jy__kgds"] = "真理医生",
+  ["#jy__kgds"] = "万物皆流",
+  ["designer:jy__kgds"] = "考公专家",
+  ["cv:jy__kgds"] = "桑毓泽",
+  ["illustrator:jy__kgds"] = "米哈游",
   ["~jy__kgds"] = "「庸人」么……呵……",
 
   ["jy_guina"] = "归纳",

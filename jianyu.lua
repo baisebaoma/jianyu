@@ -145,6 +145,10 @@ jy__jianzihao:addSkill(jy_xizao)
 
 Fk:loadTranslationTable {
   ["jy__jianzihao"] = "简自豪",
+  ["#jy__jianzihao"] = "澡子哥",
+  ["designer:jy__jianzihao"] = "导演片子怎么样了 & 考公专家",
+  ["cv:jy__jianzihao"] = "简自豪",
+  ["illustrator:jy__jianzihao"] = "简自豪",
 
   ["jy_kaiju"] = "开局",
   [":jy_kaiju"] = [[锁定技，准备阶段，其他角色可以交给你一张牌，视为对你使用一张【杀】。<br>
@@ -251,6 +255,10 @@ jy__jianzihao:addSkill("jy_xizao")
 
 Fk:loadTranslationTable {
   ["jy__new__jianzihao"] = "简自豪",
+  ["#jy__new__jianzihao"] = "无冕之王",
+  ["designer:jy__new__jianzihao"] = "考公专家",
+  ["cv:jy__new__jianzihao"] = "简自豪",
+  ["illustrator:jy__new__jianzihao"] = "简自豪",
 
   ["jy_kaiju_2"] = "开局",
   [":jy_kaiju_2"] = "出牌阶段限一次，你可以指定至多2名角色，视为你对其使用一张【顺手牵羊】（无距离限制）。",
@@ -429,6 +437,11 @@ jy__liyuanhao:addSkill(jy_erduanxiao)
 
 Fk:loadTranslationTable {
   ["jy__liyuanhao"] = "李元浩",
+  ["#jy__liyuanhao"] = "虎大将军",
+  ["designer:jy__liyuanhao"] = "拂却心尘 & 考公专家",
+  ["cv:jy__liyuanhao"] = "暂无",
+  ["illustrator:jy__liyuanhao"] = "李元浩",
+
   ["jy__liyuanhao_xiao"] = "啸",
 
   ["jy_huxiao"] = "虎啸",
@@ -492,6 +505,10 @@ jy__gaotianliang:addSkill(jy_yuyu)
 
 Fk:loadTranslationTable {
   ["jy__gaotianliang"] = "高天亮",
+  ["#jy__gaotianliang"] = "沉默寡言",
+  ["designer:jy__gaotianliang"] = "导演片子怎么样了 & 考公专家",
+  ["cv:jy__gaotianliang"] = "高天亮",
+  ["illustrator:jy__gaotianliang"] = "高天亮",
 
   ["jy_yuyu"] = "玉玉",
   [":jy_yuyu"] = [[①锁定技，当有角色对你使用【杀】造成了伤害时，令其获得“致郁”标记；②受到没有“致郁”标记的角色，或因本次伤害而获得“致郁”标记的角色造成的伤害时，你可以选择一项：摸3张牌；摸4张牌并翻面，然后对自己造成1点伤害。]],
@@ -814,6 +831,11 @@ jy__aweiluo:addSkill(jy_luojiao)
 
 Fk:loadTranslationTable {
   ["jy__aweiluo"] = "阿威罗",
+  ["#jy__aweiluo"] = "绝代双骄",
+  ["designer:jy__aweiluo"] = "导演片子怎么样了 & 考公专家",
+  ["cv:jy__aweiluo"] = "克里斯蒂亚诺·罗纳尔多·多斯·桑托斯·阿威罗 & 刘嘉远",
+  ["illustrator:jy__aweiluo"] = "《时代》封面",
+
   ["jy_aweiluo_dian"] = "点",
 
   ["jy_youlong"] = "游龙",
@@ -1298,6 +1320,10 @@ jy__yangfan:addRelatedSkill(jy_jiangbei)
 
 Fk:loadTranslationTable {
   ["jy__yangfan"] = "杨藩",
+  ["#jy__yangfan"] = "一鱼四吃",
+  ["designer:jy__yangfan"] = "敏敏伊人梦中卿 & 考公专家",
+  ["cv:jy__yangfan"] = "暂无",
+  ["illustrator:jy__yangfan"] = "杨藩",
 
   ["jy_sichi"] = "四吃",
   [":jy_sichi"] = [[你受到伤害后，可以展示牌堆顶的4张牌。根据这些牌的花色总数，你：<br>
@@ -1464,6 +1490,10 @@ jy__mou__gaotianliang:addSkill(jy_tianling)
 
 Fk:loadTranslationTable {
   ["jy__mou__gaotianliang"] = "高天亮",
+  ["#jy__mou__gaotianliang"] = "凤鸣九天",
+  ["designer:jy__mou__gaotianliang"] = "拂却心尘 & 考公专家",
+  ["cv:jy__mou__gaotianliang"] = "暂无",
+  ["illustrator:jy__mou__gaotianliang"] = "高天亮",
 
   ["jy_tianling"] = "天灵",
   [":jy_tianling"] = [[弃牌阶段开始时，你可以弃两张牌或失去一点体力。若如此做，你的下一个回合：准备阶段后执行一个额外的出牌阶段；判定阶段结束前，你的手牌可当作所有锦囊牌使用，至多5次。]],
@@ -1604,6 +1634,11 @@ jy__raiden:addSkill(jy_zhenshuo)
 
 Fk:loadTranslationTable {
   ["jy__raiden"] = [[雷电将军]],
+  ["#jy__raiden"] = "一心净土",
+  ["designer:jy__raiden"] = "考公专家",
+  ["cv:jy__raiden"] = "菊花花",
+  ["illustrator:jy__raiden"] = "米哈游",
+
   ["~jy__raiden"] = "浮世一梦……",
 
   ["jy_leiyan"] = "雷眼",
@@ -1689,6 +1724,11 @@ jy__ayato:addSkill(jy_jianying)
 
 Fk:loadTranslationTable {
   ["jy__ayato"] = [[神里绫人]],
+  ["#jy__ayato"] = "磐祭叶守",
+  ["designer:jy__ayato"] = "考公专家",
+  ["cv:jy__ayato"] = "赵路",
+  ["illustrator:jy__ayato"] = "米哈游",
+
   ["~jy__ayato"] = "世事无常……",
 
   ["jy_jinghua"] = "镜花",
@@ -1773,6 +1813,10 @@ jy__liuxian:addSkill(jy_jieyin)
 
 Fk:loadTranslationTable {
   ["jy__liuxian"] = [[刘仙]],
+  ["#jy__liuxian"] = "人中龙凤",
+  ["designer:jy__liuxian"] = "考公专家",
+  ["cv:jy__liuxian"] = "暂无",
+  ["illustrator:jy__liuxian"] = "意间AI",
 
   ["jy_jieyin"] = "结姻",
   [":jy_jieyin"] = [[限定技，出牌阶段，你可以令一名已受伤的男性角色与你各回复1点体力，然后你获得其所有牌并拥有其所有技能。]],
@@ -1897,6 +1941,10 @@ jy__tangniu:addSkill(jy_duili)
 
 Fk:loadTranslationTable {
   ["jy__tangniu"] = [[唐妞]],
+  ["#jy__tangniu"] = "版本答案",
+  ["designer:jy__tangniu"] = "考公专家 & 私服群（838724904）群友",
+  ["cv:jy__tangniu"] = "暂无",
+  ["illustrator:jy__tangniu"] = "看不腻的妞",
 
   ["jy_budeng"] = "不等",
   [":jy_budeng"] = [[锁定技，防止你受到的伤害；你跳过弃牌阶段；你于其他角色的回合内获得牌（包括有牌进入你的判定区）时，其失去一点体力，然后你失去所有体力。<br><font color="grey">受到伤害≠我掉血；弃牌阶段≠我要弃；接受礼物≠我同意。</font>]],
@@ -2001,6 +2049,11 @@ jy__huohuo:addSkill(jy_lingfu)
 
 Fk:loadTranslationTable {
   ["jy__huohuo"] = [[藿藿]],
+  ["#jy__huohuo"] = "令奉贞凶",
+  ["designer:jy__huohuo"] = "考公专家",
+  ["cv:jy__huohuo"] = "葛子瑞 & 刘北辰",
+  ["illustrator:jy__huohuo"] = "米哈游",
+
   ["~jy__huohuo"] = [[投……投降……]],
 
   ["jy_bazhen"] = "八阵",
@@ -2089,6 +2142,11 @@ argenti:addSkill(zhuhua)
 
 Fk:loadTranslationTable {
   ["jy__argenti"] = [[银枝]],
+  ["#jy__argenti"] = "荆冠芳勋",
+  ["designer:jy__argenti"] = "考公专家",
+  ["cv:jy__argenti"] = "梁达伟",
+  ["illustrator:jy__argenti"] = "米哈游",
+
   ["~jy__argenti"] = [[没找到……「祂」……]],
 
   ["jy_chunmei"] = "纯美",
