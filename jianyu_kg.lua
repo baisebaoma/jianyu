@@ -245,7 +245,7 @@ local jy_guina = fk.CreateActiveSkill {
   end,
   on_use = function(self, room, effect)
     local me = room:getPlayerById(effect.from)
-    me:broadcastSkillInvoke(self.name, math.random(2))
+    me:broadcastSkillInvoke(self.name, math.random(7))
     room:doAnimate("InvokeSkill", {
       name = self.name,
       player = effect.from,
@@ -326,7 +326,7 @@ local jy_guina = fk.CreateActiveSkill {
 
     local choice = room:askForChoice(player, answers_wrap, self.name, question_wrap)
     if choice[1] == correct_answer then                     -- 仅判断choice[1]，因为答案只保留正确选项的选项名字（ABCD）
-      me:broadcastSkillInvoke(self.name, math.random(3, 4)) -- 播放选择正确的语音
+      me:broadcastSkillInvoke(self.name, math.random(8, 9)) -- 播放选择正确的语音
 
       room:addPlayerMark(player, "@jy_zuoti_correct_count")
       room:doBroadcastNotify("ShowToast", Fk:translate("#jy_guina_correct"))
@@ -368,7 +368,7 @@ local jy_guina = fk.CreateActiveSkill {
       end
       room:obtainCard(player, toGain, true, fk.ReasonPrey)
     else
-      me:broadcastSkillInvoke(self.name, math.random(5, 6)) -- 播放选择错误的语音
+      me:broadcastSkillInvoke(self.name, math.random(10, 11)) -- 播放选择错误的语音
 
       room:addPlayerMark(player, "@jy_zuoti_incorrect_count")
       room:doBroadcastNotify("ShowToast", Fk:translate("#jy_guina_incorrect"))
@@ -490,16 +490,16 @@ Fk:loadTranslationTable {
   ["@jy_guina-phase"] = "归纳",
   ["#jy_guina_correct"] = [[答对了，你获得了真理医生的认可！<br>你可以在战报中查看正确答案。]],
   ["#jy_guina_incorrect"] = [[答错了，你被真理医生标记了！<br>你可以在战报中查看正确答案。]],
-  -- ["$jy_guina1"] = [[让我来考考你。]],
-  -- ["$jy_guina2"] = [[由我提问了。]],
-  -- ["$jy_guina3"] = [[期待各位的应答。]],
-  -- ["$jy_guina4"] = [[切勿心急，想明白再做决定。]],
-  -- ["$jy_guina5"] = [[准备好浪费人生了吗？]],
-  -- ["$jy_guina6"] = [[动动脑子！]],
-  -- ["$jy_guina7"] = [[知识既为万物尺度，定将穷尽真理、根除谬误。]],
-  -- ["$jy_guina8"] = [[不错，加五分。]],
-  -- ["$jy_guina9"] = [[做得好，加十分。]],
-  -- ["$jy_guina10"] = [[零分，下一个！]],
+  ["$jy_guina1"] = [[让我来考考你。]],
+  ["$jy_guina2"] = [[由我提问了。]],
+  ["$jy_guina3"] = [[期待各位的应答。]],
+  ["$jy_guina4"] = [[切勿心急，想明白再做决定。]],
+  ["$jy_guina5"] = [[准备好浪费人生了吗？]],
+  ["$jy_guina6"] = [[动动脑子！]],
+  ["$jy_guina7"] = [[知识既为万物尺度，定将穷尽真理、根除谬误。]],
+  ["$jy_guina8"] = [[不错，加五分。]],
+  ["$jy_guina9"] = [[做得好，加十分。]],
+  ["$jy_guina10"] = [[零分，下一个！]],
   -- ["$jy_guina11"] = [[负分，给我滚！]],
 }
 
