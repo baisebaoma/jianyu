@@ -388,26 +388,30 @@ local jy_guina_refresh = fk.CreateTriggerSkill {
   can_refresh = function(self, event, target, player, data)
     if not player:hasSkill(self) then return false end
     if event == fk.TargetConfirming then
-      if data.card then
+      if data.card then -- 虽然理论上这个事件只针对牌，但还是这么写保险一点
         return data.from == player.id and
-            not ((data.card.type == Card.TypeTrick and data.card.sub_type == Card.SubtypeDelayedTrick) or data.card.type == Card.TypeEquip)
+            (data.card:isCommonTrick() or data.card.type == Card.TypeBasic)
       else
         return data.from == player.id
       end
     else
-      return data.from == player and data.to:getMark("@jy_guina-phase") ~= 0
+      return data.to:getMark("@jy_guina-phase") ~= 0 -- data.from == player
       -- 因为这两个事件的data.to和from对应的数据结构不一样
     end
   end,
   on_refresh = function(self, event, target, player, data)
+    -- TODO：借刀等带副目标的不会生效
     local room = player.room
     if event == fk.TargetConfirming then
       local guina_players = {} -- 用来画指示线的
       local targets = AimGroup:getAllTargets(data.tos)
       for _, p in ipairs(room:getAlivePlayers()) do
         if p:getMark("@jy_guina-phase") ~= 0 and not table.contains(targets, p.id) then
-          AimGroup:addTargets(player.room, data, p.id)
-          table.insert(guina_players, p.id)
+          -- 判断目标是否不能成为这张牌的目标
+          if not Self:isProhibited(p, data.card) then
+            AimGroup:addTargets(player.room, data, p.id)
+            table.insert(guina_players, p.id)
+          end
         end
       end
       if #guina_players ~= 0 then
@@ -456,7 +460,7 @@ Fk:loadTranslationTable {
   ["illustrator:jy__kgdxs"] = "网络图片",
 
   ["jy_zuoti"] = "做题",
-  [":jy_zuoti"] = [[出牌阶段限一次，你可以回答一道行测真题。若正确，你指定一个牌名并获得一张该牌名的牌。<br><font color="grey">收录试卷]] .. total_papers .. [[套，题量]] .. total_questions .. [[，经人工筛选，不含图形推理、资料分析，全部取自2018-2023国家及各地区《行测》真题。<br>答对时，这张牌可能来自于任何位置，甚至你自己的区域。若你有同名牌，建议先使用掉。</font>]],
+  [":jy_zuoti"] = [[出牌阶段限一次，你可以回答一道行测真题。若正确，你指定一个牌名并获得一张该牌名的牌。<br><font color="grey">收录2018-2023国家及各地区《行测》试卷]] .. total_papers .. [[套，共]] .. total_questions .. [[题，经人工筛选，不含图形推理、资料分析。<br>答对时，这张牌可能来自于任何位置，甚至你自己的区域。若你有同名牌，请先使用掉。</font>]],
   ["#jy_zuoti_see_log"] = [[做题：请在战报中查看完整题干]],
   ["#jy_zuoti_ob"] = [[正在做题！其他角色可以在战报中查看这道题目的完整题干和选项。]],
   ["#jy_zuoti_correct"] = [[答对了，可以从场上随机位置获取一张想要的牌！<br>你可以在战报中查看正确答案。]],
@@ -483,16 +487,21 @@ Fk:loadTranslationTable {
 
   -- 这个技能应该是我今年的巅峰之作，设计得非常巧妙，可攻可守。
   ["jy_guina"] = "归纳",
-  [":jy_guina"] = [[出牌阶段限三次，你可以令一名角色回答一道行测真题。若正确，其指定一个牌名并获得一张该牌名的牌，否则其获得“归纳”直到本阶段结束。你使用除延时类锦囊和装备外的牌时，持有“归纳”的角色不是目标，令其也成为该牌的目标；你对持有“归纳”的角色造成伤害时，摸一张牌。<br><font color="grey">收录试卷]] .. total_papers .. [[套，题量]] .. total_questions .. [[，经人工筛选，不含图形推理、资料分析，全部取自2018-2023国家及各地区《行测》真题。<br>答对时，这张牌可能来自于任何位置，甚至你自己的区域。若你有同名牌，建议先使用掉。<br>提示：<br>谨慎思考〖归纳〗的使用时机和对象，这可以改变你的出牌顺序和效果。<br>留【桃】对队友使用〖归纳〗。<br>可以多次〖归纳〗同一名角色直到你满意。<br>〖归纳〗远处的敌人，对近处的敌人使用牌。<br>可以对自己使用〖归纳〗。</font>]],
+  [":jy_guina"] = [[出牌阶段限三次，你可以令一名角色回答一道行测真题。若正确，其指定一个牌名并获得一张该牌名的牌，否则其获得“归纳”直到本阶段结束。你使用基本牌与非延时类锦囊牌时，若持有“归纳”的角色不是目标，令其也成为该牌的目标；持有“归纳”的角色受到伤害时，你摸一张牌。<br><font color="grey">谨慎思考〖归纳〗的使用时机和对象，这可以改变你的出牌顺序和效果。<br>收录2018-2023国家及各地区《行测》试卷]] .. total_papers .. [[套，共]] .. total_questions .. [[题，经人工筛选，不含图形推理、资料分析。<br>答对时，这张牌可能来自于任何位置，甚至你自己的区域。若你有同名牌，请先使用掉。</font>]],
   ["@jy_guina-phase"] = "归纳",
   ["#jy_guina_correct"] = [[答对了，你获得了真理医生的认可！<br>你可以在战报中查看正确答案。]],
   ["#jy_guina_incorrect"] = [[答错了，你被真理医生标记了！<br>你可以在战报中查看正确答案。]],
   ["$jy_guina1"] = [[让我来考考你。]],
   ["$jy_guina2"] = [[由我提问了。]],
-  ["$jy_guina3"] = [[不错，加五分。]],
-  ["$jy_guina4"] = [[做得好，加十分。]],
-  ["$jy_guina5"] = [[零分，下一个！]],
-  ["$jy_guina6"] = [[负分，给我滚！]],
+  ["$jy_guina3"] = [[期待各位的应答。]],
+  ["$jy_guina4"] = [[切勿心急，想明白再做决定。]],
+  ["$jy_guina5"] = [[准备好浪费人生了吗？]],
+  ["$jy_guina6"] = [[动动脑子！]],
+  ["$jy_guina7"] = [[知识既为万物尺度，定将穷尽真理、根除谬误。]],
+  ["$jy_guina8"] = [[不错，加五分。]],
+  ["$jy_guina9"] = [[做得好，加十分。]],
+  ["$jy_guina10"] = [[零分，下一个！]],
+  ["$jy_guina11"] = [[负分，给我滚！]],
 }
 
 return extension
