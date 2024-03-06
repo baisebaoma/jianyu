@@ -500,6 +500,23 @@ local jy_yuyu = fk.CreateTriggerSkill {
     self.this_time_slash = false
   end,
 }
+local jy_yuyu_trigger = fk.CreateTriggerSkill {
+  name = "#jy_yuyu_trigger",
+  mute = true,
+  events = { fk.DamageCaused },
+  can_trigger = function(self, event, target, player, data)
+    return target == player and data.to:getMark("@jy_yuyu_enemy") ~= 0 and
+        not data.chain
+  end,
+  on_cost = Util.TrueFunc,
+  on_use = function(self, event, target, player, data)
+    local room = player.room
+    player:broadcastSkillInvoke("jy_yuyu")
+    room:notifySkillInvoked(player, "jy_yuyu")
+    data.damage = data.damage + 1
+  end,
+}
+jy_yuyu:addRelatedSkill(jy_yuyu_trigger)
 
 jy__gaotianliang:addSkill(jy_yuyu)
 
@@ -511,7 +528,7 @@ Fk:loadTranslationTable {
   ["illustrator:jy__gaotianliang"] = "高天亮",
 
   ["jy_yuyu"] = "玉玉",
-  [":jy_yuyu"] = [[①锁定技，当有角色对你使用【杀】造成了伤害时，令其获得“致郁”标记；②受到没有“致郁”标记的角色，或因本次伤害而获得“致郁”标记的角色造成的伤害时，你可以选择一项：摸3张牌；摸4张牌并翻面，然后对自己造成1点伤害。]],
+  [":jy_yuyu"] = [[当有角色对你使用【杀】造成了伤害时，其获得“致郁”。受到没有“致郁”的角色，或因本次伤害而获得“致郁”的角色造成的伤害时，你可以选择一项：摸3张牌；摸4张牌并翻面，然后对自己造成1点伤害。你对持有“致郁”的角色造成的非传导伤害+1。]],
   ["@jy_yuyu_enemy"] = "致郁",
   ["#jy_yuyu_ask_which"] = "玉玉：请选择你要触发的效果",
   ["#jy_yuyu_draw3"] = "摸3张牌",
