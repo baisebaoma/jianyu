@@ -185,16 +185,16 @@ local jy_jieju_success = fk.CreateTriggerSkill {
       return false
     end
     return player:hasSkill("jy_jieju") and player.phase == Player.Finish and
-        player:getMark("@jy_zuoti_correct_count") >= player:getMark("@jy_zuoti_incorrect_count") + 3
+        player:getMark("@jy_zuoti_correct_count") >= player:getMark("@jy_zuoti_incorrect_count") + 2
   end,
   on_cost = Util.TrueFunc,
   on_use = function(self, event, target, player)
     local room = player.room
     room:updateQuestSkillState(player, "jy_jieju")
-    player:drawCards(3, "jy_jieju")
+    player:drawCards(2, "jy_jieju")
     room:recover({
       who = player,
-      num = 3,
+      num = 2,
       recoverBy = player,
       skillName = self.name,
     })
@@ -214,7 +214,7 @@ local jy_jieju_fail = fk.CreateTriggerSkill {
       return false
     end
     return player:hasSkill("jy_jieju") and player.phase == Player.Finish and
-        player:getMark("@jy_zuoti_incorrect_count") >= player:getMark("@jy_zuoti_correct_count") + 3
+        player:getMark("@jy_zuoti_incorrect_count") >= player:getMark("@jy_zuoti_correct_count") + 2
   end,
   on_cost = Util.TrueFunc,
   on_use = function(self, event, target, player)
@@ -456,7 +456,7 @@ Fk:loadTranslationTable {
   ["illustrator:jy__kgdxs"] = "网络图片",
 
   ["jy_zuoti"] = "做题",
-  [":jy_zuoti"] = [[出牌阶段限一次，你可以回答一道行测真题。若你回答正确，你可以指定一个牌名并获得一张该牌名的牌。<br><font color="grey">自备纸笔以应对数学题。<br>收录试卷：]] .. total_papers .. [[套，题量：]] .. total_questions .. [[，经人工筛选，不含图形推理、资料分析，全部取自2018-2023国家及各地区《行测》真题。<br>这张牌可能来自于任何位置，甚至你自己的区域。若你有同名牌，建议先使用掉。</font>]],
+  [":jy_zuoti"] = [[出牌阶段限一次，你可以回答一道行测真题。若正确，你指定一个牌名并获得一张该牌名的牌。<br><font color="grey">收录试卷]] .. total_papers .. [[套，题量]] .. total_questions .. [[，经人工筛选，不含图形推理、资料分析，全部取自2018-2023国家及各地区《行测》真题。<br>答对时，这张牌可能来自于任何位置，甚至你自己的区域。若你有同名牌，建议先使用掉。</font>]],
   ["#jy_zuoti_see_log"] = [[做题：请在战报中查看完整题干]],
   ["#jy_zuoti_ob"] = [[正在做题！其他角色可以在战报中查看这道题目的完整题干和选项。]],
   ["#jy_zuoti_correct"] = [[答对了，可以从场上随机位置获取一张想要的牌！<br>你可以在战报中查看正确答案。]],
@@ -468,8 +468,8 @@ Fk:loadTranslationTable {
 
   ["jy_jieju"] = "熬夜",
   [":jy_jieju"] = [[使命技，出牌阶段，你可以失去一点体力使〖做题〗视为未发动过。<br>
-  成功：回合结束时，若你答对比答错至少多3次，你摸3张牌、回复3点体力，然后获得〖集智〗、〖看破〗、〖享乐〗；<br>
-  失败：回合结束时，若你答错比答对至少多3次，你翻面，然后获得〖玉玉〗、〖红温〗。]],
+  成功：回合结束时，若你答对比答错至少多2次，你摸2张牌、回复2点体力，然后获得〖集智〗、〖看破〗、〖享乐〗；<br>
+  失败：回合结束时，若你答错比答对至少多2次，你翻面，然后获得〖玉玉〗、〖红温〗。]],
   ["#jy_jieju_success"] = "结局：成功",
   ["#jy_jieju_fail"] = "结局：失败",
 
@@ -481,8 +481,9 @@ Fk:loadTranslationTable {
   ["illustrator:jy__kgds"] = "米哈游",
   ["~jy__kgds"] = "「庸人」么……呵……",
 
+  -- 这个技能应该是我今年的巅峰之作，设计得非常巧妙，可攻可守。
   ["jy_guina"] = "归纳",
-  [":jy_guina"] = [[出牌阶段限三次，你可以令一名角色回答一道行测真题。若其回答正确，其可以指定一个牌名并获得一张该牌名的牌；若其回答错误，你令其获得“归纳”直到本阶段结束。你使用除延时类锦囊和装备外的牌时，若持有“归纳”的角色不是该牌的目标，令其成为目标；你对持有“归纳”的角色造成伤害时，摸一张牌。<br><font color="grey">自备纸笔以应对数学题。<br>收录试卷：]] .. total_papers .. [[套，题量：]] .. total_questions .. [[，经人工筛选，不含图形推理、资料分析，全部取自2018-2023国家及各地区《行测》真题。<br>这张牌可能来自于任何位置，甚至你自己的区域。若你有同名牌，建议先使用掉。<br>本技能产生的答对、答错数与〖做题〗、〖熬夜〗共享。</font>]],
+  [":jy_guina"] = [[出牌阶段限三次，你可以令一名角色回答一道行测真题。若正确，其指定一个牌名并获得一张该牌名的牌，否则其获得“归纳”直到本阶段结束。你使用除延时类锦囊和装备外的牌时，持有“归纳”的角色不是目标，令其也成为该牌的目标；你对持有“归纳”的角色造成伤害时，摸一张牌。<br><font color="grey">收录试卷]] .. total_papers .. [[套，题量]] .. total_questions .. [[，经人工筛选，不含图形推理、资料分析，全部取自2018-2023国家及各地区《行测》真题。<br>答对时，这张牌可能来自于任何位置，甚至你自己的区域。若你有同名牌，建议先使用掉。<br>提示：<br>谨慎思考〖归纳〗的使用时机和对象，这可以改变你的出牌顺序和效果。<br>留【桃】对队友使用〖归纳〗。<br>可以多次〖归纳〗同一名角色直到你满意。<br>〖归纳〗远处的敌人，对近处的敌人使用牌。<br>可以对自己使用〖归纳〗。</font>]],
   ["@jy_guina-phase"] = "归纳",
   ["#jy_guina_correct"] = [[答对了，你获得了真理医生的认可！<br>你可以在战报中查看正确答案。]],
   ["#jy_guina_incorrect"] = [[答错了，你被真理医生标记了！<br>你可以在战报中查看正确答案。]],
