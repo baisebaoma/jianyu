@@ -146,7 +146,7 @@ local jy_zuoti = fk.CreateActiveSkill {
       end
       room:obtainCard(player, toGain, true, fk.ReasonPrey)
     else
-      player:broadcastSkillInvoke(self.name, math.random(8,))
+      player:broadcastSkillInvoke(self.name, math.random(8, 10))
       room:addPlayerMark(player, "@jy_zuoti_incorrect_count")
       room:doBroadcastNotify("ShowToast", Fk:translate("#jy_zuoti_incorrect"))
       room:sendLog {
