@@ -23,11 +23,12 @@ local fenlv = fk.CreateTriggerSkill {
   events = { fk.CardUsing },
   can_trigger = function(self, event, target, player, data)
     if not player:hasSkill(self) then return false end
-    return (target == player and isFactor(data.card.number, player:getMark("@jy_fenlv"))) or
-        isFactor(player:getMark("@jy_fenlv"), data.card.number)
+    return target == player and
+        (isFactor(data.card.number, player:getMark("@jy_fenlv")) or
+          isFactor(player:getMark("@jy_fenlv"), data.card.number))
   end,
   on_use = function(self, event, target, player, data)
-    if target == player and isFactor(data.card.number, player:getMark("@jy_fenlv")) then
+    if isFactor(data.card.number, player:getMark("@jy_fenlv")) then
       player:drawCards(1, self.name)
     end
   end,
