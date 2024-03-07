@@ -5,7 +5,7 @@ local U = require "packages/utility/utility"
 local Q = require "packages/jianyu/question" -- 考公大学生用的题库
 
 Fk:loadTranslationTable {
-  ["jianyu_kg"] = [[简浴-考公]],
+  ["jianyu_kg"] = [[简浴-公务员考试]],
 }
 
 local jy_zuoti = fk.CreateActiveSkill {
