@@ -24,7 +24,7 @@ local jy_zuoti = fk.CreateActiveSkill {
   end,
   on_use = function(self, room, effect)
     local player = room:getPlayerById(effect.from)
-    player:broadcastSkillInvoke(self.name, math.random(3))
+    player:broadcastSkillInvoke(self.name, math.random(4))
     room:doAnimate("InvokeSkill", {
       name = self.name,
       player = effect.from,
@@ -104,7 +104,7 @@ local jy_zuoti = fk.CreateActiveSkill {
 
     local choice = room:askForChoice(player, answers_wrap, self.name, question_wrap)
     if choice[1] == correct_answer then -- 仅判断choice[1]，因为答案只保留正确选项的选项名字（ABCD）
-      player:broadcastSkillInvoke(self.name, math.random(4, 5))
+      player:broadcastSkillInvoke(self.name, math.random(5, 7))
 
       room:addPlayerMark(player, "@jy_zuoti_correct_count")
       room:doBroadcastNotify("ShowToast", Fk:translate("#jy_zuoti_correct"))
@@ -146,7 +146,7 @@ local jy_zuoti = fk.CreateActiveSkill {
       end
       room:obtainCard(player, toGain, true, fk.ReasonPrey)
     else
-      player:broadcastSkillInvoke(self.name, math.random(6, 7))
+      player:broadcastSkillInvoke(self.name, math.random(8,))
       room:addPlayerMark(player, "@jy_zuoti_incorrect_count")
       room:doBroadcastNotify("ShowToast", Fk:translate("#jy_zuoti_incorrect"))
       room:sendLog {
@@ -482,11 +482,14 @@ Fk:loadTranslationTable {
   ["#jy_zuoti_incorrect_log"] = "%from 选择了：%arg，正确答案：%arg2。",
   ["$jy_zuoti1"] = [[伟大的智慧之神，我最近每晚都在熬夜复习，考试就请让我通过吧！拜托了拜托了……]],
   ["$jy_zuoti2"] = [[唉，为什么报告和论文永远写不完？为什么？]],
-  ["$jy_zuoti3"] = [[嗯哼，我也不想熬夜补课题进度，可谁叫她总有那么多做不完的事。没办法，我当然得帮帮她咯。……你想陪我一起吗？]],
-  ["$jy_zuoti4"] = [[好厉害，好羡慕……你还真是什么都会呀！]],
-  ["$jy_zuoti5"] = [[哇！突然感觉不困了！]],
-  ["$jy_zuoti6"] = [[现在逃还来得及吗？]],
-  ["$jy_zuoti7"] = [[完了完了完了……]],
+  ["$jy_zuoti3"] = [[嗯哼，我也不想熬夜补课题进度。你想陪我一起吗？]],
+  ["$jy_zuoti4"] = [[别害怕。]],
+  ["$jy_zuoti5"] = [[好厉害，好羡慕……你还真是什么都会呀！]],
+  ["$jy_zuoti6"] = [[哇！突然感觉不困了！]],
+  ["$jy_zuoti7"] = [[还是你眼睛尖……]],
+  ["$jy_zuoti8"] = [[现在逃还来得及吗？]],
+  ["$jy_zuoti9"] = [[完了完了完了……]],
+  ["$jy_zuoti10"] = [[啊……我……我要不行了……]],
 
   ["jy_jieju"] = "熬夜",
   [":jy_jieju"] = [[使命技，出牌阶段，你可以失去一点体力使〖做题〗视为未发动过。<br>
@@ -496,18 +499,18 @@ Fk:loadTranslationTable {
   ["#jy_jieju_fail"] = "结局：失败",
 
 
-  ["jy__kgds"] = "考公大师",
-  ["#jy__kgds"] = "万物皆流",
+  ["jy__kgds"] = "考公专家",
+  ["#jy__kgds"] = "全体起立",
   ["designer:jy__kgds"] = "考公专家",
   ["cv:jy__kgds"] = "桑毓泽",
-  ["illustrator:jy__kgds"] = "米哈游",
+  ["illustrator:jy__kgds"] = "网络图片",
   ["~jy__kgds"] = "「庸人」么……呵……",
 
   ["jy_guina"] = "归纳",
   [":jy_guina"] = [[出牌阶段限三次，你可以令一名角色回答一道行测真题。若正确，其指定一个牌名并获得一张该牌名的牌，否则其获得“归纳”直到本阶段结束。你使用基本牌与非延时类锦囊牌时，若持有“归纳”的角色不是该牌的目标，其也成为目标；持有“归纳”的角色受到伤害时，你摸一张牌。<br><font color="grey">收录2018-2023《行测》]] .. total_papers .. [[套共]] .. total_questions .. [[题，经人工筛选，不含图形推理、资料分析。<br>回答正确时，这张牌可能来自任何位置，甚至你自己的区域。若你有同名牌，请先使用掉。</font>]],
   ["@jy_guina-phase"] = "归纳",
-  ["#jy_guina_correct"] = [[答对了，你获得了考公大师的认可，可以自选一张牌获得！<br>你可以在战报中查看正确答案。]],
-  ["#jy_guina_incorrect"] = [[答错了，本阶段考公大师的牌会额外指定你为目标！<br>你可以在战报中查看正确答案。]],
+  ["#jy_guina_correct"] = [[答对了，你获得了考公专家的认可，可以自选一张牌获得！<br>你可以在战报中查看正确答案。]],
+  ["#jy_guina_incorrect"] = [[答错了，本阶段考公专家的牌会额外指定你为目标！<br>你可以在战报中查看正确答案。]],
   -- 可能是不能太多语音吧，如果你在这里放了11条语音，在武将一览的时候点开这个武将就会卡死
   ["$jy_guina1"] = [[让我来考考你。]],
   ["$jy_guina2"] = [[由我提问了。]],
