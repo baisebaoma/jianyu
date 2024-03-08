@@ -11,6 +11,7 @@ local zaisheng = fk.CreateTriggerSkill {
   events = { fk.AfterCardsMove, fk.Damaged },
   can_trigger = function(self, event, target, player, data)
     if not player:hasSkill(self) then return false end
+    if player:usedSkillTimes(self.name, Player.HistoryTurn) >= 1 then return false end
     if event == fk.AfterCardsMove then
       for _, move in ipairs(data) do
         if move.moveReason ~= fk.ReasonUse and move.from then -- and move.moveVisible 可能需要加上技能描述里没有的moveVisible，因为如果是背面朝上的，你不知道这是红色，就不应该发动这个技能
@@ -175,7 +176,8 @@ Fk:loadTranslationTable {
   ["jy_zaisheng"] = "再生",
   ["@jy_zaisheng"] = "再生",
   ["#jy_zaisheng_prompt"] = [[是否发动〖再生〗令 %dest 回复一点体力，然后你获得〖再生〗的增益效果？]],
-  [":jy_zaisheng"] = [[每当一名角色不因使用而失去红色牌时，你可以令其回复一点体力。若如此做，直到你的下回合开始：每回合限一次，当该角色受到伤害后，你获得对其造成伤害的牌，并随机获得伤害来源手牌中一张伤害牌。]],
+  [":jy_zaisheng"] = [[每轮限一次，当一名角色不因使用而失去红色牌时，你可以令其回复一点体力。若如此做，直到你的下回合开始：每回合限一次，当该角色受到伤害后，你获得对其造成伤害的牌，并随机获得伤害来源手牌中一张伤害牌。]],
+  -- [":jy_zaisheng"] = [[当一名角色不因使用而失去红色牌时，你可以令其回复一点体力。若如此做，直到你的下回合开始：每回合限一次，当该角色受到伤害后，你获得对其造成伤害的牌，并随机获得伤害来源手牌中一张伤害牌。]],
   ["$jy_zaisheng1"] = [[不要害怕。]],
   ["$jy_zaisheng2"] = [[让我来消除痛苦。]],
 
@@ -289,15 +291,12 @@ local zhitu = fk.CreateActiveSkill {
   end,
 }
 
--- local xuyu = General(extension, "jy__xuyu", "qun", 3, 3, General.Female)
--- xuyu:addSkill(zaisheng)
--- xuyu:addSkill(zhushe)
-
 local peixiu = General(extension, "jy__peixiu", "qun", 3)
 peixiu.subkingdom = "jin"
 peixiu:addSkill(fenlv)
 peixiu:addSkill(zhunwang)
 peixiu:addSkill(zhitu)
+peixiu:addSkill("juezhi")
 
 
 Fk:loadTranslationTable {
