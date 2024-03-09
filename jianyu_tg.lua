@@ -99,7 +99,8 @@ local zaisheng = fk.CreateTriggerSkill {
             if (info.fromArea == Card.PlayerHand or info.fromArea == Card.PlayerEquip) and
                 Fk:getCardById(info.cardId).color == Card.Red then
               data.jy_zaisheng_moveFrom = move.from
-              return room:getPlayerById(move.from):getMark("@jy_zaisheng") == 0 -- 没有再生标记，可以触发
+              local from = room:getPlayerById(move.from)
+              return from:getMark("@jy_zaisheng") == 0 and not from.dead -- 没有再生标记，而且没有死
             end
           end
         end
