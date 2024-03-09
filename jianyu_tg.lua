@@ -5,6 +5,7 @@ Fk:loadTranslationTable {
   ["jianyu_tg"] = [[简浴-集思广益]],
 }
 
+-- 初版再生，由于过强已被重做
 -- local zaisheng = fk.CreateTriggerSkill {
 --   name = "jy_zaisheng",
 --   anim_type = "support",
@@ -117,15 +118,23 @@ local zaisheng = fk.CreateTriggerSkill {
   on_use = function(self, event, target, player, data)
     local room = player.room
     if event == fk.AfterCardsMove then
-      room:doIndicate(player.id, { data.jy_zaisheng_moveFrom }) -- 播放指示线，代表我给你上了buff
-      local jy_zaisheng_moveFrom = room:getPlayerById(data.jy_zaisheng_moveFrom)
-      room:recover({
-        who = jy_zaisheng_moveFrom,
-        num = 1,
-        recoverBy = player,
-        skillName = self.name,
-      })
-      room:addPlayerMark(jy_zaisheng_moveFrom, "@jy_zaisheng")
+      local judge = {
+        who = player,
+        reason = self.name,
+        pattern = ".|.|heart,diamond",
+      }
+      room:judge(judge)
+      if judge.card.color == Card.Red then
+        room:doIndicate(player.id, { data.jy_zaisheng_moveFrom }) -- 播放指示线，代表我给你上了buff
+        local jy_zaisheng_moveFrom = room:getPlayerById(data.jy_zaisheng_moveFrom)
+        room:recover({
+          who = jy_zaisheng_moveFrom,
+          num = 1,
+          recoverBy = player,
+          skillName = self.name,
+        })
+        room:setPlayerMark(jy_zaisheng_moveFrom, "@jy_zaisheng", "")
+      end
     else -- fk.Damaged
       if data.card then
         local subcards = data.card:isVirtual() and data.card.subcards or { data.card.id }
@@ -133,7 +142,7 @@ local zaisheng = fk.CreateTriggerSkill {
           room:obtainCard(player.id, data.card, true, fk.ReasonJustMove)
         end
       end
-      room:addPlayerMark(data.to, "@jy_zaisheng", -1)
+      room:setPlayerMark(data.to, "@jy_zaisheng", 0)
       -- room:setPlayerMark(data.to, "jy_zaisheng_triggered-round", 1)
     end
   end,
@@ -201,7 +210,7 @@ local zhushe = fk.CreateTriggerSkill {
         recoverBy = player,
         skillName = self.name,
       })
-      data.to:drawCards(2, self.name)
+      data.to:drawCards(data.damage, self.name)
     end
   end,
 }
@@ -217,7 +226,6 @@ local zhushe_mod = fk.CreateTargetModSkill {
 zhushe:addRelatedSkill(zhushe_mod)
 
 local xuyu = General(extension, "jy__xuyu", "qun", 3, 3, General.Female)
-xuyu.hidden = true -- 正在测试！所以先不准选了
 xuyu:addSkill(zaisheng)
 xuyu:addSkill(zhushe)
 
@@ -231,16 +239,16 @@ Fk:loadTranslationTable {
 
   ["jy_zaisheng"] = "再生",
   ["@jy_zaisheng"] = "再生",
-  ["#jy_zaisheng_prompt"] = [[是否发动〖再生〗令 %dest 回复一点体力，然后你可以获得下一张对其造成伤害的牌？]],
-  [":jy_zaisheng"] = [[当一名没有“再生”标记的角色不因使用而失去红色牌时，你可以令其回复一点体力。若如此做，其获得“再生”。当有“再生”的角色受到伤害后，其移除“再生”，你获得对其造成伤害的牌。]],
-  -- [":jy_zaisheng"] = [[（原稿，因过强已被移除）当一名角色不因使用而失去红色牌时，你可以令其回复一点体力。若如此做，直到你的下回合开始：每回合限一次，当该角色受到伤害后，你获得对其造成伤害的牌，并随机获得伤害来源手牌中一张伤害牌。]],
+  ["#jy_zaisheng_prompt"] = [[是否发动〖再生〗判定，若为红色，%dest 回复一点体力且你获得下一张对其造成伤害的牌？]],
+  [":jy_zaisheng"] = [[当一名没有“再生”标记的角色不因使用而失去红色牌时，你可以判定，若为红色，令其回复一点体力并获得“再生”。当一名有“再生”的角色受到伤害后，你获得对其造成伤害的牌，然后其移除“再生”。]],
+  -- [":jy_zaisheng"] = [[（原稿，因过强已被重做）当一名角色不因使用而失去红色牌时，你可以令其回复一点体力。若如此做，直到你的下回合开始：每回合限一次，当该角色受到伤害后，你获得对其造成伤害的牌，并随机获得伤害来源手牌中一张伤害牌。]],
   ["$jy_zaisheng1"] = [[不要害怕。]],
   ["$jy_zaisheng2"] = [[让我来消除痛苦。]],
 
   ["jy_zhushe"] = "注射",
   ["@jy_zhushe-turn"] = "注射",
   ["#jy_zhushe_prompt"] = "你可以重铸任意张牌，然后本回合获得〖注射〗的效果",
-  [":jy_zhushe"] = [[出牌阶段开始时，你可以重铸任意张牌。若如此做，本回合：你使用牌无距离和次数限制、不可被响应；你造成伤害后，你令伤害目标回复等量体力并摸两张牌。]],
+  [":jy_zhushe"] = [[出牌阶段开始时，你可以重铸任意张牌。若如此做，本回合：你使用牌无距离和次数限制、不可被响应；你造成伤害后，令伤害目标回复X点体力并摸X张牌，X为伤害值。]],
   ["$jy_zhushe1"] = [[准备好注射了。]],
   ["$jy_zhushe2"] = [[我的治疗是不会痛的。]],
 }
