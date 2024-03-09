@@ -11,7 +11,7 @@ local zaisheng = fk.CreateTriggerSkill {
   events = { fk.AfterCardsMove, fk.Damaged },
   can_trigger = function(self, event, target, player, data)
     if not player:hasSkill(self) then return false end
-    if player:usedSkillTimes(self.name, Player.HistoryTurn) >= 1 then return false end
+    if player:usedSkillTimes(self.name, Player.HistoryRound) >= 1 then return false end
     if event == fk.AfterCardsMove then
       for _, move in ipairs(data) do
         if move.moveReason ~= fk.ReasonUse and move.from then -- and move.moveVisible 可能需要加上技能描述里没有的moveVisible，因为如果是背面朝上的，你不知道这是红色，就不应该发动这个技能
