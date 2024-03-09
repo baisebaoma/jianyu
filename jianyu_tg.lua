@@ -98,7 +98,7 @@ local zaisheng = fk.CreateTriggerSkill {
             if (info.fromArea == Card.PlayerHand or info.fromArea == Card.PlayerEquip) and
                 Fk:getCardById(info.cardId).color == Card.Red then
               data.jy_zaisheng_moveFrom = move.from
-              return room:getPlayerById(move.from):getMark("@jy_zaisheng") ~= 0
+              return room:getPlayerById(move.from):getMark("@jy_zaisheng") == 0 -- 没有再生标记，可以触发
             end
           end
         end
@@ -217,6 +217,7 @@ local zhushe_mod = fk.CreateTargetModSkill {
 zhushe:addRelatedSkill(zhushe_mod)
 
 local xuyu = General(extension, "jy__xuyu", "qun", 3, 3, General.Female)
+xuyu.hidden = true -- 正在测试！所以先不准选了
 xuyu:addSkill(zaisheng)
 xuyu:addSkill(zhushe)
 
