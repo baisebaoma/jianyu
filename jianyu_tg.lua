@@ -5,13 +5,92 @@ Fk:loadTranslationTable {
   ["jianyu_tg"] = [[简浴-集思广益]],
 }
 
+-- local zaisheng = fk.CreateTriggerSkill {
+--   name = "jy_zaisheng",
+--   anim_type = "support",
+--   events = { fk.AfterCardsMove, fk.Damaged },
+--   can_trigger = function(self, event, target, player, data)
+--     if not player:hasSkill(self) then return false end
+--     if event == fk.AfterCardsMove then
+--       if player:usedSkillTimes(self.name, Player.HistoryRound) >= 1 then return false end
+--       for _, move in ipairs(data) do
+--         if move.moveReason ~= fk.ReasonUse and move.from then -- and move.moveVisible 可能需要加上技能描述里没有的moveVisible，因为如果是背面朝上的，你不知道这是红色，就不应该发动这个技能
+--           for _, info in ipairs(move.moveInfo) do
+--             if (info.fromArea == Card.PlayerHand or info.fromArea == Card.PlayerEquip) and
+--                 Fk:getCardById(info.cardId).color == Card.Red then
+--               data.jy_zaisheng_moveFrom = move.from
+--               return true
+--             end
+--           end
+--         end
+--       end
+--     else -- fk.Damaged
+--       return target:getMark("@jy_zaisheng") ~= 0 and data.to:getMark("jy_zaisheng_triggered-round") == 0
+--     end
+--   end,
+--   on_cost = function(self, event, target, player, data)
+--     if event == fk.AfterCardsMove then
+--       return player.room:askForSkillInvoke(player, self.name, nil, "#jy_zaisheng_prompt::" .. data.jy_zaisheng_moveFrom)
+--     else -- fk.Damaged
+--       return true
+--     end
+--   end,
+--   on_use = function(self, event, target, player, data)
+--     local room = player.room
+--     if event == fk.AfterCardsMove then
+--       room:doIndicate(player.id, { data.jy_zaisheng_moveFrom }) -- 播放指示线，代表我给你上了buff
+--       local jy_zaisheng_moveFrom = room:getPlayerById(data.jy_zaisheng_moveFrom)
+--       room:recover({
+--         who = jy_zaisheng_moveFrom,
+--         num = 1,
+--         recoverBy = player,
+--         skillName = self.name,
+--       })
+--       room:setPlayerMark(jy_zaisheng_moveFrom, "@jy_zaisheng", "")
+--     else -- fk.Damaged
+--       if data.card then
+--         local subcards = data.card:isVirtual() and data.card.subcards or { data.card.id }
+--         if #subcards > 0 and table.every(subcards, function(id) return room:getCardArea(id) == Card.Processing end) then
+--           room:obtainCard(player.id, data.card, true, fk.ReasonJustMove)
+--         end
+--       end
+--       -- 该机制因过强已移除
+--       -- if data.from then
+--       --   local cards = {}
+--       --   for _, i in ipairs(data.from:getCardIds(Player.Hand)) do
+--       --     if Fk:getCardById(i).is_damage_card then
+--       --       table.insert(cards, i)
+--       --     end
+--       --   end
+--       --   if #cards > 0 then
+--       --     room:obtainCard(player.id, cards[math.random(#cards)], true, fk.ReasonJustMove)
+--       --   end
+--       -- end
+--       room:setPlayerMark(data.to, "jy_zaisheng_triggered-round", 1)
+--     end
+--   end,
+--   refresh_events = { fk.EventPhaseChanging },
+--   can_refresh = function(self, event, target, player, data)
+--     return target == player and player:hasSkill(self) and
+--         data.to == Player.Start
+--   end,
+--   on_refresh = function(self, event, target, player, data)
+--     local room = player.room
+--     for _, p in ipairs(room:getAlivePlayers()) do
+--       if p:getMark("@jy_zaisheng") ~= 0 then
+--         room:setPlayerMark(p, "@jy_zaisheng", 0)
+--       end
+--     end
+--   end,
+-- }
+
 local zaisheng = fk.CreateTriggerSkill {
   name = "jy_zaisheng",
   anim_type = "support",
   events = { fk.AfterCardsMove, fk.Damaged },
   can_trigger = function(self, event, target, player, data)
     if not player:hasSkill(self) then return false end
-    if player:usedSkillTimes(self.name, Player.HistoryRound) >= 1 then return false end
+    local room = player.room
     if event == fk.AfterCardsMove then
       for _, move in ipairs(data) do
         if move.moveReason ~= fk.ReasonUse and move.from then -- and move.moveVisible 可能需要加上技能描述里没有的moveVisible，因为如果是背面朝上的，你不知道这是红色，就不应该发动这个技能
@@ -19,13 +98,13 @@ local zaisheng = fk.CreateTriggerSkill {
             if (info.fromArea == Card.PlayerHand or info.fromArea == Card.PlayerEquip) and
                 Fk:getCardById(info.cardId).color == Card.Red then
               data.jy_zaisheng_moveFrom = move.from
-              return true
+              return room:getPlayerById(move.from):getMark("@jy_zaisheng") ~= 0
             end
           end
         end
       end
-    else -- fk.Damaged
-      return target:getMark("@jy_zaisheng") ~= 0 and data.to:getMark("jy_zaisheng_triggered-round") == 0
+    else                                         -- fk.Damaged
+      return target:getMark("@jy_zaisheng") ~= 0 -- and data.to:getMark("jy_zaisheng_triggered-round") == 0
     end
   end,
   on_cost = function(self, event, target, player, data)
@@ -46,40 +125,16 @@ local zaisheng = fk.CreateTriggerSkill {
         recoverBy = player,
         skillName = self.name,
       })
-      room:setPlayerMark(jy_zaisheng_moveFrom, "@jy_zaisheng", "")
+      room:addPlayerMark(jy_zaisheng_moveFrom, "@jy_zaisheng")
     else -- fk.Damaged
       if data.card then
-        local room = player.room
         local subcards = data.card:isVirtual() and data.card.subcards or { data.card.id }
         if #subcards > 0 and table.every(subcards, function(id) return room:getCardArea(id) == Card.Processing end) then
           room:obtainCard(player.id, data.card, true, fk.ReasonJustMove)
         end
       end
-      if data.from then
-        local cards = {}
-        for _, i in ipairs(data.from:getCardIds(Player.Hand)) do
-          if Fk:getCardById(i).is_damage_card then
-            table.insert(cards, i)
-          end
-        end
-        if #cards > 0 then
-          room:obtainCard(player.id, cards[math.random(#cards)], true, fk.ReasonJustMove)
-        end
-      end
-      room:setPlayerMark(data.to, "jy_zaisheng_triggered-round", 1)
-    end
-  end,
-  refresh_events = { fk.EventPhaseChanging },
-  can_refresh = function(self, event, target, player, data)
-    return target == player and player:hasSkill(self) and
-        data.to == Player.Start
-  end,
-  on_refresh = function(self, event, target, player, data)
-    local room = player.room
-    for _, p in ipairs(room:getAlivePlayers()) do
-      if p:getMark("@jy_zaisheng") ~= 0 then
-        room:setPlayerMark(p, "@jy_zaisheng", 0)
-      end
+      room:addPlayerMark(data.to, "@jy_zaisheng", -1)
+      -- room:setPlayerMark(data.to, "jy_zaisheng_triggered-round", 1)
     end
   end,
 }
@@ -175,9 +230,9 @@ Fk:loadTranslationTable {
 
   ["jy_zaisheng"] = "再生",
   ["@jy_zaisheng"] = "再生",
-  ["#jy_zaisheng_prompt"] = [[是否发动〖再生〗令 %dest 回复一点体力，然后你获得〖再生〗的增益效果？]],
-  [":jy_zaisheng"] = [[每轮限一次，当一名角色不因使用而失去红色牌时，你可以令其回复一点体力。若如此做，直到你的下回合开始：每回合限一次，当该角色受到伤害后，你获得对其造成伤害的牌，并随机获得伤害来源手牌中一张伤害牌。]],
-  -- [":jy_zaisheng"] = [[当一名角色不因使用而失去红色牌时，你可以令其回复一点体力。若如此做，直到你的下回合开始：每回合限一次，当该角色受到伤害后，你获得对其造成伤害的牌，并随机获得伤害来源手牌中一张伤害牌。]],
+  ["#jy_zaisheng_prompt"] = [[是否发动〖再生〗令 %dest 回复一点体力，然后你可以获得下一张对其造成伤害的牌？]],
+  [":jy_zaisheng"] = [[当一名没有“再生”标记的角色不因使用而失去红色牌时，你可以令其回复一点体力。若如此做，其获得“再生”。当有“再生”的角色受到伤害后，其移除“再生”，你获得对其造成伤害的牌。]],
+  -- [":jy_zaisheng"] = [[（原稿，因过强已被移除）当一名角色不因使用而失去红色牌时，你可以令其回复一点体力。若如此做，直到你的下回合开始：每回合限一次，当该角色受到伤害后，你获得对其造成伤害的牌，并随机获得伤害来源手牌中一张伤害牌。]],
   ["$jy_zaisheng1"] = [[不要害怕。]],
   ["$jy_zaisheng2"] = [[让我来消除痛苦。]],
 
