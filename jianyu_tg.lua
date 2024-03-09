@@ -104,8 +104,9 @@ local zaisheng = fk.CreateTriggerSkill {
           end
         end
       end
-    else                                         -- fk.Damaged
-      return target:getMark("@jy_zaisheng") ~= 0 -- and data.to:getMark("jy_zaisheng_triggered-round") == 0
+    else -- fk.Damaged
+      return target:getMark("@jy_zaisheng") ~= 0 and
+          not target.dead
     end
   end,
   on_cost = function(self, event, target, player, data)
@@ -143,7 +144,6 @@ local zaisheng = fk.CreateTriggerSkill {
         end
       end
       room:setPlayerMark(data.to, "@jy_zaisheng", 0)
-      -- room:setPlayerMark(data.to, "jy_zaisheng_triggered-round", 1)
     end
   end,
 }
@@ -230,7 +230,7 @@ xuyu:addSkill(zaisheng)
 xuyu:addSkill(zhushe)
 
 Fk:loadTranslationTable {
-  ["jy__xuyu"] = "絮雨",
+  ["jy__xuyu"] = "絮雨（已削弱）",
   ["#jy__xuyu"] = "巡游医师",
   ["designer:jy__xuyu"] = "emo公主",
   ["cv:jy__xuyu"] = "刘十四",
@@ -248,7 +248,7 @@ Fk:loadTranslationTable {
   ["jy_zhushe"] = "注射",
   ["@jy_zhushe-turn"] = "注射",
   ["#jy_zhushe_prompt"] = "你可以重铸任意张牌，然后本回合获得〖注射〗的效果",
-  [":jy_zhushe"] = [[出牌阶段开始时，你可以重铸任意张牌。若如此做，本回合：你使用牌无距离和次数限制、不可被响应；你造成伤害后，令伤害目标回复X点体力并摸X张牌，X为伤害值。]],
+  [":jy_zhushe"] = [[出牌阶段开始时，你可以重铸任意张牌。若如此做，本回合：你使用牌无距离和次数限制、不可被响应；你造成伤害后，令伤害目标回复X点体力并摸X张牌，X为伤害值。]], -- 已削弱，之前是摸两张牌
   ["$jy_zhushe1"] = [[准备好注射了。]],
   ["$jy_zhushe2"] = [[我的治疗是不会痛的。]],
 }
