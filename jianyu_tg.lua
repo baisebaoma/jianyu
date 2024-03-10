@@ -772,8 +772,8 @@ local yingcai = fk.CreateTriggerSkill {
   anim_type = "control",
   events = { fk.TargetConfirming },
   can_trigger = function(self, event, target, player, data)
-    if data.is_jy_yingcai_used then return false end                                       -- 所以在前面先判断是否已经做过了！
     if data.from == player.id and player:hasSkill(self) and data.card:isCommonTrick() then -- 这一段是sheyan的代码，但是因为TargetConfirming是对每一个人都生效，所以当你加了一个新目标，又会触发这个，导致触发多次，和原来的不一样。
+      if player:getMark("jy_yingcai_used") ~= 0 then return false end
       local room = player.room
       local targets = U.getUseExtraTargets(room, data, true, true)
       local origin_targets = U.getActualUseTargets(room, data, event)
@@ -790,8 +790,9 @@ local yingcai = fk.CreateTriggerSkill {
     local room = player.room
     local plist, cid = room:askForChooseCardAndPlayers(player, self.cost_data, 1, 1, nil,
       "#jy_yingcai-choose:::" .. data.card:toLogString(), self.name, false)
-    if #plist > 0 then
+    if #plist > 0 then -- 如果他选择了目标，那就发动
       self.cost_data = { plist[1], cid }
+      room:setPlayerMark(player, "jy_yingcai_used", true)
       return true
     end
   end,
@@ -804,7 +805,13 @@ local yingcai = fk.CreateTriggerSkill {
     else
       AimGroup:addTargets(player.room, data, self.cost_data[1])
     end
-    data.is_jy_yingcai_used = true
+  end,
+  refresh_events = { fk.CardUseFinished },
+  can_refresh = function(self, event, target, player, data)
+    return player:hasSkill(self) and player:getMark("jy_yingcai_used") ~= 0
+  end,
+  on_refresh = function(self, event, target, player, data)
+    player.room:setPlayerMark(player, "jy_yingcai_used", 0)
   end,
 }
 local yingcai_mod = fk.CreateTargetModSkill {
