@@ -642,7 +642,7 @@ local yingcai = fk.CreateTriggerSkill {
   anim_type = "control",
   events = { fk.TargetConfirming },
   can_trigger = function(self, event, target, player, data)
-    if target == player and player:hasSkill(self) and data.card:isCommonTrick() then
+    if data.from == player.id and player:hasSkill(self) and data.card:isCommonTrick() then
       local room = player.room
       local targets = U.getUseExtraTargets(room, data, true, true)
       local origin_targets = U.getActualUseTargets(room, data, event)
@@ -694,13 +694,15 @@ Fk:loadTranslationTable {
   ["jy__guojia"] = [[简郭嘉]],
   ["#jy__guojia"] = [[识人心智]],
   ["designer:jy__guojia"] = [[rolin]],
+  ["cv:jy__guojia"] = [[暂无]],
+  ["illustrator:jy__guojia"] = [[未知]],
 
   ["jy_tiandu"] = [[天妒]],
   [":jy_tiandu"] = [[锁定技，回合开始时，你受到一点无来源伤害。]],
 
   ["jy_yiji"] = [[遗计]],
   [":jy_yiji"] = [[当你受到一点伤害或你死亡时，你可以令一名角色摸两张牌，然后其可以立即将一张锦囊牌或两张非锦囊牌当一张本轮未以此法使用过的普通锦囊牌使用。]],
-  ["#jy_yiji_prompt"] = [[遗计：你可以令一名角色立即将一部分牌当一张本轮未以此法使用过的普通锦囊牌使用]],
+  ["#jy_yiji_prompt"] = [[遗计：你可以令一名角色摸两张牌，随后立即使用一张可自选的锦囊牌]],
   ["#jy_yiji-use"] = [[遗计：你可以立即将一张锦囊牌或两张非锦囊牌当 %arg 使用]],
   ["@$jy_yiji-round"] = [[遗计]],
   ["#jy_yiji_viewas"] = [[遗计]],

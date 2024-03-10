@@ -398,12 +398,9 @@ local jy_guina_refresh = fk.CreateTriggerSkill {
   can_refresh = function(self, event, target, player, data)
     if not player:hasSkill(self) then return false end
     if event == fk.TargetConfirming then
-      if data.card then -- 虽然理论上这个事件只针对牌，但还是这么写保险一点
-        return data.from == player.id and
-            (data.card:isCommonTrick() or data.card.type == Card.TypeBasic)
-      else
-        return data.from == player.id
-      end
+      -- if data.card then 这个事件只针对牌，所以不需要判断是否有牌
+      return data.from == player.id and
+          (data.card:isCommonTrick() or data.card.type == Card.TypeBasic)
     else
       return data.to:getMark("@jy_guina-phase") ~= 0 -- data.from == player
       -- 因为这两个事件的data.to和from对应的数据结构不一样
