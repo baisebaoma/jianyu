@@ -352,15 +352,14 @@ local zhitu = fk.CreateActiveSkill {
     local choices = { "A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K" }
     room:setPlayerMark(player, "@jy_fenlv",
       t[room:askForChoice(player, choices, self.name, "#jy_zhitu_ask")])
-    player:drawCards(1, self.name)
   end,
 }
 
 local peixiu = General(extension, "jy__peixiu", "qun", 3)
 peixiu.subkingdom = "jin"
 peixiu:addSkill(fenlv)
-peixiu:addSkill(zhunwang)
 peixiu:addSkill(zhitu)
+peixiu:addSkill(zhunwang)
 peixiu:addSkill("juezhi")
 
 
@@ -379,8 +378,326 @@ Fk:loadTranslationTable {
   ["@jy_zhunwang"] = "准望",
 
   ["jy_zhitu"] = "制图",
-  [":jy_zhitu"] = [[出牌阶段限三次，你可以修改〖分率〗记录的点数，然后你摸一张牌。]],
+  [":jy_zhitu"] = [[出牌阶段限三次，你可以修改〖分率〗记录的点数。]],
   ["#jy_zhitu_ask"] = "修改“分率”",
+}
+
+
+local xiuxing = fk.CreateTriggerSkill {
+  name = "jy_xiuxing",
+  anim_type = "drawcard",
+  frequency = Skill.Compulsory,
+  events = { fk.Damaged },
+  can_trigger = function(self, event, target, player, data)
+    if not player:hasSkill(self) then return false end
+    return data.to == player or data.from == player
+  end,
+  on_use = function(self, event, target, player, data)
+    for _, s in ipairs(player.player_skills) do
+      if s:isSwitchSkill() then
+        player.room:delay(1000)                     -- 防止异步乱搞，并且告诉玩家我们确实由A变B再变A动了一下（
+        player.room:setPlayerMark(player, MarkEnum.SwithSkillPreName .. s.name,
+          player:getSwitchSkillState(s.name, true)) -- 经测试这个是没问题的
+        player:addSkillUseHistory(s.name)           -- 加上这个就可以更新武将牌上的黑白
+        local t = {}
+        t[0] = "阳"
+        t[1] = "阴"
+        player.room:doBroadcastNotify("ShowToast",
+          "修行：更改了 " .. Fk:translate(s.name) .. " 的阴阳状态，现在是：" .. t[player:getSwitchSkillState(s.name)]) -- 记得删
+        player:drawCards(2)
+      end
+    end
+  end,
+}
+
+local zitai = fk.CreateTriggerSkill {
+  name = "jy_zitai",
+  anim_type = "switch",
+  switch_skill_name = "jy_zitai",
+  frequency = Skill.Compulsory,
+  events = { fk.DamageInflicted },
+  can_trigger = function(self, event, target, player, data)
+    return player:hasSkill(self) and (data.to == player or data.from == player)
+  end,
+  on_use = function(self, event, target, player, data)
+    if player:getSwitchSkillState(self.name, true) == fk.SwitchYang then
+      local judge = {
+        who = player,
+        reason = self.name,
+        pattern = ".|.|heart,diamond",
+      }
+      player.room:judge(judge)
+      if judge.card.color == Card.Red then
+        return true
+      end
+    else
+      data.damage = data.damage + 1
+    end
+    -- 我悟了，好像转换技本身根本就不用写转不转换
+  end
+}
+
+local yujian = fk.CreateTriggerSkill {
+  name = "jy_yujian",
+  anim_type = "control",
+  events = { fk.EventPhaseStart },
+  can_trigger = function(self, event, target, player, data)
+    return target == player and player:hasSkill(self) and
+        player.phase == Player.Start
+  end,
+  on_use = function(self, event, target, player, data)
+    local room = player.room
+    room:askForGuanxing(player, room:getNCards(math.min(5, room:getTag("RoundCount"))))
+  end,
+}
+
+local mumang = fk.CreateAttackRangeSkill {
+  name = "jy_mumang",
+  frequency = Skill.Compulsory,
+  fixed_func = function(self, player)
+    if player:hasSkill(self) then
+      return 1
+    end
+  end,
+}
+local mumang_mod = fk.CreateTargetModSkill {
+  name = "#jy_mumang_mod",
+  bypass_times = function(self, player, skill, scope, card, to)
+    return player:hasSkill(self)
+  end,
+}
+xiuxing:addRelatedSkill(mumang_mod)
+
+local guanzhe = General(extension, "jy__guanzhe", "jin", 3, 3, General.Female) -- 记得改成jin
+guanzhe:addSkill(xiuxing)
+guanzhe:addSkill(zitai)
+guanzhe:addSkill(mumang)
+guanzhe:addSkill(yujian)
+
+Fk:loadTranslationTable {
+  ["jy__guanzhe"] = [[观者]],
+  ["#jy__guanzhe"] = [[目盲的修行者]],
+  ["designer:jy__guanzhe"] = [[Kasa]],
+  ["cv:jy__guanzhe"] = [[暂无]],
+  ["illustrator:jy__guanzhe"] = [[未知]],
+
+  ["jy_xiuxing"] = [[修行]],
+  [":jy_xiuxing"] = [[锁定技，当你造成或受到伤害后，你改变你所有转换技的阴阳状态。你以此法改变一个转换技的阴阳状态时，你摸两张牌。]],
+
+  ["jy_zitai"] = [[姿态]],
+  [":jy_zitai"] = [[转换技，锁定技，阳：你造成或受到伤害时判定，若结果为红色，防止此伤害；阴：你造成和受到的伤害+1。]],
+
+  ["jy_mumang"] = [[目盲]],
+  [":jy_mumang"] = [[锁定技，你使用牌无次数限制；你的攻击范围始终为1。]],
+
+  ["jy_yujian"] = [[预见]],
+  [":jy_yujian"] = [[准备阶段开始时，你可以观看牌堆顶的X张牌，然后将任意数量的牌置于牌堆顶，将其余的牌置于牌堆底。（X为游戏轮数且至多为5）]],
+
+}
+
+local tiandu = fk.CreateTriggerSkill {
+  name = "jy_tiandu",
+  anim_type = "masochism",
+  frequency = Skill.Compulsory,
+  mod_target_filter = Util.TrueFunc,
+  events = { fk.EventPhaseStart },
+  can_trigger = function(self, event, target, player, data)
+    if not player:hasSkill(self) then return false end
+    return target == player and player.phase == Player.Start
+  end,
+  on_use = function(self, event, target, player, data)
+    player.room:damage({
+      to = player,
+      damage = 1,
+      damageType = fk.NormalDamage,
+      skillName = self.name,
+    })
+  end,
+}
+
+-- 周不疑：一名角色的结束阶段，若其本回合未造成伤害，你可以声明一种普通锦囊牌（每轮每种牌名限一次），其可以将一张牌当你声明的牌使用
+
+local yiji = fk.CreateTriggerSkill {
+  name = "jy_yiji",
+  anim_type = "support",
+  events = { fk.Damaged, fk.Death },
+  on_cost = function(self, event, target, player, data)
+    -- 选择一个目标
+    local room = player.room
+    if room:askForSkillInvoke(player, self.name) then
+      local jy_yiji_target = room:askForChoosePlayers(player, table.map(room:getAlivePlayers(), Util.IdMapper), 1,
+        1,
+        "#jy_yiji_prompt", self.name, true, false) -- 选择一个目标
+      if #jy_yiji_target > 0 then
+        data.cost_data = jy_yiji_target[1]
+        return true
+      else
+        return false
+      end
+    end
+  end,
+  on_use = function(self, event, target, player, data)
+    local room = player.room
+    local to = room:getPlayerById(data.cost_data)
+
+    to:drawCards(2, self.name)
+
+    -- 让他选择一个牌名
+    local mark = player:getMark("jy_yiji_names")
+    if type(mark) ~= "table" then
+      mark = {}
+      for _, id in ipairs(Fk:getAllCardIds()) do
+        local card = Fk:getCardById(id)
+        if card:isCommonTrick() and not card.is_derived then
+          table.insertIfNeed(mark, card.name)
+        end
+      end
+      room:setPlayerMark(to, "jy_yiji_names", mark)
+    end
+    local mark2 = to:getMark("@$jy_yiji-round")
+    if mark2 == 0 then mark2 = {} end
+    local names, choices = {}, {}
+    for _, name in ipairs(mark) do
+      local card = Fk:cloneCard(name)
+      card.skillName = self.name
+      if target:canUse(card) and not target:prohibitUse(card) then
+        table.insert(names, name)
+        if not table.contains(mark2, name) then
+          table.insert(choices, name)
+        end
+      end
+    end
+    table.insert(names, "Cancel")
+    table.insert(choices, "Cancel")
+    local choice = room:askForChoice(to, choices, self.name, "#jy_yiji-invoke::" .. to.id, false, names)
+    if choice == "Cancel" then
+      return true
+    else
+      room:doIndicate(player.id, { to.id })
+    end
+
+    -- 问他用哪个牌，并且要他用
+    mark = player:getMark("@$jy_yiji-round")
+    if mark == 0 then mark = {} end
+    table.insert(mark, choice)
+    room:setPlayerMark(player, "@$jy_yiji-round", mark)
+    room:doIndicate(player.id, { target.id })
+    room:setPlayerMark(to, "jy_yiji-tmp", choice)
+
+    local success, dat = room:askForUseActiveSkill(to, "#jy_yiji_viewas", "#jy_yiji-use:::" .. Fk:translate(choice))
+    room:setPlayerMark(to, "jy_yiji-tmp", 0)
+    if success then
+      local card = Fk:cloneCard(choice)
+      card:addSubcards(dat.cards)
+      card.skillName = self.name
+      room:useCard {
+        from = to.id,
+        tos = table.map(dat.targets, function(p) return { p } end),
+        card = card,
+      }
+      room:setPlayerMark(to, "jy_yiji-tmp", 0)
+    end
+  end,
+}
+local yiji_viewas = fk.CreateViewAsSkill {
+  name = "#jy_yiji_viewas",
+  anim_type = "offensive",
+  card_filter = function(self, to_select, selected)
+    if Self:getMark("jy_yiji-tmp") ~= 0 then
+      if #selected == 0 then return true end
+      if #selected == 1 then
+        -- 第一张如果是锦囊牌，直接return false，如果不是，那就看第二张是不是也不是锦囊牌
+        if Fk:getCardById(selected[1]).type == Card.TypeTrick then
+          return false
+        else
+          return Fk:getCardById(to_select).type ~= Card.TypeTrick
+        end
+      end
+      if #selected >= 2 then return false end
+    end
+  end,
+  view_as = function(self, cards)
+    if #cards == 1 or #cards == 2 then
+      local card = Fk:cloneCard(Self:getMark("jy_yiji-tmp"))
+      card:addSubcard(cards[1])
+      card.skillName = "jy_yiji"
+      return card
+    end
+  end,
+}
+yiji:addRelatedSkill(yiji_viewas)
+
+-- 董允舍宴
+local yingcai = fk.CreateTriggerSkill {
+  name = "jy_yingcai",
+  anim_type = "control",
+  events = { fk.TargetConfirming },
+  can_trigger = function(self, event, target, player, data)
+    if target == player and player:hasSkill(self) and data.card:isCommonTrick() then
+      local room = player.room
+      local targets = U.getUseExtraTargets(room, data, true, true)
+      local origin_targets = U.getActualUseTargets(room, data, event)
+      if #origin_targets > 1 then
+        table.insertTable(targets, origin_targets)
+      end
+      if #targets > 0 then
+        self.cost_data = targets
+        return true
+      end
+    end
+  end,
+  on_cost = function(self, event, target, player, data)
+    local room = player.room
+    local plist, cid = room:askForChooseCardAndPlayers(player, self.cost_data, 1, 1, nil,
+      "#jy_yingcai-choose:::" .. data.card:toLogString(), self.name, false)
+    if #plist > 0 then
+      self.cost_data = { plist[1], cid }
+      return true
+    end
+  end,
+  on_use = function(self, event, target, player, data)
+    local room = player.room
+    room:throwCard(self.cost_data[2], self.name, player, player)
+    if table.contains(AimGroup:getAllTargets(data.tos), self.cost_data[1]) then
+      AimGroup:cancelTarget(data, self.cost_data[1])
+      return self.cost_data[1] == player.id
+    else
+      AimGroup:addTargets(player.room, data, self.cost_data[1])
+    end
+  end,
+}
+local yingcai_mod = fk.CreateTargetModSkill {
+  name = "#yingcai_mod",
+  frequency = Skill.Compulsory,
+  bypass_distances = function(self, player, skill, card)
+    return player:hasSkill(self) and card and card.type == Card.TypeTrick
+  end,
+}
+yingcai:addRelatedSkill(yingcai_mod)
+
+local guojia = General(extension, "jy__guojia", "wei", 3)
+
+guojia:addSkill(tiandu)
+guojia:addSkill(yiji)
+guojia:addSkill(yingcai)
+
+Fk:loadTranslationTable {
+  ["jy__guojia"] = [[简郭嘉]],
+  ["#jy__guojia"] = [[识人心智]],
+  ["designer:jy__guojia"] = [[rolin]],
+
+  ["jy_tiandu"] = [[天妒]],
+  [":jy_tiandu"] = [[锁定技，回合开始时，你受到一点无来源伤害。]],
+
+  ["jy_yiji"] = [[遗计]],
+  [":jy_yiji"] = [[当你受到一点伤害或你死亡时，你可以令一名角色摸两张牌，然后其可以立即将一张锦囊牌或两张非锦囊牌当一张本轮未以此法使用过的普通锦囊牌使用。]],
+  ["#jy_yiji_prompt"] = [[遗计：你可以令一名角色立即将一部分牌当一张本轮未以此法使用过的普通锦囊牌使用]],
+  ["#jy_yiji-use"] = [[遗计：你可以立即将一张锦囊牌或两张非锦囊牌当 %arg 使用]],
+  ["@$jy_yiji-round"] = [[遗计]],
+
+  ["jy_yingcai"] = [[英才]],
+  [":jy_yingcai"] = [[锁定技，你使用锦囊牌没有距离限制；当你使用锦囊牌指定目标时，你可以弃一张牌，为该锦囊牌增加或减少一个目标（目标数至少为1）。]],
+  ["#jy_yingcai-choose"] = "英才：你可以弃一张牌，为 %arg 增加/减少一个目标",
 }
 
 return extension
