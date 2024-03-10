@@ -1,3 +1,4 @@
+---@diagnostic disable: undefined-field
 local extension = Package:new("jianyu_tg")
 extension.extensionName = "jianyu"
 
@@ -5,6 +6,135 @@ local U = require "packages/utility/utility"
 
 Fk:loadTranslationTable {
   ["jianyu_tg"] = [[简浴-集思广益]],
+}
+
+local jy__tangniu = General(extension, "jy__tangniu", "qun", 1, 1, General.Female)
+
+-- 主函数啥也不做，只是为了承载下面的
+local jy_budeng = fk.CreateTriggerSkill {
+  name = "jy_budeng",
+}
+-- 不能受到伤害
+local jy_budeng_damaged = fk.CreateTriggerSkill {
+  mute = true,
+  name = "#jy_budeng_damaged",
+  frequency = Skill.Compulsory,
+  events = { fk.DamageInflicted },
+  can_trigger = function(self, event, target, player, data)
+    if not player:hasSkill(self) then return false end
+    return target == player
+  end,
+  on_use = function(self, event, target, player, data)
+    player:broadcastSkillInvoke("jy_budeng")
+    player.room:doAnimate("InvokeSkill", {
+      name = "jy_budeng",
+      player = player.id,
+      skill_type = "defensive",
+    })
+
+    return true
+  end,
+}
+-- 跳过弃牌阶段
+local jy_budeng_discard = fk.CreateTriggerSkill {
+  mute = true,
+  frequency = Skill.Compulsory,
+  name = "#jy_budeng_discard",
+  anim_type = "defensive",
+  events = { fk.EventPhaseChanging },
+  can_trigger = function(self, event, target, player, data)
+    if target == player and player:hasSkill(self) and data.to == Player.Discard then
+      local room = player.room
+      local logic = room.logic
+      local e = logic:getCurrentEvent():findParent(GameEvent.Turn, true)
+      if e == nil then return false end
+      return true
+    end
+  end,
+  on_use = function(self, event, target, player, data)
+    player:broadcastSkillInvoke("jy_budeng")
+    player.room:doAnimate("InvokeSkill", {
+      name = "jy_budeng",
+      player = player.id,
+      skill_type = "defensive",
+    })
+
+    return true
+  end
+}
+-- 回合外有人使你摸了牌时你流失体力
+local jy_budeng_card = fk.CreateTriggerSkill {
+  mute = true,
+  frequency = Skill.Compulsory,
+  name = "#jy_budeng_card",
+  anim_type = "offensive",
+  events = { fk.AfterCardsMove },
+  can_trigger = function(self, event, target, player, data)
+    if not player:hasSkill(self) then return end
+    if player.phase == Player.NotActive then
+      for _, move in ipairs(data) do
+        if move.to == player.id and move.from ~= player.id then
+          return true
+        end
+      end
+    end
+  end,
+  on_use = function(self, event, target, player, data)
+    player:broadcastSkillInvoke("jy_budeng")
+    player.room:doAnimate("InvokeSkill", {
+      name = "jy_budeng",
+      player = player.id,
+      skill_type = "offensive",
+    })
+
+    local room = player.room
+    -- room:loseHp(room.current, 1)
+    room:loseHp(player, player.hp)
+  end
+}
+jy_budeng:addRelatedSkill(jy_budeng_damaged)
+jy_budeng:addRelatedSkill(jy_budeng_discard)
+jy_budeng:addRelatedSkill(jy_budeng_card)
+
+local jy_duili = fk.CreateTriggerSkill {
+  name = "jy_duili",
+  events = { fk.TargetSpecified },
+  can_trigger = function(self, event, target, player, data)
+    if target == player and player:hasSkill(self) and
+        data.card and data.card.trueName == "slash" then
+      local target = player.room:getPlayerById(data.to)
+      return target.gender == General.Male
+    end
+  end,
+  on_use = function(self, event, target, player, data)
+    local room = player.room
+    local to = player.room:getPlayerById(data.to)
+    if to:isKongcheng() then
+      player:drawCards(1, self.name)
+    else
+      local result = room:askForDiscard(to, 1, 1, false, self.name, true, ".", "#double_swords-invoke:" .. player.id)
+      if #result == 0 then
+        player:drawCards(1, self.name)
+      end
+    end
+  end,
+}
+
+jy__tangniu:addSkill(jy_budeng)
+jy__tangniu:addSkill(jy_duili)
+
+Fk:loadTranslationTable {
+  ["jy__tangniu"] = [[唐妞]],
+  ["#jy__tangniu"] = "版本答案",
+  ["designer:jy__tangniu"] = "考公专家 & 私服群（838724904）群友",
+  ["cv:jy__tangniu"] = "暂无",
+  ["illustrator:jy__tangniu"] = "看不腻的妞",
+
+  ["jy_budeng"] = "不等",
+  [":jy_budeng"] = [[锁定技，防止你受到的伤害；你跳过弃牌阶段；你于其他角色的回合内获得牌（包括有牌进入你的判定区）时，你失去所有体力。<br><font color="grey">受到伤害≠我掉血；弃牌阶段≠我要弃；接受礼物≠我同意。</font>]],
+
+  ["jy_duili"] = "对立",
+  [":jy_duili"] = [[当你指定男性角色为【杀】的目标后，你可以令其选择一项：弃置一张手牌，或令你摸一张牌。]],
 }
 
 -- 初版再生，由于过强已被重做
@@ -642,7 +772,8 @@ local yingcai = fk.CreateTriggerSkill {
   anim_type = "control",
   events = { fk.TargetConfirming },
   can_trigger = function(self, event, target, player, data)
-    if data.from == player.id and player:hasSkill(self) and data.card:isCommonTrick() then
+    if data.is_jy_yingcai_used then return false end                                       -- 所以在前面先判断是否已经做过了！
+    if data.from == player.id and player:hasSkill(self) and data.card:isCommonTrick() then -- 这一段是sheyan的代码，但是因为TargetConfirming是对每一个人都生效，所以当你加了一个新目标，又会触发这个，导致触发多次，和原来的不一样。
       local room = player.room
       local targets = U.getUseExtraTargets(room, data, true, true)
       local origin_targets = U.getActualUseTargets(room, data, event)
@@ -673,6 +804,7 @@ local yingcai = fk.CreateTriggerSkill {
     else
       AimGroup:addTargets(player.room, data, self.cost_data[1])
     end
+    data.is_jy_yingcai_used = true
   end,
 }
 local yingcai_mod = fk.CreateTargetModSkill {
