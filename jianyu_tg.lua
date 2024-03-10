@@ -1,6 +1,8 @@
 local extension = Package:new("jianyu_tg")
 extension.extensionName = "jianyu"
 
+local U = require "packages/utility/utility"
+
 Fk:loadTranslationTable {
   ["jianyu_tg"] = [[简浴-集思广益]],
 }
@@ -521,6 +523,13 @@ local yiji = fk.CreateTriggerSkill {
   name = "jy_yiji",
   anim_type = "support",
   events = { fk.Damaged, fk.Death },
+  can_trigger = function(self, event, target, player, data)
+    if event == fk.Damaged then
+      return target == player and player:hasSkill(self.name)
+    else
+      return target == player and player:hasSkill(self.name, false, true) -- 这样写，即使我死了也能触发
+    end
+  end,
   on_cost = function(self, event, target, player, data)
     -- 选择一个目标
     local room = player.room
@@ -694,6 +703,7 @@ Fk:loadTranslationTable {
   ["#jy_yiji_prompt"] = [[遗计：你可以令一名角色立即将一部分牌当一张本轮未以此法使用过的普通锦囊牌使用]],
   ["#jy_yiji-use"] = [[遗计：你可以立即将一张锦囊牌或两张非锦囊牌当 %arg 使用]],
   ["@$jy_yiji-round"] = [[遗计]],
+  ["#jy_yiji_viewas"] = [[遗计]],
 
   ["jy_yingcai"] = [[英才]],
   [":jy_yingcai"] = [[锁定技，你使用锦囊牌没有距离限制；当你使用锦囊牌指定目标时，你可以弃一张牌，为该锦囊牌增加或减少一个目标（目标数至少为1）。]],
