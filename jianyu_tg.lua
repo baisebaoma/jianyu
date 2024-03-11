@@ -636,6 +636,27 @@ Fk:loadTranslationTable {
   -- [":jy_yujian"] = [[准备阶段开始时，你可以观看牌堆顶的X张牌，然后弃置其中任意数量的牌，将其余的牌依次放回牌堆顶。（X为游戏轮数且至多为5）]],
 }
 
+local ex__guanzhe = General(extension, "jy__ex__guanzhe", "jin", 3, 3, General.Female)
+ex__guanzhe.hidden = true
+ex__guanzhe:addSkill(ex_xiuxing)
+ex__guanzhe:addSkill(ex_zitai)
+ex__guanzhe:addSkill("jy_mumang")
+ex__guanzhe:addSkill("jy_yujian")
+
+Fk:loadTranslationTable {
+  ["jy__ex__guanzhe"] = [[经典观者]],
+  ["#jy__ex__guanzhe"] = [[<font color="red">PVE之神<br>这是3月11日版本的观者，<br>因强度过高，这个武将<br>不会出现在选将框！</font>]],
+  ["designer:jy__ex__guanzhe"] = [[Kasa]],
+  ["cv:jy__ex__guanzhe"] = [[无]],
+  ["illustrator:jy__ex__guanzhe"] = [[未知]],
+
+  ["jy_ex_xiuxing"] = [[修行]],
+  [":jy_ex_xiuxing"] = [[锁定技，你使用牌无次数限制；当你造成或受到伤害后，你改变自身所有转换技的阴阳状态；你每以此法改变一个转换技的阴阳状态或发动一个转换技时，你摸两张牌。]],
+
+  ["jy_ex_zitai"] = [[姿态]],
+  [":jy_ex_zitai"] = [[转换技，锁定技，当你造成或受到伤害时，阳：你判定，若为红色，防止之；阴：该伤害+1。]],
+}
+
 local tiandu = fk.CreateTriggerSkill {
   name = "jy_tiandu",
   anim_type = "masochism",
@@ -1011,27 +1032,6 @@ local ex_zitai = fk.CreateTriggerSkill {
       data.damage = data.damage + 1
     end
   end
-}
-
-local ex__guanzhe = General(extension, "jy__ex__guanzhe", "jin", 3, 3, General.Female)
-ex__guanzhe.hidden = true
-ex__guanzhe:addSkill(ex_xiuxing)
-ex__guanzhe:addSkill(ex_zitai)
-ex__guanzhe:addSkill("jy_mumang")
-ex__guanzhe:addSkill("jy_yujian")
-
-Fk:loadTranslationTable {
-  ["jy__ex__guanzhe"] = [[经典观者]],
-  ["#jy__ex__guanzhe"] = [[<font color="red">因强度过高，<br>不会出现在选将框</font>]],
-  ["designer:jy__ex__guanzhe"] = [[Kasa]],
-  ["cv:jy__ex__guanzhe"] = [[无]],
-  ["illustrator:jy__ex__guanzhe"] = [[未知]],
-
-  ["jy_ex_xiuxing"] = [[修行]],
-  [":jy_ex_xiuxing"] = [[锁定技，你使用牌无次数限制；当你造成或受到伤害后，你改变自身所有转换技的阴阳状态；你每以此法改变一个转换技的阴阳状态或发动一个转换技时，你摸两张牌。]],
-
-  ["jy_ex_zitai"] = [[姿态]],
-  [":jy_ex_zitai"] = [[转换技，锁定技，当你造成或受到伤害时，阳：你判定，若为红色，防止之；阴：该伤害+1。]],
 }
 
 return extension
