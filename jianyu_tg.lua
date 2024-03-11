@@ -450,7 +450,8 @@ local zitai = fk.CreateTriggerSkill {
     return player:hasSkill(self) and (data.to == player or data.from == player)
   end,
   on_use = function(self, event, target, player, data)
-    if player:getSwitchSkillState(self.name) == fk.SwitchYang then
+    -- 我好像懂了，转换技是on_use之前就会转换
+    if player:getSwitchSkillState(self.name, true) == fk.SwitchYang then
       local judge = {
         who = player,
         reason = self.name,
