@@ -137,86 +137,6 @@ Fk:loadTranslationTable {
   [":jy_duili"] = [[当你指定男性角色为【杀】的目标后，你可以令其选择一项：弃置一张手牌，或令你摸一张牌。]],
 }
 
--- 初版再生，由于过强已被重做
--- local zaisheng = fk.CreateTriggerSkill {
---   name = "jy_zaisheng",
---   anim_type = "support",
---   events = { fk.AfterCardsMove, fk.Damaged },
---   can_trigger = function(self, event, target, player, data)
---     if not player:hasSkill(self) then return false end
---     if event == fk.AfterCardsMove then
---       if player:usedSkillTimes(self.name, Player.HistoryRound) >= 1 then return false end
---       for _, move in ipairs(data) do
---         if move.moveReason ~= fk.ReasonUse and move.from then -- and move.moveVisible 可能需要加上技能描述里没有的moveVisible，因为如果是背面朝上的，你不知道这是红色，就不应该发动这个技能
---           for _, info in ipairs(move.moveInfo) do
---             if (info.fromArea == Card.PlayerHand or info.fromArea == Card.PlayerEquip) and
---                 Fk:getCardById(info.cardId).color == Card.Red then
---               data.jy_zaisheng_moveFrom = move.from
---               return true
---             end
---           end
---         end
---       end
---     else -- fk.Damaged
---       return target:getMark("@jy_zaisheng") ~= 0 and data.to:getMark("jy_zaisheng_triggered-round") == 0
---     end
---   end,
---   on_cost = function(self, event, target, player, data)
---     if event == fk.AfterCardsMove then
---       return player.room:askForSkillInvoke(player, self.name, nil, "#jy_zaisheng_prompt::" .. data.jy_zaisheng_moveFrom)
---     else -- fk.Damaged
---       return true
---     end
---   end,
---   on_use = function(self, event, target, player, data)
---     local room = player.room
---     if event == fk.AfterCardsMove then
---       room:doIndicate(player.id, { data.jy_zaisheng_moveFrom }) -- 播放指示线，代表我给你上了buff
---       local jy_zaisheng_moveFrom = room:getPlayerById(data.jy_zaisheng_moveFrom)
---       room:recover({
---         who = jy_zaisheng_moveFrom,
---         num = 1,
---         recoverBy = player,
---         skillName = self.name,
---       })
---       room:setPlayerMark(jy_zaisheng_moveFrom, "@jy_zaisheng", "")
---     else -- fk.Damaged
---       if data.card then
---         local subcards = data.card:isVirtual() and data.card.subcards or { data.card.id }
---         if #subcards > 0 and table.every(subcards, function(id) return room:getCardArea(id) == Card.Processing end) then
---           room:obtainCard(player.id, data.card, true, fk.ReasonJustMove)
---         end
---       end
---       -- 该机制因过强已移除
---       -- if data.from then
---       --   local cards = {}
---       --   for _, i in ipairs(data.from:getCardIds(Player.Hand)) do
---       --     if Fk:getCardById(i).is_damage_card then
---       --       table.insert(cards, i)
---       --     end
---       --   end
---       --   if #cards > 0 then
---       --     room:obtainCard(player.id, cards[math.random(#cards)], true, fk.ReasonJustMove)
---       --   end
---       -- end
---       room:setPlayerMark(data.to, "jy_zaisheng_triggered-round", 1)
---     end
---   end,
---   refresh_events = { fk.EventPhaseChanging },
---   can_refresh = function(self, event, target, player, data)
---     return target == player and player:hasSkill(self) and
---         data.to == Player.Start
---   end,
---   on_refresh = function(self, event, target, player, data)
---     local room = player.room
---     for _, p in ipairs(room:getAlivePlayers()) do
---       if p:getMark("@jy_zaisheng") ~= 0 then
---         room:setPlayerMark(p, "@jy_zaisheng", 0)
---       end
---     end
---   end,
--- }
-
 local zaisheng = fk.CreateTriggerSkill {
   name = "jy_zaisheng",
   anim_type = "support",
@@ -374,14 +294,13 @@ Fk:loadTranslationTable {
   ["@jy_zaisheng"] = "再生",
   ["#jy_zaisheng_prompt"] = [[是否发动〖再生〗进行判定，若成功则 %dest 回复一点体力且你获得下一张对其造成伤害的牌？]],
   [":jy_zaisheng"] = [[当一名没有“再生”标记的角色不因使用而失去红色牌时，你可以判定，若为红色，其回复一点体力并获得“再生”。当一名有“再生”的角色受到伤害后，你获得对其造成伤害的牌，然后其移除“再生”。]],
-  -- [":jy_zaisheng"] = [[（原稿，因过强已被重做）当一名角色不因使用而失去红色牌时，你可以令其回复一点体力。若如此做，直到你的下回合开始：每回合限一次，当该角色受到伤害后，你获得对其造成伤害的牌，并随机获得伤害来源手牌中一张伤害牌。]],
   ["$jy_zaisheng1"] = [[不要害怕。]],
   ["$jy_zaisheng2"] = [[让我来消除痛苦。]],
 
   ["jy_zhushe"] = "注射",
   ["@jy_zhushe-turn"] = "注射",
   ["#jy_zhushe_prompt"] = "你可以重铸任意张牌，然后本回合获得〖注射〗的效果",
-  [":jy_zhushe"] = [[出牌阶段开始时，你可以重铸任意张牌。若如此做，本回合：你使用牌无距离和次数限制、不可被响应；你造成伤害后，伤害目标回复X点体力并摸X张牌，X为伤害值。]], -- 已削弱，之前是摸两张牌
+  [":jy_zhushe"] = [[出牌阶段开始时，你可以重铸任意张牌。若如此做，本回合：你使用牌无距离和次数限制、不可被响应；你造成伤害后，伤害目标回复X点体力并摸X张牌，X为伤害值。]],
   ["$jy_zhushe1"] = [[准备好注射了。]],
   ["$jy_zhushe2"] = [[我的治疗是不会痛的。]],
 }
@@ -599,89 +518,6 @@ Fk:loadTranslationTable {
   ["jy_yujian"] = [[预见]],
   [":jy_yujian"] = [[准备阶段开始时，你可以观看牌堆顶的X张牌，然后将任意数量的牌置于牌堆顶，将其余的牌置于牌堆底。（X为游戏轮数且至多为5）。]],
   -- [":jy_yujian"] = [[准备阶段开始时，你可以观看牌堆顶的X张牌，然后弃置其中任意数量的牌，将其余的牌依次放回牌堆顶。（X为游戏轮数且至多为5）]],
-}
-
--- 这个是按照投稿时的描述做的经典版本修行，我认为它设计得有新意，所以保留了（但由于强度问题，无法进入PVP池子）。投稿描述原文如下：锁定技，你使用牌无次数限制；当你造成或受到伤害后，你需改变自身转换技的阴阳状态；你改变转换技阴阳状态时你摸2张牌。
-local ex_xiuxing = fk.CreateTriggerSkill {
-  name = "jy_ex_xiuxing",
-  anim_type = "drawcard",
-  frequency = Skill.Compulsory,
-  events = { fk.Damaged, fk.AfterSkillEffect },
-  can_trigger = function(self, event, target, player, data)
-    if not player:hasSkill(self) then return false end
-    if event == fk.Damaged then
-      return data.to == player or data.from == player
-    else
-      return target == player and data:isSwitchSkill() and not player.dead
-    end
-  end,
-  on_use = function(self, event, target, player, data)
-    if event == fk.Damaged then
-      for _, s in ipairs(player.player_skills) do
-        if s:isSwitchSkill() then
-          player.room:delay(1000)                     -- 停告诉玩家我们确实由A变B再变A动了一下（
-          player.room:setPlayerMark(player, MarkEnum.SwithSkillPreName .. s.name,
-            player:getSwitchSkillState(s.name, true)) -- 经测试这个是没问题的
-          player:addSkillUseHistory(s.name)           -- 加上这个就可以更新武将牌上的黑白
-          local t = {}
-          t[0] = "阳"
-          t[1] = "阴"
-          player.room:doBroadcastNotify("ShowToast",
-            "修行：更改了 " .. Fk:translate(s.name) .. " 的阴阳状态，现在是：" .. t[player:getSwitchSkillState(s.name)]) -- 记得删
-          player:drawCards(2)
-        end
-      end
-    else
-      player:drawCards(2)
-    end
-  end,
-}
-
-local ex_zitai = fk.CreateTriggerSkill {
-  name = "jy_ex_zitai",
-  anim_type = "switch",
-  switch_skill_name = "jy_zitai",
-  frequency = Skill.Compulsory,
-  events = { fk.DamageInflicted },
-  can_trigger = function(self, event, target, player, data)
-    return player:hasSkill(self) and (data.to == player or data.from == player)
-  end,
-  on_use = function(self, event, target, player, data)
-    if player:getSwitchSkillState(self.name, true) == fk.SwitchYang then
-      local judge = {
-        who = player,
-        reason = self.name,
-        pattern = ".|.|heart,diamond",
-      }
-      player.room:judge(judge)
-      if judge.card.color == Card.Red then
-        return true
-      end
-    else
-      data.damage = data.damage + 1
-    end
-  end
-}
-
-local ex__guanzhe = General(extension, "jy__ex__guanzhe", "jin", 3, 3, General.Female)
-ex__guanzhe.hidden = true -- 不可以出现在选将框！！因为太强了！！
-ex__guanzhe:addSkill(ex_xiuxing)
-ex__guanzhe:addSkill(ex_zitai)
-ex__guanzhe:addSkill("jy_mumang")
-ex__guanzhe:addSkill("jy_yujian")
-
-Fk:loadTranslationTable {
-  ["jy__ex__guanzhe"] = [[经典观者]],
-  ["#jy__ex__guanzhe"] = [[<font color="red">PVE之神<br>这是未削弱版本，<br>因强度过高，这个武<br>将不会出现在选将框！</font>]],
-  ["designer:jy__ex__guanzhe"] = [[Kasa]],
-  ["cv:jy__ex__guanzhe"] = [[无]],
-  ["illustrator:jy__ex__guanzhe"] = [[未知]],
-
-  ["jy_ex_xiuxing"] = [[修行]],
-  [":jy_ex_xiuxing"] = [[锁定技，你使用牌无次数限制；当你造成或受到伤害后，你改变自身所有转换技的阴阳状态；你每以此法改变一个转换技的阴阳状态或发动一个转换技时，你摸两张牌。]],
-
-  ["jy_ex_zitai"] = [[姿态]],
-  [":jy_ex_zitai"] = [[转换技，锁定技，当你造成或受到伤害时，阳：你判定，若为红色，防止之；阴：该伤害+1。]],
 }
 
 local tiandu = fk.CreateTriggerSkill {
