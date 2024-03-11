@@ -2,10 +2,10 @@
 local extension = Package:new("jianyu_pve")
 extension.extensionName = "jianyu"
 
-local U = require "packages/utility/utility"
+-- local U = require "packages/utility/utility"
 
 Fk:loadTranslationTable {
-    ["jianyu_pve"] = [[简浴-PVE专用]],
+    ["jianyu_pve"] = [[简浴-经典]],
 }
 
 -- 初版再生！！很强！！
@@ -29,7 +29,7 @@ local ex_zaisheng = fk.CreateTriggerSkill {
                 end
             end
         else -- fk.Damaged
-            return target:getMark("@jy_zaisheng") ~= 0 and data.to:getMark("jy_ex_zaisheng_triggered-round") == 0
+            return target:getMark("@jy_ex_zaisheng") ~= 0 and data.to:getMark("jy_ex_zaisheng_triggered-round") == 0
         end
     end,
     on_cost = function(self, event, target, player, data)
