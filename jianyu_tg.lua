@@ -636,6 +636,67 @@ Fk:loadTranslationTable {
   -- [":jy_yujian"] = [[准备阶段开始时，你可以观看牌堆顶的X张牌，然后弃置其中任意数量的牌，将其余的牌依次放回牌堆顶。（X为游戏轮数且至多为5）]],
 }
 
+local ex_xiuxing = fk.CreateTriggerSkill {
+  name = "jy_ex_xiuxing",
+  anim_type = "drawcard",
+  frequency = Skill.Compulsory,
+  events = { fk.Damaged, fk.AfterSkillEffect },
+  can_trigger = function(self, event, target, player, data)
+    if not player:hasSkill(self) then return false end
+    if event == fk.Damaged then
+      return data.to == player or data.from == player
+    else
+      return target == player and data:isSwitchSkill() and not player.dead
+    end
+  end,
+  on_use = function(self, event, target, player, data)
+    if event == fk.Damaged then
+      for _, s in ipairs(player.player_skills) do
+        if s:isSwitchSkill() then
+          player.room:delay(1000)                     -- 防止异步乱搞，并且告诉玩家我们确实由A变B再变A动了一下（
+          player.room:setPlayerMark(player, MarkEnum.SwithSkillPreName .. s.name,
+            player:getSwitchSkillState(s.name, true)) -- 经测试这个是没问题的
+          player:addSkillUseHistory(s.name)           -- 加上这个就可以更新武将牌上的黑白
+          local t = {}
+          t[0] = "阳"
+          t[1] = "阴"
+          player.room:doBroadcastNotify("ShowToast",
+            "修行：更改了 " .. Fk:translate(s.name) .. " 的阴阳状态，现在是：" .. t[player:getSwitchSkillState(s.name)]) -- 记得删
+          player:drawCards(2)
+        end
+      end
+    else
+      player:drawCards(2)
+    end
+  end,
+}
+
+local ex_zitai = fk.CreateTriggerSkill {
+  name = "jy_ex_zitai",
+  anim_type = "switch",
+  switch_skill_name = "jy_zitai",
+  frequency = Skill.Compulsory,
+  events = { fk.DamageInflicted },
+  can_trigger = function(self, event, target, player, data)
+    return player:hasSkill(self) and (data.to == player or data.from == player)
+  end,
+  on_use = function(self, event, target, player, data)
+    if player:getSwitchSkillState(self.name, true) == fk.SwitchYang then
+      local judge = {
+        who = player,
+        reason = self.name,
+        pattern = ".|.|heart,diamond",
+      }
+      player.room:judge(judge)
+      if judge.card.color == Card.Red then
+        return true
+      end
+    else
+      data.damage = data.damage + 1
+    end
+  end
+}
+
 local ex__guanzhe = General(extension, "jy__ex__guanzhe", "jin", 3, 3, General.Female)
 ex__guanzhe.hidden = true
 ex__guanzhe:addSkill(ex_xiuxing)
@@ -645,7 +706,7 @@ ex__guanzhe:addSkill("jy_yujian")
 
 Fk:loadTranslationTable {
   ["jy__ex__guanzhe"] = [[经典观者]],
-  ["#jy__ex__guanzhe"] = [[<font color="red">PVE之神<br>这是3月11日版本的观者，<br>因强度过高，这个武将<br>不会出现在选将框！</font>]],
+  ["#jy__ex__guanzhe"] = [[<font color="red">PVE之神<br>这是3月11日的版本，<br>因强度过高，这个武将<br>不会出现在选将框！</font>]],
   ["designer:jy__ex__guanzhe"] = [[Kasa]],
   ["cv:jy__ex__guanzhe"] = [[无]],
   ["illustrator:jy__ex__guanzhe"] = [[未知]],
@@ -971,67 +1032,6 @@ Fk:loadTranslationTable {
   ["jy_taoqiu"] = [[逃囚]],
   [":jy_taoqiu"] = [[其他角色的结束阶段，若你的武将牌背面朝上，你可以立即将一张牌当【杀】使用。若此【杀】造成伤害，你翻面。]],
   ["#jy_taoqiu-use"] = [[逃囚：你可以将一张牌当【杀】使用，若造成伤害，你翻面]]
-}
-
-local ex_xiuxing = fk.CreateTriggerSkill {
-  name = "jy_ex_xiuxing",
-  anim_type = "drawcard",
-  frequency = Skill.Compulsory,
-  events = { fk.Damaged, fk.AfterSkillEffect },
-  can_trigger = function(self, event, target, player, data)
-    if not player:hasSkill(self) then return false end
-    if event == fk.Damaged then
-      return data.to == player or data.from == player
-    else
-      return target == player and data:isSwitchSkill() and not player.dead
-    end
-  end,
-  on_use = function(self, event, target, player, data)
-    if event == fk.Damaged then
-      for _, s in ipairs(player.player_skills) do
-        if s:isSwitchSkill() then
-          player.room:delay(1000)                     -- 防止异步乱搞，并且告诉玩家我们确实由A变B再变A动了一下（
-          player.room:setPlayerMark(player, MarkEnum.SwithSkillPreName .. s.name,
-            player:getSwitchSkillState(s.name, true)) -- 经测试这个是没问题的
-          player:addSkillUseHistory(s.name)           -- 加上这个就可以更新武将牌上的黑白
-          local t = {}
-          t[0] = "阳"
-          t[1] = "阴"
-          player.room:doBroadcastNotify("ShowToast",
-            "修行：更改了 " .. Fk:translate(s.name) .. " 的阴阳状态，现在是：" .. t[player:getSwitchSkillState(s.name)]) -- 记得删
-          player:drawCards(2)
-        end
-      end
-    else
-      player:drawCards(2)
-    end
-  end,
-}
-
-local ex_zitai = fk.CreateTriggerSkill {
-  name = "jy_ex_zitai",
-  anim_type = "switch",
-  switch_skill_name = "jy_zitai",
-  frequency = Skill.Compulsory,
-  events = { fk.DamageInflicted },
-  can_trigger = function(self, event, target, player, data)
-    return player:hasSkill(self) and (data.to == player or data.from == player)
-  end,
-  on_use = function(self, event, target, player, data)
-    if player:getSwitchSkillState(self.name, true) == fk.SwitchYang then
-      local judge = {
-        who = player,
-        reason = self.name,
-        pattern = ".|.|heart,diamond",
-      }
-      player.room:judge(judge)
-      if judge.card.color == Card.Red then
-        return true
-      end
-    else
-      data.damage = data.damage + 1
-    end
-  end
 }
 
 return extension
