@@ -505,7 +505,7 @@ local jy_yuyu_trigger = fk.CreateTriggerSkill {
   mute = true,
   events = { fk.DamageCaused },
   can_trigger = function(self, event, target, player, data)
-    return target == player and data.to:getMark("@jy_yuyu_enemy") ~= 0 and
+    return player:hasSkill(self) and target == player and data.to:getMark("@jy_yuyu_enemy") ~= 0 and
         not data.chain
   end,
   on_cost = Util.TrueFunc,
