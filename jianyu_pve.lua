@@ -277,3 +277,5 @@ Fk:loadTranslationTable {
     ["jy_ex_zitai"] = [[姿态]],
     [":jy_ex_zitai"] = [[转换技，锁定技，当你造成或受到伤害时，阳：你判定，若为红色，防止之；阴：该伤害+1。]],
 }
+
+return extension
