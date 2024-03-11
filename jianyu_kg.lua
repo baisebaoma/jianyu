@@ -102,7 +102,7 @@ local jy_zuoti = fk.CreateActiveSkill {
       table.insert(answers_short, a[1])
     end
 
-    local choice = room:askForChoice(player, answers_wrap, self.name, question_wrap)
+    local choice = room:askForChoice(player, answers_wrap, self.name, question_wrap, question_wrap)
     if choice[1] == correct_answer then -- 仅判断choice[1]，因为答案只保留正确选项的选项名字（ABCD）
       player:broadcastSkillInvoke(self.name, math.random(5, 7))
 
@@ -334,9 +334,11 @@ local jy_guina = fk.CreateActiveSkill {
       table.insert(answers_short, a[1])
     end
 
-    local choice = room:askForChoice(player, answers_wrap, self.name, question_wrap)
-    if choice[1] == correct_answer then                     -- 仅判断choice[1]，因为答案只保留正确选项的选项名字（ABCD）
-      me:broadcastSkillInvoke(self.name, math.random(5, 6)) -- 播放选择正确的语音
+    local your_question_wrap = "归纳：请尝试回答出下题，若正确你可以自选一张牌获得，<br>若错误本阶段考公专家的所有牌额外指定你为目标：<br><br><br>" .. question
+
+    local choice = room:askForChoice(player, answers_wrap, self.name, your_question_wrap, question_wrap) -- 应该第一个是显示给自己的，第二个是显示给别人的（吧）？
+    if choice[1] == correct_answer then                                                                  -- 仅判断choice[1]，因为答案只保留正确选项的选项名字（ABCD）
+      me:broadcastSkillInvoke(self.name, math.random(5, 6))                                              -- 播放选择正确的语音
 
       room:addPlayerMark(player, "@jy_zuoti_correct_count")
       room:doBroadcastNotify("ShowToast", Fk:translate("#jy_guina_correct"))
@@ -454,8 +456,6 @@ jy__kgdxs:addRelatedSkill("jy_hongwen")
 
 local kgds = General(extension, "jy__kgds", "god", 4)
 kgds:addSkill(jy_guina)
-
-
 
 local total_papers, total_questions = Q.questionCount()
 
