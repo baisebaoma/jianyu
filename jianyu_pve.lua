@@ -241,7 +241,7 @@ local ex_zitai = fk.CreateTriggerSkill {
         return player:hasSkill(self) and (data.to == player or data.from == player)
     end,
     on_use = function(self, event, target, player, data)
-        if player:getSwitchSkillState(self.name, true) == fk.SwitchYang then
+        if player:getSwitchSkillState(self.name) == fk.SwitchYang then
             local judge = {
                 who = player,
                 reason = self.name,
