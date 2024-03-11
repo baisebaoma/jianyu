@@ -102,8 +102,8 @@ local jy_zuoti = fk.CreateActiveSkill {
       table.insert(answers_short, a[1])
     end
 
-    local choice = room:askForChoice(player, answers_wrap, self.name, question_wrap, question_wrap)
-    if choice[1] == correct_answer then -- 仅判断choice[1]，因为答案只保留正确选项的选项名字（ABCD）
+    local choice = room:askForChoice(player, answers_wrap, question_wrap, question_wrap) -- 把skillName改成question可能可以
+    if choice[1] == correct_answer then                                                  -- 仅判断choice[1]，因为答案只保留正确选项的选项名字（ABCD）
       player:broadcastSkillInvoke(self.name, math.random(5, 7))
 
       room:addPlayerMark(player, "@jy_zuoti_correct_count")
@@ -334,11 +334,11 @@ local jy_guina = fk.CreateActiveSkill {
       table.insert(answers_short, a[1])
     end
 
-    local your_question_wrap = "归纳：请尝试回答出下题，若正确你可以自选一张牌获得，<br>若错误本阶段考公专家的所有牌额外指定你为目标：<br><br><br>" .. question
+    local your_question_wrap = "归纳：请尝试回答出下题，若正确你可以自选一张牌获得，<br>若错误本阶段其所有牌额外指定你为目标：<br><br>" .. question
 
-    local choice = room:askForChoice(player, answers_wrap, self.name, your_question_wrap, question_wrap) -- 应该第一个是显示给自己的，第二个是显示给别人的（吧）？
-    if choice[1] == correct_answer then                                                                  -- 仅判断choice[1]，因为答案只保留正确选项的选项名字（ABCD）
-      me:broadcastSkillInvoke(self.name, math.random(5, 6))                                              -- 播放选择正确的语音
+    local choice = room:askForChoice(player, answers_wrap, question_wrap, your_question_wrap)
+    if choice[1] == correct_answer then                     -- 仅判断choice[1]，因为答案只保留正确选项的选项名字（ABCD）
+      me:broadcastSkillInvoke(self.name, math.random(5, 6)) -- 播放选择正确的语音
 
       room:addPlayerMark(player, "@jy_zuoti_correct_count")
       room:doBroadcastNotify("ShowToast", Fk:translate("#jy_guina_correct"))
@@ -506,8 +506,8 @@ Fk:loadTranslationTable {
   ["jy_guina"] = "归纳",
   [":jy_guina"] = [[出牌阶段限三次，你可以令一名角色回答一道行测真题。若正确，其指定一个牌名并获得一张该牌名的牌，否则其获得“归纳”直到本阶段结束。你使用基本牌与非延时类锦囊牌时，若持有“归纳”的角色不是该牌的目标，其也成为目标；持有“归纳”的角色受到伤害时，你摸一张牌。<br><font color="grey">收录2018-2023《行测》]] .. total_papers .. [[套共]] .. total_questions .. [[题，经人工筛选，不含图形推理、资料分析。<br>回答正确时，这张牌可能来自任何位置，甚至你自己的区域。若你有同名牌，请先使用掉。</font>]],
   ["@jy_guina-phase"] = "归纳",
-  ["#jy_guina_correct"] = [[答对了，你获得了考公专家的认可，可以自选一张牌获得！<br>你可以在战报中查看正确答案。]],
-  ["#jy_guina_incorrect"] = [[答错了，本阶段考公专家的牌会额外指定你为目标！<br>你可以在战报中查看正确答案。]],
+  ["#jy_guina_correct"] = [[答对了！你可以自选一张牌获得！<br>你可以在战报中查看正确答案。]],
+  ["#jy_guina_incorrect"] = [[答错了，本阶段的所有牌会额外指定你为目标！<br>你可以在战报中查看正确答案。]],
   -- 可能是不能太多语音吧，如果你在这里放了11条语音，在武将一览的时候点开这个武将就会卡死
   ["$jy_guina1"] = [[让我来考考你。]],
   ["$jy_guina2"] = [[由我提问了。]],
