@@ -574,12 +574,13 @@ local zitai = fk.CreateTriggerSkill {
       }
       player.room:judge(judge)
       if judge.card.color == Card.Red then
+        player:drawCards(2)
         return true
       end
     else
       data.damage = data.damage + 1
+      player:drawCards(2)
     end
-    player:drawCards(2)
   end
 }
 
@@ -616,8 +617,8 @@ local mumang = fk.CreateProhibitSkill {
   name = "jy_mumang",
   frequency = Skill.Compulsory,
   is_prohibited = function(self, from, to, card)
-    return from:hasSkill(self) and card.trueName == "slash" and
-        from:getNextAlive(true) ~= to and to:getNextAlive(true) ~= from
+    return from:hasSkill(self) and card.trueName == "slash" and from:distanceTo(to) > 1
+    -- from:getNextAlive(true) ~= to and to:getNextAlive(true) ~= from -- 不能指定上家或下家以外的目标
   end,
 }
 
@@ -641,7 +642,7 @@ Fk:loadTranslationTable {
   [":jy_zitai"] = [[转换技，锁定技，当你造成或受到伤害时，阳：你判定，若为红色，防止之；阴：此伤害+1。然后你摸两张牌。]],
 
   ["jy_mumang"] = [[目盲]],
-  [":jy_mumang"] = [[锁定技，你的【杀】只能对上家和下家使用。]],
+  [":jy_mumang"] = [[锁定技，你的【杀】不能指定与你距离大于1的角色为目标。]],
 
   ["jy_yujian"] = [[预见]],
   [":jy_yujian"] = [[准备阶段开始时，你可以观看牌堆顶的X张牌，然后将任意数量的牌置于牌堆顶，将其余的牌置于牌堆底。（X为游戏轮数且至多为5）。]],
