@@ -514,41 +514,6 @@ Fk:loadTranslationTable {
   ["#jy_zhitu_ask"] = "修改“分率”",
 }
 
--- 我觉得这个技能设计得很有创意的！结果删掉了！唉！
--- local xiuxing = fk.CreateTriggerSkill {
---   name = "jy_xiuxing",
---   anim_type = "drawcard",
---   frequency = Skill.Compulsory,
---   events = { fk.Damaged, fk.AfterSkillEffect },
---   can_trigger = function(self, event, target, player, data)
---     if not player:hasSkill(self) then return false end
---     if event == fk.Damaged then
---       return data.to == player or data.from == player
---     else
---       return target == player and data:isSwitchSkill() and not player.dead
---     end
---   end,
---   on_use = function(self, event, target, player, data)
---     if event == fk.Damaged then
---       for _, s in ipairs(player.player_skills) do
---         if s:isSwitchSkill() then
---           player.room:delay(1000)                     -- 防止异步乱搞，并且告诉玩家我们确实由A变B再变A动了一下（
---           player.room:setPlayerMark(player, MarkEnum.SwithSkillPreName .. s.name,
---             player:getSwitchSkillState(s.name, true)) -- 经测试这个是没问题的
---           player:addSkillUseHistory(s.name)           -- 加上这个就可以更新武将牌上的黑白
---           local t = {}
---           t[0] = "阳"
---           t[1] = "阴"
---           player.room:doBroadcastNotify("ShowToast",
---             "修行：更改了 " .. Fk:translate(s.name) .. " 的阴阳状态，现在是：" .. t[player:getSwitchSkillState(s.name)]) -- 记得删
---           player:drawCards(2)
---         end
---       end
---     else
---       player:drawCards(2)
---     end
---   end,
--- }
 local xiuxing = fk.CreateTargetModSkill {
   name = "jy_xiuxing",
   bypass_times = function(self, player, skill, scope, card, to)
@@ -603,8 +568,8 @@ local mumang = fk.CreateProhibitSkill {
   frequency = Skill.Compulsory,
   is_prohibited = function(self, from, to, card)
     if from:hasSkill(self) and card.trueName == "slash" then
-      return from:distanceTo(to) > 1 or                                     -- 不能指定与你距离大于1的角色为目标
-          (from:getNextAlive(true) ~= to and to:getNextAlive(true) ~= from) -- 不能指定上家或下家以外的角色为目标
+      return from:distanceTo(to) > 1 -- 不能指定与你距离大于1的角色为目标
+      --  or (from:getNextAlive(true) ~= to and to:getNextAlive(true) ~= from) -- 不能指定上家或下家以外的角色为目标
     end
   end,
 }
@@ -629,13 +594,14 @@ Fk:loadTranslationTable {
   [":jy_zitai"] = [[转换技，锁定技，当你造成或受到伤害时，阳：你判定，若为红色，防止之；阴：该伤害+1。然后你摸两张牌。]],
 
   ["jy_mumang"] = [[目盲]],
-  [":jy_mumang"] = [[锁定技，你只能选择位于你的上家或下家且与你的距离不超过1的角色作为【杀】的目标。]],
+  [":jy_mumang"] = [[锁定技，你只能指定与你的距离不超过1的角色为【杀】的目标。]],
 
   ["jy_yujian"] = [[预见]],
   [":jy_yujian"] = [[准备阶段开始时，你可以观看牌堆顶的X张牌，然后将任意数量的牌置于牌堆顶，将其余的牌置于牌堆底。（X为游戏轮数且至多为5）。]],
   -- [":jy_yujian"] = [[准备阶段开始时，你可以观看牌堆顶的X张牌，然后弃置其中任意数量的牌，将其余的牌依次放回牌堆顶。（X为游戏轮数且至多为5）]],
 }
 
+-- 这个是按照投稿时的描述做的经典版本修行，我认为它设计得有新意，所以保留了（但由于强度问题，无法进入PVP池子）。投稿描述原文如下：锁定技，你使用牌无次数限制；当你造成或受到伤害后，你需改变自身转换技的阴阳状态；你改变转换技阴阳状态时你摸2张牌。
 local ex_xiuxing = fk.CreateTriggerSkill {
   name = "jy_ex_xiuxing",
   anim_type = "drawcard",
@@ -653,7 +619,7 @@ local ex_xiuxing = fk.CreateTriggerSkill {
     if event == fk.Damaged then
       for _, s in ipairs(player.player_skills) do
         if s:isSwitchSkill() then
-          player.room:delay(1000)                     -- 防止异步乱搞，并且告诉玩家我们确实由A变B再变A动了一下（
+          player.room:delay(1000)                     -- 停告诉玩家我们确实由A变B再变A动了一下（
           player.room:setPlayerMark(player, MarkEnum.SwithSkillPreName .. s.name,
             player:getSwitchSkillState(s.name, true)) -- 经测试这个是没问题的
           player:addSkillUseHistory(s.name)           -- 加上这个就可以更新武将牌上的黑白
@@ -698,7 +664,7 @@ local ex_zitai = fk.CreateTriggerSkill {
 }
 
 local ex__guanzhe = General(extension, "jy__ex__guanzhe", "jin", 3, 3, General.Female)
-ex__guanzhe.hidden = true
+ex__guanzhe.hidden = true -- 不可以出现在选将框！！因为太强了！！
 ex__guanzhe:addSkill(ex_xiuxing)
 ex__guanzhe:addSkill(ex_zitai)
 ex__guanzhe:addSkill("jy_mumang")
@@ -706,7 +672,7 @@ ex__guanzhe:addSkill("jy_yujian")
 
 Fk:loadTranslationTable {
   ["jy__ex__guanzhe"] = [[经典观者]],
-  ["#jy__ex__guanzhe"] = [[<font color="red">PVE之神<br>这是3月11日的版本，<br>因强度过高，这个武将<br>不会出现在选将框！</font>]],
+  ["#jy__ex__guanzhe"] = [[<font color="red">PVE之神<br>这是未削弱版本，<br>因强度过高，这个武<br>将不会出现在选将框！</font>]],
   ["designer:jy__ex__guanzhe"] = [[Kasa]],
   ["cv:jy__ex__guanzhe"] = [[无]],
   ["illustrator:jy__ex__guanzhe"] = [[未知]],
