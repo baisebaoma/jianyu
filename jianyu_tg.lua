@@ -598,21 +598,6 @@ local yujian = fk.CreateTriggerSkill {
   end,
 }
 
--- 我觉得这个可能不行，看起来存在死循环的情况
--- local mumang = fk.CreateAttackRangeSkill {
---   name = "jy_mumang",
---   frequency = Skill.Compulsory,
---   correct_func = function(self, player)
---     if player:hasSkill(self) then
---       local n = player:getAttackRange()
---       if n > 1 then
---         return -n + 1
---       else
---         return 0
---       end
---     end
---   end,
--- }
 local mumang = fk.CreateProhibitSkill {
   name = "jy_mumang",
   frequency = Skill.Compulsory,
@@ -641,7 +626,7 @@ Fk:loadTranslationTable {
   [":jy_xiuxing"] = [[锁定技，你使用牌无次数限制。]],
 
   ["jy_zitai"] = [[姿态]],
-  [":jy_zitai"] = [[转换技，锁定技，当你造成或受到伤害时，阳：你判定，若为红色，防止之；阴：此伤害+1。然后你摸两张牌。]],
+  [":jy_zitai"] = [[转换技，锁定技，当你造成或受到伤害时，阳：你判定，若为红色，防止之；阴：该伤害+1。然后你摸两张牌。]],
 
   ["jy_mumang"] = [[目盲]],
   [":jy_mumang"] = [[锁定技，你只能选择位于你的上家或下家且与你的距离不超过1的角色作为【杀】的目标。]],
@@ -649,7 +634,6 @@ Fk:loadTranslationTable {
   ["jy_yujian"] = [[预见]],
   [":jy_yujian"] = [[准备阶段开始时，你可以观看牌堆顶的X张牌，然后将任意数量的牌置于牌堆顶，将其余的牌置于牌堆底。（X为游戏轮数且至多为5）。]],
   -- [":jy_yujian"] = [[准备阶段开始时，你可以观看牌堆顶的X张牌，然后弃置其中任意数量的牌，将其余的牌依次放回牌堆顶。（X为游戏轮数且至多为5）]],
-
 }
 
 local tiandu = fk.CreateTriggerSkill {
@@ -966,6 +950,88 @@ Fk:loadTranslationTable {
   ["jy_taoqiu"] = [[逃囚]],
   [":jy_taoqiu"] = [[其他角色的结束阶段，若你的武将牌背面朝上，你可以立即将一张牌当【杀】使用。若此【杀】造成伤害，你翻面。]],
   ["#jy_taoqiu-use"] = [[逃囚：你可以将一张牌当【杀】使用，若造成伤害，你翻面]]
+}
+
+local ex_xiuxing = fk.CreateTriggerSkill {
+  name = "jy_ex_xiuxing",
+  anim_type = "drawcard",
+  frequency = Skill.Compulsory,
+  events = { fk.Damaged, fk.AfterSkillEffect },
+  can_trigger = function(self, event, target, player, data)
+    if not player:hasSkill(self) then return false end
+    if event == fk.Damaged then
+      return data.to == player or data.from == player
+    else
+      return target == player and data:isSwitchSkill() and not player.dead
+    end
+  end,
+  on_use = function(self, event, target, player, data)
+    if event == fk.Damaged then
+      for _, s in ipairs(player.player_skills) do
+        if s:isSwitchSkill() then
+          player.room:delay(1000)                     -- 防止异步乱搞，并且告诉玩家我们确实由A变B再变A动了一下（
+          player.room:setPlayerMark(player, MarkEnum.SwithSkillPreName .. s.name,
+            player:getSwitchSkillState(s.name, true)) -- 经测试这个是没问题的
+          player:addSkillUseHistory(s.name)           -- 加上这个就可以更新武将牌上的黑白
+          local t = {}
+          t[0] = "阳"
+          t[1] = "阴"
+          player.room:doBroadcastNotify("ShowToast",
+            "修行：更改了 " .. Fk:translate(s.name) .. " 的阴阳状态，现在是：" .. t[player:getSwitchSkillState(s.name)]) -- 记得删
+          player:drawCards(2)
+        end
+      end
+    else
+      player:drawCards(2)
+    end
+  end,
+}
+
+local ex_zitai = fk.CreateTriggerSkill {
+  name = "jy_ex_zitai",
+  anim_type = "switch",
+  switch_skill_name = "jy_zitai",
+  frequency = Skill.Compulsory,
+  events = { fk.DamageInflicted },
+  can_trigger = function(self, event, target, player, data)
+    return player:hasSkill(self) and (data.to == player or data.from == player)
+  end,
+  on_use = function(self, event, target, player, data)
+    if player:getSwitchSkillState(self.name, true) == fk.SwitchYang then
+      local judge = {
+        who = player,
+        reason = self.name,
+        pattern = ".|.|heart,diamond",
+      }
+      player.room:judge(judge)
+      if judge.card.color == Card.Red then
+        return true
+      end
+    else
+      data.damage = data.damage + 1
+    end
+  end
+}
+
+local ex__guanzhe = General(extension, "jy__ex__guanzhe", "jin", 3, 3, General.Female)
+ex__guanzhe.hidden = true
+ex__guanzhe:addSkill(ex_xiuxing)
+ex__guanzhe:addSkill(ex_zitai)
+ex__guanzhe:addSkill("mumang")
+ex__guanzhe:addSkill("yujian")
+
+Fk:loadTranslationTable {
+  ["jy__ex__guanzhe"] = [[原观者]],
+  ["#jy__ex__guanzhe"] = [[<font color="red">这个武将因为太强，<br>不会出现在选将框</font>]],
+  ["designer:jy__ex__guanzhe"] = [[Kasa]],
+  ["cv:jy__ex__guanzhe"] = [[]],
+  ["illustrator:jy__ex__guanzhe"] = [[未知]],
+
+  ["jy_ex_xiuxing"] = [[修行]],
+  [":jy_ex_xiuxing"] = [[锁定技，你使用牌无次数限制；当你造成或受到伤害后，你改变自身所有转换技的阴阳状态；你每以此法改变一个转换技的阴阳状态或发动一个转换技时，你摸两张牌。]],
+
+  ["jy_ex_zitai"] = [[姿态]],
+  [":jy_ex_zitai"] = [[转换技，锁定技，当你造成或受到伤害时，阳：你判定，若为红色，防止之；阴：该伤害+1。]],
 }
 
 return extension
