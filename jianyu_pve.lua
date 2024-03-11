@@ -265,7 +265,7 @@ local ex_zitai = fk.CreateTriggerSkill {
 }
 
 local ex__guanzhe = General(extension, "jy__ex__guanzhe", "jin", 3, 3, General.Female)
-ex__guanzhe.hidden = true -- 不可以出现在选将框！！因为太强了！！
+ex__guanzhe.total_hidden = true -- 不可以出现在选将框！！因为太强了！！
 ex__guanzhe:addSkill(ex_xiuxing)
 ex__guanzhe:addSkill(ex_zitai)
 ex__guanzhe:addSkill("jy_mumang")
