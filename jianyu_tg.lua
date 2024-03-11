@@ -655,20 +655,22 @@ local tiandu = fk.CreateTriggerSkill {
 }
 
 -- 周不疑：一名角色的结束阶段，若其本回合未造成伤害，你可以声明一种普通锦囊牌（每轮每种牌名限一次），其可以将一张牌当你声明的牌使用
-
 local yiji = fk.CreateTriggerSkill {
   name = "jy_yiji",
   anim_type = "support",
   events = { fk.Damaged, fk.Death },
   can_trigger = function(self, event, target, player, data)
-    if event == fk.Damaged then
-      self.cancel_cost = false
-      for _ = 1, data.damage do
-        if self.cancel_cost or not player:hasSkill(self) then break end
-        self:doCost(event, target, player, data)
+    if target == player then
+      if event == fk.Damaged then
+        if not player:hasSkill(self) then return false end
+        self.cancel_cost = false
+        for _ = 1, data.damage do
+          if self.cancel_cost or not player:hasSkill(self) then break end
+          self:doCost(event, target, player, data)
+        end
+      else
+        return target == player and player:hasSkill(self, false, true) -- 这样写，即使我死了也能触发
       end
-    else
-      return target == player and player:hasSkill(self.name, false, true) -- 这样写，即使我死了也能触发
     end
   end,
   on_cost = function(self, event, target, player, data)
