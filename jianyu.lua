@@ -1728,7 +1728,7 @@ local jy_jianying = fk.CreateTriggerSkill {
         #player:getCardIds(Player.Hand) < player.hp
   end,
   on_use = function(self, event, target, player, data)
-    player:drawCards(1, self.name)
+    local success, dat = room:askForUseActiveSkill(to, "#jy_yiji_viewas", "#jy_yiji-use:::" .. Fk:translate(choice))
   end,
 }
 

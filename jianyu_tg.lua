@@ -863,4 +863,92 @@ Fk:loadTranslationTable {
   ["#jy_yingcai-choose"] = "英才：你可以弃一张牌，为 %arg 增加/减少一个目标",
 }
 
+local yangbai = fk.CreateTriggerSkill {
+  name = "jy_yangbai",
+  anim_type = "defensive",
+  events = { fk.EventPhaseEnd, fk.Damaged },
+  can_trigger = function(self, event, target, player, data)
+    if target == player and player:hasSkill(self) and player.faceup then
+      if event == fk.EventPhaseEnd then
+        return player.phase == Player.Finish
+      else
+        return true
+      end
+    end
+  end,
+  on_use = function(self, event, target, player, data)
+    if not player.dead then
+      player:turnOver()
+      player:drawCards(3, self.name)
+    end
+  end,
+}
+
+local taoqiu = fk.CreateTriggerSkill {
+  name = "jy_taoqiu",
+  anim_type = "offensive",
+  events = { fk.EventPhaseProceeding },
+  can_trigger = function(self, event, target, player, data)
+    return player:hasSkill(self) and
+        target.phase == Player.Finish and
+        not player.faceup
+  end,
+  on_use = function(self, event, target, player, data)
+    local room = player.room
+    local success, dat = room:askForUseActiveSkill(player, "#jy_taoqiu_viewas", "#jy_taoqiu-use")
+    if success then
+      local card = Fk:cloneCard("slash")
+      card:addSubcards(dat.cards)
+      card.skillName = self.name
+      local use = {
+        from = player.id,
+        tos = table.map(dat.targets, function(p) return { p } end),
+        card = card,
+      }
+      room:useCard(use)
+      if use.damageDealt then
+        player:turnOver()
+      end
+    end
+  end,
+}
+local taoqiu_viewas = fk.CreateViewAsSkill {
+  name = "#jy_taoqiu_viewas",
+  anim_type = "offensive",
+  pattern = "slash",
+  card_filter = function(self, to_select, selected)
+    if #selected == 1 then return false end
+    return true
+  end,
+  view_as = function(self, cards)
+    if #cards ~= 1 then
+      return nil
+    end
+    local c = Fk:cloneCard("slash")
+    c.skillName = self.name
+    c:addSubcard(cards[1])
+    return c
+  end,
+}
+taoqiu:addRelatedSkill(taoqiu_viewas)
+
+local hbrz = General(extension, "jy__hbrz", "shu", 4)
+hbrz:addSkill(yangbai)
+hbrz:addSkill(taoqiu)
+
+Fk:loadTranslationTable {
+  ["jy__hbrz"] = [[狐坂若藻]],
+  ["#jy__hbrz"] = [[灾厄之狐]],
+  ["designer:jy__hbrz"] = [[白洲]],
+  ["cv:jy__hbrz"] = [[无]],
+  ["illustrator:jy__hbrz"] = [[Nexon]],
+
+  ["jy_yangbai"] = [[佯败]],
+  [":jy_yangbai"] = [[结束阶段或你受到伤害后，若你的武将牌正面朝上，你可以翻面并摸三张牌。]],
+
+  ["jy_taoqiu"] = [[逃囚]],
+  [":jy_taoqiu"] = [[其他角色的结束阶段，若你的武将牌背面朝上，你可以立即将一张牌当【杀】使用。若此【杀】造成伤害，你翻面。]],
+  ["#jy_taoqiu-use"] = [[逃囚：你可以将一张牌当【杀】使用，若造成伤害，你翻面]]
+}
+
 return extension
