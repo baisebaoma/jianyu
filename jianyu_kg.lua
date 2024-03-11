@@ -336,9 +336,9 @@ local jy_guina = fk.CreateActiveSkill {
     end
 
     local status = "行测真题"
-    local your_question_wrap = "归纳：回答行测真题，若正确你可以自选一张牌，<br>若错误本阶段其所有牌额外指定你为目标：<br><br>" .. question
+    -- local your_question_wrap = "归纳：回答行测真题，若正确你可以自选一张牌，<br>若错误本阶段其所有牌额外指定你为目标：<br><br>" .. question
 
-    local choice = room:askForChoice(player, answers_wrap, status, your_question_wrap)
+    local choice = room:askForChoice(player, answers_wrap, status, question_wrap)
     if choice[1] == correct_answer then                     -- 仅判断choice[1]，因为答案只保留正确选项的选项名字（ABCD）
       me:broadcastSkillInvoke(self.name, math.random(5, 6)) -- 播放选择正确的语音
 
