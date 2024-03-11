@@ -889,7 +889,7 @@ local taoqiu = fk.CreateTriggerSkill {
   anim_type = "offensive",
   events = { fk.EventPhaseProceeding },
   can_trigger = function(self, event, target, player, data)
-    return player:hasSkill(self) and
+    return player:hasSkill(self) and target ~= player and
         target.phase == Player.Finish and
         not player.faceup
   end,
