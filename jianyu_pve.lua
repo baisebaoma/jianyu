@@ -230,6 +230,13 @@ local ex_xiuxing = fk.CreateTriggerSkill {
         end
     end,
 }
+local ex_xiuxing_mod = fk.CreateTargetModSkill {
+    name = "#jy_ex_xiuxing_mod",
+    bypass_times = function(self, player, skill, scope, card, to)
+        return player:hasSkill(self)
+    end,
+}
+ex_xiuxing:addRelatedSkill(ex_xiuxing_mod)
 
 local ex_zitai = fk.CreateTriggerSkill {
     name = "jy_ex_zitai",
