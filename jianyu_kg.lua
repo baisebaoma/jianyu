@@ -102,8 +102,9 @@ local jy_zuoti = fk.CreateActiveSkill {
       table.insert(answers_short, a[1])
     end
 
-    local choice = room:askForChoice(player, answers_wrap, question_wrap, question_wrap) -- 把skillName改成question可能可以
-    if choice[1] == correct_answer then                                                  -- 仅判断choice[1]，因为答案只保留正确选项的选项名字（ABCD）
+    local status = "正在做行测真题<br>请在战报中查看完整题干"
+    local choice = room:askForChoice(player, answers_wrap, status, question_wrap) -- 把skillName改成question可能可以
+    if choice[1] == correct_answer then                                           -- 仅判断choice[1]，因为答案只保留正确选项的选项名字（ABCD）
       player:broadcastSkillInvoke(self.name, math.random(5, 7))
 
       room:addPlayerMark(player, "@jy_zuoti_correct_count")
@@ -334,9 +335,10 @@ local jy_guina = fk.CreateActiveSkill {
       table.insert(answers_short, a[1])
     end
 
+    local status = "正在做行测真题<br>请在战报中查看完整题干"
     local your_question_wrap = "归纳：请尝试回答出下题，若正确你可以自选一张牌获得，<br>若错误本阶段其所有牌额外指定你为目标：<br><br>" .. question
 
-    local choice = room:askForChoice(player, answers_wrap, question_wrap, your_question_wrap)
+    local choice = room:askForChoice(player, answers_wrap, status, your_question_wrap)
     if choice[1] == correct_answer then                     -- 仅判断choice[1]，因为答案只保留正确选项的选项名字（ABCD）
       me:broadcastSkillInvoke(self.name, math.random(5, 6)) -- 播放选择正确的语音
 
