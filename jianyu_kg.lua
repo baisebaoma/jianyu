@@ -102,7 +102,7 @@ local jy_zuoti = fk.CreateActiveSkill {
       table.insert(answers_short, a[1])
     end
 
-    local status = self.name .. " 正在做行测真题<br>你可以在战报中看题"
+    local status = Fk:translate(self.name) .. " 正在做行测真题<br>你可以在战报中看题"
     local choice = room:askForChoice(player, answers_wrap, status, question_wrap) -- 把skillName改成question可能可以
     if choice[1] == correct_answer then                                           -- 仅判断choice[1]，因为答案只保留正确选项的选项名字（ABCD）
       player:broadcastSkillInvoke(self.name, math.random(5, 7))
@@ -335,8 +335,8 @@ local jy_guina = fk.CreateActiveSkill {
       table.insert(answers_short, a[1])
     end
 
-    local status = self.name .. " 正在做行测真题<br>你可以在战报中看题"
-    local your_question_wrap = "归纳：请回答下题，若正确你可以自选一张牌，<br>若错误本阶段其所有牌额外指定你为目标：<br><br>" .. question
+    local status = Fk:translate(self.name) .. " 正在做行测真题<br>你可以在战报中看题"
+    local your_question_wrap = "归纳：请回答这道行测真题，若正确你可以自选一张牌，<br>若错误本阶段其所有牌额外指定你为目标：<br><br>" .. question
 
     local choice = room:askForChoice(player, answers_wrap, status, your_question_wrap)
     if choice[1] == correct_answer then                     -- 仅判断choice[1]，因为答案只保留正确选项的选项名字（ABCD）
@@ -352,7 +352,7 @@ local jy_guina = fk.CreateActiveSkill {
 
       -- cheat，从谋徐盛抄来的
       local cardType = { 'basic', 'trick', 'equip' }
-      local cardTypeName = room:askForChoice(player, cardType, self.name)
+      local cardTypeName = room:askForChoice(player, cardType, self.name, "#jy_guina_choose_card")
       local card_types = { Card.TypeBasic, Card.TypeTrick, Card.TypeEquip }
       cardType = card_types[table.indexOf(cardType, cardTypeName)]
 
@@ -439,7 +439,7 @@ local jy_guina_refresh = fk.CreateTriggerSkill {
         player = player.id,
         skill_type = "offensive",
       })
-      player:drawCards(1, "jy_guina")
+      player:drawCards(2, "jy_guina")
     end
   end,
 }
@@ -473,8 +473,8 @@ Fk:loadTranslationTable {
   [":jy_zuoti"] = [[出牌阶段限一次，你可以回答一道行测真题。若正确，你指定一个牌名并获得一张该牌名的牌。<br><font color="grey">收录2018-2023《行测》]] .. total_papers .. [[套共]] .. total_questions .. [[题，经人工筛选，不含图形推理、资料分析。<br>回答正确时，这张牌可能来自任何位置，甚至你自己的区域。若你有同名牌，请先使用掉。</font>]],
   ["#jy_zuoti_see_log"] = [[做题：请在战报中查看完整题干]],
   ["#jy_zuoti_ob"] = [[正在做题！其他角色可以在战报中查看这道题目的完整题干和选项。]],
-  ["#jy_zuoti_correct"] = [[答对了，可以从场上随机位置获取一张想要的牌！<br>你可以在战报中查看正确答案。]],
-  ["#jy_zuoti_incorrect"] = [[答错了，不过没有什么惩罚，你学习到了新知识！<br>你可以在战报中查看正确答案。]],
+  ["#jy_zuoti_correct"] = [[答对了！你可以自选一张牌！<br>你可以在战报中查看正确答案。]],
+  ["#jy_zuoti_incorrect"] = [[答错了，不过没有什么惩罚，你学到了新知识！<br>你可以在战报中查看正确答案。]],
   ["@jy_zuoti_correct_count"] = "答对",
   ["#jy_zuoti_correct_log"] = "%from 回答正确，正确答案：%arg。",
   ["@jy_zuoti_incorrect_count"] = "答错",
@@ -503,13 +503,14 @@ Fk:loadTranslationTable {
   ["designer:jy__kgds"] = "考公专家",
   ["cv:jy__kgds"] = "桑毓泽",
   ["illustrator:jy__kgds"] = "网络图片",
-  ["~jy__kgds"] = "「庸人」么……呵……",
+  ["~jy__kgds"] = "“庸人”么……呵……",
 
   ["jy_guina"] = "归纳",
-  [":jy_guina"] = [[出牌阶段限三次，你可以令一名角色回答一道行测真题。若正确，其指定一个牌名并获得一张该牌名的牌，否则其获得“归纳”直到本阶段结束。你使用基本牌与非延时类锦囊牌时，若持有“归纳”的角色不是该牌的目标，其也成为目标；持有“归纳”的角色受到伤害时，你摸一张牌。<br><font color="grey">收录2018-2023《行测》]] .. total_papers .. [[套共]] .. total_questions .. [[题，经人工筛选，不含图形推理、资料分析。<br>回答正确时，这张牌可能来自任何位置，甚至你自己的区域。若你有同名牌，请先使用掉。</font>]],
+  [":jy_guina"] = [[出牌阶段限三次，你可以令一名角色回答一道行测真题。若正确，其指定一个牌名并获得一张该牌名的牌，否则其获得“归纳”直到本阶段结束。你使用基本牌与非延时类锦囊牌时，若持有“归纳”的角色不是该牌的目标，其也成为目标；持有“归纳”的角色受到伤害时，你摸两张牌。<br><font color="grey">收录2018-2023《行测》]] .. total_papers .. [[套共]] .. total_questions .. [[题，经人工筛选，不含图形推理、资料分析。<br>回答正确时，这张牌可能来自任何位置，甚至你自己的区域。若你有同名牌，请先使用掉。</font>]],
   ["@jy_guina-phase"] = "归纳",
   ["#jy_guina_correct"] = [[答对了！你可以自选一张牌获得！<br>你可以在战报中查看正确答案。]],
   ["#jy_guina_incorrect"] = [[答错了，本阶段的所有牌会额外指定你为目标！<br>你可以在战报中查看正确答案。]],
+  ["#jy_guina_choose_card"] = [[你可以自选一个牌名并获得一张该牌名的牌（尽量不要是自己有的牌）]],
   -- 可能是不能太多语音吧，如果你在这里放了11条语音，在武将一览的时候点开这个武将就会卡死
   ["$jy_guina1"] = [[让我来考考你。]],
   ["$jy_guina2"] = [[由我提问了。]],
