@@ -541,6 +541,13 @@ local xiuxing = fk.CreateTriggerSkill {
     end
   end,
 }
+local xiuxing_mod = fk.CreateTargetModSkill {
+  name = "#jy_xiuxing_mod",
+  bypass_times = function(self, player, skill, scope, card, to)
+    return player:hasSkill(self)
+  end,
+}
+xiuxing:addRelatedSkill(xiuxing_mod)
 
 local zitai = fk.CreateTriggerSkill {
   name = "jy_zitai",
@@ -592,15 +599,8 @@ local mumang = fk.CreateAttackRangeSkill {
     end
   end,
 }
-local mumang_mod = fk.CreateTargetModSkill {
-  name = "#jy_mumang_mod",
-  bypass_times = function(self, player, skill, scope, card, to)
-    return player:hasSkill(self)
-  end,
-}
-xiuxing:addRelatedSkill(mumang_mod)
 
-local guanzhe = General(extension, "jy__guanzhe", "jin", 3, 3, General.Female) -- 记得改成jin
+local guanzhe = General(extension, "jy__guanzhe", "jin", 3, 3, General.Female)
 guanzhe:addSkill(xiuxing)
 guanzhe:addSkill(zitai)
 guanzhe:addSkill(mumang)
@@ -614,13 +614,13 @@ Fk:loadTranslationTable {
   ["illustrator:jy__guanzhe"] = [[未知]],
 
   ["jy_xiuxing"] = [[修行]],
-  [":jy_xiuxing"] = [[锁定技，当你造成或受到伤害后，你改变你所有转换技的阴阳状态。你以此法改变一个转换技的阴阳状态时，你摸两张牌。]],
+  [":jy_xiuxing"] = [[锁定技，你使用牌无次数限制；当你造成或受到伤害后，你改变你所有转换技的阴阳状态。每以此法改变一个转换技的阴阳状态时，你摸两张牌。]],
 
   ["jy_zitai"] = [[姿态]],
   [":jy_zitai"] = [[转换技，锁定技，阳：你造成或受到伤害时判定，若结果为红色，防止此伤害；阴：你造成和受到的伤害+1。]],
 
   ["jy_mumang"] = [[目盲]],
-  [":jy_mumang"] = [[锁定技，你使用牌无次数限制；你的攻击范围始终为1。]],
+  [":jy_mumang"] = [[锁定技，你的攻击范围始终为1。]],
 
   ["jy_yujian"] = [[预见]],
   [":jy_yujian"] = [[准备阶段开始时，你可以观看牌堆顶的X张牌，然后将任意数量的牌置于牌堆顶，将其余的牌置于牌堆底。（X为游戏轮数且至多为5）]],
@@ -655,7 +655,11 @@ local yiji = fk.CreateTriggerSkill {
   events = { fk.Damaged, fk.Death },
   can_trigger = function(self, event, target, player, data)
     if event == fk.Damaged then
-      return target == player and player:hasSkill(self.name)
+      self.cancel_cost = false
+      for _ = 1, data.damage do
+        if self.cancel_cost or not player:hasSkill(self) then break end
+        self:doCost(event, target, player, data)
+      end
     else
       return target == player and player:hasSkill(self.name, false, true) -- 这样写，即使我死了也能触发
     end
@@ -745,11 +749,11 @@ local yiji_viewas = fk.CreateViewAsSkill {
     if Self:getMark("jy_yiji-tmp") ~= 0 then
       if #selected == 0 then return true end
       if #selected == 1 then
-        -- 第一张如果是锦囊牌，直接return false，如果不是，那就看第二张是不是也不是锦囊牌
-        if Fk:getCardById(selected[1]).type == Card.TypeTrick then
+        -- 第一张如果是非基本牌，直接return false，如果不是，那就看第二张是不是基本牌，是就是对的
+        if Fk:getCardById(selected[1]).type ~= Card.TypeBasic then
           return false
         else
-          return Fk:getCardById(to_select).type ~= Card.TypeTrick
+          return Fk:getCardById(to_select).type == Card.TypeBasic
         end
       end
       if #selected >= 2 then return false end
@@ -789,7 +793,7 @@ local yingcai = fk.CreateTriggerSkill {
   on_cost = function(self, event, target, player, data)
     local room = player.room
     local plist, cid = room:askForChooseCardAndPlayers(player, self.cost_data, 1, 1, nil,
-      "#jy_yingcai-choose:::" .. data.card:toLogString(), self.name, false)
+      "#jy_yingcai-choose:::" .. data.card:toLogString(), self.name, true)
     if #plist > 0 then -- 如果他选择了目标，那就发动
       self.cost_data = { plist[1], cid }
       room:setPlayerMark(player, "jy_yingcai_used", true)
@@ -814,14 +818,6 @@ local yingcai = fk.CreateTriggerSkill {
     player.room:setPlayerMark(player, "jy_yingcai_used", 0)
   end,
 }
-local yingcai_mod = fk.CreateTargetModSkill {
-  name = "#yingcai_mod",
-  frequency = Skill.Compulsory,
-  bypass_distances = function(self, player, skill, card)
-    return player:hasSkill(self) and card and card.type == Card.TypeTrick
-  end,
-}
-yingcai:addRelatedSkill(yingcai_mod)
 
 local guojia = General(extension, "jy__guojia", "wei", 3)
 
@@ -840,14 +836,14 @@ Fk:loadTranslationTable {
   [":jy_tiandu"] = [[锁定技，回合开始时，你受到一点无来源伤害。]],
 
   ["jy_yiji"] = [[遗计]],
-  [":jy_yiji"] = [[当你受到一点伤害或你死亡时，你可以令一名角色摸两张牌，然后其可以立即将一张锦囊牌或两张非锦囊牌当一张本轮未以此法使用过的普通锦囊牌使用。]],
+  [":jy_yiji"] = [[当你受到一点伤害或你死亡时，你可以令一名角色摸两张牌，然后其可以立即将一张非基本牌或两张基本牌当一张本轮未以此法使用过的普通锦囊牌使用。]],
   ["#jy_yiji_prompt"] = [[遗计：你可以令一名角色摸两张牌，随后立即使用一张可自选的锦囊牌]],
-  ["#jy_yiji-use"] = [[遗计：你可以立即将一张锦囊牌或两张非锦囊牌当 %arg 使用]],
+  ["#jy_yiji-use"] = [[遗计：你可以立即将一张非基本牌或两张基本牌当 %arg 使用]],
   ["@$jy_yiji-round"] = [[遗计]],
   ["#jy_yiji_viewas"] = [[遗计]],
 
   ["jy_yingcai"] = [[英才]],
-  [":jy_yingcai"] = [[锁定技，你使用锦囊牌没有距离限制；当你使用锦囊牌指定目标时，你可以弃一张牌，为该锦囊牌增加或减少一个目标（目标数至少为1）。]],
+  [":jy_yingcai"] = [[当你使用锦囊牌指定目标时，你可以弃一张牌，为该锦囊牌增加或减少一个目标（目标数至少为1）。]],
   ["#jy_yingcai-choose"] = "英才：你可以弃一张牌，为 %arg 增加/减少一个目标",
 }
 
