@@ -1017,14 +1017,14 @@ local ex__guanzhe = General(extension, "jy__ex__guanzhe", "jin", 3, 3, General.F
 ex__guanzhe.hidden = true
 ex__guanzhe:addSkill(ex_xiuxing)
 ex__guanzhe:addSkill(ex_zitai)
-ex__guanzhe:addSkill("mumang")
-ex__guanzhe:addSkill("yujian")
+ex__guanzhe:addSkill("jy_mumang")
+ex__guanzhe:addSkill("jy_yujian")
 
 Fk:loadTranslationTable {
-  ["jy__ex__guanzhe"] = [[原观者]],
-  ["#jy__ex__guanzhe"] = [[<font color="red">这个武将因为太强，<br>不会出现在选将框</font>]],
+  ["jy__ex__guanzhe"] = [[经典观者]],
+  ["#jy__ex__guanzhe"] = [[<font color="red">因强度过高，<br>不会出现在选将框</font>]],
   ["designer:jy__ex__guanzhe"] = [[Kasa]],
-  ["cv:jy__ex__guanzhe"] = [[]],
+  ["cv:jy__ex__guanzhe"] = [[无]],
   ["illustrator:jy__ex__guanzhe"] = [[未知]],
 
   ["jy_ex_xiuxing"] = [[修行]],
