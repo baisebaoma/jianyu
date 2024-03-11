@@ -621,7 +621,7 @@ Fk:loadTranslationTable {
   ["illustrator:jy__guanzhe"] = [[未知]],
 
   ["jy_xiuxing"] = [[修行]],
-  [":jy_xiuxing"] = [[锁定技，你使用牌无次数限制；当你造成或受到伤害后，你改变你所有转换技的阴阳状态。每以此法改变一个转换技的阴阳状态或发动一个转换技时，你摸两张牌。]],
+  [":jy_xiuxing"] = [[锁定技，你使用牌无次数限制；当你造成或受到伤害后，你改变你所有转换技的阴阳状态。每以此法改变一个转换技的阴阳状态或你发动一个转换技时，你摸两张牌。]],
 
   ["jy_zitai"] = [[姿态]],
   [":jy_zitai"] = [[转换技，锁定技，阳：你造成或受到伤害时判定，若结果为红色，防止此伤害；阴：你造成和受到的伤害+1。]],
@@ -662,15 +662,21 @@ local yiji = fk.CreateTriggerSkill {
   can_trigger = function(self, event, target, player, data)
     if target == player then
       if event == fk.Damaged then
-        if not player:hasSkill(self) then return false end
-        self.cancel_cost = false
-        for _ = 1, data.damage do
-          if self.cancel_cost or not player:hasSkill(self) then break end
-          self:doCost(event, target, player, data)
-        end
+        return player:hasSkill(self)
       else
-        return target == player and player:hasSkill(self, false, true) -- 这样写，即使我死了也能触发
+        return player:hasSkill(self, false, true) -- 这样写，即使我死了也能触发
       end
+    end
+  end,
+  on_trigger = function(self, event, target, player, data)
+    if event == fk.Damaged then
+      self.cancel_cost = false
+      for _ = 1, data.damage do
+        if self.cancel_cost or not player:hasSkill(self) then break end
+        self:doCost(event, target, player, data)
+      end
+    else
+      self:doCost(event, target, player, data)
     end
   end,
   on_cost = function(self, event, target, player, data)
