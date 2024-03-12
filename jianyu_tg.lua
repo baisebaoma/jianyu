@@ -464,8 +464,8 @@ local zitai = fk.CreateTriggerSkill {
       end
     else
       data.damage = data.damage + 1
-      player:drawCards(2)
     end
+    player:drawCards(2)
   end
 }
 
