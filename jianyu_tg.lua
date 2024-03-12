@@ -478,16 +478,63 @@ local yujian = fk.CreateTriggerSkill {
   end,
 }
 
-local mumang = fk.CreateProhibitSkill {
+-- local mumang = fk.CreateProhibitSkill {
+--   name = "jy_mumang",
+--   frequency = Skill.Compulsory,
+--   is_prohibited = function(self, from, to, card)
+--     if from:hasSkill(self) and card.trueName == "slash" then
+--       return from:distanceTo(to) > 1 -- 不能指定与你距离大于1的角色为目标
+--       --  or (from:getNextAlive(true) ~= to and to:getNextAlive(true) ~= from) -- 不能指定上家或下家以外的角色为目标
+--     end
+--   end,
+-- }
+
+-- 祈写的
+local mumang = fk.CreateAttackRangeSkill {
   name = "jy_mumang",
-  frequency = Skill.Compulsory,
-  is_prohibited = function(self, from, to, card)
-    if from:hasSkill(self) and card.trueName == "slash" then
-      return from:distanceTo(to) > 1 -- 不能指定与你距离大于1的角色为目标
-      --  or (from:getNextAlive(true) ~= to and to:getNextAlive(true) ~= from) -- 不能指定上家或下家以外的角色为目标
+  correct_func = function(self, from, to)
+    if from:hasSkill(self) then
+      if from:getMark("jy_mumang_a-turn") > 0 then
+        return -from:getMark("jy_mumang_a-turn")
+      elseif from:getMark("jy_mumang_b-turn") > 0 then
+        return from:getMark("jy_mumang_b-turn")
+      end
     end
   end,
 }
+local mumang_trigger = fk.CreateTriggerSkill {
+  name = "#jy_mumang_trigger",
+  mute = true,
+  refresh_events = { fk.EventPhaseStart, fk.CardUseFinished },
+  can_refresh = function(self, event, target, player, data)
+    if player:hasSkill(self) and target == player then
+      if event == fk.EventPhaseStart then
+        return player.phase == Player.Start and player:getAttackRange() ~= 1
+      else
+        return data.card.sub_type == Card.SubtypeWeapon
+      end
+    end
+  end,
+  on_refresh = function(self, event, target, player, data)
+    local room = player.room
+    if event == fk.EventPhaseStart then
+      if player:getAttackRange() > 1 then
+        room:setPlayerMark(player, "jy_mumang_a-turn", player:getAttackRange() - 1)
+      elseif player:getAttackRange() == 0 then
+        room:setPlayerMark(player, "jy_mumang_b-turn", 1)
+      end
+    else
+      room:setPlayerMark(player, "jy_mumang_a-turn", 0)
+      room:setPlayerMark(player, "jy_mumang_b-turn", 0)
+      if player:getAttackRange() > 1 then
+        room:setPlayerMark(player, "jy_mumang_a-turn", player:getAttackRange() - 1)
+      elseif player:getAttackRange() == 0 then
+        room:setPlayerMark(player, "jy_mumang_b-turn", 1)
+      end
+    end
+  end,
+}
+mumang:addRelatedSkill(mumang_trigger)
 
 local guanzhe = General(extension, "jy__guanzhe", "jin", 3, 3, General.Female)
 guanzhe:addSkill(xiuxing)
@@ -509,7 +556,8 @@ Fk:loadTranslationTable {
   [":jy_zitai"] = [[转换技，锁定技，当你造成或受到伤害时，阳：你判定，若为红色，防止之；阴：该伤害+1。然后你摸两张牌。]],
 
   ["jy_mumang"] = [[目盲]],
-  [":jy_mumang"] = [[锁定技，你不能指定与你距离大于1的角色为【杀】的目标。]],
+  -- [":jy_mumang"] = [[锁定技，你不能指定与你距离大于1的角色为【杀】的目标。]],
+  [":jy_mumang"] = [[锁定技，你的攻击距离始终为1。]],
 
   ["jy_yujian"] = [[预见]],
   [":jy_yujian"] = [[准备阶段开始时，你可以观看牌堆顶的X张牌，然后将任意数量的牌置于牌堆顶，将其余的牌置于牌堆底。（X为游戏轮数且至多为5）。]],
