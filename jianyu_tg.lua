@@ -309,8 +309,37 @@ local function isFactor(a, b)
   return a ~= 0 and b ~= 0 and b % a == 0
 end
 
-local fenlv = fk.CreateTriggerSkill {
+local fenlv = fk.CreateActiveSkill {
   name = "jy_fenlv",
+  anim_type = "support",
+  can_use = function(self, player)
+    return player:usedSkillTimes(self.name) < 3
+  end,
+  card_num = 0,
+  target_num = 0,
+  on_use = function(self, room, use)
+    local player = room:getPlayerById(use.from)
+    local t = {}
+    t["A"] = 1
+    t["2"] = 2
+    t["3"] = 3
+    t["4"] = 4
+    t["5"] = 5
+    t["6"] = 6
+    t["7"] = 7
+    t["8"] = 8
+    t["9"] = 9
+    t["10"] = 10
+    t["J"] = 11
+    t["Q"] = 12
+    t["K"] = 13
+    local choices = { "A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K" }
+    room:setPlayerMark(player, "@jy_fenlv",
+      t[room:askForChoice(player, choices, self.name, "#jy_fenlv_ask")])
+  end,
+}
+local fenlv_draw = fk.CreateTriggerSkill {
+  name = "#jy_fenlv_draw",
   anim_type = "control",
   frequency = Skill.Compulsory,
   refresh_events = { fk.CardUseFinished },
@@ -339,6 +368,7 @@ local fenlv_mod = fk.CreateTargetModSkill {
     return player:hasSkill(self) and isFactor(player:getMark("@jy_fenlv"), card.number)
   end,
 }
+fenlv:addRelatedSkill(fenlv_draw)
 fenlv:addRelatedSkill(fenlv_mod)
 
 local function translateCardType(a)
@@ -376,61 +406,26 @@ local zhunwang = fk.CreateTargetModSkill {
 }
 zhunwang:addRelatedSkill(zhunwang_mod)
 
-local zhitu = fk.CreateActiveSkill {
-  name = "jy_zhitu",
-  anim_type = "support",
-  can_use = function(self, player)
-    return player:usedSkillTimes(self.name) < 3
-  end,
-  card_num = 0,
-  target_num = 0,
-  on_use = function(self, room, use)
-    local player = room:getPlayerById(use.from)
-    local t = {}
-    t["A"] = 1
-    t["2"] = 2
-    t["3"] = 3
-    t["4"] = 4
-    t["5"] = 5
-    t["6"] = 6
-    t["7"] = 7
-    t["8"] = 8
-    t["9"] = 9
-    t["10"] = 10
-    t["J"] = 11
-    t["Q"] = 12
-    t["K"] = 13
-    local choices = { "A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K" }
-    room:setPlayerMark(player, "@jy_fenlv",
-      t[room:askForChoice(player, choices, self.name, "#jy_zhitu_ask")])
-  end,
-}
-
 local peixiu = General(extension, "jy__peixiu", "qun", 3)
 peixiu.subkingdom = "jin"
 peixiu:addSkill(fenlv)
-peixiu:addSkill(zhitu)
 peixiu:addSkill(zhunwang)
 peixiu:addSkill("juezhi")
 
 
 Fk:loadTranslationTable {
   ["jy__peixiu"] = "简裴秀",
-  ["#jy__peixiu"] = "晋图开秘",
+  ["#jy__peixiu"] = "禁图开秘",
   ["designer:jy__peixiu"] = "贾文和",
-  -- ["cv:jy__peixiu"] = "官方",
 
   ["jy_fenlv"] = "分率",
-  [":jy_fenlv"] = [[锁定技，你使用牌结算结束后记录此牌点数。你使用牌时，若此牌点数为〖分率〗记录点数的约数，你摸一张牌；你有已记录的点数，你使用点数为〖分率〗记录点数的倍数的牌无次数限制。]],
+  [":jy_fenlv"] = [[锁定技，你使用牌结算结束后记录此牌点数。你使用牌时，若此牌点数为〖分率〗记录点数的约数，你摸一张牌；你有已记录的点数，你使用点数为〖分率〗记录点数的倍数的牌无次数限制。出牌阶段限三次，你可以修改〖分率〗记录的点数。]],
   ["@jy_fenlv"] = "分率",
+  ["#jy_fenlv_ask"] = "修改“分率”",
 
   ["jy_zhunwang"] = "准望",
   [":jy_zhunwang"] = [[锁定技，你使用与你使用的上一张牌类型相同的牌无距离限制。]],
   ["@jy_zhunwang"] = "准望",
-
-  ["jy_zhitu"] = "制图",
-  [":jy_zhitu"] = [[出牌阶段限三次，你可以修改〖分率〗记录的点数。]],
-  ["#jy_zhitu_ask"] = "修改“分率”",
 }
 
 local xiuxing = fk.CreateTargetModSkill {

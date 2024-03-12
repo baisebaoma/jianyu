@@ -1,7 +1,6 @@
 local extension = Package:new("jianyu_kg")
 extension.extensionName = "jianyu"
 
-local U = require "packages/utility/utility"
 local Q = require "packages/jianyu/question" -- 考公大学生用的题库
 
 Fk:loadTranslationTable {

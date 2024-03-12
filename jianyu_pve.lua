@@ -216,7 +216,7 @@ local ex_xiuxing = fk.CreateTriggerSkill {
                     player.room:delay(1000)                       -- 停告诉玩家我们确实由A变B再变A动了一下（
                     player.room:setPlayerMark(player, MarkEnum.SwithSkillPreName .. s.name,
                         player:getSwitchSkillState(s.name, true)) -- 经测试这个是没问题的
-                    player:addSkillUseHistory(s.name)             -- 加上这个就可以更新武将牌上的黑白
+                    player:addSkillUseHistory(s.name)             -- 加上这个就可以更新武将牌上的黑白，因为qml监听的是这个事件
                     local t = {}
                     t[0] = "阳"
                     t[1] = "阴"
@@ -248,7 +248,7 @@ local ex_zitai = fk.CreateTriggerSkill {
         return player:hasSkill(self) and (data.to == player or data.from == player)
     end,
     on_use = function(self, event, target, player, data)
-        if player:getSwitchSkillState(self.name, true) == fk.SwitchYang then
+        if player:getSwitchSkillState(self.name, true) == fk.SwitchYang then -- 这里必须传true，因为到执行这一行代码的时候已经改变了状态
             local judge = {
                 who = player,
                 reason = self.name,
@@ -264,10 +264,19 @@ local ex_zitai = fk.CreateTriggerSkill {
     end
 }
 
+local empty = fk.CreateTriggerSkill {
+    name = "jy_test_empty",
+    anim_type = "switch",
+    switch_skill_name = "jy_test_empty",
+    frequency = Skill.Compulsory,
+    events = {},
+}
+
 local ex__guanzhe = General(extension, "jy__ex__guanzhe", "jin", 3, 3, General.Female)
-ex__guanzhe.total_hidden = true -- 不可以出现在选将框！！因为太强了！！
+ex__guanzhe.hidden = true -- 不可以出现在选将框！！因为太强了！！
 ex__guanzhe:addSkill(ex_xiuxing)
 ex__guanzhe:addSkill(ex_zitai)
+ex__guanzhe:addSkill(empty)
 ex__guanzhe:addSkill("jy_mumang")
 ex__guanzhe:addSkill("jy_yujian")
 
