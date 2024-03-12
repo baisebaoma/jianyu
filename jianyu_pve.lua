@@ -216,7 +216,7 @@ local ex_xiuxing = fk.CreateTriggerSkill {
                     player.room:delay(1000)                       -- 停告诉玩家我们确实由A变B再变A动了一下（
                     player.room:setPlayerMark(player, MarkEnum.SwithSkillPreName .. s.name,
                         player:getSwitchSkillState(s.name, true)) -- 经测试这个是没问题的
-                    -- player:addSkillUseHistory(s.name)             -- 不要加这个
+                    player:addSkillUseHistory(s.name)             -- 加这个，在UI上更新
                     local t = {}
                     t[0] = "阳"
                     t[1] = "阴"
