@@ -248,7 +248,9 @@ local ex_zitai = fk.CreateTriggerSkill {
         return player:hasSkill(self) and (data.to == player or data.from == player)
     end,
     on_use = function(self, event, target, player, data)
-        if player:getSwitchSkillState(self.name, true) == fk.SwitchYang then -- 这里必须传true，因为到执行这一行代码的时候已经改变了状态
+        local isYang = player:getSwitchSkillState(self.name, true) ==
+            fk.SwitchYang -- 这是从许攸https://gitee.com/qsgs-fans/shzl/blob/master/shadow.lua抄来的，不可能错的
+        if isYang then    -- 这里必须传true，因为到执行这一行代码的时候已经改变了状态
             local judge = {
                 who = player,
                 reason = self.name,
