@@ -266,19 +266,10 @@ local ex_zitai = fk.CreateTriggerSkill {
     end
 }
 
--- local empty = fk.CreateTriggerSkill {
---     name = "jy_test_empty",
---     anim_type = "switch",
---     switch_skill_name = "jy_test_empty",
---     frequency = Skill.Compulsory,
---     events = {},
--- }
-
 local ex__guanzhe = General(extension, "jy__ex__guanzhe", "jin", 3, 3, General.Female)
 ex__guanzhe.hidden = true -- 不可以出现在选将框！！因为太强了！！
 ex__guanzhe:addSkill(ex_xiuxing)
 ex__guanzhe:addSkill(ex_zitai)
--- ex__guanzhe:addSkill(empty)
 ex__guanzhe:addSkill("jy_mumang")
 ex__guanzhe:addSkill("jy_yujian")
 
@@ -294,9 +285,6 @@ Fk:loadTranslationTable {
 
     ["jy_ex_zitai"] = [[姿态]],
     [":jy_ex_zitai"] = [[转换技，锁定技，当你造成或受到伤害时，阳：你判定，若为红色，防止之；阴：该伤害+1。]],
-
-    ["jy_test_empty"] = [[做空]],
-    [":jy_test_empty"] = [[转换技，阳：这个技能没有效果；阴：这个技能没有效果。]],
 }
 
 return extension
