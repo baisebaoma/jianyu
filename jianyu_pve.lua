@@ -241,7 +241,7 @@ ex_xiuxing:addRelatedSkill(ex_xiuxing_mod)
 local ex_zitai = fk.CreateTriggerSkill {
     name = "jy_ex_zitai",
     anim_type = "switch",
-    switch_skill_name = "jy_zitai",
+    switch_skill_name = "jy_ex_zitai",
     frequency = Skill.Compulsory,
     events = { fk.DamageInflicted },
     can_trigger = function(self, event, target, player, data)
@@ -266,19 +266,19 @@ local ex_zitai = fk.CreateTriggerSkill {
     end
 }
 
-local empty = fk.CreateTriggerSkill {
-    name = "jy_test_empty",
-    anim_type = "switch",
-    switch_skill_name = "jy_test_empty",
-    frequency = Skill.Compulsory,
-    events = {},
-}
+-- local empty = fk.CreateTriggerSkill {
+--     name = "jy_test_empty",
+--     anim_type = "switch",
+--     switch_skill_name = "jy_test_empty",
+--     frequency = Skill.Compulsory,
+--     events = {},
+-- }
 
 local ex__guanzhe = General(extension, "jy__ex__guanzhe", "jin", 3, 3, General.Female)
 ex__guanzhe.hidden = true -- 不可以出现在选将框！！因为太强了！！
 ex__guanzhe:addSkill(ex_xiuxing)
 ex__guanzhe:addSkill(ex_zitai)
-ex__guanzhe:addSkill(empty)
+-- ex__guanzhe:addSkill(empty)
 ex__guanzhe:addSkill("jy_mumang")
 ex__guanzhe:addSkill("jy_yujian")
 
