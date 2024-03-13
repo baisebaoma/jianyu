@@ -705,13 +705,15 @@ local yingcai = fk.CreateTriggerSkill {
   end,
   on_cost = function(self, event, target, player, data)
     local room = player.room
+    local ret = false
     local plist = room:askForChoosePlayers(player, self.cost_data, 1, 1,
       "#jy_yingcai-choose:::" .. data.card:toLogString(), self.name, true)
     if #plist > 0 then -- 如果他选择了目标，那就发动
       self.cost_data = plist[1]
-      room:setPlayerMark(player, "jy_yingcai_used", true)
-      return true
+      ret = true
     end
+    room:setPlayerMark(player, "jy_yingcai_used", true)
+    return ret
   end,
   on_use = function(self, event, target, player, data)
     local room = player.room
