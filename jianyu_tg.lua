@@ -571,8 +571,13 @@ local tiandu = fk.CreateTriggerSkill {
   mod_target_filter = Util.TrueFunc,
   events = { fk.EventPhaseStart },
   can_trigger = function(self, event, target, player, data)
-    if not player:hasSkill(self) then return false end
-    return target == player and player.phase == Player.Start
+    local room = player.room
+    if player:hasSkill(self) and target == player and player.phase == Player.Start then
+      for _, p in ipairs(room:getOtherPlayers(player, true)) do
+        if p.hp < player.hp then return false end
+      end
+      return true
+    end
   end,
   on_use = function(self, event, target, player, data)
     player.room:damage({
@@ -588,47 +593,17 @@ local tiandu = fk.CreateTriggerSkill {
 local yiji = fk.CreateTriggerSkill {
   name = "jy_yiji",
   anim_type = "support",
-  events = { fk.Damaged, fk.Death },
-  can_trigger = function(self, event, target, player, data)
-    if target == player then
-      if event == fk.Damaged then
-        return player:hasSkill(self)
-      else
-        return player:hasSkill(self, false, true) -- 这样写，即使我死了也能触发
-      end
-    end
-  end,
+  events = { fk.Damaged },
   on_trigger = function(self, event, target, player, data)
-    if event == fk.Damaged then
-      self.cancel_cost = false
-      for _ = 1, data.damage do
-        if self.cancel_cost or not player:hasSkill(self) then break end
-        self:doCost(event, target, player, data)
-      end
-    else
+    self.cancel_cost = false
+    for _ = 1, data.damage do
+      if self.cancel_cost or not player:hasSkill(self) then break end
       self:doCost(event, target, player, data)
-    end
-  end,
-  on_cost = function(self, event, target, player, data)
-    -- 选择一个目标
-    local room = player.room
-    if room:askForSkillInvoke(player, self.name) then
-      local jy_yiji_target = room:askForChoosePlayers(player, table.map(room:getAlivePlayers(), Util.IdMapper), 1,
-        1,
-        "#jy_yiji_prompt", self.name, true, false) -- 选择一个目标
-      if #jy_yiji_target > 0 then
-        data.cost_data = jy_yiji_target[1]
-        return true
-      else
-        return false
-      end
     end
   end,
   on_use = function(self, event, target, player, data)
     local room = player.room
-    local to = room:getPlayerById(data.cost_data)
-
-    to:drawCards(2, self.name)
+    local to = player
 
     -- 让他选择一个牌名
     local mark = player:getMark("jy_yiji_names")
@@ -636,7 +611,7 @@ local yiji = fk.CreateTriggerSkill {
       mark = {}
       for _, id in ipairs(Fk:getAllCardIds()) do
         local card = Fk:getCardById(id)
-        if card:isCommonTrick() and not card.is_derived then
+        if card:isCommonTrick() and not card.is_derived and not card.is_damage_card then
           table.insertIfNeed(mark, card.name)
         end
       end
@@ -655,10 +630,11 @@ local yiji = fk.CreateTriggerSkill {
         end
       end
     end
-    table.insert(names, "Cancel")
-    table.insert(choices, "Cancel")
-    local choice = room:askForChoice(to, choices, self.name, "#jy_yiji-invoke::" .. to.id, false, names)
-    if choice == "Cancel" then
+    table.insert(names, "#jy_yiji_draw2")
+    table.insert(choices, "#jy_yiji_draw2")
+    local choice = room:askForChoice(to, choices, self.name, "#jy_yiji_prompt", false, names)
+    if choice == "#jy_yiji_draw2" then
+      to:drawCards(2, self.name)
       return true
     else
       room:doIndicate(player.id, { to.id })
@@ -693,19 +669,11 @@ local yiji_viewas = fk.CreateViewAsSkill {
   card_filter = function(self, to_select, selected)
     if Self:getMark("jy_yiji-tmp") ~= 0 then
       if #selected == 0 then return true end
-      if #selected == 1 then
-        -- 第一张如果是非基本牌，直接return false，如果不是，那就看第二张是不是基本牌，是就是对的
-        if Fk:getCardById(selected[1]).type ~= Card.TypeBasic then
-          return false
-        else
-          return Fk:getCardById(to_select).type == Card.TypeBasic
-        end
-      end
-      if #selected >= 2 then return false end
+      return false
     end
   end,
   view_as = function(self, cards)
-    if #cards == 1 or #cards == 2 then
+    if #cards == 1 then
       local card = Fk:cloneCard(Self:getMark("jy_yiji-tmp"))
       card:addSubcard(cards[1])
       card.skillName = "jy_yiji"
@@ -737,22 +705,21 @@ local yingcai = fk.CreateTriggerSkill {
   end,
   on_cost = function(self, event, target, player, data)
     local room = player.room
-    local plist, cid = room:askForChooseCardAndPlayers(player, self.cost_data, 1, 1, nil,
+    local plist = room:askForChoosePlayers(player, self.cost_data, 1, 1,
       "#jy_yingcai-choose:::" .. data.card:toLogString(), self.name, true)
     if #plist > 0 then -- 如果他选择了目标，那就发动
-      self.cost_data = { plist[1], cid }
+      self.cost_data = plist[1]
       room:setPlayerMark(player, "jy_yingcai_used", true)
       return true
     end
   end,
   on_use = function(self, event, target, player, data)
     local room = player.room
-    room:throwCard(self.cost_data[2], self.name, player, player)
-    if table.contains(AimGroup:getAllTargets(data.tos), self.cost_data[1]) then
-      AimGroup:cancelTarget(data, self.cost_data[1])
-      return self.cost_data[1] == player.id
+    if table.contains(AimGroup:getAllTargets(data.tos), self.cost_data) then
+      AimGroup:cancelTarget(data, self.cost_data)
+      return self.cost_data == player.id
     else
-      AimGroup:addTargets(player.room, data, self.cost_data[1])
+      AimGroup:addTargets(player.room, data, self.cost_data)
     end
   end,
   refresh_events = { fk.CardUseFinished },
@@ -778,18 +745,19 @@ Fk:loadTranslationTable {
   ["illustrator:jy__guojia"] = [[未知]],
 
   ["jy_tiandu"] = [[天妒]],
-  [":jy_tiandu"] = [[锁定技，回合开始时，你受到一点无来源伤害。]],
+  [":jy_tiandu"] = [[锁定技，回合开始时，若你体力值不为全场最低，你受到一点无来源伤害。]],
 
   ["jy_yiji"] = [[遗计]],
-  [":jy_yiji"] = [[当你受到一点伤害或你死亡时，你可以令一名角色摸两张牌，然后其可以立即将一张非基本牌或两张基本牌当一张本轮未以此法使用过的普通锦囊牌使用。]],
-  ["#jy_yiji_prompt"] = [[遗计：你可以令一名角色摸两张牌，随后立即使用一张可自选的锦囊牌]],
-  ["#jy_yiji-use"] = [[遗计：你可以立即将一张非基本牌或两张基本牌当 %arg 使用]],
+  [":jy_yiji"] = [[当你受到一点伤害时，你可以选择一项：摸两张牌；将一张牌当一张本轮未以此法使用过的非伤害类普通锦囊牌使用。]],
+  ["#jy_yiji_prompt"] = [[遗计：你可以摸两张牌，或将一张牌当一张本轮未以此法使用过的非伤害类普通锦囊牌使用]],
+  ["#jy_yiji-use"] = [[遗计：你可以立即将一张牌当 %arg 使用]],
   ["@$jy_yiji-round"] = [[遗计]],
   ["#jy_yiji_viewas"] = [[遗计]],
+  ["#jy_yiji_draw2"] = [[<font color="gold">摸两张牌</font>]],
 
   ["jy_yingcai"] = [[英才]],
-  [":jy_yingcai"] = [[当你使用锦囊牌指定目标时，你可以弃一张牌，为该锦囊牌增加或减少一个目标（目标数至少为1）。]],
-  ["#jy_yingcai-choose"] = "英才：你可以弃一张牌，为 %arg 增加/减少一个目标",
+  [":jy_yingcai"] = [[当你使用普通锦囊牌时，你可以为此牌增加或减少一个目标（无距离限制，目标数至少为1）。]],
+  ["#jy_yingcai-choose"] = "英才：为 %arg 增加/减少一个目标",
 }
 
 local yangbai = fk.CreateTriggerSkill {
