@@ -574,9 +574,9 @@ local tiandu = fk.CreateTriggerSkill {
     local room = player.room
     if player:hasSkill(self) and target == player and player.phase == Player.Start then
       for _, p in ipairs(room:getOtherPlayers(player, true)) do
-        if p.hp < player.hp then return false end
+        if p.hp < player.hp then return true end -- 只要找到一个比我血还少的，就可以触发了
       end
-      return true
+      return false
     end
   end,
   on_use = function(self, event, target, player, data)
@@ -620,6 +620,8 @@ local yiji = fk.CreateTriggerSkill {
     local mark2 = to:getMark("@$jy_yiji-round")
     if mark2 == 0 then mark2 = {} end
     local names, choices = {}, {}
+    table.insert(names, "#jy_yiji_draw2")
+    table.insert(choices, "#jy_yiji_draw2")
     for _, name in ipairs(mark) do
       local card = Fk:cloneCard(name)
       card.skillName = self.name
@@ -630,8 +632,6 @@ local yiji = fk.CreateTriggerSkill {
         end
       end
     end
-    table.insert(names, "#jy_yiji_draw2")
-    table.insert(choices, "#jy_yiji_draw2")
     local choice = room:askForChoice(to, choices, self.name, "#jy_yiji_prompt", false, names)
     if choice == "#jy_yiji_draw2" then
       to:drawCards(2, self.name)
