@@ -684,60 +684,62 @@ local yiji_viewas = fk.CreateViewAsSkill {
 yiji:addRelatedSkill(yiji_viewas)
 
 -- 董允舍宴
-local yingcai = fk.CreateTriggerSkill {
-  name = "jy_yingcai",
-  anim_type = "control",
-  events = { fk.TargetConfirming },
-  can_trigger = function(self, event, target, player, data)
-    if data.from == player.id and player:hasSkill(self) and data.card:isCommonTrick() then -- 这一段是sheyan的代码，但是因为TargetConfirming是对每一个人都生效，所以当你加了一个新目标，又会触发这个，导致触发多次，和原来的不一样。
-      if player:getMark("jy_yingcai_used") ~= 0 then return false end
-      local room = player.room
-      local targets = U.getUseExtraTargets(room, data, true, true)
-      local origin_targets = U.getActualUseTargets(room, data, event)
-      if #origin_targets > 1 then
-        table.insertTable(targets, origin_targets)
-      end
-      if #targets > 0 then
-        self.cost_data = targets
-        return true
-      end
-    end
-  end,
-  on_cost = function(self, event, target, player, data)
-    local room = player.room
-    local ret = false
-    local plist = room:askForChoosePlayers(player, self.cost_data, 1, 1,
-      "#jy_yingcai-choose:::" .. data.card:toLogString(), self.name, true)
-    if #plist > 0 then -- 如果他选择了目标，那就发动
-      self.cost_data = plist[1]
-      ret = true
-    end
-    room:setPlayerMark(player, "jy_yingcai_used", true)
-    return ret
-  end,
-  on_use = function(self, event, target, player, data)
-    local room = player.room
-    if table.contains(AimGroup:getAllTargets(data.tos), self.cost_data) then
-      AimGroup:cancelTarget(data, self.cost_data)
-      return self.cost_data == player.id
-    else
-      AimGroup:addTargets(player.room, data, self.cost_data)
-    end
-  end,
-  refresh_events = { fk.CardUseFinished },
-  can_refresh = function(self, event, target, player, data)
-    return player:hasSkill(self) and player:getMark("jy_yingcai_used") ~= 0
-  end,
-  on_refresh = function(self, event, target, player, data)
-    player.room:setPlayerMark(player, "jy_yingcai_used", 0)
-  end,
-}
+-- 目前已经改成了经典版本，所以先这样
+
+-- local yingcai = fk.CreateTriggerSkill {
+--   name = "jy_yingcai",
+--   anim_type = "control",
+--   events = { fk.TargetConfirming },
+--   can_trigger = function(self, event, target, player, data)
+--     if data.from == player.id and player:hasSkill(self) and data.card:isCommonTrick() then -- 这一段是sheyan的代码，但是因为TargetConfirming是对每一个人都生效，所以当你加了一个新目标，又会触发这个，导致触发多次，和原来的不一样。
+--       if player:getMark("jy_yingcai_used") ~= 0 then return false end
+--       local room = player.room
+--       local targets = U.getUseExtraTargets(room, data, true, true)
+--       local origin_targets = U.getActualUseTargets(room, data, event)
+--       if #origin_targets > 1 then
+--         table.insertTable(targets, origin_targets)
+--       end
+--       if #targets > 0 then
+--         self.cost_data = targets
+--         return true
+--       end
+--     end
+--   end,
+--   on_cost = function(self, event, target, player, data)
+--     local room = player.room
+--     local ret = false
+--     local plist = room:askForChoosePlayers(player, self.cost_data, 1, 1,
+--       "#jy_yingcai-choose:::" .. data.card:toLogString(), self.name, true)
+--     if #plist > 0 then -- 如果他选择了目标，那就发动
+--       self.cost_data = plist[1]
+--       ret = true
+--     end
+--     room:setPlayerMark(player, "jy_yingcai_used", true)
+--     return ret
+--   end,
+--   on_use = function(self, event, target, player, data)
+--     local room = player.room
+--     if table.contains(AimGroup:getAllTargets(data.tos), self.cost_data) then
+--       AimGroup:cancelTarget(data, self.cost_data)
+--       return self.cost_data == player.id
+--     else
+--       AimGroup:addTargets(player.room, data, self.cost_data)
+--     end
+--   end,
+--   refresh_events = { fk.CardUseFinished },
+--   can_refresh = function(self, event, target, player, data)
+--     return player:hasSkill(self) and player:getMark("jy_yingcai_used") ~= 0
+--   end,
+--   on_refresh = function(self, event, target, player, data)
+--     player.room:setPlayerMark(player, "jy_yingcai_used", 0)
+--   end,
+-- }
 
 local guojia = General(extension, "jy__guojia", "wei", 3)
 
 guojia:addSkill(tiandu)
 guojia:addSkill(yiji)
-guojia:addSkill(yingcai)
+guojia:addSkill("jy_trad_yingcai")
 
 Fk:loadTranslationTable {
   ["jy__guojia"] = [[简郭嘉]],
@@ -757,9 +759,9 @@ Fk:loadTranslationTable {
   ["#jy_yiji_viewas"] = [[遗计]],
   ["#jy_yiji_draw2"] = [[<font color="gold">摸两张牌</font>]],
 
-  ["jy_yingcai"] = [[英才]],
-  [":jy_yingcai"] = [[当你使用普通锦囊牌时，你可以为此牌增加或减少一个目标（无距离限制，目标数至少为1）。]],
-  ["#jy_yingcai-choose"] = "英才：为 %arg 增加/减少一个目标",
+  -- ["jy_yingcai"] = [[英才]],
+  -- [":jy_yingcai"] = [[当你使用普通锦囊牌时，你可以为此牌增加或减少一个目标（无距离限制，目标数至少为1）。]],
+  -- ["#jy_yingcai-choose"] = "英才：为 %arg 增加/减少一个目标",
 }
 
 local yangbai = fk.CreateTriggerSkill {
