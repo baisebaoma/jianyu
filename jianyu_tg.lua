@@ -845,7 +845,7 @@ local taoqiu_viewas = fk.CreateViewAsSkill {
 }
 taoqiu:addRelatedSkill(taoqiu_viewas)
 
-local hbrz = General(extension, "jy__hbrz", "shu", 4)
+local hbrz = General(extension, "jy__hbrz", "shu", 4, 4, General.Female)
 hbrz:addSkill(yangbai)
 hbrz:addSkill(taoqiu)
 
@@ -860,7 +860,7 @@ Fk:loadTranslationTable {
   [":jy_yangbai"] = [[结束阶段或你受到伤害后，若你的武将牌正面朝上，你可以翻面并摸三张牌。]],
 
   ["jy_taoqiu"] = [[逃囚]],
-  [":jy_taoqiu"] = [[其他角色的结束阶段，若你的武将牌背面朝上，你可以立即将一张牌当【杀】使用，该【杀】无距离限制。若此【杀】造成伤害，你翻面。]],
+  [":jy_taoqiu"] = [[其他角色的结束阶段，若你的武将牌背面朝上，你可以立即将一张牌当无距离限制的【杀】使用。若此【杀】造成伤害，你翻面。]],
   ["#jy_taoqiu-use"] = [[逃囚：你可以将一张牌当无距离限制的【杀】使用，若造成伤害，你翻面]]
 }
 
@@ -1122,7 +1122,7 @@ local xidi = fk.CreateTriggerSkill {
       if success then
         local card = Fk:cloneCard("slash")
         card.skillName = self.name
-        card.is_jy_xidi = true
+        card.is_jy_xidi = true -- TODO：这样写好像不对，传不到伤害事件里去。晚点再研究吧
         room:useCard {
           from = player.id,
           tos = table.map(dat.targets, function(p) return { p } end),
@@ -1164,7 +1164,8 @@ local xidi_viewas = fk.CreateViewAsSkill {
 }
 xidi:addRelatedSkill(xidi_viewas)
 
-local qexbj = General(extension, "jy__qexbj", "moe", 3, 3, General.Female)
+local qexbj = General(extension, "jy__qexbj", "qun", 3, 3, General.Female)
+qexbj.total_hidden = true -- bug 还没修完
 qexbj:addSkill(zhijin)
 qexbj:addSkill(xidi)
 -- qexbj:addSkill(baoyang)
@@ -1182,6 +1183,7 @@ Fk:loadTranslationTable {
 
   ["jy_xidi"] = [[西迪]],
   ["@jy_xidi"] = [[西迪]],
+  ["#jy_xidi_viewas"] = [[西迪]],
   ["#jy_xidi-use"] = [[西迪：你需视为使用一张伤害值为 %arg 的【杀】]],
   [":jy_xidi"] = [[锁定技，你于回合外受到伤害后，你获得1点护甲和1枚“西迪”；一名角色的回合结束时，你失去所有护甲；回合开始时，若你有“西迪”，你移除所有“西迪”视为使用一张伤害值为“西迪”数的【杀】。]],
   ["$jy_xidi1"] = [[就这？]],
