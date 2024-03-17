@@ -460,7 +460,6 @@ local zitai = fk.CreateTriggerSkill {
     else
       data.damage = data.damage + 1
     end
-    player:drawCards(2, self.name)
   end
 }
 
@@ -511,7 +510,7 @@ local mumang_trigger = fk.CreateTriggerSkill {
       if event == fk.EventPhaseStart then
         return player.phase == Player.Start and player:getAttackRange() ~= 1
       else
-        return data.card.sub_type == Card.SubtypeWeapon
+        return data.card.sub_type == Card.SubtypeWeapon or data.card.sub_type == Card.SubtypeTreasure
       end
     end
   end,
@@ -553,7 +552,7 @@ Fk:loadTranslationTable {
   [":jy_xiuxing"] = [[锁定技，你使用牌无次数限制。]],
 
   ["jy_zitai"] = [[姿态]],
-  [":jy_zitai"] = [[转换技，锁定技，当你造成或受到伤害时，阳：你判定，若为红色，防止之；阴：该伤害+1。然后你摸两张牌。]],
+  [":jy_zitai"] = [[转换技，锁定技，当你造成或受到伤害时，阳：你判定，若为红色，防止之且你摸两张牌；阴：该伤害+1。]],
 
   ["jy_mumang"] = [[目盲]],
   -- [":jy_mumang"] = [[锁定技，你不能指定与你距离大于1的角色为【杀】的目标。]],
