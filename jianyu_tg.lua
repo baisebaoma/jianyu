@@ -852,4 +852,77 @@ Fk:loadTranslationTable {
   ["#jy_taoqiu-use"] = [[逃囚：你可以将一张牌当【杀】使用，若造成伤害，你翻面]]
 }
 
+local jianyan = fk.CreateTriggerSkill {
+  name = "jy_jianyan",
+  events = { fk.CardUsing },
+  frequency = Skill.Compulsory,
+  can_trigger = function(self, event, target, player, data)
+    return player:hasSkill(self) and target:getMark("jy_jianyan-turn") == 1 and target.phase ~= Player.NotActive and
+        (data.card.type == Card.TypeBasic or data.card:isCommonTrick()) and data.card.is_damage_card
+  end,
+  on_use = function(self, event, target, player, data)
+    -- local room = player.room
+    -- local choice = room:askForChoice()
+    -- if choice == "#jy_jianyan_do_extra" then
+    -- 让它结算两次
+    -- 给它打上标记
+    --  data.card.is_jy_jianyan = true
+    -- else
+    -- 令此牌无效
+    -- 你获得此牌（参考奸雄）
+    -- 若为锦囊牌，获得一点护甲
+    -- end
+    data.card.is_jy_jianyan = true
+  end,
+  refresh_events = { fk.Damaged, fk.CardUsing },
+  can_refresh = function(self, event, target, player, data)
+    if player:hasSkill(self) then
+      if event == fk.Damaged then
+        return data.card and data.card.is_jy_jianyan
+      else
+        return target.phase ~= Player.NotActive and
+            (data.card.type == Card.TypeBasic or data.card:isCommonTrick()) and data.card.is_damage_card
+      end
+    end
+  end,
+  on_refresh = function(self, event, target, player, data)
+    if event == fk.Damaged then player:drawCards(data.damage) else player.room:addPlayerMark(target, "jy_jianyan-turn") end
+  end,
+}
+
+local jimin = fk.CreateTriggerSkill {
+  name = "jy_jimin",
+  events = { fk.TargetConfirmed },
+  frequency = Skill.Compulsory,
+  can_trigger = function(self, event, target, player, data)
+    return player:hasSkill(self) and data.to == player.id and
+        player.room:getPlayerById(target.id):getMark("jy_jimin") == 0 and
+        data.card.trueName == "slash"
+  end,
+  on_use = function(self, event, target, player, data)
+    -- 取消你自己当做目标
+    table.insertIfNeed(data.nullifiedTargets, player.id)
+    player.room:setPlayerMark(player.room:getPlayerById(data.from), "jy_jimin", true)
+    player:drawCards(2)
+  end,
+}
+
+local luotong = General(extension, "jy__luotong", "wu", 4)
+luotong:addSkill(jianyan)
+luotong:addSkill(jimin)
+
+Fk:loadTranslationTable {
+  ["jy__luotong"] = [[简骆统]],
+
+  ["jy_jianyan"] = [[谏言]],
+  [":jy_jianyan"] = [[锁定技，一名角色于其回合内首次使用伤害类基本牌/普通锦囊牌时，该牌每造成一点伤害，你摸一张牌。]],
+  -- [":jy_jianyan"] = [[一名角色于其回合内首次使用牌时，你可以选择一项：①令此牌额外结算一次，然后该牌每造成一点伤害，你摸一张牌；②令此牌无效且你获得此牌，若该牌为锦囊牌，你获得一点护甲]],
+  -- 建议削弱方案：[":jy_jianyan"] = [[一名角色于其回合内首次使用牌时，你可以弃一张牌，若你弃的牌为：红色，令此牌额外结算一次；黑色，令此牌无效且你获得之。]],
+
+  ["jy_jimin"] = [[济民]],
+  [":jy_jimin"] = [[锁定技，每局游戏每名角色限一次，一名角色使用【杀】指定你为目标时，该牌对你无效，然后你摸两张牌。]],
+  -- [":jy_jimin"] = [[锁定技，每局游戏每名角色限一次，一名角色使用【杀】指定你为目标时，你令此牌对你无效，然后你摸两张牌。]],
+  -- 建议削弱方案：[":jy_jimin"] = [[锁定技，一名角色于其回合内首次使用【杀】指定你为目标时，你取消之，然后你摸两张牌。若你本回合发动过【谏言】，则你可以令一名角色摸一张牌。]],
+}
+
 return extension
