@@ -454,13 +454,13 @@ local zitai = fk.CreateTriggerSkill {
       }
       player.room:judge(judge)
       if judge.card.color == Card.Red then
-        player:drawCards(2)
+        player:drawCards(2, self.name)
         return true
       end
     else
       data.damage = data.damage + 1
     end
-    player:drawCards(2)
+    player:drawCards(2, self.name)
   end
 }
 
@@ -926,80 +926,80 @@ Fk:loadTranslationTable {
 }
 
 -- TODO：还没写
-local baoyang = fk.CreateActiveSkill {
-  name = "jy_baoyang",
-  expand_pile = function() return U.getMark(Self, "jy_baoyang_cards") end,
-  card_filter = function(self, to_select, selected)
-    if #selected > 0 then return false end
-    if not table.contains(U.getMark(Self, "jy_baoyang_cards"), to_select) then return false end
-    local target = table.find(Fk:currentRoom().alive_players, function(p) return p:getMark("@@jy_baoyang-turn") > 0 end)
-    if not target then return end
-    local card = Fk:getCardById(to_select)
-    return target:canUse(card) and not target:prohibitUse(card)
-  end,
-  target_filter = function(self, to_select, selected, selected_cards)
-    if #selected_cards ~= 1 then return false end
-    local card = Fk:getCardById(selected_cards[1])
-    local card_skill = card.skill
-    local room = Fk:currentRoom()
-    local target = table.find(room.alive_players, function(p) return p:getMark("@@jy_baoyang-turn") > 0 end)
-    if not target then return end
-    if card_skill:getMinTargetNum() == 0 or #selected >= card_skill:getMaxTargetNum(target, card) then return false end
-    return not target:isProhibited(room:getPlayerById(to_select), card) and
-        card_skill:modTargetFilter(to_select, selected, target.id, card, true)
-  end,
-  feasible = function(self, selected, selected_cards)
-    if #selected_cards ~= 1 then return false end
-    local card = Fk:getCardById(selected_cards[1])
-    local card_skill = card.skill
-    local target = table.find(Fk:currentRoom().alive_players, function(p) return p:getMark("@@jy_baoyang-turn") > 0 end)
-    if not target then return end
-    return #selected >= card_skill:getMinTargetNum() and #selected <= card_skill:getMaxTargetNum(target, card)
-  end,
-  on_use = function(self, room, effect)
-    local player = room:getPlayerById(effect.from)
-    local target = table.find(room.alive_players, function(p) return p:getMark("@@jy_baoyang-turn") > 0 end)
-    if not target then return end
-    room:useCard({
-      from = target.id,
-      tos = table.map(effect.tos, function(pid) return { pid } end),
-      card = Fk:getCardById(effect.cards[1]),
-      extraUse = true,
-    })
-  end,
-}
-local baoyang_trigger = fk.CreateTriggerSkill {
-  name = "#jy_baoyang_trigger",
-  events = { fk.TurnStart },
-  frequency = Skill.Compulsory,
-  mute = true,
-  can_trigger = function(self, event, target, player, data)
-    return player:hasSkill(self) and target == player
-  end,
-  on_use = function(self, event, target, player, data)
-    local room = player.room
-    local targets = room:getOtherPlayers(player)
-    if #targets > 0 then
-      local to = table.random(targets)
-      room:setPlayerMark(to, "@@jy_baoyang-turn", 1)
-    end
-  end,
+-- local baoyang = fk.CreateActiveSkill {
+--   name = "jy_baoyang",
+--   expand_pile = function() return U.getMark(Self, "jy_baoyang_cards") end,
+--   card_filter = function(self, to_select, selected)
+--     if #selected > 0 then return false end
+--     if not table.contains(U.getMark(Self, "jy_baoyang_cards"), to_select) then return false end
+--     local target = table.find(Fk:currentRoom().alive_players, function(p) return p:getMark("@@jy_baoyang-turn") > 0 end)
+--     if not target then return end
+--     local card = Fk:getCardById(to_select)
+--     return target:canUse(card) and not target:prohibitUse(card)
+--   end,
+--   target_filter = function(self, to_select, selected, selected_cards)
+--     if #selected_cards ~= 1 then return false end
+--     local card = Fk:getCardById(selected_cards[1])
+--     local card_skill = card.skill
+--     local room = Fk:currentRoom()
+--     local target = table.find(room.alive_players, function(p) return p:getMark("@@jy_baoyang-turn") > 0 end)
+--     if not target then return end
+--     if card_skill:getMinTargetNum() == 0 or #selected >= card_skill:getMaxTargetNum(target, card) then return false end
+--     return not target:isProhibited(room:getPlayerById(to_select), card) and
+--         card_skill:modTargetFilter(to_select, selected, target.id, card, true)
+--   end,
+--   feasible = function(self, selected, selected_cards)
+--     if #selected_cards ~= 1 then return false end
+--     local card = Fk:getCardById(selected_cards[1])
+--     local card_skill = card.skill
+--     local target = table.find(Fk:currentRoom().alive_players, function(p) return p:getMark("@@jy_baoyang-turn") > 0 end)
+--     if not target then return end
+--     return #selected >= card_skill:getMinTargetNum() and #selected <= card_skill:getMaxTargetNum(target, card)
+--   end,
+--   on_use = function(self, room, effect)
+--     local player = room:getPlayerById(effect.from)
+--     local target = table.find(room.alive_players, function(p) return p:getMark("@@jy_baoyang-turn") > 0 end)
+--     if not target then return end
+--     room:useCard({
+--       from = target.id,
+--       tos = table.map(effect.tos, function(pid) return { pid } end),
+--       card = Fk:getCardById(effect.cards[1]),
+--       extraUse = true,
+--     })
+--   end,
+-- }
+-- local baoyang_trigger = fk.CreateTriggerSkill {
+--   name = "#jy_baoyang_trigger",
+--   events = { fk.TurnStart },
+--   frequency = Skill.Compulsory,
+--   mute = true,
+--   can_trigger = function(self, event, target, player, data)
+--     return player:hasSkill(self) and target == player
+--   end,
+--   on_use = function(self, event, target, player, data)
+--     local room = player.room
+--     local targets = room:getOtherPlayers(player)
+--     if #targets > 0 then
+--       local to = table.random(targets)
+--       room:setPlayerMark(to, "@@jy_baoyang-turn", 1)
+--     end
+--   end,
 
-  refresh_events = { fk.StartPlayCard },
-  can_refresh = function(self, event, target, player, data)
-    return target == player and player:hasSkill(self)
-  end,
-  on_refresh = function(self, event, target, player, data)
-    local room = player.room
-    local ids = {}
-    local to = table.find(room.alive_players, function(p) return p:getMark("@@jy_baoyang-turn") > 0 end)
-    if to then
-      ids = to.player_cards[Player.Hand]
-    end
-    room:setPlayerMark(player, "jy_baoyang_cards", ids)
-  end,
-}
-baoyang:addRelatedSkill(baoyang_trigger)
+--   refresh_events = { fk.StartPlayCard },
+--   can_refresh = function(self, event, target, player, data)
+--     return target == player and player:hasSkill(self)
+--   end,
+--   on_refresh = function(self, event, target, player, data)
+--     local room = player.room
+--     local ids = {}
+--     local to = table.find(room.alive_players, function(p) return p:getMark("@@jy_baoyang-turn") > 0 end)
+--     if to then
+--       ids = to.player_cards[Player.Hand]
+--     end
+--     room:setPlayerMark(player, "jy_baoyang_cards", ids)
+--   end,
+-- }
+-- baoyang:addRelatedSkill(baoyang_trigger)
 
 local function zhijinShow(suit, number)
   if type(suit) ~= "number" or type(number) ~= "number" then
@@ -1049,7 +1049,7 @@ local zhijin = fk.CreateTriggerSkill {
       room:setPlayerMark(player, "jy_zhijin_suit-phase", judge.card.suit)
       room:setPlayerMark(player, "@jy_zhijin-phase", zhijinShow(judge.card.suit, judge.card.number))
     else
-      player:drawCards(1, self.name)
+      player:drawCards(2, self.name)
     end
   end,
   refresh_events = { fk.CardUsing },
@@ -1160,19 +1160,26 @@ qexbj:addSkill(xidi)
 Fk:loadTranslationTable {
   ["jy__qexbj"] = [[切尔西伯爵]],
   ["designer:jy__qexbj"] = [[emo公主]],
+  ["~jy__qexbj"] = [[怎么会……这样……]],
 
   ["jy_zhijin"] = [[掷金]],
   ["@jy_zhijin-phase"] = [[掷金]],
-  [":jy_zhijin"] = [[出牌阶段开始时，你可以判定，然后本阶段：你至多使用判定结果点数张非装备牌；你使用与判定结果花色相同的牌时无距离和次数限制并摸一张牌。]],
+  [":jy_zhijin"] = [[出牌阶段开始时，你可以判定，然后本阶段：你至多使用判定结果点数张非装备牌；你使用与判定结果花色相同的牌时无距离和次数限制并摸两张牌。]],
+  ["$jy_zhijin1"] = [[我就是为宝石而生的。]],
+  ["$jy_zhijin2"] = [[我还没试过花钱买人的手脚。]],
 
   ["jy_xidi"] = [[西迪]],
   ["@jy_xidi"] = [[西迪]],
-  ["#jy_xidi-use"] = [[你需视为使用一张伤害值为 %arg 的【杀】]],
-  [":jy_xidi"] = [[锁定技，你于回合外受到伤害后，你获得1点护甲（回合结束时你失去所有护甲）和1枚“西迪”；回合开始时，若你有“西迪”，你移除所有“西迪”视为使用一张伤害值为移除的“西迪”数的【杀】。]],
+  ["#jy_xidi-use"] = [[西迪：你需视为使用一张伤害值为 %arg 的【杀】]],
+  [":jy_xidi"] = [[锁定技，你于回合外受到伤害后，你获得1点护甲和1枚“西迪”；一名角色的回合结束时，你失去所有护甲；回合开始时，若你有“西迪”，你移除所有“西迪”视为使用一张伤害值为移除“西迪”数的【杀】。]],
+  ["$jy_xidi1"] = [[就这？]],
+  ["$jy_xidi2"] = [[西迪，拦住他们！]],
 
   ["jy_baoyang"] = [[包养]],
   ["@@jy_baoyang-turn"] = "包养",
   [":jy_baoyang"] = [[每轮开始时，你可以指定三个不同的牌名，然后依次从场上获得一张该牌名的牌。若如此做，本轮你首个回合开始前，你须交给一名其他角色三张牌并选择一项（每项限一次）：1.结束当前回合并令其立即执行一个额外回合；2.获得其一个技能（限定/觉醒/使命技除外）直到回合结束；3.观看其手牌并令其立即使用其中一张。]],
+  ["$jy_baoyang1"] = [[开个价吧。]],
+  ["$jy_baoyang2"] = [[你知道该怎么做的对吧？]],
 }
 
 return extension
