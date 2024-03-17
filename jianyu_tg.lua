@@ -479,17 +479,11 @@ local mumang_trigger = fk.CreateTriggerSkill {
     end
   end,
 }
-local cancel = fk.CreateTriggerSkill {
+local cancel = fk.CreateProhibitSkill {
   name = "#jy_xiuxing_cancel",
-  mute = true,
-  events = { fk.TargetConfirmed },
   frequency = Skill.Compulsory,
-  can_trigger = function(self, event, target, player, data)
-    return player:hasSkill(self) and data.from == player.id and target:distanceTo(player) > player:getAttackRange()
-  end,
-  on_use = function(self, event, target, player, data)
-    -- 取消这个目标
-    table.insertIfNeed(data.nullifiedTargets, target.id)
+  is_prohibited = function(self, from, to, card)
+    return from:hasSkill(self) and from:distanceTo(to) > from:getAttackRange()
   end,
 }
 
@@ -523,6 +517,7 @@ local zitai = fk.CreateTriggerSkill {
     else
       data.damage = data.damage + 1
     end
+    player:drawCards(2, self.name)
   end
 }
 
@@ -564,10 +559,10 @@ Fk:loadTranslationTable {
   ["illustrator:jy__guanzhe"] = [[未知]],
 
   ["jy_xiuxing"] = [[修行]],
-  [":jy_xiuxing"] = [[锁定技，你使用牌无次数限制；你指定攻击范围外的角色为牌的目标时，取消之；你的攻击范围始终为1。]],
+  [":jy_xiuxing"] = [[锁定技，你使用牌无次数限制；你攻击范围外的角色不是你使用牌的合法目标；你的攻击范围始终为1。]],
 
   ["jy_zitai"] = [[姿态]],
-  [":jy_zitai"] = [[转换技，锁定技，当你造成或受到伤害时，阳：你判定，若为红色，防止之且你摸两张牌；阴：该伤害+1。]],
+  [":jy_zitai"] = [[转换技，锁定技，当你造成或受到伤害时，阳：你判定，若为红色，防止之；阴：该伤害+1。然后你摸两张牌。]],
 
   ["jy_yujian"] = [[预见]],
   [":jy_yujian"] = [[准备阶段开始时，你可以观看牌堆顶的X张牌，然后将任意数量的牌置于牌堆顶，将其余的牌置于牌堆底。（X为游戏轮数且至多为5）。]],
