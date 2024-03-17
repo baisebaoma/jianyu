@@ -481,14 +481,14 @@ local mumang_trigger = fk.CreateTriggerSkill {
 }
 local cancel = fk.CreateTriggerSkill {
   name = "#jy_xiuxing_cancel",
-  events = { fk.TargetConfirmed },
+  events = { fk.TargetSpecified },
   frequency = Skill.Compulsory,
   can_trigger = function(self, event, target, player, data)
     return player:hasSkill(self) and data.from == player.id and target:distanceTo(player) > player:getAttackRange()
   end,
   on_use = function(self, event, target, player, data)
     -- 取消这个目标
-    table.insertIfNeed(data.nullifiedTargets, target.id)
+    table.removeOne(data.targets, target.id)
   end,
 }
 
