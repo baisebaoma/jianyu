@@ -340,6 +340,7 @@ local fenlv = fk.CreateActiveSkill {
 }
 local fenlv_draw = fk.CreateTriggerSkill {
   name = "#jy_fenlv_draw",
+  mute = true,
   anim_type = "control",
   frequency = Skill.Compulsory,
   refresh_events = { fk.CardUseFinished },
@@ -353,13 +354,16 @@ local fenlv_draw = fk.CreateTriggerSkill {
   can_trigger = function(self, event, target, player, data)
     if not player:hasSkill(self) then return false end
     return target == player and
-        (isFactor(data.card.number, player:getMark("@jy_fenlv")) or
-          isFactor(player:getMark("@jy_fenlv"), data.card.number))
+        isFactor(data.card.number, player:getMark("@jy_fenlv"))
   end,
   on_use = function(self, event, target, player, data)
-    if isFactor(data.card.number, player:getMark("@jy_fenlv")) then
-      player:drawCards(1, self.name)
-    end
+    player:broadcastSkillInvoke(fenlv.name)
+    player.room:doAnimate("InvokeSkill", {
+      name = fenlv.name,
+      player = player.id,
+      skill_type = "drawcard",
+    })
+    player:drawCards(1, self.name)
   end,
 }
 local fenlv_mod = fk.CreateTargetModSkill {
@@ -801,7 +805,8 @@ local taoqiu = fk.CreateTriggerSkill {
   end,
   on_use = function(self, event, target, player, data)
     local room = player.room
-    local success, dat = room:askForUseActiveSkill(player, "#jy_taoqiu_viewas", "#jy_taoqiu-use")
+    local success, dat = room:askForUseActiveSkill(player, "#jy_taoqiu_viewas", "#jy_taoqiu-use", true,
+      { bypass_distances = true })
     if success then
       local card = Fk:cloneCard("slash")
       card:addSubcards(dat.cards)
@@ -810,6 +815,7 @@ local taoqiu = fk.CreateTriggerSkill {
         from = player.id,
         tos = table.map(dat.targets, function(p) return { p } end),
         card = card,
+        extraData = { bypass_distances = true },
       }
       room:useCard(use)
       if use.damageDealt then
@@ -831,6 +837,7 @@ local taoqiu_viewas = fk.CreateViewAsSkill {
       return nil
     end
     local c = Fk:cloneCard("slash")
+
     c.skillName = self.name
     c:addSubcard(cards[1])
     return c
@@ -853,8 +860,8 @@ Fk:loadTranslationTable {
   [":jy_yangbai"] = [[结束阶段或你受到伤害后，若你的武将牌正面朝上，你可以翻面并摸三张牌。]],
 
   ["jy_taoqiu"] = [[逃囚]],
-  [":jy_taoqiu"] = [[其他角色的结束阶段，若你的武将牌背面朝上，你可以立即将一张牌当【杀】使用。若此【杀】造成伤害，你翻面。]],
-  ["#jy_taoqiu-use"] = [[逃囚：你可以将一张牌当【杀】使用，若造成伤害，你翻面]]
+  [":jy_taoqiu"] = [[其他角色的结束阶段，若你的武将牌背面朝上，你可以立即将一张牌当【杀】使用，该【杀】无距离限制。若此【杀】造成伤害，你翻面。]],
+  ["#jy_taoqiu-use"] = [[逃囚：你可以将一张牌当无距离限制的【杀】使用，若造成伤害，你翻面]]
 }
 
 local jianyan = fk.CreateTriggerSkill {
@@ -1111,7 +1118,6 @@ local xidi = fk.CreateTriggerSkill {
     else
       -- 要求他使用一张虚拟杀
       local dmg = player:getMark("@jy_xidi")
-      room:setPlayerMark(player, "@jy_xidi", 0)
       local success, dat = room:askForUseActiveSkill(player, "#jy_xidi_viewas", "#jy_xidi-use:::" .. dmg)
       if success then
         local card = Fk:cloneCard("slash")
@@ -1140,6 +1146,7 @@ local xidi = fk.CreateTriggerSkill {
       player.room:changeShield(player, -player.shield)
     else
       data.damage = data.damage + player:getMark("@jy_xidi") - 1
+      player.room:setPlayerMark(player, "@jy_xidi", 0)
     end
   end
 }
@@ -1176,7 +1183,7 @@ Fk:loadTranslationTable {
   ["jy_xidi"] = [[西迪]],
   ["@jy_xidi"] = [[西迪]],
   ["#jy_xidi-use"] = [[西迪：你需视为使用一张伤害值为 %arg 的【杀】]],
-  [":jy_xidi"] = [[锁定技，你于回合外受到伤害后，你获得1点护甲和1枚“西迪”；一名角色的回合结束时，你失去所有护甲；回合开始时，若你有“西迪”，你移除所有“西迪”视为使用一张伤害值为移除“西迪”数的【杀】。]],
+  [":jy_xidi"] = [[锁定技，你于回合外受到伤害后，你获得1点护甲和1枚“西迪”；一名角色的回合结束时，你失去所有护甲；回合开始时，若你有“西迪”，你移除所有“西迪”视为使用一张伤害值为“西迪”数的【杀】。]],
   ["$jy_xidi1"] = [[就这？]],
   ["$jy_xidi2"] = [[西迪，拦住他们！]],
 
