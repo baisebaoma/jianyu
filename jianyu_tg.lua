@@ -481,14 +481,15 @@ local mumang_trigger = fk.CreateTriggerSkill {
 }
 local cancel = fk.CreateTriggerSkill {
   name = "#jy_xiuxing_cancel",
-  events = { fk.TargetSpecified },
+  mute = true,
+  events = { fk.TargetConfirmed },
   frequency = Skill.Compulsory,
   can_trigger = function(self, event, target, player, data)
     return player:hasSkill(self) and data.from == player.id and target:distanceTo(player) > player:getAttackRange()
   end,
   on_use = function(self, event, target, player, data)
     -- 取消这个目标
-    table.removeOne(data.targets, target.id)
+    table.insertIfNeed(data.nullifiedTargets, target.id)
   end,
 }
 
@@ -563,7 +564,7 @@ Fk:loadTranslationTable {
   ["illustrator:jy__guanzhe"] = [[未知]],
 
   ["jy_xiuxing"] = [[修行]],
-  [":jy_xiuxing"] = [[锁定技，你使用牌无次数限制；你指定攻击范围外的角色为牌的目标时，取消之；你的攻击距离始终为1。]],
+  [":jy_xiuxing"] = [[锁定技，你使用牌无次数限制；你指定攻击范围外的角色为牌的目标时，取消之；你的攻击范围始终为1。]],
 
   ["jy_zitai"] = [[姿态]],
   [":jy_zitai"] = [[转换技，锁定技，当你造成或受到伤害时，阳：你判定，若为红色，防止之且你摸两张牌；阴：该伤害+1。]],

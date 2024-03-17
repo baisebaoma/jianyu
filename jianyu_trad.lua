@@ -223,11 +223,11 @@ local trad_xiuxing = fk.CreateTriggerSkill {
           t[1] = "阴"
           player.room:doBroadcastNotify("ShowToast",
             "修行：更改了 " .. Fk:translate(s.name) .. " 的阴阳状态，现在是：" .. t[player:getSwitchSkillState(s.name)]) -- 记得删
-          player:drawCards(2)
+          player:drawCards(1, self.name)
         end
       end
     else
-      player:drawCards(2)
+      player:drawCards(1, self.name)
     end
   end,
 }
@@ -328,7 +328,10 @@ Fk:loadTranslationTable {
   ["illustrator:jy__trad__guanzhe"] = [[未知]],
 
   ["jy_trad_xiuxing"] = [[修行]],
-  [":jy_trad_xiuxing"] = [[锁定技，你使用牌无次数限制；当你造成或受到伤害后，你改变自身所有转换技的阴阳状态；你每以此法改变一个转换技的阴阳状态或发动一个转换技时，你摸两张牌。]],
+  [":jy_trad_xiuxing"] = [[锁定技，你使用牌无次数限制；当你造成或受到伤害后，你改变自身所有转换技的阴阳状态；你每以此法改变一个转换技的阴阳状态或发动一个转换技时，你摸一张牌。]],
+
+  ["jy_trad_mumang"] = [[目盲]],
+  [":jy_trad_mumang"] = [[锁定技，你的攻击范围始终为1。]],
 
   ["jy_trad_zitai"] = [[姿态]],
   [":jy_trad_zitai"] = [[转换技，锁定技，当你造成或受到伤害时，阳：你判定，若为红色，防止之；阴：该伤害+1。]],
