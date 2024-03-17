@@ -903,7 +903,7 @@ local jimin = fk.CreateTriggerSkill {
     -- 取消你自己当做目标
     table.insertIfNeed(data.nullifiedTargets, player.id)
     player.room:setPlayerMark(player.room:getPlayerById(data.from), "jy_jimin", true)
-    player:drawCards(2)
+    player:drawCards(2, self.name)
   end,
 }
 
@@ -923,6 +923,256 @@ Fk:loadTranslationTable {
   [":jy_jimin"] = [[锁定技，每名角色限一次，一名角色使用【杀】指定你为目标时，该牌对你无效，然后你摸两张牌。]],
   -- [":jy_jimin"] = [[锁定技，每局游戏每名角色限一次，一名角色使用【杀】指定你为目标时，你令此牌对你无效，然后你摸两张牌。]],
   -- 建议削弱方案：[":jy_jimin"] = [[锁定技，一名角色于其回合内首次使用【杀】指定你为目标时，你取消之，然后你摸两张牌。若你本回合发动过【谏言】，则你可以令一名角色摸一张牌。]],
+}
+
+-- TODO：还没写
+local baoyang = fk.CreateActiveSkill {
+  name = "jy_baoyang",
+  expand_pile = function() return U.getMark(Self, "jy_baoyang_cards") end,
+  card_filter = function(self, to_select, selected)
+    if #selected > 0 then return false end
+    if not table.contains(U.getMark(Self, "jy_baoyang_cards"), to_select) then return false end
+    local target = table.find(Fk:currentRoom().alive_players, function(p) return p:getMark("@@jy_baoyang-turn") > 0 end)
+    if not target then return end
+    local card = Fk:getCardById(to_select)
+    return target:canUse(card) and not target:prohibitUse(card)
+  end,
+  target_filter = function(self, to_select, selected, selected_cards)
+    if #selected_cards ~= 1 then return false end
+    local card = Fk:getCardById(selected_cards[1])
+    local card_skill = card.skill
+    local room = Fk:currentRoom()
+    local target = table.find(room.alive_players, function(p) return p:getMark("@@jy_baoyang-turn") > 0 end)
+    if not target then return end
+    if card_skill:getMinTargetNum() == 0 or #selected >= card_skill:getMaxTargetNum(target, card) then return false end
+    return not target:isProhibited(room:getPlayerById(to_select), card) and
+        card_skill:modTargetFilter(to_select, selected, target.id, card, true)
+  end,
+  feasible = function(self, selected, selected_cards)
+    if #selected_cards ~= 1 then return false end
+    local card = Fk:getCardById(selected_cards[1])
+    local card_skill = card.skill
+    local target = table.find(Fk:currentRoom().alive_players, function(p) return p:getMark("@@jy_baoyang-turn") > 0 end)
+    if not target then return end
+    return #selected >= card_skill:getMinTargetNum() and #selected <= card_skill:getMaxTargetNum(target, card)
+  end,
+  on_use = function(self, room, effect)
+    local player = room:getPlayerById(effect.from)
+    local target = table.find(room.alive_players, function(p) return p:getMark("@@jy_baoyang-turn") > 0 end)
+    if not target then return end
+    room:useCard({
+      from = target.id,
+      tos = table.map(effect.tos, function(pid) return { pid } end),
+      card = Fk:getCardById(effect.cards[1]),
+      extraUse = true,
+    })
+  end,
+}
+local baoyang_trigger = fk.CreateTriggerSkill {
+  name = "#jy_baoyang_trigger",
+  events = { fk.TurnStart },
+  frequency = Skill.Compulsory,
+  mute = true,
+  can_trigger = function(self, event, target, player, data)
+    return player:hasSkill(self) and target == player
+  end,
+  on_use = function(self, event, target, player, data)
+    local room = player.room
+    local targets = room:getOtherPlayers(player)
+    if #targets > 0 then
+      local to = table.random(targets)
+      room:setPlayerMark(to, "@@jy_baoyang-turn", 1)
+    end
+  end,
+
+  refresh_events = { fk.StartPlayCard },
+  can_refresh = function(self, event, target, player, data)
+    return target == player and player:hasSkill(self)
+  end,
+  on_refresh = function(self, event, target, player, data)
+    local room = player.room
+    local ids = {}
+    local to = table.find(room.alive_players, function(p) return p:getMark("@@jy_baoyang-turn") > 0 end)
+    if to then
+      ids = to.player_cards[Player.Hand]
+    end
+    room:setPlayerMark(player, "jy_baoyang_cards", ids)
+  end,
+}
+baoyang:addRelatedSkill(baoyang_trigger)
+
+local function zhijinShow(suit, number)
+  if type(suit) ~= "number" or type(number) ~= "number" then
+    return ""
+  end
+  local suits = {}
+  suits[Card.Spade] = [[♠]]
+  suits[Card.Heart] = [[<font color="red">♥</font>]]
+  suits[Card.Club] = [[♣]]
+  suits[Card.Diamond] = [[<font color="red">♦</font>]]
+  if suits[suit] then
+    return suits[suit] .. number
+  end
+  return ""
+end
+
+local zhijin = fk.CreateTriggerSkill {
+  name = "jy_zhijin",
+  anim_type = "drawcard",
+  events = { fk.EventPhaseStart, fk.CardUsing },
+  can_trigger = function(self, event, target, player, data)
+    if target == player and player:hasSkill(self) then
+      if event == fk.EventPhaseStart then
+        return player.phase == Player.Play
+      else
+        return not data.card:isVirtual() and data.card.suit == player:getMark("jy_zhijin_suit-phase") and data.card.suit and
+            data.card.number
+      end
+    end
+  end,
+  on_cost = function(self, event, target, player, data)
+    if event == fk.EventPhaseStart then
+      return player.room:askForSkillInvoke(player, self.name)
+    else
+      return true
+    end
+  end,
+  on_use = function(self, event, target, player, data)
+    local room = player.room
+    if event == fk.EventPhaseStart then
+      local judge = {
+        who = player,
+        reason = self.name,
+      }
+      room:judge(judge)
+      room:setPlayerMark(player, "jy_zhijin_card-phase", judge.card.number)
+      room:setPlayerMark(player, "jy_zhijin_suit-phase", judge.card.suit)
+      room:setPlayerMark(player, "@jy_zhijin-phase", zhijinShow(judge.card.suit, judge.card.number))
+    else
+      player:drawCards(1, self.name)
+    end
+  end,
+  refresh_events = { fk.CardUsing },
+  can_refresh = function(self, event, target, player, data)
+    if target == player and player:hasSkill(self) then
+      return data.card.type ~= Card.TypeEquip
+    end
+  end,
+  on_refresh = function(self, event, target, player, data)
+    player.room:addPlayerMark(player, "jy_zhijin_card-phase", -1)
+    player.room:setPlayerMark(player, "@jy_zhijin-phase",
+      zhijinShow(player:getMark("jy_zhijin_suit-phase"), player:getMark("jy_zhijin_card-phase")))
+  end
+}
+local zhijin_prohibit = fk.CreateProhibitSkill {
+  name = "#jy_zhijin_prohibit",
+  frequency = Skill.Compulsory,
+  prohibit_use = function(self, player, card)
+    return player:hasSkill(self) and player:getMark("jy_zhijin_card-phase") <= 0 and card.type ~= Card.TypeEquip
+  end,
+}
+local zhijin_mod = fk.CreateTargetModSkill {
+  name = "#jy_zhijin_mod",
+  bypass_times = function(self, player, skill, scope, card, to)
+    return player:hasSkill(self) and card.suit == player:getMark("jy_zhijin_suit-phase") and to
+  end,
+  bypass_distances = function(self, player, skill, card, to)
+    return player:hasSkill(self) and card.suit == player:getMark("jy_zhijin_suit-phase") and to
+  end,
+}
+zhijin:addRelatedSkill(zhijin_prohibit)
+zhijin:addRelatedSkill(zhijin_mod)
+
+local xidi = fk.CreateTriggerSkill {
+  name = "jy_xidi",
+  events = { fk.Damaged, fk.EventPhaseStart },
+  frequency = Skill.Compulsory,
+  can_trigger = function(self, event, target, player, data)
+    if target == player and player:hasSkill(self) then
+      if event == fk.Damaged then
+        return player.phase == Player.NotActive
+      else
+        return player.phase == Player.Start and player:getMark("@jy_xidi") ~= 0
+      end
+    end
+  end,
+  on_use = function(self, event, target, player, data)
+    local room = player.room
+    if event == fk.Damaged then
+      -- TODO：只要这个技能触发过，那回合结束时就减一点护甲（因为每次受到伤害都获得一点护甲，而失去体力是不会减护甲的，所以一定会有一点护甲留存）
+      room:changeShield(player, 1)
+      -- room:addPlayerMark(player, "jy_xidi-turn")
+      room:addPlayerMark(player, "@jy_xidi")
+    else
+      -- 要求他使用一张虚拟杀
+      local dmg = player:getMark("@jy_xidi")
+      room:setPlayerMark(player, "@jy_xidi", 0)
+      local success, dat = room:askForUseActiveSkill(player, "#jy_xidi_viewas", "#jy_xidi-use:::" .. dmg)
+      if success then
+        local card = Fk:cloneCard("slash")
+        card.skillName = self.name
+        card.is_jy_xidi = true
+        room:useCard {
+          from = player.id,
+          tos = table.map(dat.targets, function(p) return { p } end),
+          card = card,
+        }
+      end
+    end
+  end,
+  refresh_events = { fk.EventPhaseEnd, fk.DamageInflicted },
+  can_refresh = function(self, event, target, player, data)
+    if player:hasSkill(self) then
+      if event == fk.EventPhaseEnd then
+        return player.shield > 0
+      else
+        return target == player and data.card and data.card.is_jy_xidi
+      end
+    end
+  end,
+  on_refresh = function(self, event, target, player, data)
+    if event == fk.EventPhaseEnd then
+      player.room:changeShield(player, -player.shield)
+    else
+      data.damage = data.damage + player:getMark("@jy_xidi") - 1
+    end
+  end
+}
+local xidi_viewas = fk.CreateViewAsSkill {
+  name = "#jy_xidi_viewas",
+  anim_type = "offensive",
+  pattern = "analeptic",
+  card_filter = Util.FalseFunc,
+  view_as = function(self, cards)
+    local c = Fk:cloneCard("slash")
+    c.skillName = self.name
+    c.is_jy_xidi = true
+    return c
+  end,
+}
+xidi:addRelatedSkill(xidi_viewas)
+
+local qexbj = General(extension, "jy__qexbj", "moe", 3, 3, General.Female)
+qexbj:addSkill(zhijin)
+qexbj:addSkill(xidi)
+-- qexbj:addSkill(baoyang)
+
+Fk:loadTranslationTable {
+  ["jy__qexbj"] = [[切尔西伯爵]],
+  ["designer:jy__qexbj"] = [[emo公主]],
+
+  ["jy_zhijin"] = [[掷金]],
+  ["@jy_zhijin-phase"] = [[掷金]],
+  [":jy_zhijin"] = [[出牌阶段开始时，你可以判定，然后本阶段：你至多使用判定结果点数张非装备牌；你使用与判定结果花色相同的牌时无距离和次数限制并摸一张牌。]],
+
+  ["jy_xidi"] = [[西迪]],
+  ["@jy_xidi"] = [[西迪]],
+  ["#jy_xidi-use"] = [[你需视为使用一张伤害值为 %arg 的【杀】]],
+  [":jy_xidi"] = [[锁定技，你于回合外受到伤害后，你获得1点护甲（回合结束时你失去所有护甲）和1枚“西迪”；回合开始时，若你有“西迪”，你移除所有“西迪”视为使用一张伤害值为移除的“西迪”数的【杀】。]],
+
+  ["jy_baoyang"] = [[包养]],
+  ["@@jy_baoyang-turn"] = "包养",
+  [":jy_baoyang"] = [[每轮开始时，你可以指定三个不同的牌名，然后依次从场上获得一张该牌名的牌。若如此做，本轮你首个回合开始前，你须交给一名其他角色三张牌并选择一项（每项限一次）：1.结束当前回合并令其立即执行一个额外回合；2.获得其一个技能（限定/觉醒/使命技除外）直到回合结束；3.观看其手牌并令其立即使用其中一张。]],
 }
 
 return extension
