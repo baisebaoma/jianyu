@@ -1201,12 +1201,10 @@ local maochong = fk.CreateViewAsSkill {
     end
   end,
   enabled_at_play = function(self, player)
-    return not player:isKongcheng() and player:usedSkillTimes(self.name) == 0 and
-        player:getSwitchSkillState(self.name) == fk.SwitchYang
+    return player:getSwitchSkillState(self.name) == fk.SwitchYang
   end,
   enabled_at_response = function(self, player, response)
-    return not player:isKongcheng() and player:usedSkillTimes(self.name) == 0 and
-        player:getSwitchSkillState(self.name) == fk.SwitchYang
+    return player:getSwitchSkillState(self.name) == fk.SwitchYang
   end,
 }
 local maochong_extra = fk.CreateTriggerSkill {
@@ -1339,13 +1337,13 @@ ylmc:addSkill(muhuo)
 
 Fk:loadTranslationTable {
   ["jy__ylmc"] = [[御稜名草]],
-  ["#jy__ylmc"] = [[灾厄之狐]],
-  ["designer:jy__ylmc"] = [[冒充会长]],
+  ["#jy__ylmc"] = [[冒充会长]],
+  ["designer:jy__ylmc"] = [[白洲]],
   ["cv:jy__ylmc"] = [[无]],
   ["illustrator:jy__ylmc"] = [[Nexon]],
 
   ["jy_maochong"] = [[冒充]],
-  [":jy_maochong"] = [[转换技，阳：出牌阶段限一次，你可将任意张牌当【杀】使用，该【杀】需等量张【闪】才能抵消且不计入次数限制；若你的装备区有武器牌，该【杀】伤害+1；阴：其他角色的出牌阶段限一次，其可以将一张【杀】或武器牌正面朝上交给你，然后其摸一张牌。]],
+  [":jy_maochong"] = [[转换技，阳：你可将任意张牌当【杀】使用，该【杀】需等量张【闪】才能抵消且不计入次数限制；若你的装备区有武器牌，该【杀】伤害+1；阴：其他角色的出牌阶段限一次，其可以将一张【杀】或武器牌正面朝上交给你，然后其摸一张牌。]],
   ["#jy_maochong-active"] = [[冒充：你可以将一张【杀】或武器牌交给 御稜名草，然后你摸一张牌]],
   ["jy_maochong_other&"] = [[冒充]],
   [":jy_maochong_other&"] = [[出牌阶段限一次，当御稜名草的〖冒充〗状态为阴时，你可以将一张【杀】或武器牌正面向上交给其，然后你摸一张牌。]],
