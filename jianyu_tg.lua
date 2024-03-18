@@ -1312,7 +1312,8 @@ local muhuo = fk.CreateTriggerSkill {
   name = "jy_muhuo",
   events = { fk.Damaged },
   can_trigger = function(self, event, target, player, data)
-    return player:hasSkill(self) and player:distanceTo(target) <= 1
+    return player:hasSkill(self) and player:distanceTo(target, "both", true) <= 1 and
+        player:distanceTo(target, "both", true) >= 0 -- 需要判断 >= 0，因为如果目标因该伤害而死就是-1了
   end,
   on_use = function(self, event, target, player, data)
     player:drawCards(math.min(player.maxHp - player.hp, 5), self.name)
@@ -1351,7 +1352,7 @@ Fk:loadTranslationTable {
   [":jy_maochong_other&"] = [[出牌阶段限一次，当御稜名草的〖冒充〗状态为阴时，你可以将一张【杀】或武器牌正面向上交给其，然后你摸一张牌。]],
 
   ["jy_muhuo"] = [[目祸]],
-  [":jy_muhuo"] = [[当一名角色受到伤害后，若你与其的距离不大于1，你可以摸X张牌（X为你已损失的体力值且至多为5）、将〖冒充〗状态改为阴。若该角色不为你，你本回合不能再对其使用牌。]],
+  [":jy_muhuo"] = [[当一名角色受到伤害后，若你与其距离1以内，你可以摸X张牌（X为你已损失的体力值且至多为5）、将〖冒充〗状态改为阴。若该角色不为你，你本回合不能再对其使用牌。]],
   ["@jy_muhuo-turn"] = [[目祸]],
 }
 
