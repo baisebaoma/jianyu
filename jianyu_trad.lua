@@ -357,7 +357,8 @@ local tiandu = fk.CreateTriggerSkill {
   end,
 }
 
--- 周不疑：一名角色的结束阶段，若其本回合未造成伤害，你可以声明一种普通锦囊牌（每轮每种牌名限一次），其可以将一张牌当你声明的牌使用
+-- tenyear_sp3 周不疑：一名角色的结束阶段，若其本回合未造成伤害，你可以声明一种普通锦囊牌（每轮每种牌名限一次），其可以将一张牌当你声明的牌使用
+-- TODO：目前有bug，两个人可以一直刷联军盛宴
 local yiji = fk.CreateTriggerSkill {
   name = "jy_trad_yiji",
   anim_type = "support",
@@ -414,9 +415,9 @@ local yiji = fk.CreateTriggerSkill {
           table.insertIfNeed(mark, card.name)
         end
       end
-      room:setPlayerMark(to, "jy_trad_yiji_names", mark)
+      room:setPlayerMark(player, "jy_trad_yiji_names", mark)
     end
-    local mark2 = to:getMark("@$jy_trad_yiji-round")
+    local mark2 = player:getMark("@$jy_trad_yiji-round") -- 这是禁止继续使用的
     if mark2 == 0 then mark2 = {} end
     local names, choices = {}, {}
     for _, name in ipairs(mark) do

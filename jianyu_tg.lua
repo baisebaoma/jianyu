@@ -613,9 +613,9 @@ local yiji = fk.CreateTriggerSkill {
           table.insertIfNeed(mark, card.name)
         end
       end
-      room:setPlayerMark(to, "jy_yiji_names", mark)
+      room:setPlayerMark(player, "jy_yiji_names", mark)
     end
-    local mark2 = to:getMark("@$jy_yiji-round")
+    local mark2 = player:getMark("@$jy_yiji-round")
     if mark2 == 0 then mark2 = {} end
     local names, choices = {}, {}
     table.insert(names, "#jy_yiji_draw2")
