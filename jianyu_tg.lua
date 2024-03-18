@@ -309,11 +309,11 @@ local function isFactor(a, b)
   return a ~= 0 and b ~= 0 and b % a == 0
 end
 
-local fenlv = fk.CreateActiveSkill {
-  name = "jy_fenlv",
+local xingtu = fk.CreateActiveSkill {
+  name = "jy_xingtu",
   anim_type = "support",
   can_use = function(self, player)
-    return player:usedSkillTimes(self.name) < 3
+    return player:usedSkillTimes(self.name) < 1
   end,
   card_num = 0,
   target_num = 0,
@@ -334,12 +334,12 @@ local fenlv = fk.CreateActiveSkill {
     t["Q"] = 12
     t["K"] = 13
     local choices = { "A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K" }
-    room:setPlayerMark(player, "@jy_fenlv",
-      t[room:askForChoice(player, choices, self.name, "#jy_fenlv_ask")])
+    room:setPlayerMark(player, "@jy_xingtu",
+      t[room:askForChoice(player, choices, self.name, "#jy_xingtu_ask")])
   end,
 }
-local fenlv_draw = fk.CreateTriggerSkill {
-  name = "#jy_fenlv_draw",
+local xingtu_draw = fk.CreateTriggerSkill {
+  name = "#jy_xingtu_draw",
   mute = true,
   anim_type = "control",
   frequency = Skill.Compulsory,
@@ -348,32 +348,32 @@ local fenlv_draw = fk.CreateTriggerSkill {
     return player:hasSkill(self) and target == player
   end,
   on_refresh = function(self, event, target, player, data)
-    player.room:setPlayerMark(player, "@jy_fenlv", data.card.number)
+    player.room:setPlayerMark(player, "@jy_xingtu", data.card.number)
   end,
   events = { fk.CardUsing },
   can_trigger = function(self, event, target, player, data)
     if not player:hasSkill(self) then return false end
     return target == player and
-        isFactor(data.card.number, player:getMark("@jy_fenlv"))
+        isFactor(data.card.number, player:getMark("@jy_xingtu"))
   end,
   on_use = function(self, event, target, player, data)
-    player:broadcastSkillInvoke(fenlv.name)
+    player:broadcastSkillInvoke(xingtu.name)
     player.room:doAnimate("InvokeSkill", {
-      name = fenlv.name,
+      name = xingtu.name,
       player = player.id,
       skill_type = "drawcard",
     })
     player:drawCards(1, self.name)
   end,
 }
-local fenlv_mod = fk.CreateTargetModSkill {
-  name = "#jy_fenlv_mod",
+local xingtu_mod = fk.CreateTargetModSkill {
+  name = "#jy_xingtu_mod",
   bypass_times = function(self, player, skill, scope, card, to)
-    return player:hasSkill(self) and isFactor(player:getMark("@jy_fenlv"), card.number)
+    return player:hasSkill(self) and isFactor(player:getMark("@jy_xingtu"), card.number)
   end,
 }
-fenlv:addRelatedSkill(fenlv_draw)
-fenlv:addRelatedSkill(fenlv_mod)
+xingtu:addRelatedSkill(xingtu_draw)
+xingtu:addRelatedSkill(xingtu_mod)
 
 local function translateCardType(a)
   local t = {}
@@ -412,7 +412,7 @@ zhunwang:addRelatedSkill(zhunwang_mod)
 
 local peixiu = General(extension, "jy__peixiu", "qun", 3)
 peixiu.subkingdom = "jin"
-peixiu:addSkill(fenlv)
+peixiu:addSkill(xingtu)
 peixiu:addSkill(zhunwang)
 peixiu:addSkill("juezhi")
 
@@ -422,10 +422,10 @@ Fk:loadTranslationTable {
   ["#jy__peixiu"] = "禁图开秘",
   ["designer:jy__peixiu"] = "贾文和",
 
-  ["jy_fenlv"] = "分率",
-  [":jy_fenlv"] = [[锁定技，你使用牌结算结束后记录此牌点数。你使用牌时，若此牌点数为〖分率〗记录点数的约数，你摸一张牌；你有已记录的点数，你使用点数为〖分率〗记录点数的倍数的牌无次数限制。出牌阶段限三次，你可以修改〖分率〗记录的点数。]],
-  ["@jy_fenlv"] = "分率",
-  ["#jy_fenlv_ask"] = "修改“分率”",
+  ["jy_xingtu"] = "行图",
+  [":jy_xingtu"] = [[锁定技，你使用牌时，若此牌的点数是X（X为你使用的上一张牌的点数）的约数，你摸一张牌。你使用点数为X的倍数的牌无次数限制。出牌阶段限一次，你可以修改X。]],
+  ["@jy_xingtu"] = "行图",
+  ["#jy_xingtu_ask"] = "修改“行图”",
 
   ["jy_zhunwang"] = "准望",
   [":jy_zhunwang"] = [[锁定技，你使用与你使用的上一张牌类型相同的牌无距离限制。]],
@@ -1346,7 +1346,7 @@ Fk:loadTranslationTable {
 
   ["jy_maochong"] = [[冒充]],
   [":jy_maochong"] = [[转换技，阳：你可将任意张牌当【杀】使用，该【杀】需等量张【闪】才能抵消且不计入次数限制；若你的装备区有武器牌，该【杀】伤害+1；阴：其他角色的出牌阶段限一次，其可以将一张【杀】或武器牌正面朝上交给你，然后其摸一张牌。]],
-  ["#jy_maochong-active"] = [[冒充：你可以将一张【杀】或武器牌交给 御稜名草，然后你摸一张牌]],
+  ["#jy_maochong-active"] = [[你可以将一张【杀】或武器牌交给御稜名草，然后你摸一张牌]],
   ["jy_maochong_other&"] = [[冒充]],
   [":jy_maochong_other&"] = [[出牌阶段限一次，当御稜名草的〖冒充〗状态为阴时，你可以将一张【杀】或武器牌正面向上交给其，然后你摸一张牌。]],
 
