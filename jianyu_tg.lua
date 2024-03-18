@@ -1223,7 +1223,7 @@ local maochong_extra = fk.CreateTriggerSkill {
   refresh_events = { fk.DamageInflicted },
   can_refresh = function(self, event, target, player, data)
     if not player:hasSkill(self) then return false end
-    return data.from == player and data.card.trueName == "slash" and data.card.jy_maochong and
+    return data.from == player and data.card and data.card.trueName == "slash" and data.card.jy_maochong and
         player:getEquipment(Card.SubtypeWeapon)
   end,
   on_refresh = function(self, event, target, player, data)
@@ -1345,13 +1345,13 @@ Fk:loadTranslationTable {
   ["illustrator:jy__ylmc"] = [[Nexon]],
 
   ["jy_maochong"] = [[冒充]],
-  [":jy_maochong"] = [[转换技，阳：你可将任意张牌当【杀】使用，该【杀】需等量张【闪】才能抵消且不计入次数限制；若你的装备区有武器牌，该【杀】伤害+1；阴：其他角色的出牌阶段限一次，其可以将一张【杀】或武器牌正面朝上交给你，然后其摸一张牌。]],
+  [":jy_maochong"] = [[转换技，阳：你可将任意张牌当【杀】使用，该【杀】需等量张【闪】才能抵消且无次数限制；若你的装备区有武器牌，该【杀】伤害+1；阴：其他角色的出牌阶段限一次，其可以将一张【杀】或武器牌正面朝上交给你，然后其摸一张牌。]],
   ["#jy_maochong-active"] = [[你可以将一张【杀】或武器牌交给御稜名草，然后你摸一张牌]],
   ["jy_maochong_other&"] = [[冒充]],
   [":jy_maochong_other&"] = [[出牌阶段限一次，当御稜名草的〖冒充〗状态为阴时，你可以将一张【杀】或武器牌正面向上交给其，然后你摸一张牌。]],
 
   ["jy_muhuo"] = [[目祸]],
-  [":jy_muhuo"] = [[当与你距离不大于1的角色受到伤害后，你可以摸X张牌（X为你已损失的体力值且至多为5）、将〖冒充〗状态改为阴。若该角色不为你，你本回合不能再对其使用牌。]],
+  [":jy_muhuo"] = [[当一名角色受到伤害后，若你与其的距离不大于1，你可以摸X张牌（X为你已损失的体力值且至多为5）、将〖冒充〗状态改为阴。若该角色不为你，你本回合不能再对其使用牌。]],
   ["@jy_muhuo-turn"] = [[目祸]],
 }
 
