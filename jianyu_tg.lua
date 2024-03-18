@@ -1297,7 +1297,7 @@ local maochong_other = fk.CreateActiveSkill {
     -- 给target更改阴阳状态
     player.room:setPlayerMark(target, MarkEnum.SwithSkillPreName .. maochong.name,
       target:getSwitchSkillState(maochong.name, true))
-    -- target:addSkillUseHistory(maochong.name)
+    target:addSkillUseHistory(maochong.name)
 
     room:moveCardTo(effect.cards, Player.Hand, target, fk.ReasonGive, self.name, nil, true)
     player:drawCards(1, maochong.name)
