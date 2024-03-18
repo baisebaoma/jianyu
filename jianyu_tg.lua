@@ -5,7 +5,7 @@ extension.extensionName = "jianyu"
 local U = require "packages/utility/utility"
 
 Fk:loadTranslationTable {
-  ["jianyu_tg"] = [[简浴-集思广益]],
+  ["jianyu_tg"] = [[简浴-投稿]],
 }
 
 local jy__tangniu = General(extension, "jy__tangniu", "qun", 1, 1, General.Female)
@@ -538,17 +538,6 @@ local yujian = fk.CreateTriggerSkill {
     room:askForGuanxing(player, room:getNCards(math.min(5, room:getTag("RoundCount"))))
   end,
 }
-
--- local mumang = fk.CreateProhibitSkill {
---   name = "jy_mumang",
---   frequency = Skill.Compulsory,
---   is_prohibited = function(self, from, to, card)
---     if from:hasSkill(self) and card.trueName == "slash" then
---       return from:distanceTo(to) > 1 -- 不能指定与你距离大于1的角色为目标
---       --  or (from:getNextAlive(true) ~= to and to:getNextAlive(true) ~= from) -- 不能指定上家或下家以外的角色为目标
---     end
---   end,
--- }
 
 local guanzhe = General(extension, "jy__guanzhe", "jin", 3, 3, General.Female)
 guanzhe:addSkill(xiuxing)
@@ -1193,6 +1182,177 @@ Fk:loadTranslationTable {
   [":jy_baoyang"] = [[每轮开始时，你可以指定三个不同的牌名，然后依次从场上获得一张该牌名的牌。若如此做，本轮你首个回合开始前，你须交给一名其他角色三张牌并选择一项（每项限一次）：1.结束当前回合并令其立即执行一个额外回合；2.获得其一个技能（限定/觉醒/使命技除外）直到回合结束；3.观看其手牌并令其立即使用其中一张。]],
   ["$jy_baoyang1"] = [[开个价吧。]],
   ["$jy_baoyang2"] = [[你知道该怎么做的对吧？]],
+}
+
+local maochong = fk.CreateViewAsSkill {
+  name = "jy_maochong",
+  anim_type = "switch",
+  switch_skill_name = "jy_maochong",
+  card_filter = function(self, to_select, selected)
+    return true
+  end,
+  view_as = function(self, cards)
+    if #cards > 0 then
+      local card = Fk:cloneCard("slash")
+      card:addSubcards(cards)
+      card.skillName = self.name
+      card.jy_maochong = #cards
+      return card
+    end
+  end,
+  enabled_at_play = function(self, player)
+    return not player:isKongcheng() and player:usedSkillTimes(self.name) == 0 and
+        player:getSwitchSkillState(self.name) == fk.SwitchYang
+  end,
+  enabled_at_response = function(self, player, response)
+    return not player:isKongcheng() and player:usedSkillTimes(self.name) == 0 and
+        player:getSwitchSkillState(self.name) == fk.SwitchYang
+  end,
+}
+local maochong_extra = fk.CreateTriggerSkill {
+  name = "#jy_maochong_extra",
+  mute = true,
+  frequency = Skill.Compulsory,
+  events = { fk.TargetSpecified },
+  can_trigger = function(self, event, target, player, data)
+    if not player:hasSkill(self) then return false end
+    return target == player and data.card.trueName == "slash" and data.card.jy_maochong
+  end,
+  on_use = function(self, event, target, player, data)
+    data.fixedResponseTimes = data.fixedResponseTimes or {}
+    data.fixedResponseTimes["jink"] = data.card.jy_maochong
+  end,
+  refresh_events = { fk.DamageInflicted },
+  can_refresh = function(self, event, target, player, data)
+    if not player:hasSkill(self) then return false end
+    return data.from == player and data.card.trueName == "slash" and data.card.jy_maochong and
+        player:getEquipment(Card.SubtypeWeapon)
+  end,
+  on_refresh = function(self, event, target, player, data)
+    data.damage = data.damage + 1
+  end,
+}
+local maochong_bypass = fk.CreateTargetModSkill {
+  name = "#jy_maochong_bypass",
+  bypass_times = function(self, player, skill, scope, card, to)
+    return player:hasSkill(self) and to and card.jy_maochong
+  end,
+}
+local maochong_skills = fk.CreateTriggerSkill {
+  name = "#maochong_skills",
+  mute = true,
+  refresh_events = { fk.EventAcquireSkill, fk.EventLoseSkill, fk.BuryVictim, fk.AfterPropertyChange },
+  can_refresh = function(self, event, target, player, data)
+    if event == fk.EventAcquireSkill or event == fk.EventLoseSkill then
+      return data == self
+    elseif event == fk.BuryVictim then
+      return target:hasSkill(self, true, true)
+    elseif event == fk.AfterPropertyChange then
+      return target == player
+    end
+  end,
+  on_refresh = function(self, event, target, player, data)
+    local room = player.room
+    local attached_huangtian = table.find(room.alive_players, function(p)
+      return p ~= player and p:hasSkill(self, true)
+    end)
+    if attached_huangtian and not player:hasSkill("jy_maochong_other&", true, true) then
+      room:handleAddLoseSkills(player, "jy_maochong_other&", nil, false, true)
+    elseif not attached_huangtian and player:hasSkill("jy_maochong_other&", true, true) then
+      room:handleAddLoseSkills(player, "-jy_maochong_other&", nil, false, true)
+    end
+  end,
+}
+local maochong_other = fk.CreateActiveSkill {
+  name = "jy_maochong_other&",
+  anim_type = "support",
+  prompt = "#jy_maochong-active",
+  mute = true,
+  can_use = function(self, player)
+    local me = table.find(Fk:currentRoom().alive_players,
+      function(p) return p:hasSkill(maochong.name) and p ~= player end)
+    return player:usedSkillTimes(self.name, Player.HistoryPhase) < 1 and me and
+        me:getSwitchSkillState(maochong.name) == fk.SwitchYin
+  end,
+  card_num = 1,
+  card_filter = function(self, to_select, selected)
+    local card = Fk:getCardById(to_select)
+    return #selected < 1 and
+        (card.trueName == "slash" or (card.type == Card.TypeEquip and card.sub_type == Card.SubtypeWeapon))
+  end,
+  target_num = 0,
+  on_use = function(self, room, effect)
+    local player = room:getPlayerById(effect.from)
+    local targets = table.filter(room.alive_players, function(p) return p:hasSkill("jy_maochong") and p ~= player end)
+    local target
+    if #targets == 1 then
+      target = targets[1]
+    else
+      target = room:getPlayerById(room:askForChoosePlayers(player, table.map(targets, Util.IdMapper), 1, 1, nil,
+        self.name, false)[1])
+    end
+    if not target then return false end
+    room:notifySkillInvoked(player, "jy_maochong")
+    player:broadcastSkillInvoke("jy_maochong")
+    room:doIndicate(effect.from, { target.id })
+    room:moveCardTo(effect.cards, Player.Hand, target, fk.ReasonGive, self.name, nil, true)
+    player:drawCards(1, maochong.name)
+    -- 给target更改阴阳状态
+    target.room:setPlayerMark(target, MarkEnum.SwithSkillPreName .. maochong.name,
+      target:getSwitchSkillState(maochong.name, true))
+    target:addSkillUseHistory(maochong.name)
+  end,
+}
+Fk:addSkill(maochong_other)
+maochong:addRelatedSkill(maochong_extra)
+maochong:addRelatedSkill(maochong_bypass)
+maochong:addRelatedSkill(maochong_skills)
+
+local muhuo = fk.CreateTriggerSkill {
+  name = "jy_muhuo",
+  events = { fk.Damaged },
+  can_trigger = function(self, event, target, player, data)
+    return player:hasSkill(self) and player:distanceTo(target) <= 1
+  end,
+  on_use = function(self, event, target, player, data)
+    player:drawCards(math.min(player.maxHp - player.hp, 5), self.name)
+    player.room:setPlayerMark(target, MarkEnum.SwithSkillPreName .. maochong.name,
+      fk.SwitchYin)
+    player:addSkillUseHistory(maochong.name)
+    if target ~= player then
+      player.room:setPlayerMark(target, "@jy_muhuo-turn", "")
+    end
+  end,
+}
+local muhuo_prohibit = fk.CreateProhibitSkill {
+  name = "#jy_muhuo_prohibit",
+  frequency = Skill.Compulsory,
+  is_prohibited = function(self, from, to, card)
+    return from:hasSkill(self) and to:getMark("@jy_muhuo-turn") ~= 0
+  end,
+}
+muhuo:addRelatedSkill(muhuo_prohibit)
+
+local ylmc = General(extension, "jy__ylmc", "wei", 3, 4, General.Female)
+ylmc:addSkill(maochong)
+ylmc:addSkill(muhuo)
+
+Fk:loadTranslationTable {
+  ["jy__ylmc"] = [[御稜名草]],
+  ["#jy__ylmc"] = [[灾厄之狐]],
+  ["designer:jy__ylmc"] = [[冒充会长]],
+  ["cv:jy__ylmc"] = [[无]],
+  ["illustrator:jy__ylmc"] = [[Nexon]],
+
+  ["jy_maochong"] = [[冒充]],
+  [":jy_maochong"] = [[转换技，阳：出牌阶段限一次，你可将任意张牌当【杀】使用，该【杀】需等量张【闪】才能抵消且不计入次数限制；若你的装备区有武器牌，该【杀】伤害+1；阴：其他角色的出牌阶段限一次，其可以将一张【杀】或武器牌正面朝上交给你，然后其摸一张牌。]],
+  ["#jy_maochong-active"] = [[冒充：你可以将一张【杀】或武器牌交给 御稜名草，然后你摸一张牌]],
+  ["jy_maochong_other&"] = [[冒充]],
+  [":jy_maochong_other&"] = [[出牌阶段限一次，当御稜名草的〖冒充〗状态为阴时，你可以将一张【杀】或武器牌正面向上交给其，然后你摸一张牌。]],
+
+  ["jy_muhuo"] = [[目祸]],
+  [":jy_muhuo"] = [[当与你距离不大于1的角色受到伤害后，你可以摸X张牌（X为你已损失的体力值且至多为5）、将〖冒充〗状态改为阴。若该角色不为你，你本回合不能再对其使用牌。]],
+  ["@jy_muhuo-turn"] = [[目祸]],
 }
 
 return extension
