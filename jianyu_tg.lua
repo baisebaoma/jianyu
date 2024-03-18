@@ -897,7 +897,7 @@ local jimin = fk.CreateTriggerSkill {
   frequency = Skill.Compulsory,
   can_trigger = function(self, event, target, player, data)
     return player:hasSkill(self) and data.to == player.id and
-        player.room:getPlayerById(target.id):getMark("jy_jimin") == 0 and
+        player.room:getPlayerById(data.from):getMark("jy_jimin") == 0 and
         data.card.trueName == "slash"
   end,
   on_use = function(self, event, target, player, data)

@@ -564,6 +564,7 @@ Fk:loadTranslationTable {
   ["#jy_trad_yiji-use"] = [[遗计：你可以立即将一张非基本牌或两张基本牌当 %arg 使用]],
   ["@$jy_trad_yiji-round"] = [[遗计]],
   ["#jy_trad_yiji_viewas"] = [[遗计]],
+  ["#jy_trad_yiji-invoke"] = [[遗计：选择一个牌名，随后你可以将一张非基本牌或两张基本牌当该牌名使用]],
 
   ["jy_trad_yingcai"] = [[英才]],
   [":jy_trad_yingcai"] = [[当你使用锦囊牌指定目标时，你可以弃一张牌，为该锦囊牌增加或减少一个目标（目标数至少为1）。]],
