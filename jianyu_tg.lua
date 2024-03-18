@@ -1293,12 +1293,14 @@ local maochong_other = fk.CreateActiveSkill {
     room:notifySkillInvoked(player, "jy_maochong")
     player:broadcastSkillInvoke("jy_maochong")
     room:doIndicate(effect.from, { target.id })
+
+    -- 给target更改阴阳状态
+    -- target.room:setPlayerMark(target, MarkEnum.SwithSkillPreName .. maochong.name,
+    --   target:getSwitchSkillState(maochong.name, true))
+    target:addSkillUseHistory(maochong.name) -- 这一句就改了？
+
     room:moveCardTo(effect.cards, Player.Hand, target, fk.ReasonGive, self.name, nil, true)
     player:drawCards(1, maochong.name)
-    -- 给target更改阴阳状态
-    target.room:setPlayerMark(target, MarkEnum.SwithSkillPreName .. maochong.name,
-      target:getSwitchSkillState(maochong.name, true))
-    target:addSkillUseHistory(maochong.name)
   end,
 }
 Fk:addSkill(maochong_other)
