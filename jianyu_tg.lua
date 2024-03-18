@@ -1122,7 +1122,7 @@ local xidi = fk.CreateTriggerSkill {
       if success then
         local card = Fk:cloneCard("slash")
         card.skillName = self.name
-        card.is_jy_xidi = true -- TODO：这样写好像不对，传不到伤害事件里去。晚点再研究吧
+        card.is_jy_xidi = true
         room:useCard {
           from = player.id,
           tos = table.map(dat.targets, function(p) return { p } end),
@@ -1137,7 +1137,7 @@ local xidi = fk.CreateTriggerSkill {
       if event == fk.EventPhaseEnd then
         return player.shield > 0
       else
-        return target == player and data.card and data.card.is_jy_xidi
+        return data.card and data.card.is_jy_xidi
       end
     end
   end,
@@ -1165,7 +1165,6 @@ local xidi_viewas = fk.CreateViewAsSkill {
 xidi:addRelatedSkill(xidi_viewas)
 
 local qexbj = General(extension, "jy__qexbj", "qun", 3, 3, General.Female)
-qexbj.total_hidden = true -- bug 还没修完
 qexbj:addSkill(zhijin)
 qexbj:addSkill(xidi)
 -- qexbj:addSkill(baoyang)
@@ -1184,8 +1183,8 @@ Fk:loadTranslationTable {
   ["jy_xidi"] = [[西迪]],
   ["@jy_xidi"] = [[西迪]],
   ["#jy_xidi_viewas"] = [[西迪]],
-  ["#jy_xidi-use"] = [[西迪：你需视为使用一张伤害值为 %arg 的【杀】]],
-  [":jy_xidi"] = [[锁定技，你于回合外受到伤害后，你获得1点护甲和1枚“西迪”；一名角色的回合结束时，你失去所有护甲；回合开始时，若你有“西迪”，你移除所有“西迪”视为使用一张伤害值为“西迪”数的【杀】。]],
+  ["#jy_xidi-use"] = [[西迪：你需视为使用一张基础伤害值为 %arg 的【杀】]],
+  [":jy_xidi"] = [[锁定技，你于回合外受到伤害后，你获得1点护甲和1枚“西迪”；一名角色的回合结束时，你失去所有护甲；回合开始时，若你有“西迪”，你移除所有“西迪”视为使用一张基础伤害值为“西迪”数的【杀】。]],
   ["$jy_xidi1"] = [[就这？]],
   ["$jy_xidi2"] = [[西迪，拦住他们！]],
 
