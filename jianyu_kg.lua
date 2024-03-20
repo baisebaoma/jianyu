@@ -126,7 +126,7 @@ local jy_zuoti = fk.CreateActiveSkill {
       for _, id in ipairs(allCardIds) do
         local card = Fk:getCardById(id)
         if card.type == cardType then
-          if allCardMapper[card.name] == nil then
+          if allCardMapper[card.name] == nil and not Fk:cloneCard(card.name).is_derived then -- 我改了这里，禁止抽衍生牌
             table.insert(allCardNames, card.name)
           end
 
@@ -361,7 +361,7 @@ local jy_guina = fk.CreateActiveSkill {
       for _, id in ipairs(allCardIds) do
         local card = Fk:getCardById(id)
         if card.type == cardType then
-          if allCardMapper[card.name] == nil then
+          if allCardMapper[card.name] == nil and not Fk:cloneCard(card.name).is_derived then -- 我改了这里，禁止抽衍生牌
             table.insert(allCardNames, card.name)
           end
 
@@ -469,7 +469,7 @@ Fk:loadTranslationTable {
   ["~jy__kgdxs"] = [[老师，对不起……]],
 
   ["jy_zuoti"] = "做题",
-  [":jy_zuoti"] = [[出牌阶段限一次，你可以回答一道行测真题。若正确，你指定一个牌名并获得一张该牌名的牌。<br><font color="grey">收录2018-2023《行测》]] .. total_papers .. [[套共]] .. total_questions .. [[题，经人工筛选，不含图形推理、资料分析。<br>回答正确时，这张牌可能来自任何位置，甚至你自己的区域。若你有同名牌，请先使用掉。</font>]],
+  [":jy_zuoti"] = [[出牌阶段限一次，你可以回答一道行测真题。若正确，你指定一个牌名并获得一张该牌名的牌（不能是衍生牌）。<br><font color="grey">收录2018-2023《行测》]] .. total_papers .. [[套共]] .. total_questions .. [[题，经人工筛选，不含图形推理、资料分析。<br>回答正确时，这张牌可能来自任何位置，甚至你自己的区域。若你有同名牌，请先使用掉。</font>]],
   ["#jy_zuoti_see_log"] = [[做题：请在战报中查看完整题干]],
   ["#jy_zuoti_ob"] = [[正在做题！其他角色可以在战报中查看这道题目的完整题干和选项。]],
   ["#jy_zuoti_correct"] = [[答对了！你可以自选一张牌！<br>你可以在战报中查看正确答案。]],
@@ -505,7 +505,7 @@ Fk:loadTranslationTable {
   ["~jy__kgds"] = "“庸人”么……呵……",
 
   ["jy_guina"] = "归纳",
-  [":jy_guina"] = [[出牌阶段限三次，你可以令一名角色回答一道行测真题。若正确，其指定一个牌名并获得一张该牌名的牌，否则其获得“归纳”直到本阶段结束。你使用基本牌与非延时类锦囊牌时，若持有“归纳”的角色不是该牌的目标，其也成为目标；持有“归纳”的角色受到伤害时，你摸两张牌。<br><font color="grey">收录2018-2023《行测》]] .. total_papers .. [[套共]] .. total_questions .. [[题，经人工筛选，不含图形推理、资料分析。<br>回答正确时，这张牌可能来自任何位置，甚至你自己的区域。若你有同名牌，请先使用掉。</font>]],
+  [":jy_guina"] = [[出牌阶段限三次，你可以令一名角色回答一道行测真题。若正确，其指定一个牌名并获得一张该牌名的牌（不能是衍生牌），否则其获得“归纳”直到本阶段结束。你使用基本牌与非延时类锦囊牌时，若持有“归纳”的角色不是该牌的目标，其也成为目标；持有“归纳”的角色受到伤害时，你摸两张牌。<br><font color="grey">收录2018-2023《行测》]] .. total_papers .. [[套共]] .. total_questions .. [[题，经人工筛选，不含图形推理、资料分析。<br>回答正确时，这张牌可能来自任何位置，甚至你自己的区域。若你有同名牌，请先使用掉。</font>]],
   ["@jy_guina-phase"] = "归纳",
   ["#jy_guina_correct"] = [[答对了！你可以自选一张牌获得！<br>你可以在战报中查看正确答案。]],
   ["#jy_guina_incorrect"] = [[答错了，本阶段的所有牌会额外指定你为目标！<br>你可以在战报中查看正确答案。]],
