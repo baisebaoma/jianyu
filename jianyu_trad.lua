@@ -587,7 +587,7 @@ local heiyong = fk.CreateTriggerSkill {
     if event ~= fk.EventPhaseProceeding then
       return not table.contains(mark, data.card.name)
     else
-      if target.phase == Player.End and #mark > player.maxHp then return true end
+      return player.phase == Player.Finish and #mark > player.maxHp
     end
   end,
   on_use = function(self, event, target, player, data)
@@ -599,7 +599,6 @@ local heiyong = fk.CreateTriggerSkill {
       end
 
       player:drawCards(1, self.name)
-      local mark = player:getMark("@$jy_trad_heiyong-turn")
       table.insert(mark, data.card.name)
       player.room:setPlayerMark(player, "@$jy_trad_heiyong-turn", mark)
     else
