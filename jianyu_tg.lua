@@ -1359,7 +1359,7 @@ Fk:loadTranslationTable {
 local heiyong = fk.CreateTriggerSkill {
   name = "jy_heiyong",
   anim_type = "drawcard",
-  events = { fk.CardUseFinished, fk.CardRespondFinished, fk.EventPhaseProceeding },
+  events = { fk.CardUsing, fk.CardResponding, fk.EventPhaseProceeding },
   frequency = Skill.Compulsory,
   can_trigger = function(self, event, target, player, data)
     if not (player:hasSkill(self.name) and target == player) then return false end
@@ -1432,14 +1432,18 @@ tjzs:addSkill(silie)
 
 Fk:loadTranslationTable {
   ["jy__tjzs"] = [[铁甲战士]],
+  ["#jy__tjzs"] = [[铁甲战士]],
+  ["designer:jy__tjzs"] = [[Kasa]],
+  ["cv:jy__tjzs"] = [[高达一号]],
+  ["illustrator:jy__tjzs"] = [[未知]],
 
   ["jy_heiyong"] = [[黑拥]],
-  [":jy_heiyong"] = [[锁定技，你使用或打出牌结算完成后，你摸一张牌（每种牌名每回合限一次）；每名角色的结束阶段，若你本回合以此法获得的牌数大于你的体力上限，你失去一点体力。]],
+  [":jy_heiyong"] = [[锁定技，你使用或打出牌后，你摸一张牌（每种牌名每回合限一次）；每名角色的结束阶段，若你本回合以此法获得的牌数大于你的体力上限，你失去一点体力。]],
   ["$jy_heiyong1"] = [[龙战于野，其血玄黄！]],
   ["@$jy_heiyong-turn"] = [[黑拥]],
 
   ["jy_silie"] = [[撕裂]],
-  [":jy_silie"] = [[锁定技，你失去一点体力时，获得1枚“撕裂”；你造成伤害时，移去1枚“撕裂”令此伤害+1。]],
+  [":jy_silie"] = [[锁定技，你失去一点体力时，获得1枚“撕裂”；你造成伤害时，弃1枚“撕裂”令此伤害+1。]],
   ["@jy_silie"] = [[撕裂]],
 
 }
