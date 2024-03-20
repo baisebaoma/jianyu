@@ -1413,7 +1413,7 @@ local silie = fk.CreateTriggerSkill {
         self:doCost(event, target, player, data)
       end
     else
-      return true
+      self:doCost(event, target, player, data)
     end
   end,
   on_use = function(self, event, target, player, data)
