@@ -1357,12 +1357,12 @@ Fk:loadTranslationTable {
 local heiyong = fk.CreateTriggerSkill {
   name = "jy_heiyong",
   anim_type = "drawcard",
-  events = { fk.CardUsing, fk.CardResponding },
+  events = { fk.CardUsing },
   frequency = Skill.Compulsory,
   can_trigger = function(self, event, target, player, data)
     if not (player:hasSkill(self.name) and target == player) then return false end
 
-    local mark = player:getMark("@$jy_trad_heiyong-turn")
+    local mark = player:getMark("@$jy_trad_heiyong-round")
     if type(mark) ~= "table" then
       mark = {}
     end
@@ -1370,15 +1370,15 @@ local heiyong = fk.CreateTriggerSkill {
     return not table.contains(mark, data.card.name)
   end,
   on_use = function(self, event, target, player, data)
-    local mark = player:getMark("@$jy_trad_heiyong-turn")
+    local mark = player:getMark("@$jy_trad_heiyong-round")
     if type(mark) ~= "table" then
       mark = {}
-      player.room:setPlayerMark(player, "@$jy_trad_heiyong-turn", mark)
+      player.room:setPlayerMark(player, "@$jy_trad_heiyong-round", mark)
     end
 
     player:drawCards(1, self.name)
     table.insert(mark, data.card.name)
-    player.room:setPlayerMark(player, "@$jy_trad_heiyong-turn", mark)
+    player.room:setPlayerMark(player, "@$jy_trad_heiyong-round", mark)
   end,
 }
 
@@ -1393,9 +1393,9 @@ Fk:loadTranslationTable {
   ["illustrator:jy__tjzs"] = [[未知]],
 
   ["jy_heiyong"] = [[黑拥]],
-  [":jy_heiyong"] = [[锁定技，你使用或打出牌后，你摸一张牌（每个牌名每回合限一次）。]],
+  [":jy_heiyong"] = [[锁定技，每个牌名每轮限一次，你使用或打出一张牌时，你摸一张牌。]],
   ["$jy_heiyong1"] = [[龙战于野，其血玄黄！]],
-  ["@$jy_heiyong-turn"] = [[黑拥]],
+  ["@$jy_heiyong-round"] = [[黑拥]],
 
 }
 
