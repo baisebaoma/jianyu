@@ -653,7 +653,7 @@ Fk:loadTranslationTable {
   ["illustrator:jy__trad__tjzs"] = [[未知]],
 
   ["jy_trad_heiyong"] = [[黑拥]],
-  [":jy_trad_heiyong"] = [[锁定技，你使用或打出牌后，你摸一张牌（每种牌名每回合限一次）；每名角色的结束阶段，若你本回合以此法获得的牌数大于你的体力上限，你失去一点体力。]],
+  [":jy_trad_heiyong"] = [[锁定技，你使用或打出牌后，你摸一张牌（每个牌名每回合限一次）；每名角色的结束阶段，若你本回合以此法获得的牌数大于你的体力上限，你失去一点体力。]],
   ["$jy_trad_heiyong1"] = [[龙战于野，其血玄黄！]],
   ["@$jy_trad_heiyong-turn"] = [[黑拥]],
 

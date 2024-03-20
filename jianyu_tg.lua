@@ -1354,4 +1354,49 @@ Fk:loadTranslationTable {
   ["@jy_muhuo-turn"] = [[目祸]],
 }
 
+local heiyong = fk.CreateTriggerSkill {
+  name = "jy_heiyong",
+  anim_type = "drawcard",
+  events = { fk.CardUsing, fk.CardResponding },
+  frequency = Skill.Compulsory,
+  can_trigger = function(self, event, target, player, data)
+    if not (player:hasSkill(self.name) and target == player) then return false end
+
+    local mark = player:getMark("@$jy_trad_heiyong-turn")
+    if type(mark) ~= "table" then
+      mark = {}
+    end
+
+    return not table.contains(mark, data.card.name)
+  end,
+  on_use = function(self, event, target, player, data)
+    local mark = player:getMark("@$jy_trad_heiyong-turn")
+    if type(mark) ~= "table" then
+      mark = {}
+      player.room:setPlayerMark(player, "@$jy_trad_heiyong-turn", mark)
+    end
+
+    player:drawCards(1, self.name)
+    table.insert(mark, data.card.name)
+    player.room:setPlayerMark(player, "@$jy_trad_heiyong-turn", mark)
+  end,
+}
+
+local tjzs = General(extension, "jy__tjzs", "shu", 3, 3, General.Female)
+tjzs:addSkill(heiyong)
+
+Fk:loadTranslationTable {
+  ["jy__tjzs"] = [[铁甲战士]],
+  ["#jy__tjzs"] = [[铁甲战士]],
+  ["designer:jy__tjzs"] = [[Kasa]],
+  ["cv:jy__tjzs"] = [[高达一号]],
+  ["illustrator:jy__tjzs"] = [[未知]],
+
+  ["jy_heiyong"] = [[黑拥]],
+  [":jy_heiyong"] = [[锁定技，你使用或打出牌后，你摸一张牌（每个牌名每回合限一次）。]],
+  ["$jy_heiyong1"] = [[龙战于野，其血玄黄！]],
+  ["@$jy_heiyong-turn"] = [[黑拥]],
+
+}
+
 return extension
