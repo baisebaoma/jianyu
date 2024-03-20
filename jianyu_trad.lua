@@ -543,14 +543,14 @@ local yingcai = fk.CreateTriggerSkill {
 }
 
 local guojia = General(extension, "jy__trad__guojia", "wei", 3)
-
+guojia.hidden = true
 guojia:addSkill(tiandu)
 guojia:addSkill(yiji)
 guojia:addSkill(yingcai)
 
 Fk:loadTranslationTable {
   ["jy__trad__guojia"] = [[经典简郭嘉]],
-  ["#jy__trad__guojia"] = [[识人心智]],
+  ["#jy__trad__guojia"] = [[<font color="red">人机皇帝<br>这是未削弱版本，<br>因强度过高，这个武<br>将不会出现在选将框！</font>]],
   ["designer:jy__trad__guojia"] = [[rolin]],
   ["cv:jy__trad__guojia"] = [[暂无]],
   ["illustrator:jy__trad__guojia"] = [[未知]],
