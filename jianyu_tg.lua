@@ -1373,7 +1373,7 @@ local heiyong = fk.CreateTriggerSkill {
     if event ~= fk.EventPhaseProceeding then
       return not table.contains(mark, data.card.name)
     else
-      if #mark > player.maxHp then return true end
+      if target.phase == Player.End and #mark > player.maxHp then return true end
     end
   end,
   on_use = function(self, event, target, player, data)
@@ -1402,8 +1402,12 @@ local silie = fk.CreateTriggerSkill {
     end
   end,
   on_trigger = function(self, event, target, player, data)
-    for _ = 1, data.num do
-      self:doCost(event, target, player, data)
+    if event == fk.LoseHp then
+      for _ = 1, data.num do
+        self:doCost(event, target, player, data)
+      end
+    else
+      return true
     end
   end,
   on_use = function(self, event, target, player, data)
