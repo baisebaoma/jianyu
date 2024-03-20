@@ -1356,4 +1356,82 @@ Fk:loadTranslationTable {
   ["@jy_muhuo-turn"] = [[目祸]],
 }
 
+local heiyong = fk.CreateTriggerSkill {
+  name = "jy_heiyong",
+  anim_type = "drawcard",
+  events = { fk.CardUseFinished, fk.CardRespondFinished, fk.EventPhaseProceeding },
+  frequency = Skill.Compulsory,
+  can_trigger = function(self, event, target, player, data)
+    if not (player:hasSkill(self.name) and target == player) then return false end
+
+    local mark = player:getMark("@$jy_heiyong-turn")
+    if type(mark) ~= "table" then
+      mark = {}
+      player.room:setPlayerMark(player, "@$jy_heiyong-turn", mark)
+    end
+
+    if event ~= fk.EventPhaseProceeding then
+      return not table.contains(mark, data.card.name)
+    else
+      if #mark > player.maxHp then return true end
+    end
+  end,
+  on_use = function(self, event, target, player, data)
+    if event ~= fk.EventPhaseProceeding then
+      player:drawCards(1, self.name)
+      local mark = player:getMark("@$jy_heiyong-turn")
+      table.insert(mark, data.card.name)
+      player.room:setPlayerMark(player, "@$jy_heiyong-turn", mark)
+    else
+      player.room:loseHp(player, 1)
+    end
+  end,
+}
+
+local silie = fk.CreateTriggerSkill {
+  name = "jy_silie",
+  anim_type = "offensive",
+  events = { fk.LoseHp, fk.DamageInflicted },
+  frequency = Skill.Compulsory,
+  can_trigger = function(self, event, target, player, data)
+    if not player:hasSkill(self.name) then return false end
+    if event == fk.LoseHp then
+      return target == player
+    else
+      return data.from and data.from == player and player:getMark("@jy_silie") ~= 0
+    end
+  end,
+  on_trigger = function(self, event, target, player, data)
+    for _ = 1, data.num do
+      self:doCost(event, target, player, data)
+    end
+  end,
+  on_use = function(self, event, target, player, data)
+    if event == fk.LoseHp then
+      player.room:addPlayerMark(player, "@jy_silie")
+    else
+      data.damage = data.damage + 1
+      player.room:addPlayerMark(player, "@jy_silie", -1)
+    end
+  end,
+}
+
+local tjzs = General(extension, "jy__tjzs", "shu", 3, 3, General.Female)
+tjzs:addSkill(heiyong)
+tjzs:addSkill(silie)
+
+Fk:loadTranslationTable {
+  ["jy__tjzs"] = [[铁甲战士]],
+
+  ["jy_heiyong"] = [[黑拥]],
+  [":jy_heiyong"] = [[锁定技，你使用或打出牌后，你摸一张牌（每种牌名每回合限一次）；每名角色的结束阶段，若你本回合以此法获得的牌数大于你的体力上限，你失去一点体力。]],
+  ["$jy_heiyong1"] = [[龙战于野，其血玄黄！]],
+  ["@$jy_heiyong-turn"] = [[黑拥]],
+
+  ["jy_silie"] = [[撕裂]],
+  [":jy_silie"] = [[锁定技，你失去一点体力时，获得1枚“撕裂”；你造成伤害时，移去1枚“撕裂”令此伤害+1。]],
+  ["@jy_silie"] = [[撕裂]],
+
+}
+
 return extension
