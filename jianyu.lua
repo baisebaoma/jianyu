@@ -1687,18 +1687,17 @@ local jy_jinghua = fk.CreateTriggerSkill {
     local room = player.room
 
     room:setPlayerMark(player, "jy_jinghua-turn", true)
-    local extraData = { bypass_times = true, bypass_distances = true }                                       -- 加上这个，就可以让它就算之前使用过杀，也可以再使用了
+    local extraData = { bypass_times = true, bypass_distances = true } -- 加上这个，就可以让它就算之前使用过杀，也可以再使用了
+    local disresponsiveList = table.map(room.alive_players, Util.IdMapper)
 
-    local jinghua_use = room:askForUseCard(player, "slash", "slash|.|.", "#jy_jinghua_use", true, extraData) -- 这里填false也没用，反正是可以取消的
-    if jinghua_use then
-      jinghua_use.extraUse = true                                                                            -- 加上这个，就可以让它不计入次数了，也就是说还可以再使用一张杀
-      room:useCard(jinghua_use)
-
-      jinghua_use = room:askForUseCard(player, "slash", "slash|.|.", "#jy_jinghua_use_again", true, extraData) -- 这里填false也没用，反正是可以取消的
+    for i = 1, 2 do
+      local jinghua_use = room:askForUseCard(player, "slash", "slash|.|.", "#jy_jinghua_use:::" .. i, true, extraData) -- 这里填false也没用，反正是可以取消的
       if jinghua_use then
-        jinghua_use.extraUse = true                                                                            -- 加上这个，就可以让它不计入次数了，也就是说还可以再使用一张杀
-        jinghua_use.disresponsiveList = table.map(room.alive_players, Util.IdMapper)                           -- 加上这个就可以禁止响应
+        jinghua_use.extraUse = true                                                                                    -- 加上这个，就可以让它不计入次数了，也就是说还可以再使用一张杀
+        jinghua_use.disresponsiveList = disresponsiveList
         room:useCard(jinghua_use)
+      else
+        break
       end
     end
   end,
@@ -1738,11 +1737,10 @@ Fk:loadTranslationTable {
   ["~jy__ayato"] = "世事无常……",
 
   ["jy_jinghua"] = "镜花",
-  [":jy_jinghua"] = [[每回合限一次，你使用或打出一张基本牌后，可以使用2张【杀】，以此法使用的【杀】不计入使用次数、无距离限制、不可响应。]],
+  [":jy_jinghua"] = [[每回合限一次，你使用或打出一张基本牌后，可以使用两张【杀】，以此法使用的【杀】不计入使用次数、无距离限制、不可响应。]],
   ["$jy_jinghua1"] = "苍流水影。",
   ["$jy_jinghua2"] = "剑影。",
-  ["#jy_jinghua_use"] = "镜花：使用两张不计入使用次数且无距离限制的【杀】，第一张",
-  ["#jy_jinghua_use_again"] = "镜花：使用两张不计入使用次数且无距离限制的【杀】，第二张",
+  ["#jy_jinghua_use"] = "镜花：你可以使用不计入使用次数、无距离限制、不可响应【杀】，第 %arg/2 张",
 
   ["jy_jianying"] = "渐盈",
   [":jy_jianying"] = [[锁定技，所有角色的结束阶段，若你的手牌数小于体力值，你摸一张牌。]],
