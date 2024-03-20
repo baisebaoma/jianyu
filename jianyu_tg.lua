@@ -1362,7 +1362,7 @@ local heiyong = fk.CreateTriggerSkill {
   can_trigger = function(self, event, target, player, data)
     if not (player:hasSkill(self.name) and target == player) then return false end
 
-    local mark = player:getMark("@$jy_trad_heiyong-round")
+    local mark = player:getMark("@$jy_heiyong-round")
     if type(mark) ~= "table" then
       mark = {}
     end
@@ -1370,15 +1370,15 @@ local heiyong = fk.CreateTriggerSkill {
     return not table.contains(mark, data.card.name)
   end,
   on_use = function(self, event, target, player, data)
-    local mark = player:getMark("@$jy_trad_heiyong-round")
+    local mark = player:getMark("@$jy_heiyong-round")
     if type(mark) ~= "table" then
       mark = {}
-      player.room:setPlayerMark(player, "@$jy_trad_heiyong-round", mark)
+      player.room:setPlayerMark(player, "@$jy_heiyong-round", mark)
     end
 
     player:drawCards(1, self.name)
     table.insert(mark, data.card.name)
-    player.room:setPlayerMark(player, "@$jy_trad_heiyong-round", mark)
+    player.room:setPlayerMark(player, "@$jy_heiyong-round", mark)
   end,
 }
 
