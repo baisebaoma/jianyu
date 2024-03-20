@@ -1357,7 +1357,7 @@ Fk:loadTranslationTable {
 local heiyong = fk.CreateTriggerSkill {
   name = "jy_heiyong",
   anim_type = "drawcard",
-  events = { fk.CardUsing },
+  events = { fk.CardUsing, fk.CardResponding },
   frequency = Skill.Compulsory,
   can_trigger = function(self, event, target, player, data)
     if not (player:hasSkill(self.name) and target == player) then return false end
