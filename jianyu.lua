@@ -251,7 +251,6 @@ local jy_kaiju_2 = fk.CreateActiveSkill {
 jy__jianzihao:addSkill(jy_kaiju_2)
 jy__jianzihao:addSkill(jy_sanjian)
 jy__jianzihao:addSkill("jy_shengnu")
-jy__jianzihao:addSkill("jy_xizao")
 
 Fk:loadTranslationTable {
   ["jy__new__jianzihao"] = "简自豪",
@@ -857,7 +856,7 @@ Fk:loadTranslationTable {
 
   ["jy_youlong"] = "游龙",
   ["#jy_youlong-choose"] = "游龙：选择一张手牌交给下家",
-  [":jy_youlong"] = "锁定技，准备阶段，从你开始，有手牌的角色依次将一张手牌交给下家。",
+  [":jy_youlong"] = "锁定技，准备阶段，有手牌的角色依次将一张手牌交给下家。",
   ["$jy_youlong1"] = "翩若惊鸿！婉若游龙！",
 
   ["jy_hebao"] = "核爆",
@@ -1698,6 +1697,7 @@ local jy_jinghua = fk.CreateTriggerSkill {
       jinghua_use = room:askForUseCard(player, "slash", "slash|.|.", "#jy_jinghua_use_again", true, extraData) -- 这里填false也没用，反正是可以取消的
       if jinghua_use then
         jinghua_use.extraUse = true                                                                            -- 加上这个，就可以让它不计入次数了，也就是说还可以再使用一张杀
+        jinghua_use.disresponsiveList = table.map(room.alive_players, Util.IdMapper)                           -- 加上这个就可以禁止响应
         room:useCard(jinghua_use)
       end
     end
@@ -1716,7 +1716,7 @@ local jy_jianying = fk.CreateTriggerSkill {
         #player:getCardIds(Player.Hand) < player.hp
   end,
   on_use = function(self, event, target, player, data)
-    local success, dat = room:askForUseActiveSkill(to, "#jy_yiji_viewas", "#jy_yiji-use:::" .. Fk:translate(choice))
+    player:drawCards(1)
   end,
 }
 
@@ -1738,7 +1738,7 @@ Fk:loadTranslationTable {
   ["~jy__ayato"] = "世事无常……",
 
   ["jy_jinghua"] = "镜花",
-  [":jy_jinghua"] = [[每回合限一次，你使用或打出一张基本牌后，可以使用2张【杀】，以此法使用的【杀】不计入使用次数且无距离限制。]],
+  [":jy_jinghua"] = [[每回合限一次，你使用或打出一张基本牌后，可以使用2张【杀】，以此法使用的【杀】不计入使用次数、无距离限制、不可响应。]],
   ["$jy_jinghua1"] = "苍流水影。",
   ["$jy_jinghua2"] = "剑影。",
   ["#jy_jinghua_use"] = "镜花：使用两张不计入使用次数且无距离限制的【杀】，第一张",
