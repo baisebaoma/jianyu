@@ -1367,7 +1367,6 @@ local heiyong = fk.CreateTriggerSkill {
     local mark = player:getMark("@$jy_heiyong-turn")
     if type(mark) ~= "table" then
       mark = {}
-      player.room:setPlayerMark(player, "@$jy_heiyong-turn", mark)
     end
 
     if event ~= fk.EventPhaseProceeding then
@@ -1378,6 +1377,12 @@ local heiyong = fk.CreateTriggerSkill {
   end,
   on_use = function(self, event, target, player, data)
     if event ~= fk.EventPhaseProceeding then
+      local mark = player:getMark("@$jy_heiyong-turn")
+      if type(mark) ~= "table" then
+        mark = {}
+        player.room:setPlayerMark(player, "@$jy_heiyong-turn", mark)
+      end
+
       player:drawCards(1, self.name)
       local mark = player:getMark("@$jy_heiyong-turn")
       table.insert(mark, data.card.name)
@@ -1391,18 +1396,19 @@ local heiyong = fk.CreateTriggerSkill {
 local silie = fk.CreateTriggerSkill {
   name = "jy_silie",
   anim_type = "offensive",
-  events = { fk.LoseHp, fk.DamageInflicted },
+  events = { fk.HpLost, fk.DamageInflicted },
   frequency = Skill.Compulsory,
   can_trigger = function(self, event, target, player, data)
     if not player:hasSkill(self.name) then return false end
-    if event == fk.LoseHp then
+    if event == fk.HpLost then
       return target == player
     else
       return data.from and data.from == player and player:getMark("@jy_silie") ~= 0
     end
   end,
   on_trigger = function(self, event, target, player, data)
-    if event == fk.LoseHp then
+    if not player:hasSkill(self.name) then return false end
+    if event == fk.HpLost then
       for _ = 1, data.num do
         self:doCost(event, target, player, data)
       end
@@ -1411,7 +1417,7 @@ local silie = fk.CreateTriggerSkill {
     end
   end,
   on_use = function(self, event, target, player, data)
-    if event == fk.LoseHp then
+    if event == fk.HpLost then
       player.room:addPlayerMark(player, "@jy_silie")
     else
       data.damage = data.damage + 1
@@ -1428,7 +1434,7 @@ Fk:loadTranslationTable {
   ["jy__tjzs"] = [[铁甲战士]],
 
   ["jy_heiyong"] = [[黑拥]],
-  [":jy_heiyong"] = [[锁定技，你使用或打出牌后，你摸一张牌（每种牌名每回合限一次）；每名角色的结束阶段，若你本回合以此法获得的牌数大于你的体力上限，你失去一点体力。]],
+  [":jy_heiyong"] = [[锁定技，你使用或打出牌结算完成后，你摸一张牌（每种牌名每回合限一次）；每名角色的结束阶段，若你本回合以此法获得的牌数大于你的体力上限，你失去一点体力。]],
   ["$jy_heiyong1"] = [[龙战于野，其血玄黄！]],
   ["@$jy_heiyong-turn"] = [[黑拥]],
 
