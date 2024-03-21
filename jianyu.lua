@@ -2167,7 +2167,7 @@ local genshin = fk.CreateTriggerSkill {
     end
   end,
   on_use = function(self, event, target, player, data)
-    player.room:changeHero(player, "jy__jianzihao", false, self.is_deputy, true)
+    player.room:changeHero(player, "jy__trad__tjzs", false, self.is_deputy, true)
   end,
 
   refresh_events = { fk.TargetConfirming },
@@ -2205,13 +2205,13 @@ ysgs:addSkill(genshin)
 
 Fk:loadTranslationTable {
   ["jy__ysgs"] = "原神高手",
-  ["#jy__ysgs"] = "原神高手",
+  ["#jy__ysgs"] = "天理",
   ["designer:jy__ysgs"] = "考公专家",
   ["cv:jy__ysgs"] = "无",
   ["illustrator:jy__ysgs"] = "德丽傻",
 
   ["jy_genshin"] = "原友",
-  [":jy_genshin"] = [[锁定技，你使用普通锦囊牌和基本牌时额外指定所有有原神武将牌的角色为目标；你的回合开始时，若场上没有存活的原神角色且你的武将牌上有该技能，你将该武将牌替换为简自豪。]], -- <br><font color="grey">原神武将牌的判定标准是基于该武将的名字。</font>
+  [":jy_genshin"] = [[锁定技，你使用普通锦囊牌和基本牌时额外指定所有有原神武将牌的角色为目标；准备阶段，若场上没有存活的原神角色且你的武将牌上有该技能，你将该武将牌替换为经典铁甲战士。]], -- <br><font color="grey">原神武将牌的判定标准是基于该武将的名字。</font>
 }
 
 return extension
