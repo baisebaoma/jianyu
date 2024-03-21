@@ -621,7 +621,6 @@ kgds:addSkill(jy_guina)
 
 local ysgs = General(extension, "jy__ysgs", "qun", 4)
 ysgs:addSkill(genshin)
-ysgs:addRelatedSkill(jy_guina.name)
 
 local total_papers, total_questions = Q.questionCount()
 
@@ -693,7 +692,7 @@ Fk:loadTranslationTable {
   ["illustrator:jy__ysgs"] = "德丽傻",
 
   ["jy_genshin"] = "原友",
-  [":jy_genshin"] = [[锁定技，你使用普通锦囊牌和基本牌时额外指定所有有原神武将牌的角色为目标；你的回合开始时，若场上没有存活的原神角色且你的一张武将牌上有该技能，你将该武将牌替换为考公专家。<br><font color="grey">原神武将牌的判定标准是基于该武将的名字。已收录截至4.6版本所有《原神》角色名（含阿蕾奇诺）。</font>]],
+  [":jy_genshin"] = [[锁定技，你使用普通锦囊牌和基本牌时额外指定所有有原神武将牌的角色为目标；你的回合开始时，若场上没有存活的原神角色且你的一张武将牌上有该技能，你将该武将牌替换为考公专家。<br><font color="grey">原神武将牌的判定标准是基于该武将的名字。</font>]],
 }
 
 return extension
