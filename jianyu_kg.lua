@@ -556,15 +556,14 @@ local genshin = fk.CreateTriggerSkill {
     if is_genshin_exist then return false end
 
     -- 替换武将牌。先确认自己有没有哪个武将牌有这个技能
-    local is_deputy
     local generals
-    if player.deputyGeneral ~= "" then
-      generals = { player.general, player.deputyGeneral }
-    else
+    if player.deputyGeneral == "" then
       generals = { player.general }
+    else
+      generals = { player.general, player.deputyGeneral }
     end
     for _, g in ipairs(generals) do
-      if table.contains(Fk.generals[g].skills, self) then
+      if table.contains(Fk.generals[g]:getSkillNameList(true), self.name) then
         room:setPlayerMark(player, "jy_genshin_is_deputy-phase", g == player.deputyGeneral)
         return true
       end
@@ -573,7 +572,7 @@ local genshin = fk.CreateTriggerSkill {
   on_use = function(self, event, target, player, data)
     player.room:changeHero(player, "jy__kgds", false, player:getMark("jy_genshin_is_deputy-phase"), true)
   end,
-  
+
   refresh_events = { fk.TargetConfirming },
   can_refresh = function(self, event, target, player, data)
     if not player:hasSkill(self) then return false end
