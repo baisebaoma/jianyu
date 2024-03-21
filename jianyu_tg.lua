@@ -1396,7 +1396,6 @@ Fk:loadTranslationTable {
   [":jy_heiyong"] = [[锁定技，每个牌名每轮限一次，你使用或打出一张牌时，你摸一张牌。]],
   ["$jy_heiyong1"] = [[龙战于野，其血玄黄！]],
   ["@$jy_heiyong-round"] = [[黑拥]],
-
 }
 
 return extension

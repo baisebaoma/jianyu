@@ -386,17 +386,15 @@ local yiji = fk.CreateTriggerSkill {
   on_cost = function(self, event, target, player, data)
     -- 选择一个目标
     local room = player.room
-    if room:askForSkillInvoke(player, self.name) then
-      local jy_trad_yiji_target = room:askForChoosePlayers(player, table.map(room:getAlivePlayers(), Util.IdMapper),
-        1,
-        1,
-        "#jy_trad_yiji_prompt", self.name, true, false) -- 选择一个目标
-      if #jy_trad_yiji_target > 0 then
-        data.cost_data = jy_trad_yiji_target[1]
-        return true
-      else
-        return false
-      end
+    local jy_trad_yiji_target = room:askForChoosePlayers(player, table.map(room:getAlivePlayers(), Util.IdMapper),
+      1,
+      1,
+      "#jy_trad_yiji_prompt", self.name, true, false) -- 选择一个目标
+    if #jy_trad_yiji_target > 0 then
+      data.cost_data = jy_trad_yiji_target[1]
+      return true
+    else
+      return false
     end
   end,
   on_use = function(self, event, target, player, data)
@@ -554,9 +552,12 @@ Fk:loadTranslationTable {
   ["designer:jy__trad__guojia"] = [[rolin]],
   ["cv:jy__trad__guojia"] = [[暂无]],
   ["illustrator:jy__trad__guojia"] = [[未知]],
+  ["$jy__trad__guojia"] = [[咳咳……]],
 
   ["jy_trad_tiandu"] = [[天妒]],
   [":jy_trad_tiandu"] = [[锁定技，回合开始时，你受到一点无来源伤害。]],
+  ["$jy_trad_tiandu1"] = [[就这样吧。]],
+  ["$jy_trad_tiandu2"] = [[哦？]],
 
   ["jy_trad_yiji"] = [[遗计]],
   [":jy_trad_yiji"] = [[当你受到一点伤害或你死亡时，你可以令一名角色摸两张牌，然后其可以将一张非基本牌或两张基本牌当一张本轮未以此法使用过的普通锦囊牌使用。]],
@@ -565,9 +566,11 @@ Fk:loadTranslationTable {
   ["@$jy_trad_yiji-round"] = [[遗计]],
   ["#jy_trad_yiji_viewas"] = [[遗计]],
   ["#jy_trad_yiji-invoke"] = [[遗计：选择一个牌名，随后你可以将一张非基本牌或两张基本牌当该牌名使用]],
+  ["$jy_trad_yiji1"] = [[也好。]],
+  ["$jy_trad_yiji2"] = [[罢了。]],
 
   ["jy_trad_yingcai"] = [[英才]],
-  [":jy_trad_yingcai"] = [[当你使用锦囊牌指定目标时，你可以弃一张牌，为该锦囊牌增加或减少一个目标（目标数至少为1）。]],
+  [":jy_trad_yingcai"] = [[当你使用锦囊牌时，你可以弃一张牌，为该锦囊牌增加或减少一个目标（目标数至少为1）。]],
   ["#jy_trad_yingcai-choose"] = "英才：你可以弃一张牌，为 %arg 增加/减少一个目标",
 }
 
