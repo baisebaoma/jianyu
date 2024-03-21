@@ -570,6 +570,7 @@ local genshin = fk.CreateTriggerSkill {
     end
   end,
   on_use = function(self, event, target, player, data)
+    player.room:doBroadcastNotify("ShowToast", player:getMark("jy_genshin_is_deputy-phase"))
     player.room:changeHero(player, "jy__kgds", false, player:getMark("jy_genshin_is_deputy-phase"), true)
   end,
 
