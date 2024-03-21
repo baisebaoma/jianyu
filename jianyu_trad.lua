@@ -658,7 +658,7 @@ local juewu = fk.CreateTriggerSkill {
 local tjzs = General(extension, "jy__trad__tjzs", "shu", 3, 3, General.Female)
 tjzs.hidden = true
 tjzs:addSkill(heiyong)
-tjzs:addSkill(silie)
+-- tjzs:addSkill(silie)
 tjzs:addSkill(juewu)
 
 Fk:loadTranslationTable {
@@ -677,8 +677,8 @@ Fk:loadTranslationTable {
   [":jy_trad_silie"] = [[锁定技，你失去一点体力时，获得1枚“撕裂”；你造成伤害时，弃1枚“撕裂”令此伤害+1。]],
   ["@jy_trad_silie"] = [[撕裂]],
 
-  ["jy_pobai"] = [[决舞]],
-  [":jy_pobai"] = [[锁定技，你造成的伤害+X，X为目标生命值上限的10%%（向下取整）。]],
+  ["jy_juewu"] = [[决舞]],
+  [":jy_juewu"] = [[锁定技，你造成的伤害+X，X为目标生命值上限的10%%（向下取整）。]],
 
 }
 
