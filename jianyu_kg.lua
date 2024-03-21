@@ -558,7 +558,11 @@ local genshin = fk.CreateTriggerSkill {
     -- 替换武将牌。先确认自己有没有哪个武将牌有这个技能
     local is_deputy
     local generals
-    if player.deputyGeneral then generals = { player.general, player.deputyGeneral } else generals = { player.general } end
+    if player.deputyGeneral ~= "" then
+      generals = { player.general, player.deputyGeneral }
+    else
+      generals = { player.general }
+    end
     for _, g in ipairs(generals) do
       if table.contains(Fk.generals[g].skills, self) then
         is_deputy = g == player.deputyGeneral
@@ -620,7 +624,6 @@ local kgds = General(extension, "jy__kgds", "god", 4)
 kgds:addSkill(jy_guina)
 
 local ysgs = General(extension, "jy__ysgs", "qun", 4)
-ysgs.hidden = true
 ysgs:addSkill(genshin)
 
 local total_papers, total_questions = Q.questionCount()
