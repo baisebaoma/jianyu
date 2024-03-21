@@ -444,165 +444,6 @@ local jy_guina_refresh = fk.CreateTriggerSkill {
 }
 jy_guina:addRelatedSkill(jy_guina_refresh)
 
--- 以武将名为判定是否为原神角色的标准。按照bwiki排序，截止2024.3.21
-local genshin_names = {
-  ["凯亚"] = true,
-  ["重云"] = true,
-  ["诺艾尔"] = true,
-  ["凝光"] = true,
-  ["行秋"] = true,
-  ["芭芭拉"] = true,
-  ["班尼特"] = true,
-  ["安柏"] = true,
-  ["香菱"] = true,
-  ["丽莎"] = true,
-  ["菲谢尔"] = true,
-  ["雷泽"] = true,
-  ["北斗"] = true,
-  ["砂糖"] = true,
-  ["迪奥娜"] = true,
-  ["辛焱"] = true,
-  ["罗莎莉亚"] = true,
-  ["烟绯"] = true,
-  ["早柚"] = true,
-  ["九条裟罗"] = true,
-  ["托马"] = true,
-  ["五郎"] = true,
-  ["云堇"] = true,
-  ["久岐忍"] = true,
-  ["鹿野院平藏"] = true,
-  ["柯莱"] = true,
-  ["多莉"] = true,
-  ["坎蒂丝"] = true,
-  ["莱依拉"] = true,
-  ["珐露珊"] = true,
-  ["瑶瑶"] = true,
-  ["米卡"] = true,
-  ["卡维"] = true,
-  ["绮良良"] = true,
-  ["琳妮特"] = true,
-  ["菲米尼"] = true,
-  ["夏洛蒂"] = true,
-  ["夏沃蕾"] = true,
-  ["嘉明"] = true,
-  ["七七"] = true,
-  ["旅行者"] = true,
-  ["原神"] = true,
-  ["派蒙"] = true,
-  ["莫娜"] = true,
-  ["迪卢克"] = true,
-  ["刻晴"] = true,
-  ["琴"] = true,
-  ["温迪"] = true,
-  ["可莉"] = true,
-  ["达达利亚"] = true,
-  ["钟离"] = true,
-  ["阿贝多"] = true,
-  ["甘雨"] = true,
-  ["魈"] = true,
-  ["胡桃"] = true,
-  ["优菈"] = true,
-  ["枫原万叶"] = true,
-  ["神里绫华"] = true,
-  ["宵宫"] = true,
-  ["雷电将军"] = true,
-  ["埃洛伊"] = true,
-  ["珊瑚宫心海"] = true,
-  ["荒泷一斗"] = true,
-  ["申鹤"] = true,
-  ["八重神子"] = true,
-  ["神里绫人"] = true,
-  ["夜兰"] = true,
-  ["提纳里"] = true,
-  ["赛诺"] = true,
-  ["妮露"] = true,
-  ["纳西妲"] = true,
-  ["流浪者"] = true,
-  ["艾尔海森"] = true,
-  ["迪希雅"] = true,
-  ["白术"] = true,
-  ["林尼"] = true,
-  ["那维莱特"] = true,
-  ["莱欧斯利"] = true,
-  ["芙宁娜"] = true,
-  ["娜维娅"] = true,
-  ["闲云"] = true,
-  ["千织"] = true,
-  ["阿蕾奇诺"] = true,
-}
-
-local function is_genshin_name(name)
-  return genshin_names[Fk:translate(name)]
-end
-
-local function is_genshin(player)
-  return is_genshin_name(player.general) or is_genshin_name(player.deputyGeneral)
-end
-
-local genshin = fk.CreateTriggerSkill {
-  name = "jy_genshin",
-  frequency = Skill.Compulsory,
-  events = { fk.EventPhaseProceeding },
-  can_trigger = function(self, event, target, player, data)
-    if not (player:hasSkill(self) and target == player and player.phase == Player.Start) then return false end
-    local room = player.room
-    local is_genshin_exist = false
-    for _, p in ipairs(room:getAlivePlayers()) do
-      if is_genshin(p) then
-        is_genshin_exist = true
-        break
-      end
-    end
-    if is_genshin_exist then return false end
-
-    -- 替换武将牌。先确认自己有没有哪个武将牌有这个技能
-    local generals
-    if player.deputyGeneral == "" then
-      generals = { player.general }
-    else
-      generals = { player.general, player.deputyGeneral }
-    end
-    for _, g in ipairs(generals) do
-      if table.contains(Fk.generals[g].skills, self) then
-        self.is_deputy = g == player.deputyGeneral
-        return true
-      end
-    end
-  end,
-  on_use = function(self, event, target, player, data)
-    player.room:changeHero(player, "jy__kgds", false, self.is_deputy, true)
-  end,
-
-  refresh_events = { fk.TargetConfirming },
-  can_refresh = function(self, event, target, player, data)
-    if not player:hasSkill(self) then return false end
-    return data.from == player.id and
-        (data.card:isCommonTrick() or data.card.type == Card.TypeBasic)
-  end,
-  on_refresh = function(self, event, target, player, data)
-    local room = player.room
-    local guina_players = {} -- 用来画指示线的
-    local targets = AimGroup:getAllTargets(data.tos)
-    for _, p in ipairs(room:getAlivePlayers()) do
-      if is_genshin(p) and not table.contains(targets, p.id) then -- 抄的room.lua142行
-        -- 判断目标是否不能成为这张牌的目标
-        if not Self:isProhibited(p, data.card) then
-          AimGroup:addTargets(player.room, data, p.id)
-          table.insert(guina_players, p.id)
-        end
-      end
-    end
-    if #guina_players ~= 0 then
-      room:doAnimate("InvokeSkill", {
-        name = self.name,
-        player = player.id,
-        skill_type = "offensive",
-      })
-      room:doIndicate(data.from, guina_players)
-    end
-  end,
-}
-
 
 local jy__kgdxs = General(extension, "jy__kgdxs", "qun", 5, 5, General.Female)
 jy__kgdxs:addSkill(jy_zuoti)
@@ -616,9 +457,6 @@ jy__kgdxs:addRelatedSkill("jy_hongwen")
 
 local kgds = General(extension, "jy__kgds", "god", 4)
 kgds:addSkill(jy_guina)
-
-local ysgs = General(extension, "jy__ysgs", "qun", 4)
-ysgs:addSkill(genshin)
 
 local total_papers, total_questions = Q.questionCount()
 
@@ -681,16 +519,6 @@ Fk:loadTranslationTable {
   ["$jy_guina6"] = [[做得好，加十分。]],
   ["$jy_guina7"] = [[零分，下一个！]],
   ["$jy_guina8"] = [[负分，给我滚！]],
-
-
-  ["jy__ysgs"] = "原神高手",
-  ["#jy__ysgs"] = "原神高手",
-  ["designer:jy__ysgs"] = "考公专家",
-  ["cv:jy__ysgs"] = "无",
-  ["illustrator:jy__ysgs"] = "德丽傻",
-
-  ["jy_genshin"] = "原友",
-  [":jy_genshin"] = [[锁定技，你使用普通锦囊牌和基本牌时额外指定所有有原神武将牌的角色为目标；你的回合开始时，若场上没有存活的原神角色且你的一张武将牌上有该技能，你将该武将牌替换为考公专家（优先替换主将）。]], -- <br><font color="grey">原神武将牌的判定标准是基于该武将的名字。</font>
 }
 
 return extension

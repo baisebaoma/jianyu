@@ -616,7 +616,7 @@ local silie = fk.CreateTriggerSkill {
   events = { fk.HpLost, fk.DamageInflicted },
   frequency = Skill.Compulsory,
   can_trigger = function(self, event, target, player, data)
-    if not player:hasSkill(self.name) then return false end
+    if not player:hasSkill(self) then return false end
     if event == fk.HpLost then
       return target == player
     else
@@ -624,7 +624,6 @@ local silie = fk.CreateTriggerSkill {
     end
   end,
   on_trigger = function(self, event, target, player, data)
-    if not player:hasSkill(self.name) then return false end
     if event == fk.HpLost then
       for _ = 1, data.num do
         self:doCost(event, target, player, data)
@@ -643,10 +642,24 @@ local silie = fk.CreateTriggerSkill {
   end,
 }
 
+local juewu = fk.CreateTriggerSkill {
+  name = "jy_juewu",
+  anim_type = "offensive",
+  events = { fk.DamageInflicted },
+  frequency = Skill.Compulsory,
+  can_trigger = function(self, event, target, player, data)
+    return player:hasSkill(self) and data.from and data.from == player
+  end,
+  on_use = function(self, event, target, player, data)
+    data.damage = data.damage + data.to.maxHp // 10
+  end,
+}
+
 local tjzs = General(extension, "jy__trad__tjzs", "shu", 3, 3, General.Female)
 tjzs.hidden = true
 tjzs:addSkill(heiyong)
 tjzs:addSkill(silie)
+tjzs:addSkill(juewu)
 
 Fk:loadTranslationTable {
   ["jy__trad__tjzs"] = [[经典铁甲战士]],
@@ -663,6 +676,9 @@ Fk:loadTranslationTable {
   ["jy_trad_silie"] = [[撕裂]],
   [":jy_trad_silie"] = [[锁定技，你失去一点体力时，获得1枚“撕裂”；你造成伤害时，弃1枚“撕裂”令此伤害+1。]],
   ["@jy_trad_silie"] = [[撕裂]],
+
+  ["jy_pobai"] = [[决舞]],
+  [":jy_pobai"] = [[锁定技，你造成的伤害+X，X为目标生命值上限的10%%（向下取整）。]],
 
 }
 
