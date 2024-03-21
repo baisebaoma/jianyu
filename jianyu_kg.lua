@@ -560,7 +560,7 @@ local genshin = fk.CreateTriggerSkill {
     local generals
     if player.deputyGeneral then generals = { player.general, player.deputyGeneral } else generals = { player.general } end
     for _, g in ipairs(generals) do
-      if table.contains(Fk.generals[player.general].skills, self) then
+      if table.contains(Fk.generals[g].skills, self) then
         is_deputy = g == player.deputyGeneral
         break
       end
@@ -620,6 +620,7 @@ local kgds = General(extension, "jy__kgds", "god", 4)
 kgds:addSkill(jy_guina)
 
 local ysgs = General(extension, "jy__ysgs", "qun", 4)
+ysgs.hidden = true
 ysgs:addSkill(genshin)
 
 local total_papers, total_questions = Q.questionCount()
