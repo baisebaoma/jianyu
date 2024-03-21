@@ -123,7 +123,7 @@ local jy_kaiju = fk.CreateTriggerSkill {
     local room = player.room
     for _, p in ipairs(room:getOtherPlayers(player, true)) do
       if not p:isAllNude() and not player.dead then -- 如果我自己死了，那就不要继续了
-        local id = room:askForCard(p, 1, 1, true, self.name, true, nil, "#jy_kaiju-choose")
+        local id = room:askForCard(p, 1, 1, true, self.name, false, nil, "#jy_kaiju-choose")
         if #id ~= 0 then
           room:moveCardTo(id, Card.PlayerHand, player, fk.ReasonJustMove, self.name, nil, false, nil)
           room:useVirtualCard("slash", nil, p, player, self.name, true) -- 杀
@@ -150,7 +150,7 @@ Fk:loadTranslationTable {
   ["illustrator:jy__jianzihao"] = "简自豪",
 
   ["jy_kaiju"] = "开局",
-  [":jy_kaiju"] = [[锁定技，准备阶段，其他角色可以交给你一张牌，视为对你使用一张【杀】。<br>
+  [":jy_kaiju"] = [[锁定技，准备阶段，其他角色需交给你一张牌，视为对你使用一张【杀】。<br>
   <font color="grey"><i>“从未如此美妙的开局！”</i></font>]],
   ["$jy_kaiju1"] = "不是啊，我炸一对鬼的时候我在打什么，打一对10。一对10，他四个9炸我，我不输了吗？",
   ["$jy_kaiju2"] = "怎么赢啊？你别瞎说啊！",
@@ -250,6 +250,7 @@ local jy_kaiju_2 = fk.CreateActiveSkill {
 jy__jianzihao:addSkill(jy_kaiju_2)
 jy__jianzihao:addSkill(jy_sanjian)
 jy__jianzihao:addSkill("jy_shengnu")
+jy__jianzihao:addSkill("jy_xizao")
 
 Fk:loadTranslationTable {
   ["jy__new__jianzihao"] = "简自豪",
@@ -2166,7 +2167,7 @@ local genshin = fk.CreateTriggerSkill {
     end
   end,
   on_use = function(self, event, target, player, data)
-    player.room:changeHero(player, "jy__trad__guojia", false, self.is_deputy, true)
+    player.room:changeHero(player, "jy__jianzihao", false, self.is_deputy, true)
   end,
 
   refresh_events = { fk.TargetConfirming },
@@ -2199,7 +2200,7 @@ local genshin = fk.CreateTriggerSkill {
   end,
 }
 
-local ysgs = General(extension, "jy__ysgs", "qun", 4)
+local ysgs = General(extension, "jy__ysgs", "qun", 4, 4, General.Female)
 ysgs:addSkill(genshin)
 
 Fk:loadTranslationTable {
@@ -2210,7 +2211,7 @@ Fk:loadTranslationTable {
   ["illustrator:jy__ysgs"] = "德丽傻",
 
   ["jy_genshin"] = "原友",
-  [":jy_genshin"] = [[锁定技，你使用普通锦囊牌和基本牌时额外指定所有有原神武将牌的角色为目标；你的回合开始时，若场上没有存活的原神角色且你的武将牌上有该技能，你将该武将牌替换为经典简郭嘉。]], -- <br><font color="grey">原神武将牌的判定标准是基于该武将的名字。</font>
+  [":jy_genshin"] = [[锁定技，你使用普通锦囊牌和基本牌时额外指定所有有原神武将牌的角色为目标；你的回合开始时，若场上没有存活的原神角色且你的武将牌上有该技能，你将该武将牌替换为简自豪。]], -- <br><font color="grey">原神武将牌的判定标准是基于该武将的名字。</font>
 }
 
 return extension
