@@ -648,7 +648,7 @@ local juewu = fk.CreateTriggerSkill {
   events = { fk.DamageInflicted },
   frequency = Skill.Compulsory,
   can_trigger = function(self, event, target, player, data)
-    return player:hasSkill(self) and data.from and data.from == player
+    return player:hasSkill(self) and data.from and data.from == player and data.to.maxHp >= 10
   end,
   on_use = function(self, event, target, player, data)
     data.damage = data.damage + data.to.maxHp // 10
@@ -678,8 +678,7 @@ Fk:loadTranslationTable {
   ["@jy_trad_silie"] = [[撕裂]],
 
   ["jy_juewu"] = [[决舞]],
-  [":jy_juewu"] = [[锁定技，你造成的伤害+X，X为目标生命值上限的10%%（向下取整）。]],
-
+  [":jy_juewu"] = [[锁定技，你造成的伤害+X，X为目标生命值上限的十分之一（向下取整）。]],
 }
 
 return extension

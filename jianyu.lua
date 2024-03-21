@@ -2,7 +2,6 @@ local extension = Package:new("jianyu_standard")
 extension.extensionName = "jianyu"
 
 local U = require "packages/utility/utility"
-local Q = require "packages/jianyu/question" -- 考公大学生用的题库
 
 Fk:loadTranslationTable {
   ["jianyu"] = [[简浴]],
@@ -2167,7 +2166,7 @@ local genshin = fk.CreateTriggerSkill {
     end
   end,
   on_use = function(self, event, target, player, data)
-    player.room:changeHero(player, "jy__kgds", false, self.is_deputy, true)
+    player.room:changeHero(player, "jy__trad__guojia", false, self.is_deputy, true)
   end,
 
   refresh_events = { fk.TargetConfirming },
@@ -2211,7 +2210,7 @@ Fk:loadTranslationTable {
   ["illustrator:jy__ysgs"] = "德丽傻",
 
   ["jy_genshin"] = "原友",
-  [":jy_genshin"] = [[锁定技，你使用普通锦囊牌和基本牌时额外指定所有有原神武将牌的角色为目标；你的回合开始时，若场上没有存活的原神角色且你的一张武将牌上有该技能，你将该武将牌替换为考公专家（优先替换主将）。]], -- <br><font color="grey">原神武将牌的判定标准是基于该武将的名字。</font>
+  [":jy_genshin"] = [[锁定技，你使用普通锦囊牌和基本牌时额外指定所有有原神武将牌的角色为目标；你的回合开始时，若场上没有存活的原神角色且你的武将牌上有该技能，你将该武将牌替换为经典简郭嘉。]], -- <br><font color="grey">原神武将牌的判定标准是基于该武将的名字。</font>
 }
 
 return extension
