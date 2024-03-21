@@ -568,12 +568,12 @@ local genshin = fk.CreateTriggerSkill {
     if is_deputy == nil then
       return false
     else
-      data.jy_genshin_is_deputy = is_deputy
+      room:setPlayerMark(player, "jy_genshin_is_deputy-phase", is_deputy)
       return true
     end
   end,
   on_use = function(self, event, target, player, data)
-    player.room:changeHero(player, "jy__kgds", false, data.jy_genshin_is_deputy, true)
+    player.room:changeHero(player, "jy__kgds", false, player:getMark("jy_genshin_is_deputy-phase"), true)
   end,
   refresh_events = { fk.TargetConfirming },
   can_refresh = function(self, event, target, player, data)
@@ -692,7 +692,7 @@ Fk:loadTranslationTable {
   ["illustrator:jy__ysgs"] = "德丽傻",
 
   ["jy_genshin"] = "原友",
-  [":jy_genshin"] = [[锁定技，你使用普通锦囊牌和基本牌时额外指定所有有原神武将牌的角色为目标；你的回合开始时，若场上没有存活的原神角色且你的一张武将牌上有该技能，你将该武将牌替换为考公专家。<br><font color="grey">原神武将牌的判定标准是基于该武将的名字。</font>]],
+  [":jy_genshin"] = [[锁定技，你使用普通锦囊牌和基本牌时额外指定所有有原神武将牌的角色为目标；你的回合开始时，若场上没有存活的原神角色且你的一张武将牌上有该技能，你将该武将牌替换为考公专家（优先替换主将）。]], -- <br><font color="grey">原神武将牌的判定标准是基于该武将的名字。</font>
 }
 
 return extension
