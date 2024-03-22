@@ -2168,21 +2168,22 @@ local genshin = fk.CreateTriggerSkill {
     else
       if not player:hasSkill(self) then return false end
       return data.from == player.id and
-          (data.card:isCommonTrick() or data.card.type == Card.TypeBasic)
+          (data.card:isCommonTrick() or data.card.type == Card.TypeBasic) and player:getMark("jy_genshin") == 0
     end
   end,
   on_cost = function(self, event, target, player, data)
     if event == fk.EventPhaseProceeding then
       return true
     else
+      room:setPlayerMark(player, "jy_genshin", true)
       return player.room:askForSkillInvoke(player, self.name)
     end
   end,
   on_use = function(self, event, target, player, data)
+    local room = player.room
     if event == fk.EventPhaseProceeding then
-      player.room:changeHero(player, "jy__ayato", false, self.is_deputy, true)
+      room:changeHero(player, "jy__ayato", false, self.is_deputy, true)
     else
-      local room = player.room
       local guina_players = {} -- 用来画指示线的
       local targets = AimGroup:getAllTargets(data.tos)
       for _, p in ipairs(room:getAlivePlayers()) do
@@ -2203,6 +2204,13 @@ local genshin = fk.CreateTriggerSkill {
         room:doIndicate(data.from, guina_players)
       end
     end
+  end,
+  refresh_events = { fk.CardUseFinished },
+  can_refresh = function(self, event, target, player, data)
+    return player:hasSkill(self) and player:getMark("jy_genshin") ~= 0
+  end,
+  on_refresh = function(self, event, target, player, data)
+    player.room:setPlayerMark(player, "jy_genshin", 0)
   end,
 }
 
