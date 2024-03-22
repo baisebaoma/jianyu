@@ -1944,7 +1944,7 @@ Fk:loadTranslationTable {
   ["$jy_bazhen4"] = "说不定我也能做到……",
 
   ["jy_lingfu"] = "灵符",
-  [":jy_lingfu"] = [[出牌阶段限一次，你可以弃置X（X由你选择，X不小于3且不大于5）张牌并令X-2名角色回复一点体力并摸两张牌、你获得其判定区的牌，然后若其武将牌反面向上，其翻面；若其处于横置状态，重置之。]],
+  [":jy_lingfu"] = [[出牌阶段限一次，你可以弃置X（X由你选择，X不小于3且不大于5）张牌并令X-2名角色回复一点体力并摸两张牌、你获得其判定区的牌、重置其武将牌。]],
   ["$jy_lingfu1"] = [[驱邪……缚魅……]],
   ["$jy_lingfu2"] = [[灵符……保命……]],
 }
@@ -2038,7 +2038,6 @@ Fk:loadTranslationTable {
   ["$jy_zhuhua2"] = [[银河中的一切美丽，我将捍卫至最后一刻！]],
   ["$jy_zhuhua3"] = [[……献给伊德莉拉。]],
 }
-
 
 
 -- 以武将名为判定是否为原神角色的标准。按照bwiki排序，截止2024.3.21
@@ -2182,7 +2181,7 @@ local genshin = fk.CreateTriggerSkill {
   on_use = function(self, event, target, player, data)
     local room = player.room
     if event == fk.EventPhaseProceeding then
-      room:changeHero(player, "jy__ayato", false, self.is_deputy, true)
+      room:changeHero(player, "jy__kgds", false, self.is_deputy, true)
     else
       local guina_players = {} -- 用来画指示线的
       local targets = AimGroup:getAllTargets(data.tos)
@@ -2225,7 +2224,7 @@ Fk:loadTranslationTable {
   ["illustrator:jy__ysgs"] = "德丽傻",
 
   ["jy_genshin"] = "原友",
-  [":jy_genshin"] = [[你使用普通锦囊牌和基本牌可以额外指定所有原神角色为目标。准备阶段，若场上没有存活的原神角色且你武将牌上有该技能，你将该武将牌替换为神里绫人。]], -- <br><font color="grey">原神武将牌的判定标准是基于该武将的名字。</font>
+  [":jy_genshin"] = [[你使用普通锦囊牌和基本牌可以额外指定所有原神角色为目标。准备阶段，若场上没有存活的原神角色且你武将牌上有该技能，你将该武将牌替换为考公专家。]], -- <br><font color="grey">原神武将牌的判定标准是基于该武将的名字。</font>
 }
 
 return extension
