@@ -2175,7 +2175,7 @@ local genshin = fk.CreateTriggerSkill {
     if event == fk.EventPhaseProceeding then
       return true
     else
-      room:setPlayerMark(player, "jy_genshin", true)
+      player.room:setPlayerMark(player, "jy_genshin", true)
       return player.room:askForSkillInvoke(player, self.name)
     end
   end,
