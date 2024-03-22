@@ -196,7 +196,7 @@ Fk:loadTranslationTable {
 }
 
 
--- 这个是按照投稿时的描述做的经典版本修行，我认为它设计得有新意，所以保留了（但由于强度问题，无法进入PVP池子）。投稿描述原文如下：锁定技，你使用牌无次数限制；当你造成或受到伤害后，你需改变自身转换技的阴阳状态；你改变转换技阴阳状态时你摸2张牌。
+-- 我认为它设计得有新意，所以保留了（但由于强度问题，无法进入PVP池子）。
 local trad_xiuxing = fk.CreateTriggerSkill {
   name = "jy_trad_xiuxing",
   anim_type = "drawcard",
@@ -214,7 +214,7 @@ local trad_xiuxing = fk.CreateTriggerSkill {
     if event == fk.Damaged then
       for _, s in ipairs(player.player_skills) do
         if s:isSwitchSkill() then
-          player.room:delay(1000)                     -- 停告诉玩家我们确实由A变B再变A动了一下（
+          player.room:delay(400)                      -- 停告诉玩家我们确实由A变B再变A动了一下。400优化手感
           player.room:setPlayerMark(player, MarkEnum.SwithSkillPreName .. s.name,
             player:getSwitchSkillState(s.name, true)) -- 经测试这个是没问题的
           player:addSkillUseHistory(s.name)           -- 加这个，在UI上更新
@@ -222,7 +222,7 @@ local trad_xiuxing = fk.CreateTriggerSkill {
           t[0] = "阳"
           t[1] = "阴"
           player.room:doBroadcastNotify("ShowToast",
-            "修行：更改了 " .. Fk:translate(s.name) .. " 的阴阳状态，现在是：" .. t[player:getSwitchSkillState(s.name)]) -- 记得删
+            "修行：已将 " .. Fk:translate(s.name) .. " 改为 " .. t[player:getSwitchSkillState(s.name)]) -- 记得删
           player:drawCards(2, self.name)
         end
       end
@@ -314,7 +314,7 @@ local mumang_trigger = fk.CreateTriggerSkill {
 mumang:addRelatedSkill(mumang_trigger)
 
 local trad__guanzhe = General(extension, "jy__trad__guanzhe", "jin", 3, 3, General.Female)
-trad__guanzhe.hidden = true -- 不可以出现在选将框！！因为太强了！！
+trad__guanzhe.hidden = true
 trad__guanzhe:addSkill(trad_xiuxing)
 trad__guanzhe:addSkill(trad_zitai)
 trad__guanzhe:addSkill(mumang)
@@ -328,7 +328,7 @@ Fk:loadTranslationTable {
   ["illustrator:jy__trad__guanzhe"] = [[未知]],
 
   ["jy_trad_xiuxing"] = [[修行]],
-  [":jy_trad_xiuxing"] = [[锁定技，你使用牌无次数限制；当你造成或受到伤害后，你改变自身所有转换技的阴阳状态；你每以此法改变一个转换技的阴阳状态或发动一个转换技时，你摸两张牌。]],
+  [":jy_trad_xiuxing"] = [[锁定技，你使用牌无次数限制；当你造成或受到伤害后，你改变你所有转换技的状态。你每以此法改变一个转换技的状态或发动一个转换技时，你摸两张牌。]],
 
   ["jy_trad_mumang"] = [[目盲]],
   [":jy_trad_mumang"] = [[锁定技，你的攻击范围始终为1。]],
@@ -644,13 +644,21 @@ local silie = fk.CreateTriggerSkill {
 local juewu = fk.CreateTriggerSkill {
   name = "jy_juewu",
   anim_type = "offensive",
-  events = { fk.DamageInflicted },
+  events = { fk.DamageInflicted, fk.Damage },
   frequency = Skill.Compulsory,
   can_trigger = function(self, event, target, player, data)
-    return player:hasSkill(self) and data.from and data.from == player and data.to.maxHp >= 8
+    if event == fk.DamageInflicted then
+      return player:hasSkill(self) and data.from and data.from == player and data.to.maxHp >= 8
+    else
+      return player:hasSkill(self) and data.from and target == player
+    end
   end,
   on_use = function(self, event, target, player, data)
-    data.damage = data.damage + data.to.maxHp // 8
+    if event == fk.DamageInflicted then
+      data.damage = data.damage + data.to.maxHp // 8
+    else
+      player.room:changeMaxHp(data.to, 2)
+    end
   end,
 }
 
@@ -662,7 +670,7 @@ tjzs:addSkill(juewu)
 
 Fk:loadTranslationTable {
   ["jy__trad__tjzs"] = [[经典铁甲战士]],
-  ["#jy__trad__tjzs"] = [[<font color="red">人机皇帝<br>这是专为PVE设计的武将，<br>不会出现在选将框！</font>]],
+  ["#jy__trad__tjzs"] = [[<font color="red">人机皇帝<br>本武将专为PVE设计，<br>不会出现在选将框。</font>]],
   ["designer:jy__trad__tjzs"] = [[Kasa]],
   ["cv:jy__trad__tjzs"] = [[高达一号]],
   ["illustrator:jy__trad__tjzs"] = [[未知]],
@@ -677,7 +685,7 @@ Fk:loadTranslationTable {
   ["@jy_trad_silie"] = [[撕裂]],
 
   ["jy_juewu"] = [[决舞]],
-  [":jy_juewu"] = [[锁定技，你造成的伤害+X，X为目标生命值上限的八分之一（向下取整）。]],
+  [":jy_juewu"] = [[锁定技，你造成的伤害+X，X为目标体力上限的八分之一（向下取整）；你造成伤害时，令目标增加两点体力上限。]],
 }
 
 return extension
