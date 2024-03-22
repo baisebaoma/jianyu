@@ -214,7 +214,7 @@ local trad_xiuxing = fk.CreateTriggerSkill {
     if event == fk.Damaged then
       for _, s in ipairs(player.player_skills) do
         if s:isSwitchSkill() then
-          player.room:delay(400)                      -- 停告诉玩家我们确实由A变B再变A动了一下。400优化手感
+          player.room:delay(200)                      -- 停告诉玩家我们确实由A变B再变A动了一下。延迟降低优化手感
           player.room:setPlayerMark(player, MarkEnum.SwithSkillPreName .. s.name,
             player:getSwitchSkillState(s.name, true)) -- 经测试这个是没问题的
           player:addSkillUseHistory(s.name)           -- 加这个，在UI上更新
@@ -222,7 +222,7 @@ local trad_xiuxing = fk.CreateTriggerSkill {
           t[0] = "阳"
           t[1] = "阴"
           player.room:doBroadcastNotify("ShowToast",
-            "修行：已将 " .. Fk:translate(s.name) .. " 改为 " .. t[player:getSwitchSkillState(s.name)]) -- 记得删
+            "修行：已将 " .. Fk:translate(s.name) .. " 改为 " .. t[player:getSwitchSkillState(s.name)])
           player:drawCards(2, self.name)
         end
       end
@@ -319,7 +319,6 @@ trad__guanzhe:addSkill(trad_xiuxing)
 trad__guanzhe:addSkill(trad_zitai)
 trad__guanzhe:addSkill(mumang)
 trad__guanzhe:addSkill("jy_yujian")
-trad__guanzhe:addSkill("jy_juewu")
 
 Fk:loadTranslationTable {
   ["jy__trad__guanzhe"] = [[经典观者]],
