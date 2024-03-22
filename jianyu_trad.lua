@@ -319,6 +319,7 @@ trad__guanzhe:addSkill(trad_xiuxing)
 trad__guanzhe:addSkill(trad_zitai)
 trad__guanzhe:addSkill(mumang)
 trad__guanzhe:addSkill("jy_yujian")
+trad__guanzhe:addSkill("jy_juewu")
 
 Fk:loadTranslationTable {
   ["jy__trad__guanzhe"] = [[经典观者]],
@@ -644,28 +645,20 @@ local silie = fk.CreateTriggerSkill {
 local juewu = fk.CreateTriggerSkill {
   name = "jy_juewu",
   anim_type = "offensive",
-  events = { fk.DamageInflicted, fk.Damage },
+  events = { fk.DamageInflicted },
   frequency = Skill.Compulsory,
   can_trigger = function(self, event, target, player, data)
-    if event == fk.DamageInflicted then
-      return player:hasSkill(self) and data.from and data.from == player and data.to.maxHp >= 8
-    else
-      return player:hasSkill(self) and data.from and target == player
-    end
+    return player:hasSkill(self) and data.from and data.from == player and data.to.maxHp >= 8
   end,
   on_use = function(self, event, target, player, data)
-    if event == fk.DamageInflicted then
-      data.damage = data.damage + data.to.maxHp // 8
-    else
-      player.room:changeMaxHp(data.to, 2)
-    end
+    data.damage = data.damage + data.to.maxHp // 8
   end,
 }
 
 local tjzs = General(extension, "jy__trad__tjzs", "shu", 3, 3, General.Female)
 tjzs.hidden = true
 tjzs:addSkill(heiyong)
--- tjzs:addSkill(silie)
+tjzs:addSkill(silie)
 tjzs:addSkill(juewu)
 
 Fk:loadTranslationTable {
@@ -685,7 +678,7 @@ Fk:loadTranslationTable {
   ["@jy_trad_silie"] = [[撕裂]],
 
   ["jy_juewu"] = [[决舞]],
-  [":jy_juewu"] = [[锁定技，你造成的伤害+X，X为目标体力上限的八分之一（向下取整）；你造成伤害时，令目标增加两点体力上限。]],
+  [":jy_juewu"] = [[锁定技，你造成的伤害+X，X为目标体力上限的八分之一（向下取整）。]],
 }
 
 return extension
