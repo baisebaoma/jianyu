@@ -1711,11 +1711,11 @@ local jy_jianying = fk.CreateTriggerSkill {
   can_trigger = function(self, event, target, player, data)
     -- 任何一个人回合都要发动
     return player:hasSkill(self) and
-        target.phase == Player.Finish and -- 如果是这个人的结束阶段
-        #player:getCardIds(Player.Hand) < player.hp
+        target.phase == Player.Finish and
+        #player:getCardIds(Player.Hand) < 2
   end,
   on_use = function(self, event, target, player, data)
-    player:drawCards(1)
+    player:drawCards(1, self.name)
   end,
 }
 
@@ -1740,10 +1740,10 @@ Fk:loadTranslationTable {
   [":jy_jinghua"] = [[每回合限一次，你使用或打出一张基本牌后，可以使用两张【杀】，以此法使用的【杀】不计入使用次数、无距离限制、不可响应。]],
   ["$jy_jinghua1"] = "苍流水影。",
   ["$jy_jinghua2"] = "剑影。",
-  ["#jy_jinghua_use"] = "镜花：你可以使用不计入使用次数、无距离限制、不可响应【杀】，第 %arg/2 张",
+  ["#jy_jinghua_use"] = "镜花：你可以使用不计入使用次数、无距离限制、不可响应的【杀】，第 %arg/2 张",
 
   ["jy_jianying"] = "渐盈",
-  [":jy_jianying"] = [[锁定技，所有角色的结束阶段，若你的手牌数小于体力值，你摸一张牌。]],
+  [":jy_jianying"] = [[锁定技，所有角色的结束阶段，若你的手牌数小于2，你摸一张牌。]],
   ["$jy_jianying1"] = "冒进是大忌。",
   ["$jy_jianying2"] = "呵……余兴节目。",
 }
@@ -2138,64 +2138,70 @@ end
 
 local genshin = fk.CreateTriggerSkill {
   name = "jy_genshin",
-  frequency = Skill.Compulsory,
-  events = { fk.EventPhaseProceeding },
+  -- frequency = Skill.Compulsory,
+  events = { fk.EventPhaseProceeding, fk.TargetConfirming },
   can_trigger = function(self, event, target, player, data)
-    if not (player:hasSkill(self) and target == player and player.phase == Player.Start) then return false end
-    local room = player.room
-    local is_genshin_exist = false
-    for _, p in ipairs(room:getAlivePlayers()) do
-      if is_genshin(p) then
-        is_genshin_exist = true
-        break
+    if event == fk.EventPhaseProceeding then
+      if not (player:hasSkill(self) and target == player and player.phase == Player.Start) then return false end
+      local room = player.room
+      local is_genshin_exist = false
+      for _, p in ipairs(room:getAlivePlayers()) do
+        if is_genshin(p) then
+          is_genshin_exist = true
+          break
+        end
       end
-    end
-    if is_genshin_exist then return false end
-
-    -- 替换武将牌。先确认自己有没有哪个武将牌有这个技能
-    local generals
-    if player.deputyGeneral == "" then
-      generals = { player.general }
+      if is_genshin_exist then return false end
+      -- 替换武将牌。先确认自己有没有哪个武将牌有这个技能
+      local generals
+      if player.deputyGeneral == "" then
+        generals = { player.general }
+      else
+        generals = { player.general, player.deputyGeneral }
+      end
+      for _, g in ipairs(generals) do
+        if table.contains(Fk.generals[g].skills, self) then
+          self.is_deputy = g == player.deputyGeneral
+          return true
+        end
+      end
     else
-      generals = { player.general, player.deputyGeneral }
+      if not player:hasSkill(self) then return false end
+      return data.from == player.id and
+          (data.card:isCommonTrick() or data.card.type == Card.TypeBasic)
     end
-    for _, g in ipairs(generals) do
-      if table.contains(Fk.generals[g].skills, self) then
-        self.is_deputy = g == player.deputyGeneral
-        return true
-      end
+  end,
+  on_cost = function(self, event, target, player, data)
+    if event == fk.EventPhaseProceeding then
+      return true
+    else
+      return player.room:askForSkillInvoke(player, self.name)
     end
   end,
   on_use = function(self, event, target, player, data)
-    player.room:changeHero(player, "jy__kgds", false, self.is_deputy, true)
-  end,
-
-  refresh_events = { fk.TargetConfirming },
-  can_refresh = function(self, event, target, player, data)
-    if not player:hasSkill(self) then return false end
-    return data.from == player.id and
-        (data.card:isCommonTrick() or data.card.type == Card.TypeBasic)
-  end,
-  on_refresh = function(self, event, target, player, data)
-    local room = player.room
-    local guina_players = {} -- 用来画指示线的
-    local targets = AimGroup:getAllTargets(data.tos)
-    for _, p in ipairs(room:getAlivePlayers()) do
-      if is_genshin(p) and not table.contains(targets, p.id) then -- 抄的room.lua142行
-        -- 判断目标是否不能成为这张牌的目标
-        if not Self:isProhibited(p, data.card) then
-          AimGroup:addTargets(player.room, data, p.id)
-          table.insert(guina_players, p.id)
+    if event == fk.EventPhaseProceeding then
+      player.room:changeHero(player, "jy__ayato", false, self.is_deputy, true)
+    else
+      local room = player.room
+      local guina_players = {} -- 用来画指示线的
+      local targets = AimGroup:getAllTargets(data.tos)
+      for _, p in ipairs(room:getAlivePlayers()) do
+        if is_genshin(p) and not table.contains(targets, p.id) then -- 抄的room.lua142行
+          -- 判断目标是否不能成为这张牌的目标
+          if not Self:isProhibited(p, data.card) then
+            AimGroup:addTargets(player.room, data, p.id)
+            table.insert(guina_players, p.id)
+          end
         end
       end
-    end
-    if #guina_players ~= 0 then
-      room:doAnimate("InvokeSkill", {
-        name = self.name,
-        player = player.id,
-        skill_type = "offensive",
-      })
-      room:doIndicate(data.from, guina_players)
+      if #guina_players ~= 0 then
+        room:doAnimate("InvokeSkill", {
+          name = self.name,
+          player = player.id,
+          skill_type = "offensive",
+        })
+        room:doIndicate(data.from, guina_players)
+      end
     end
   end,
 }
@@ -2211,7 +2217,7 @@ Fk:loadTranslationTable {
   ["illustrator:jy__ysgs"] = "德丽傻",
 
   ["jy_genshin"] = "原友",
-  [":jy_genshin"] = [[锁定技，你使用普通锦囊牌和基本牌时额外指定所有原神角色为目标；准备阶段，若场上没有存活的原神角色且你的武将牌上有该技能，你将该武将牌替换为考公专家。]], -- <br><font color="grey">原神武将牌的判定标准是基于该武将的名字。</font>
+  [":jy_genshin"] = [[你使用普通锦囊牌和基本牌可以额外指定所有原神角色为目标。准备阶段，若场上没有存活的原神角色且你武将牌上有该技能，你将该武将牌替换为神里绫人。]], -- <br><font color="grey">原神武将牌的判定标准是基于该武将的名字。</font>
 }
 
 return extension

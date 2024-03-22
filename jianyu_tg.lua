@@ -851,6 +851,7 @@ Fk:loadTranslationTable {
   ["jy_taoqiu"] = [[逃囚]],
   [":jy_taoqiu"] = [[其他角色的结束阶段，若你的武将牌背面朝上，你可以将一张牌当无距离限制的【杀】使用。若此【杀】造成伤害，你翻面。]],
   ["#jy_taoqiu-use"] = [[逃囚：你可以将一张牌当无距离限制的【杀】使用，若造成伤害，你翻面]]
+  ["#jy_taoqiu_viewas"] = [[逃囚]],
 }
 
 local jianyan = fk.CreateTriggerSkill {
@@ -1383,7 +1384,7 @@ local heiyong = fk.CreateTriggerSkill {
 }
 
 local tjzs = General(extension, "jy__tjzs", "shu", 3, 3, General.Female)
-tjzs:addSkill(heiyong)
+tjzs:addSkill("jy_trad_heiyong")
 
 Fk:loadTranslationTable {
   ["jy__tjzs"] = [[铁甲战士]],

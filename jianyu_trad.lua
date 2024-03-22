@@ -374,9 +374,8 @@ local yiji = fk.CreateTriggerSkill {
   end,
   on_trigger = function(self, event, target, player, data)
     if event == fk.Damaged then
-      self.cancel_cost = false
       for _ = 1, data.damage do
-        if self.cancel_cost or not player:hasSkill(self) then break end
+        if not player:hasSkill(self) then break end
         self:doCost(event, target, player, data)
       end
     else
@@ -648,10 +647,10 @@ local juewu = fk.CreateTriggerSkill {
   events = { fk.DamageInflicted },
   frequency = Skill.Compulsory,
   can_trigger = function(self, event, target, player, data)
-    return player:hasSkill(self) and data.from and data.from == player and data.to.maxHp >= 10
+    return player:hasSkill(self) and data.from and data.from == player and data.to.maxHp >= 8
   end,
   on_use = function(self, event, target, player, data)
-    data.damage = data.damage + data.to.maxHp // 10
+    data.damage = data.damage + data.to.maxHp // 8
   end,
 }
 
@@ -663,7 +662,7 @@ tjzs:addSkill(juewu)
 
 Fk:loadTranslationTable {
   ["jy__trad__tjzs"] = [[经典铁甲战士]],
-  ["#jy__trad__tjzs"] = [[<font color="red">人机皇帝<br>这是未削弱版本，<br>因强度过高，这个武<br>将不会出现在选将框！</font>]],
+  ["#jy__trad__tjzs"] = [[<font color="red">人机皇帝<br>这是专为PVE设计的武将，<br>不会出现在选将框！</font>]],
   ["designer:jy__trad__tjzs"] = [[Kasa]],
   ["cv:jy__trad__tjzs"] = [[高达一号]],
   ["illustrator:jy__trad__tjzs"] = [[未知]],
@@ -678,7 +677,7 @@ Fk:loadTranslationTable {
   ["@jy_trad_silie"] = [[撕裂]],
 
   ["jy_juewu"] = [[决舞]],
-  [":jy_juewu"] = [[锁定技，你造成的伤害+X，X为目标生命值上限的十分之一（向下取整）。]],
+  [":jy_juewu"] = [[锁定技，你造成的伤害+X，X为目标生命值上限的八分之一（向下取整）。]],
 }
 
 return extension
