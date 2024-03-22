@@ -10,5 +10,7 @@ local q9 = require "packages/jianyu/questions/1575887944358vgv"
 local q10 = require "packages/jianyu/questions/1640265343201"
 local q11 = require "packages/jianyu/questions/1691414156185"
 local q12 = require "packages/jianyu/questions/1551335590950"
+local q13 = require "packages/jianyu/questions/1706852972568"
+local q14 = require "packages/jianyu/questions/1551337099196"
 
-return { q1, q2, q3, q4, q5, q6, q7, q8, q9, q10, q11, q12 }
+return { q1, q2, q3, q4, q5, q6, q7, q8, q9, q10, q11, q12, q13, q14 }

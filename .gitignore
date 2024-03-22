@@ -48,3 +48,6 @@ luac.out
 
 # vscode files
 .vscode/
+
+# idea files
+.idea/

@@ -11,7 +11,7 @@
 import requests
 from bs4 import BeautifulSoup
 
-code = "1640265343891"
+code = "1706852972568"
 
 # 获取选择题网页内容
 url_questions = f'https://www.gkzenti.cn/paper/{code}'
