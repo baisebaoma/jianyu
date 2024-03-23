@@ -300,7 +300,7 @@ Fk:loadTranslationTable {
   ["jy_zhushe"] = "注射",
   ["@jy_zhushe-turn"] = "注射",
   ["#jy_zhushe_prompt"] = "你可以重铸任意张牌，然后本回合获得〖注射〗的效果",
-  [":jy_zhushe"] = [[出牌阶段开始时，你可以重铸任意张牌。若如此做，本回合：你使用牌无距离和次数限制、不可被响应；你造成伤害后，伤害目标回复X点体力并摸X张牌，X为伤害值。]],
+  [":jy_zhushe"] = [[出牌阶段开始时，你可以重铸任意张牌。若如此做，本回合：你使用牌无距离和次数限制且不可被响应；你造成伤害后，伤害目标回复X点体力并摸X张牌，X为伤害值。]],
   ["$jy_zhushe1"] = [[准备好注射了。]],
   ["$jy_zhushe2"] = [[我的治疗是不会痛的。]],
 }
@@ -1320,7 +1320,7 @@ local muhuo = fk.CreateTriggerSkill {
       fk.SwitchYin)
     player:addSkillUseHistory(maochong.name)
     if target ~= player then
-      player.room:setPlayerMark(target, "@jy_muhuo-turn", "")
+      player.room:setPlayerMark(target, "jy_muhuo-turn", "")
     end
   end,
 }
@@ -1328,7 +1328,7 @@ local muhuo_prohibit = fk.CreateProhibitSkill {
   name = "#jy_muhuo_prohibit",
   frequency = Skill.Compulsory,
   is_prohibited = function(self, from, to, card)
-    return from:hasSkill(self) and to:getMark("@jy_muhuo-turn") ~= 0
+    return from:hasSkill(self) and to:getMark("jy_muhuo-turn") ~= 0
   end,
 }
 muhuo:addRelatedSkill(muhuo_prohibit)
@@ -1345,42 +1345,13 @@ Fk:loadTranslationTable {
   ["illustrator:jy__ylmc"] = [[Nexon]],
 
   ["jy_maochong"] = [[冒充]],
-  [":jy_maochong"] = [[转换技，阳：你可将任意张牌当【杀】使用，该【杀】需等量张【闪】才能抵消且无次数限制，若你的装备区有武器牌，该【杀】伤害+1；阴：其他角色的出牌阶段限一次，其可以将一张【杀】或武器牌正面朝上交给你，然后其摸一张牌。]],
+  [":jy_maochong"] = [[转换技，阳：你可将X（X由你选择且至少为1）张牌当【杀】使用，该【杀】无次数限制，当你使用该【杀】指定一个目标后，该角色需依次使用X张【闪】才能抵消此【杀】，若你的装备区有武器牌，该【杀】伤害+1；阴：其他角色的出牌阶段限一次，其可以将一张【杀】或武器牌正面朝上交给你，然后其摸一张牌。]],
   ["#jy_maochong-active"] = [[你可以将一张【杀】或武器牌交给御稜名草，然后你摸一张牌]],
   ["jy_maochong_other&"] = [[冒充]],
   [":jy_maochong_other&"] = [[出牌阶段限一次，当御稜名草的〖冒充〗状态为阴时，你可以将一张【杀】或武器牌正面向上交给其，然后你摸一张牌。]],
 
   ["jy_muhuo"] = [[目祸]],
-  [":jy_muhuo"] = [[当一名角色受到伤害后，若你与其距离1以内且其未死亡，你可以摸X张牌（X为你已损失的体力值且至多为5）、将〖冒充〗状态改为阴。若其不为你，你本回合不能再对其使用牌。]],
-  ["@jy_muhuo-turn"] = [[目祸]],
-}
-
-local heiyong = fk.CreateTriggerSkill {
-  name = "jy_heiyong",
-  anim_type = "drawcard",
-  events = { fk.CardUsing, fk.CardResponding },
-  frequency = Skill.Compulsory,
-  can_trigger = function(self, event, target, player, data)
-    if not (player:hasSkill(self.name) and target == player) then return false end
-
-    local mark = player:getMark("@$jy_heiyong-round")
-    if type(mark) ~= "table" then
-      mark = {}
-    end
-
-    return not table.contains(mark, data.card.name)
-  end,
-  on_use = function(self, event, target, player, data)
-    local mark = player:getMark("@$jy_heiyong-round")
-    if type(mark) ~= "table" then
-      mark = {}
-      player.room:setPlayerMark(player, "@$jy_heiyong-round", mark)
-    end
-
-    player:drawCards(1, self.name)
-    table.insert(mark, data.card.name)
-    player.room:setPlayerMark(player, "@$jy_heiyong-round", mark)
-  end,
+  [":jy_muhuo"] = [[当一名角色受到伤害后，若你与其距离1以内且其未死亡，你可以摸X张牌（X为你已损失的体力值且至多为5）并将〖冒充〗状态改为阴。若其不为你，你本回合不能再对其使用牌。]],
 }
 
 local tjzs = General(extension, "jy__tjzs", "shu", 3, 3, General.Female)
@@ -1392,11 +1363,6 @@ Fk:loadTranslationTable {
   ["designer:jy__tjzs"] = [[Kasa]],
   ["cv:jy__tjzs"] = [[高达一号]],
   ["illustrator:jy__tjzs"] = [[未知]],
-
-  ["jy_heiyong"] = [[黑拥]],
-  [":jy_heiyong"] = [[锁定技，每个牌名每轮限一次，你使用或打出一张牌时，你摸一张牌。]],
-  ["$jy_heiyong1"] = [[龙战于野，其血玄黄！]],
-  ["@$jy_heiyong-round"] = [[黑拥]],
 }
 
 return extension

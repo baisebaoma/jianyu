@@ -101,9 +101,8 @@ local jy_zuoti = fk.CreateActiveSkill {
       table.insert(answers_short, a[1])
     end
 
-    local status = "行测真题"
-    local choice = room:askForChoice(player, answers_wrap, status, question_wrap) -- 把skillName改成question可能可以
-    if choice[1] == correct_answer then                                           -- 仅判断choice[1]，因为答案只保留正确选项的选项名字（ABCD）
+    local choice = room:askForChoice(player, answers_wrap, "#jy_zuoti_q", question_wrap) -- 把skillName改成question可能可以
+    if choice[1] == correct_answer then                                                  -- 仅判断choice[1]，因为答案只保留正确选项的选项名字（ABCD）
       player:broadcastSkillInvoke(self.name, math.random(5, 7))
 
       room:addPlayerMark(player, "@jy_zuoti_correct_count")
@@ -334,10 +333,9 @@ local jy_guina = fk.CreateActiveSkill {
       table.insert(answers_short, a[1])
     end
 
-    local status = "行测真题"
     -- local your_question_wrap = "归纳：回答行测真题，若正确你可以自选一张牌，<br>若错误本阶段其所有牌额外指定你为目标：<br><br>" .. question
 
-    local choice = room:askForChoice(player, answers_wrap, status, question_wrap)
+    local choice = room:askForChoice(player, answers_wrap, "#jy_zuoti_q", question_wrap)
     if choice[1] == correct_answer then                     -- 仅判断choice[1]，因为答案只保留正确选项的选项名字（ABCD）
       me:broadcastSkillInvoke(self.name, math.random(5, 6)) -- 播放选择正确的语音
 
@@ -470,6 +468,7 @@ Fk:loadTranslationTable {
 
   ["jy_zuoti"] = "做题",
   [":jy_zuoti"] = [[出牌阶段限一次，你可以回答一道行测真题。若正确，你指定一个非衍生牌牌名并获得一张该牌名的牌。<br><font color="grey">收录2018-2024《行测》]] .. total_papers .. [[套共]] .. total_questions .. [[题，经人工筛选，不含图形推理、资料分析。<br>回答正确时，这张牌可能来自任何位置，甚至你自己的区域。若你有同名牌，请先使用掉。</font>]],
+  ["jy_zuoti_q"] = "行测真题",
   ["#jy_zuoti_see_log"] = [[做题：请在战报中查看完整题干]],
   ["#jy_zuoti_ob"] = [[正在做题！其他角色可以在战报中查看这道题目的完整题干和选项。]],
   ["#jy_zuoti_correct"] = [[答对了！你可以自选一张牌！<br>你可以在战报中查看正确答案。]],
