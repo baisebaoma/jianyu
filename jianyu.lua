@@ -160,7 +160,7 @@ Fk:loadTranslationTable {
   ["$jy_kaiju6"] = "从未如此美妙的开局！请为我欢呼，为我喝，喝，喝彩，OK？",
   ["$jy_kaiju7"] = "如此美妙的开局，这是我近两天来第一次啊！",
   ["$jy_kaiju8"] = "Oh my God，我要珍惜这段时光，我要好好地将它珍惜！",
-  ["#jy_kaiju-choose"] = "开局：你可以交给简自豪一张牌，视为对他使用一张【杀】",
+  ["#jy_kaiju-choose"] = "开局：交给简自豪一张牌，视为对他使用一张【杀】",
 
   ["jy_hongwen"] = "红温",
   [":jy_hongwen"] = "锁定技，你的♠牌视为<font color='red'>♥</font>牌，你的♣牌视为<font color='red'>♦</font>牌。",
