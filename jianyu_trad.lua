@@ -9,6 +9,9 @@ Fk:loadTranslationTable {
   ["trad"] = [[经典]],
 }
 
+local rjhd = [[<font color="red">人机皇帝<br>因强度过高，本武将<br>不会出现在选将框。</font>]]
+local pve = [[<font color="red">人机皇帝<br>本武将专为PVE设计，<br>不会出现在选将框。</font>]]
+
 -- 初版再生！！很强！！
 local trad_zaisheng = fk.CreateTriggerSkill {
   name = "jy_trad_zaisheng",
@@ -174,7 +177,7 @@ trad__xuyu:addSkill(trad_zhushe)
 
 Fk:loadTranslationTable {
   ["jy__trad__xuyu"] = "经典絮雨",
-  ["#jy__trad__xuyu"] = [[<font color="red">人机皇帝<br>这是未削弱版本，<br>因强度过高，这个武<br>将不会出现在选将框！</font>]],
+  ["#jy__trad__xuyu"] = rjhd,
   ["designer:jy__trad__xuyu"] = "emo公主",
   ["cv:jy__trad__xuyu"] = "刘十四",
   ["illustrator:jy__trad__xuyu"] = "未知",
@@ -322,7 +325,7 @@ trad__guanzhe:addSkill("jy_yujian")
 
 Fk:loadTranslationTable {
   ["jy__trad__guanzhe"] = [[经典观者]],
-  ["#jy__trad__guanzhe"] = [[<font color="red">人机皇帝<br>这是未削弱版本，<br>因强度过高，这个武<br>将不会出现在选将框！</font>]],
+  ["#jy__trad__guanzhe"] = rjhd,
   ["designer:jy__trad__guanzhe"] = [[Kasa]],
   ["cv:jy__trad__guanzhe"] = [[无]],
   ["illustrator:jy__trad__guanzhe"] = [[未知]],
@@ -547,7 +550,7 @@ guojia:addSkill(yingcai)
 
 Fk:loadTranslationTable {
   ["jy__trad__guojia"] = [[经典简郭嘉]],
-  ["#jy__trad__guojia"] = [[<font color="red">人机皇帝<br>这是未削弱版本，<br>因强度过高，这个武<br>将不会出现在选将框！</font>]],
+  ["#jy__trad__guojia"] = rjhd,
   ["designer:jy__trad__guojia"] = [[rolin]],
   ["cv:jy__trad__guojia"] = [[暂无]],
   ["illustrator:jy__trad__guojia"] = [[未知]],
@@ -662,7 +665,7 @@ tjzs:addSkill(juewu)
 
 Fk:loadTranslationTable {
   ["jy__trad__tjzs"] = [[经典铁甲战士]],
-  ["#jy__trad__tjzs"] = [[<font color="red">人机皇帝<br>本武将专为PVE设计，<br>不会出现在选将框。</font>]],
+  ["#jy__trad__tjzs"] = pve,
   ["designer:jy__trad__tjzs"] = [[Kasa]],
   ["cv:jy__trad__tjzs"] = [[高达一号]],
   ["illustrator:jy__trad__tjzs"] = [[未知]],

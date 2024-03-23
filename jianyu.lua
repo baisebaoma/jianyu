@@ -2133,11 +2133,11 @@ end
 
 local genshin = fk.CreateTriggerSkill {
   name = "jy_genshin",
-  -- frequency = Skill.Compulsory,
-  events = { fk.EventPhaseProceeding, fk.TargetConfirming },
+  events = { fk.EventPhaseProceeding, fk.TargetConfirming, fk.Damage },
   can_trigger = function(self, event, target, player, data)
+    if not player:hasSkill(self) then return false end
     if event == fk.EventPhaseProceeding then
-      if not (player:hasSkill(self) and target == player and player.phase == Player.Start) then return false end
+      if not (target == player and player.phase == Player.Start) then return false end
       local room = player.room
       local is_genshin_exist = false
       for _, p in ipairs(room:getAlivePlayers()) do
@@ -2147,7 +2147,7 @@ local genshin = fk.CreateTriggerSkill {
         end
       end
       if is_genshin_exist then return false end
-      -- 替换武将牌。先确认自己有没有哪个武将牌有这个技能
+      -- 确认自己有没有哪个武将牌有这个技能
       local generals
       if player.deputyGeneral == "" then
         generals = { player.general }
@@ -2160,24 +2160,30 @@ local genshin = fk.CreateTriggerSkill {
           return true
         end
       end
-    else
-      if not player:hasSkill(self) then return false end
+    elseif event == fk.TargetConfirming then
       return data.from == player.id and
           (data.card:isCommonTrick() or data.card.type == Card.TypeBasic) and player:getMark("jy_genshin") == 0
+    else
+      return target and is_genshin(target)
     end
   end,
   on_cost = function(self, event, target, player, data)
     if event == fk.EventPhaseProceeding then
       return true
-    else
+    elseif event == fk.TargetConfirming then
       player.room:setPlayerMark(player, "jy_genshin", true)
       return player.room:askForSkillInvoke(player, self.name)
+    else
+      player:drawCards(1, self.name)
     end
   end,
   on_use = function(self, event, target, player, data)
     local room = player.room
     if event == fk.EventPhaseProceeding then
-      room:changeHero(player, "jy__kgds", false, self.is_deputy, true)
+      -- local generals = Fk.packages["jianyu_standard"]  -- TODO:自动检索所有简浴，但是先懒得写了
+      local generals = { "jy__liuxian", "jy__huohuo", "jy__kgdxs", "jy__kgds", "jy__tjzs" }
+      local general = room:askForGeneral(player, generals, 1)
+      room:changeHero(player, general, false, self.is_deputy, true)
     else
       local guina_players = {} -- 用来画指示线的
       local targets = AimGroup:getAllTargets(data.tos)
@@ -2220,7 +2226,8 @@ Fk:loadTranslationTable {
   ["illustrator:jy__ysgs"] = "德丽傻",
 
   ["jy_genshin"] = "原友",
-  [":jy_genshin"] = [[你使用普通锦囊牌和基本牌可以额外指定所有原神角色为目标。准备阶段，若场上没有存活的原神角色且你武将牌上有该技能，你将该武将牌替换为考公专家。]], -- <br><font color="grey">原神武将牌的判定标准是基于该武将的名字。</font>
+  [":jy_genshin"] = [[你使用普通锦囊牌和基本牌可以额外指定所有原神角色为目标；原神角色造成伤害时，你摸一张牌。准备阶段，若场上没有存活的原神角色且你武将牌上有该技能，你将该武将牌替换为五个简浴包武将中的一个。<br><font color="grey">可选的简浴包武将：刘仙（复制男性角色）、藿藿（治疗与解控）、考公大学生（自选牌）、考公专家（自选牌与群体效果）、铁甲战士（摸牌）。]], -- <br><font color="grey">原神武将牌的判定标准是基于该武将的名字。</font>
+  ["#jy_genshin_ask"] = [[原友：从简浴包精选武将中选择一张武将牌替换原神高手]]
 }
 
 return extension
