@@ -2135,7 +2135,7 @@ local function master_can_trigger(is_fun, property)
       end
       for _, g in ipairs(generals) do
         if table.contains(Fk.generals[g].skills, self) then
-          self.is_deputy = g == player.deputyGeneral
+          self.general = g
           return true
         end
       end
@@ -2157,7 +2157,7 @@ local function master_on_cost(property)
       player.room:setPlayerMark(player, "jy_master_" .. property, true)
       return player.room:askForSkillInvoke(player, self.name)
     else
-      player:drawCards(1, self.name)
+      return true
     end
   end
 end
@@ -2169,9 +2169,10 @@ local function master_on_use(is_fun)
       -- local generals = Fk.packages["jianyu_standard"]  -- TODO:自动检索所有简浴，但是先懒得写了
       local generals = { "jy__liuxian", "jy__huohuo", "jy__kgdxs", "jy__kgds", "jy__guanzhe", "jy__genshin__master",
         "jy__que__master", "jy__moe__master" }
+      table.removeOne(generals, self.general)
       local general = room:askForGeneral(player, generals, 1)
-      room:changeHero(player, general, false, self.is_deputy, true)
-    else
+      room:changeHero(player, general, false, self.general == player.deputyGeneral, true)
+    elseif event == fk.TargetConfirming then
       local indicate_players = {} -- 用来画指示线的
       local targets = AimGroup:getAllTargets(data.tos)
       for _, p in ipairs(room:getOtherPlayers(player)) do
@@ -2191,6 +2192,8 @@ local function master_on_use(is_fun)
         })
         room:doIndicate(data.from, indicate_players)
       end
+    else
+      player:drawCards(1, self.name)
     end
   end
 end
@@ -2239,14 +2242,14 @@ local function master_des(property)
       property ..
       [[角色造成伤害时，你摸一张牌。准备阶段，若场上没有存活的其他]] ..
       property ..
-      [[角色且你武将牌上有该技能，你将该武将牌替换为八个简浴包武将之一。<br><font color="grey">可选的简浴包武将：刘仙（复制男性角色）、藿藿（治疗与解控）、考公大学生（自选牌）、考公专家（自选牌与群体效果）、观者（摸牌与近战输出）、原神高手、雀魂高手、萌萌高手。]]
+      [[角色且你武将牌上有该技能，你将该武将替换为七个简浴武将之一。<br><font color="grey">可选的简浴武将：刘仙（复制男性角色）、藿藿（治疗与解控）、考公大学生（自选牌与高防御）、考公专家（自选牌与群体效果）、观者（摸牌与近战伤害）、原神高手、雀魂高手、萌包高手。不能与替换前的武将相同。]]
 end
 
 Fk:loadTranslationTable {
   ["jy__genshin__master"] = "原神高手",
   ["#jy__genshin__master"] = "天理！！",
   ["designer:jy__genshin__master"] = "考公专家",
-  ["cv:jy__genshin__master"] = "无",
+  ["cv:jy__genshin__master"] = "暂无",
   ["illustrator:jy__genshin__master"] = "德丽傻",
 
   ["jy_genshin_master"] = "原友",
@@ -2255,19 +2258,19 @@ Fk:loadTranslationTable {
   ["jy__que__master"] = "雀魂高手",
   ["#jy__que__master"] = "祈！！",
   ["designer:jy__que__master"] = "考公专家",
-  ["cv:jy__que__master"] = "无",
+  ["cv:jy__que__master"] = "暂无",
   ["illustrator:jy__que__master"] = "德丽傻",
 
   ["jy_master_majsoul"] = "雀魂",
   [":jy_master_majsoul"] = master_des("雀势力"),
 
-  ["jy__moe__master"] = "萌萌高手",
+  ["jy__moe__master"] = "萌包高手",
   ["#jy__moe__master"] = "喑黒毁灭emo公主！！",
   ["designer:jy__moe__master"] = "考公专家",
-  ["cv:jy__moe__master"] = "无",
+  ["cv:jy__moe__master"] = "暂无",
   ["illustrator:jy__moe__master"] = "德丽傻",
 
-  ["jy_master_moe"] = "萌萌",
+  ["jy_master_moe"] = "萌神",
   [":jy_master_moe"] = master_des("萌势力"),
 }
 
