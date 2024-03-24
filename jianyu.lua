@@ -2148,7 +2148,7 @@ local function master_can_trigger(is_fun, property)
         -- 检查是否所有的目标角色已经被选中。只要有一个没被选中，那就return true
         local targets = AimGroup:getAllTargets(data.tos)
         for _, p in ipairs(player.room:getOtherPlayers(player)) do
-          if is_fun(p) and not table.contains(targets, p) then
+          if is_fun(p) and not table.contains(targets, p.id) and not Self:isProhibited(p, data.card) then
             return true
           end
         end
@@ -2184,12 +2184,9 @@ local function master_on_use(is_fun)
       local indicate_players = {} -- 用来画指示线的
       local targets = AimGroup:getAllTargets(data.tos)
       for _, p in ipairs(room:getOtherPlayers(player)) do
-        if is_fun(p) and not table.contains(targets, p.id) then -- 抄的room.lua142行
-          -- 判断目标是否不能成为这张牌的目标
-          if not Self:isProhibited(p, data.card) then
-            AimGroup:addTargets(player.room, data, p.id)
-            table.insert(indicate_players, p.id)
-          end
+        if is_fun(p) and not table.contains(targets, p.id) and not Self:isProhibited(p, data.card) then -- 抄的room.lua142行
+          AimGroup:addTargets(player.room, data, p.id)
+          table.insert(indicate_players, p.id)
         end
       end
       if #indicate_players ~= 0 then
