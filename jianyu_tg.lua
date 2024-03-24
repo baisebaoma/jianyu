@@ -9,6 +9,7 @@ Fk:loadTranslationTable {
 }
 
 local jy__tangniu = General(extension, "jy__tangniu", "qun", 1, 1, General.Female)
+jy__tangniu.hidden = true
 
 -- 主函数啥也不做，只是为了承载下面的
 local jy_budeng = fk.CreateTriggerSkill {
@@ -313,7 +314,7 @@ local xingtu = fk.CreateActiveSkill {
   name = "jy_xingtu",
   anim_type = "support",
   can_use = function(self, player)
-    return player:usedSkillTimes(self.name) < 1
+    return player:usedSkillTimes(self.name) < 5
   end,
   card_num = 0,
   target_num = 0,
@@ -414,8 +415,6 @@ local peixiu = General(extension, "jy__peixiu", "qun", 3)
 peixiu.subkingdom = "jin"
 peixiu:addSkill(xingtu)
 peixiu:addSkill(zhunwang)
-peixiu:addSkill("juezhi")
-
 
 Fk:loadTranslationTable {
   ["jy__peixiu"] = "简裴秀",
@@ -423,7 +422,7 @@ Fk:loadTranslationTable {
   ["designer:jy__peixiu"] = "贾文和",
 
   ["jy_xingtu"] = "行图",
-  [":jy_xingtu"] = [[锁定技，你使用牌时，若此牌的点数是X（X为你使用的上一张牌的点数）的约数，你摸一张牌。你使用点数为X的倍数的牌无次数限制。出牌阶段限一次，你可以修改X。]],
+  [":jy_xingtu"] = [[锁定技，你使用牌时，若此牌的点数是X（X为你使用的上一张牌的点数）的约数，你摸一张牌。你使用点数为X的倍数的牌无次数限制。出牌阶段限五次，你可以修改X。],
   ["@jy_xingtu"] = "行图",
   ["#jy_xingtu_ask"] = "修改“行图”",
 
@@ -917,7 +916,7 @@ Fk:loadTranslationTable {
   ["jy__luotong"] = [[简骆统]],
 
   ["jy_jianyan"] = [[谏言]],
-  [":jy_jianyan"] = [[锁定技，一名角色于其回合内首次使用伤害类基本牌/普通锦囊牌时，该牌每造成一点伤害，你摸一张牌。]],
+  [":jy_jianyan"] = [[锁定技，一名角色于其回合内首次使用伤害类基本牌或普通锦囊牌时，该牌每造成一点伤害，你摸一张牌。]],
   -- [":jy_jianyan"] = [[一名角色于其回合内首次使用牌时，你可以选择一项：①令此牌额外结算一次，然后该牌每造成一点伤害，你摸一张牌；②令此牌无效且你获得此牌，若该牌为锦囊牌，你获得一点护甲]],
 
   ["jy_jimin"] = [[济民]],

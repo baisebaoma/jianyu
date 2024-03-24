@@ -1343,7 +1343,7 @@ Fk:loadTranslationTable {
   ["illustrator:jy__yangfan"] = "杨藩",
 
   ["jy_sichi"] = "四吃",
-  [":jy_sichi"] = [[你受到伤害后，可以展示牌堆顶的4张牌，根据其花色数：一种，令一名角色获得之；两种，获得其中一张可以使用的牌，并可以使用之，若都无法使用，你弃一张牌；<br>三种，获得3张同类型或2张不同类型的牌，然后其他角色摸一张牌；<br>四种，你与至多3名角色各失去一点体力。]],
+  [":jy_sichi"] = [[你受到伤害后，可以展示牌堆顶的4张牌，根据其花色数：1，令一名角色获得之；2，获得其中一张可以使用的牌并可以使用之，若都无法使用，你弃一张牌；3，获得3/2张同类型/不同类型的牌，然后其他角色摸一张牌；4，你与至多3名角色各失去一点体力。]],
 
   ["#jy_sichi_suits_1"] = "四吃：1种花色，选择一名角色获得这些牌",
   ["#jy_sichi_suits_2"] = "四吃：2种花色，获得一张可使用的牌并可以使用",
@@ -1367,7 +1367,7 @@ Fk:loadTranslationTable {
   ["@jy_boshi_judge_count"] = "搏时",
 
   ["jy_jiangbei"] = "奖杯",
-  [":jy_jiangbei"] = [[锁定技。你的基本牌和锦囊牌花色若为：♣，无视距离、防具、次数限制；<font color="red">♥</font>，不可响应；出牌阶段结束时，你摸X张牌，X为你出牌阶段使用或打出过♣和<font color="red">♥</font>牌的数量。]],
+  [":jy_jiangbei"] = [[锁定技，你的基本牌和锦囊牌花色若为：♣，无视距离、次数限制和防具；<font color="red">♥</font>，不可响应；出牌阶段结束时，你摸X张牌（X为你出牌阶段使用或打出的♣和<font color="red">♥</font>牌数）。]],
   ["#jy_jiangbei_heart"] = "奖杯",
   ["#jy_jiangbei_club"] = "奖杯",
   ["#jy_jiangbei_club_2"] = "奖杯",
@@ -2181,7 +2181,7 @@ local genshin = fk.CreateTriggerSkill {
     local room = player.room
     if event == fk.EventPhaseProceeding then
       -- local generals = Fk.packages["jianyu_standard"]  -- TODO:自动检索所有简浴，但是先懒得写了
-      local generals = { "jy__liuxian", "jy__huohuo", "jy__kgdxs", "jy__kgds", "jy__tjzs" }
+      local generals = { "jy__liuxian", "jy__huohuo", "jy__kgdxs", "jy__kgds", "jy__guanzhe" }
       local general = room:askForGeneral(player, generals, 1)
       room:changeHero(player, general, false, self.is_deputy, true)
     else
@@ -2226,7 +2226,7 @@ Fk:loadTranslationTable {
   ["illustrator:jy__ysgs"] = "德丽傻",
 
   ["jy_genshin"] = "原友",
-  [":jy_genshin"] = [[你使用普通锦囊牌和基本牌可以额外指定所有原神角色为目标；原神角色造成伤害时，你摸一张牌。准备阶段，若场上没有存活的原神角色且你武将牌上有该技能，你将该武将牌替换为五个简浴包武将中的一个。<br><font color="grey">可选的简浴包武将：刘仙（复制男性角色）、藿藿（治疗与解控）、考公大学生（自选牌）、考公专家（自选牌与群体效果）、铁甲战士（摸牌）。]], -- <br><font color="grey">原神武将牌的判定标准是基于该武将的名字。</font>
+  [":jy_genshin"] = [[你使用普通锦囊牌和基本牌可以额外指定所有原神角色为目标；原神角色造成伤害时，你摸一张牌。准备阶段，若场上没有存活的原神角色且你武将牌上有该技能，你将该武将牌替换为五个简浴包武将之一。<br><font color="grey">可选的简浴包武将：刘仙（复制男性角色）、藿藿（治疗与解控）、考公大学生（自选牌）、考公专家（自选牌与群体效果）、观者（摸牌与近战输出）。]], -- <br><font color="grey">原神武将牌的判定标准是基于该武将的名字。</font>
   ["#jy_genshin_ask"] = [[原友：从简浴包精选武将中选择一张武将牌替换原神高手]]
 }
 
