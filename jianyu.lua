@@ -2101,6 +2101,7 @@ local function is_genshin(player)
   return genshin_names[Fk:translate(player.general)] or
       genshin_names[Fk:translate(player.deputyGeneral)]
 end
+
 local function is_majsoul(player)
   return player.kingdom == "que"
 end
@@ -2118,7 +2119,7 @@ local function master_can_trigger(is_fun, property)
       if not (target == player and player.phase == Player.Start) then return false end
       local room = player.room
       local is_exist = false
-      for _, p in ipairs(room:getAlivePlayers()) do
+      for _, p in ipairs(room:getOtherPlayers(player)) do
         if is_fun(p) then
           is_exist = true
           break
@@ -2166,7 +2167,8 @@ local function master_on_use(is_fun)
     local room = player.room
     if event == fk.EventPhaseProceeding then
       -- local generals = Fk.packages["jianyu_standard"]  -- TODO:自动检索所有简浴，但是先懒得写了
-      local generals = { "jy__liuxian", "jy__huohuo", "jy__kgdxs", "jy__kgds", "jy__guanzhe" }
+      local generals = { "jy__liuxian", "jy__huohuo", "jy__kgdxs", "jy__kgds", "jy__guanzhe", "jy__genshin__master",
+        "jy__que__master", "jy__moe__master" }
       local general = room:askForGeneral(player, generals, 1)
       room:changeHero(player, general, false, self.is_deputy, true)
     else
@@ -2221,7 +2223,7 @@ local function master_createTriggerSkill(is_fun, property)
 end
 
 local ysgs = General(extension, "jy__genshin__master", "qun", 4, 4, General.Female)
-ysgs:addSkill(master_createTriggerSkill(is_majsoul, "genshin"))
+ysgs:addSkill(master_createTriggerSkill(is_genshin, "genshin"))
 
 local qhgs = General(extension, "jy__que__master", "que", 4, 4, General.Female)
 qhgs:addSkill(master_createTriggerSkill(is_majsoul, "majsoul"))
@@ -2231,21 +2233,21 @@ mgs:addSkill(master_createTriggerSkill(is_moe, "moe"))
 
 
 local function master_des(property)
-  return [[你使用普通锦囊牌和基本牌可以额外指定除你以外的所有其他]] ..
+  return [[你使用普通锦囊牌和基本牌可以额外指定除你以外所有]] ..
       property ..
       [[角色为目标；]] ..
       property ..
-      [[角色造成伤害时，你摸一张牌。准备阶段，若场上没有存活的]] ..
+      [[角色造成伤害时，你摸一张牌。准备阶段，若场上没有存活的其他]] ..
       property ..
-      [[角色且你武将牌上有该技能，你将该武将牌替换为五个简浴包武将之一。<br><font color="grey">可选的简浴包武将：刘仙（复制男性角色）、藿藿（治疗与解控）、考公大学生（自选牌）、考公专家（自选牌与群体效果）、观者（摸牌与近战输出）。]]
+      [[角色且你武将牌上有该技能，你将该武将牌替换为八个简浴包武将之一。<br><font color="grey">可选的简浴包武将：刘仙（复制男性角色）、藿藿（治疗与解控）、考公大学生（自选牌）、考公专家（自选牌与群体效果）、观者（摸牌与近战输出）、原神高手、雀魂高手、萌萌高手。]]
 end
 
 Fk:loadTranslationTable {
-  ["jy__ysgs"] = "原神高手",
-  ["#jy__ysgs"] = "天理！！",
-  ["designer:jy__ysgs"] = "考公专家",
-  ["cv:jy__ysgs"] = "无",
-  ["illustrator:jy__ysgs"] = "德丽傻",
+  ["jy__genshin__master"] = "原神高手",
+  ["#jy__genshin__master"] = "天理！！",
+  ["designer:jy__genshin__master"] = "考公专家",
+  ["cv:jy__genshin__master"] = "无",
+  ["illustrator:jy__genshin__master"] = "德丽傻",
 
   ["jy_genshin_master"] = "原友",
   [":jy_master_genshin"] = master_des("原神"),
