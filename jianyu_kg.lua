@@ -3,6 +3,8 @@ extension.extensionName = "jianyu"
 
 local Q = require "packages/jianyu/question" -- 考公大学生用的题库
 
+-- TODO: 这两个武将太耦合了，建议重写。
+
 Fk:loadTranslationTable {
   ["jianyu_kg"] = [[简浴-考公]],
 }
@@ -115,7 +117,7 @@ local jy_zuoti = fk.CreateActiveSkill {
 
       -- cheat，从谋徐盛抄来的
       local cardType = { 'basic', 'trick', 'equip' }
-      local cardTypeName = room:askForChoice(player, cardType, self.name)
+      local cardTypeName = room:askForChoice(player, cardType, self.name, "#jy_zuoti_choose_card")
       local card_types = { Card.TypeBasic, Card.TypeTrick, Card.TypeEquip }
       cardType = card_types[table.indexOf(cardType, cardTypeName)]
 
@@ -467,12 +469,13 @@ Fk:loadTranslationTable {
   ["~jy__kgdxs"] = [[老师，对不起……]],
 
   ["jy_zuoti"] = "做题",
-  [":jy_zuoti"] = [[出牌阶段限一次，你可以回答一道行测真题。若正确，你指定一个非衍生牌牌名并获得一张该牌名的牌。<br><font color="grey">收录2018-2024《行测》]] .. total_papers .. [[套共]] .. total_questions .. [[题，经人工筛选，不含图形推理、资料分析。<br>回答正确时，这张牌可能来自任何位置，甚至你自己的区域。若你有同名牌，请先使用掉。</font>]],
+  [":jy_zuoti"] = [[出牌阶段限一次，你可以回答一道行测真题。若正确，你指定一个非衍生牌牌名并获得一张该牌名的牌。<br><font color="grey">收录2018-2024《行测》]] .. total_papers .. [[套共]] .. total_questions .. [[题，经人工筛选，不含图形推理、资料分析。</font>]],
   ["#jy_zuoti_q"] = "行测真题",
   ["#jy_zuoti_see_log"] = [[做题：请在战报中查看完整题干]],
   ["#jy_zuoti_ob"] = [[正在做题！其他角色可以在战报中查看这道题目的完整题干和选项。]],
   ["#jy_zuoti_correct"] = [[答对了！你可以自选一张牌！<br>你可以在战报中查看正确答案。]],
   ["#jy_zuoti_incorrect"] = [[答错了，不过没有什么惩罚，你学到了新知识！<br>你可以在战报中查看正确答案。]],
+  ["#jy_zuoti_choose_card"] = [[自选一张牌（尽量不要是自己区域内同牌名的牌）]],
   ["@jy_zuoti_correct_count"] = "答对",
   ["#jy_zuoti_correct_log"] = "%from 回答正确，正确答案：%arg。",
   ["@jy_zuoti_incorrect_count"] = "答错",
@@ -504,11 +507,11 @@ Fk:loadTranslationTable {
   ["~jy__kgds"] = "“庸人”么……呵……",
 
   ["jy_guina"] = "归纳",
-  [":jy_guina"] = [[出牌阶段限三次，你可以令一名角色回答一道行测真题。若正确，其指定一个非衍生牌牌名并获得一张该牌名的牌，否则其获得“归纳”直到本阶段结束。你使用基本牌与普通锦囊牌时，额外指定有“归纳”的角色为目标；有“归纳”的角色受到伤害时，你摸两张牌。<br><font color="grey">收录2018-2024《行测》]] .. total_papers .. [[套共]] .. total_questions .. [[题，经人工筛选，不含图形推理、资料分析。<br>回答正确时，这张牌可能来自任何位置，甚至你自己的区域。若你有同名牌，请先使用掉。</font>]],
+  [":jy_guina"] = [[出牌阶段限三次，你可以令一名角色回答一道行测真题。若正确，其指定一个非衍生牌牌名并获得一张该牌名的牌，否则其获得“归纳”直到本阶段结束。你使用基本牌与普通锦囊牌时，额外指定有“归纳”的角色为目标；有“归纳”的角色受到伤害时，你摸两张牌。<br><font color="grey">收录2018-2024《行测》]] .. total_papers .. [[套共]] .. total_questions .. [[题，经人工筛选，不含图形推理、资料分析。</font>]],
   ["@jy_guina-phase"] = "归纳",
   ["#jy_guina_correct"] = [[答对了！你可以自选一张牌获得！<br>你可以在战报中查看正确答案。]],
   ["#jy_guina_incorrect"] = [[答错了，本阶段的所有牌会额外指定你为目标！<br>你可以在战报中查看正确答案。]],
-  ["#jy_guina_choose_card"] = [[你可以自选一个牌名并获得一张该牌名的牌（尽量不要是自己有的牌）]],
+  ["#jy_guina_choose_card"] = [[自选一张牌（尽量不要是自己区域内同牌名的牌）]],
   -- 可能是不能太多语音吧，如果你在这里放了11条语音，在武将一览的时候点开这个武将就会卡死
   ["$jy_guina1"] = [[让我来考考你。]],
   ["$jy_guina2"] = [[由我提问了。]],

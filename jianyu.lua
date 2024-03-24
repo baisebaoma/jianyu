@@ -2007,7 +2007,7 @@ Fk:loadTranslationTable {
 
 -- 因为下面几个都属于高手系列差不多，所以都放到一起写了，降低耦合度
 
--- 下面的这一堆函数是用于判断“这个玩家是否是满足某一属性的玩家”，有可能是它的名字符合，也有可能是它的势力符合。总之不是特定的针对某个势力的，不要误以为是。
+-- 下面的这一堆函数是用于判断“这个玩家是否是满足某一属性的玩家”，有可能是它的名字符合，也有可能是它的势力符合，或者还有别的判断标准。总之不是特定的针对某个势力的，不要误以为是。
 
 -- 以武将名为判定是否为原神角色的标准。按照bwiki排序，截止2024.3.21
 -- 使用哈希表，时间复杂度低
@@ -2107,8 +2107,10 @@ local function is_majsoul(player)
 end
 
 local function is_moe(player)
-  return player.kingdom == "shu"
+  return player.kingdom == "moe"
 end
+
+-- 下面这一堆函数是用来快速制作高手系列的。
 
 local master_events = { fk.EventPhaseProceeding, fk.TargetConfirming, fk.Damage }
 
@@ -2250,7 +2252,7 @@ local function master_des(property, masters)
       property ..
       [[角色造成伤害时，你摸一张牌。准备阶段，若场上没有存活的其他]] ..
       property ..
-      [[角色且你武将牌上有该技能，你将该武将替换为八个简浴武将之一。<br><font color="grey">可选：雷电将军（伤害）、刘仙（复制并摧毁一名男性角色）、藿藿（治疗与辅助）、考公大学生（自选牌）、考公专家（自选牌与群体效果）、观者（近战伤害）、]] ..
+      [[角色且你武将牌上有该技能，你变更该武将。<br><font color="grey">可选：雷电将军（队友伤害）、刘仙（复制男性角色）、藿藿（治疗与辅助）、考公大学生（自选牌）、考公专家（自选牌与群体效果）、观者（近战伤害）、]] ..
       masters ..
       [[。]]
 end
