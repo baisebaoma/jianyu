@@ -2147,7 +2147,7 @@ local function master_can_trigger(is_fun, property)
           player:getMark("jy_master_" .. property) == 0 then
         -- 检查是否所有的目标角色已经被选中。只要有一个没被选中，那就return true
         local targets = AimGroup:getAllTargets(data.tos)
-        for _, p in ipairs(room:getOtherPlayers(player)) do
+        for _, p in ipairs(player.room:getOtherPlayers(player)) do
           if is_fun(p) and not table.contains(targets, p) then
             return true
           end
@@ -2177,9 +2177,7 @@ local function master_on_use(is_fun)
     local room = player.room
     if event == fk.EventPhaseProceeding then
       -- local generals = Fk.packages["jianyu_standard"]  -- TODO:自动检索所有简浴，但是先懒得写了
-      local generals = { "jy__raiden", "jy__liuxian", "jy__huohuo", "jy__kgdxs", "jy__kgds",
-        "jy__guanzhe", "jy__genshin__master", "jy__que__master", "jy__moe__master" }
-      table.removeOne(generals, self.general)
+      local generals = { "jy__raiden", "jy__liuxian", "jy__huohuo", "jy__kgdxs", "jy__kgds" }
       local general = room:askForGeneral(player, generals, 1)
       room:changeHero(player, general, false, self.general == player.deputyGeneral, true)
     elseif event == fk.TargetConfirming then
@@ -2245,16 +2243,14 @@ local mgs = General(extension, "jy__moe__master", "moe", 4, 4, General.Female)
 mgs:addSkill(master_createTriggerSkill(is_moe, "moe"))
 
 
-local function master_des(property, masters)
+local function master_des(property)
   return [[你使用普通锦囊牌和基本牌可以额外指定除你以外所有]] ..
       property ..
       [[角色为目标；]] ..
       property ..
       [[角色造成伤害时，你摸一张牌。准备阶段，若场上没有存活的其他]] ..
       property ..
-      [[角色且你武将牌上有该技能，你变更该武将。<br><font color="grey">可选：雷电将军（队友伤害）、刘仙（复制男性角色）、藿藿（治疗与辅助）、考公大学生（自选牌）、考公专家（自选牌与群体效果）、观者（近战伤害）、]] ..
-      masters ..
-      [[。]]
+      [[角色且你武将牌上有该技能，你变更该武将。<br><font color="grey">可选变更武将：雷电将军（队友伤害）、刘仙（复制男性角色）、藿藿（治疗与辅助）、考公大学生（自选牌与使命技）、考公专家（自选牌与群体效果）。]]
 end
 
 Fk:loadTranslationTable {
@@ -2262,28 +2258,28 @@ Fk:loadTranslationTable {
   ["#jy__genshin__master"] = "考公专家！！",
   ["designer:jy__genshin__master"] = "考公专家",
   ["cv:jy__genshin__master"] = "暂无",
-  ["illustrator:jy__genshin__master"] = "德丽傻",
+  ["illustrator:jy__genshin__master"] = "德丽莎·阿波卡利斯",
 
   ["jy_master_genshin"] = "原友",
-  [":jy_master_genshin"] = master_des("原神", "雀魂高手、萌包高手"),
+  [":jy_master_genshin"] = master_des("原神"),
 
   ["jy__que__master"] = "雀魂高手",
   ["#jy__que__master"] = "祈！！",
   ["designer:jy__que__master"] = "考公专家",
   ["cv:jy__que__master"] = "暂无",
-  ["illustrator:jy__que__master"] = "德丽傻",
+  ["illustrator:jy__que__master"] = "德丽莎·阿波卡利斯",
 
   ["jy_master_majsoul"] = "雀魂",
-  [":jy_master_majsoul"] = master_des("雀势力", "原神高手、萌包高手"),
+  [":jy_master_majsoul"] = master_des("雀势力"),
 
   ["jy__moe__master"] = "萌包高手",
   ["#jy__moe__master"] = "喑黒毁灭emo公主！！",
   ["designer:jy__moe__master"] = "考公专家",
   ["cv:jy__moe__master"] = "暂无",
-  ["illustrator:jy__moe__master"] = "德丽傻",
+  ["illustrator:jy__moe__master"] = "德丽莎·阿波卡利斯",
 
   ["jy_master_moe"] = "萌神",
-  [":jy_master_moe"] = master_des("萌势力", "原神高手、雀魂高手"),
+  [":jy_master_moe"] = master_des("萌势力"),
 }
 
 return extension
