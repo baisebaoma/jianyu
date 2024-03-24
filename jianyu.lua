@@ -1873,18 +1873,18 @@ local jy_lingfu = fk.CreateActiveSkill {
         recoverBy = player,
         skillName = self.name,
       })
-      to:drawCards(1, self.name)
-      if #to:getCardIds(Player.Judge) ~= 0 then
-        local cards_id = to:getCardIds(Player.Judge)
-        local dummy = Fk:cloneCard 'slash'
-        dummy:addSubcards(cards_id)
-        room:obtainCard(player.id, dummy, false, fk.ReasonPrey)
-      end
+      to:drawCards(2, self.name)
       if not to.faceup then
         to:turnOver()
       end
       if to.chained then
         to:setChainState(false)
+      end
+      if #to:getCardIds(Player.Judge) ~= 0 then
+        local cards_id = to:getCardIds(Player.Judge)
+        local dummy = Fk:cloneCard 'slash'
+        dummy:addSubcards(cards_id)
+        room:obtainCard(player.id, dummy, false, fk.ReasonPrey)
       end
     end
   end,
@@ -1910,7 +1910,7 @@ Fk:loadTranslationTable {
   ["$jy_bazhen4"] = "说不定我也能做到……",
 
   ["jy_lingfu"] = "灵符",
-  [":jy_lingfu"] = [[出牌阶段限一次，你可以弃置X（X由你选择，X不小于3且不大于5）张牌并令X-2名角色回复一点体力并摸两张牌、你获得其判定区的牌、重置其武将牌。]],
+  [":jy_lingfu"] = [[出牌阶段限一次，你可以弃置X+2张牌并令X（X由你选择，X不小于1且不大于3）名角色回复一点体力、摸两张牌、重置武将牌，然后你获得其判定区的牌。]],
   ["$jy_lingfu1"] = [[驱邪……缚魅……]],
   ["$jy_lingfu2"] = [[灵符……保命……]],
 }
@@ -2140,9 +2140,17 @@ local function master_can_trigger(is_fun, property)
         end
       end
     elseif event == fk.TargetConfirming then
-      return data.from == player.id and
+      if data.from == player.id and
           (data.card:isCommonTrick() or data.card.type == Card.TypeBasic) and
-          player:getMark("jy_master_" .. property) == 0
+          player:getMark("jy_master_" .. property) == 0 then
+        -- 检查是否所有的目标角色已经被选中。只要有一个没被选中，那就return true
+        local targets = AimGroup:getAllTargets(data.tos)
+        for _, p in ipairs(room:getOtherPlayers(player)) do
+          if is_fun(p) and not table.contains(targets, p) then
+            return true
+          end
+        end
+      end
     else
       return target and is_fun(target)
     end
@@ -2167,8 +2175,8 @@ local function master_on_use(is_fun)
     local room = player.room
     if event == fk.EventPhaseProceeding then
       -- local generals = Fk.packages["jianyu_standard"]  -- TODO:自动检索所有简浴，但是先懒得写了
-      local generals = { "jy__liuxian", "jy__huohuo", "jy__kgdxs", "jy__kgds", "jy__guanzhe", "jy__genshin__master",
-        "jy__que__master", "jy__moe__master" }
+      local generals = { "jy__raiden", "jy__liuxian", "jy__huohuo", "jy__kgdxs", "jy__kgds",
+        "jy__guanzhe", "jy__genshin__master", "jy__que__master", "jy__moe__master" }
       table.removeOne(generals, self.general)
       local general = room:askForGeneral(player, generals, 1)
       room:changeHero(player, general, false, self.general == player.deputyGeneral, true)
@@ -2235,25 +2243,27 @@ local mgs = General(extension, "jy__moe__master", "moe", 4, 4, General.Female)
 mgs:addSkill(master_createTriggerSkill(is_moe, "moe"))
 
 
-local function master_des(property)
+local function master_des(property, masters)
   return [[你使用普通锦囊牌和基本牌可以额外指定除你以外所有]] ..
       property ..
       [[角色为目标；]] ..
       property ..
       [[角色造成伤害时，你摸一张牌。准备阶段，若场上没有存活的其他]] ..
       property ..
-      [[角色且你武将牌上有该技能，你将该武将替换为七个简浴武将之一。<br><font color="grey">可选的简浴武将：刘仙（复制男性角色）、藿藿（治疗与解控）、考公大学生（自选牌与高防御）、考公专家（自选牌与群体效果）、观者（摸牌与近战伤害）、原神高手、雀魂高手、萌包高手。不能与替换前的武将相同。]]
+      [[角色且你武将牌上有该技能，你将该武将替换为八个简浴武将之一。<br><font color="grey">可选：雷电将军（伤害）、刘仙（复制并摧毁一名男性角色）、藿藿（治疗与辅助）、考公大学生（自选牌）、考公专家（自选牌与群体效果）、观者（近战伤害）、]] ..
+      masters ..
+      [[。]]
 end
 
 Fk:loadTranslationTable {
   ["jy__genshin__master"] = "原神高手",
-  ["#jy__genshin__master"] = "天理！！",
+  ["#jy__genshin__master"] = "考公专家！！",
   ["designer:jy__genshin__master"] = "考公专家",
   ["cv:jy__genshin__master"] = "暂无",
   ["illustrator:jy__genshin__master"] = "德丽傻",
 
-  ["jy_genshin_master"] = "原友",
-  [":jy_master_genshin"] = master_des("原神"),
+  ["jy_master_genshin"] = "原友",
+  [":jy_master_genshin"] = master_des("原神", "雀魂高手、萌包高手"),
 
   ["jy__que__master"] = "雀魂高手",
   ["#jy__que__master"] = "祈！！",
@@ -2262,7 +2272,7 @@ Fk:loadTranslationTable {
   ["illustrator:jy__que__master"] = "德丽傻",
 
   ["jy_master_majsoul"] = "雀魂",
-  [":jy_master_majsoul"] = master_des("雀势力"),
+  [":jy_master_majsoul"] = master_des("雀势力", "原神高手、萌包高手"),
 
   ["jy__moe__master"] = "萌包高手",
   ["#jy__moe__master"] = "喑黒毁灭emo公主！！",
@@ -2271,7 +2281,7 @@ Fk:loadTranslationTable {
   ["illustrator:jy__moe__master"] = "德丽傻",
 
   ["jy_master_moe"] = "萌神",
-  [":jy_master_moe"] = master_des("萌势力"),
+  [":jy_master_moe"] = master_des("萌势力", "原神高手、雀魂高手"),
 }
 
 return extension
