@@ -2221,7 +2221,7 @@ local function master_createTriggerSkill(is_fun, property)
 end
 
 local ysgs = General(extension, "jy__genshin__master", "qun", 4, 4, General.Female)
-qhgs:addSkill(master_createTriggerSkill(is_majsoul, "genshin"))
+ysgs:addSkill(master_createTriggerSkill(is_majsoul, "genshin"))
 
 local qhgs = General(extension, "jy__que__master", "que", 4, 4, General.Female)
 qhgs:addSkill(master_createTriggerSkill(is_majsoul, "majsoul"))
