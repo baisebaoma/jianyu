@@ -4,7 +4,7 @@ extension.extensionName = "jianyu"
 local Q = require "packages/jianyu/question" -- 考公大学生用的题库
 
 Fk:loadTranslationTable {
-  ["jianyu_kg"] = [[简浴-公务员考试]],
+  ["jianyu_kg"] = [[简浴-考公]],
 }
 
 local jy_zuoti = fk.CreateActiveSkill {
@@ -517,7 +517,7 @@ Fk:loadTranslationTable {
   ["$jy_guina5"] = [[不错，加五分。]],
   ["$jy_guina6"] = [[做得好，加十分。]],
   ["$jy_guina7"] = [[零分，下一个！]],
-  ["$jy_guina8"] = [[负分，给我滚！]],
+  ["$jy_guina8"] = [[负分！]], -- 已经和谐了这个语音了
 }
 
 return extension

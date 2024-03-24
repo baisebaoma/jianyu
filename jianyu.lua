@@ -838,7 +838,6 @@ local jy_yusu = fk.CreateTriggerSkill {
     room:setPlayerMark(player, "@jy_yusu_basic_count", "#jy_yusu_triggered")
   end,
 }
-
 jy__aweiluo:addSkill(jy_youlong)
 jy__aweiluo:addSkill(jy_hebao)
 jy__aweiluo:addSkill(jy_tiaoshui)
@@ -898,7 +897,6 @@ Fk:loadTranslationTable {
 -- 没有次数距离限制：星火燎原刘焉
 -- 无法被响应：tenyear_huicui1 #gonghu_delay
 -- 使用一张牌：诸葛恪，借刀
-
 local jy__yangfan = General(extension, "jy__yangfan", "qun", 4)
 
 -- 四吃3的选牌规则
@@ -1157,7 +1155,6 @@ local jy_huapen = fk.CreateTriggerSkill {
   on_use = function(self, event, target, player, data)
     local room = player.room
     local targets = {}
-
     local judge = {
       who = player,
       reason = self.name,
@@ -1191,13 +1188,6 @@ local jy_boshi = fk.CreateTriggerSkill {
   on_use = function(self, event, target, player, data)
     local room = player.room
     room:changeMaxHp(player, 1)
-    -- room:recover({
-    --   who = player,
-    --   num = 1,
-    --   recoverBy = player,
-    --   skillName = self.name,
-    -- })
-    -- player:drawCards(3, self.name)
     room:setPlayerMark(player, "@jy_boshi_judge_count", 0) -- 清空标记
     room:handleAddLoseSkills(player, "-jy_huapen")
     room:handleAddLoseSkills(player, "jy_jiangbei")
@@ -1218,14 +1208,10 @@ local jy_boshi_count = fk.CreateTriggerSkill {
 }
 jy_boshi:addRelatedSkill(jy_boshi_count)
 
--- 测试通过
--- 主函数啥也不做，只是为了承载下面的
+-- TODO: 重写这个技能，把它们放到一起
+-- ♥无法被响应
 local jy_jiangbei = fk.CreateTriggerSkill {
   name = "jy_jiangbei",
-}
--- ♥无法被响应
-local jy_jiangbei_heart = fk.CreateTriggerSkill {
-  name = "#jy_jiangbei_heart",
   frequency = Skill.Compulsory,
   events = { fk.CardUsing },
   can_trigger = function(self, event, target, player, data)
@@ -1236,7 +1222,7 @@ local jy_jiangbei_heart = fk.CreateTriggerSkill {
   end,
   on_use = function(self, event, target, player, data)
     local room = player.room
-    player:broadcastSkillInvoke(jy_jiangbei.name)
+    player:broadcastSkillInvoke(self.name)
     data.disresponsiveList = table.map(room.alive_players, Util.IdMapper)
   end,
 }
@@ -1518,7 +1504,6 @@ Fk:loadTranslationTable {
 
   ["jy_yali"] = "压力",
   [":jy_yali"] = [[锁定技，你的摸牌阶段改为摸X张牌，X为你的体力值与手牌数之差且至少为1；你的手牌上限等于你的体力上限。]],
-
 }
 
 local jy__raiden = General(extension, "jy__raiden", "god", 4, 4, General.Female)
@@ -1529,8 +1514,7 @@ local jy_leiyan = fk.CreateActiveSkill {
   can_use = function(self, player)
     -- local room = player.room
     -- 如果所有人都有雷眼，那么就不能发动
-    local all_players = true -- 默认所有人都有雷眼
-    -- 只要有一个人没有雷眼，那么就是假
+    local all_players = true
 
     -- 在这里写room:getAlivePlayers不行
     -- Fk:currentRoom():getAlivePlayer也不行。因为这里用的是客户端Room。
@@ -1585,15 +1569,6 @@ local jy_leiyan_trigger = fk.CreateTriggerSkill {
         pattern = ".|.|club,spade",
       }
       room:judge(judge)
-
-      -- if judge.card.color == Card.Red then
-      --   player:broadcastSkillInvoke("jy_leiyan")
-      --   for _, p in ipairs(room:getAlivePlayers()) do
-      --     if p:getMark("@jy_raiden_leiyan") ~= 0 and not p.dead then
-      --       p:drawCards(1)
-      --     end
-      --   end
-      -- else
       if judge.card.color == Card.Black then
         player:broadcastSkillInvoke("jy_leiyan")
         room:doIndicate(player.id, { to.id }) -- 播放指示线
@@ -1656,14 +1631,11 @@ Fk:loadTranslationTable {
 
   ["jy_leiyan"] = "雷眼",
   [":jy_leiyan"] = [[出牌阶段限一次，你可以令至少一名角色获得<font color="Fuchsia">雷眼</font>；持有<font color="Fuchsia">雷眼</font>的角色造成伤害后，若目标未死亡，你判定，若为黑色，你对目标造成1点雷电伤害，该伤害不会触发〖雷眼〗。]],
-  -- ；若为红色，所有持有该标记的角色摸一张牌
   ["@jy_raiden_leiyan"] = [[<font color="Fuchsia">雷眼</font>]],
-  ["@jy_raiden_yuanli"] = [[<font color="Fuchsia">愿力</font>]],
   ["#jy_leiyan_trigger"] = "雷眼",
   ["$jy_leiyan1"] = "泡影看破！",
   ["$jy_leiyan2"] = "无处遁逃！",
   ["$jy_leiyan3"] = "威光无赦！",
-  -- ["#jy_yuanli_full"] = [[<font color="Fuchsia">愿力</font>已满！]],
 
   ["jy_zhenshuo"] = "真说",
   [":jy_zhenshuo"] = [[出牌阶段限一次，你可以弃3张牌对一名攻击范围内的角色造成1点雷电伤害。]],
@@ -1675,7 +1647,6 @@ Fk:loadTranslationTable {
 local jy__ayato = General(extension, "jy__ayato", "qun", 4)
 
 local jy_jinghua = fk.CreateTriggerSkill {
-  -- frequency = Skill.Compulsory,
   name = "jy_jinghua",
   anim_type = "offensive",
   events = { fk.CardResponding, fk.CardUseFinished },
@@ -1705,7 +1676,6 @@ local jy_jianying = fk.CreateTriggerSkill {
   anim_type = "defensive",
   events = { fk.EventPhaseProceeding },
   can_trigger = function(self, event, target, player, data)
-    -- 任何一个人回合都要发动
     return player:hasSkill(self) and
         target.phase == Player.Finish and
         #player:getCardIds(Player.Hand) < 2
@@ -2035,8 +2005,12 @@ Fk:loadTranslationTable {
   ["$jy_zhuhua3"] = [[……献给伊德莉拉。]],
 }
 
+-- 因为下面几个都属于高手系列差不多，所以都放到一起写了，降低耦合度
+
+-- 下面的这一堆函数是用于判断“这个玩家是否是满足某一属性的玩家”，有可能是它的名字符合，也有可能是它的势力符合。总之不是特定的针对某个势力的，不要误以为。
 
 -- 以武将名为判定是否为原神角色的标准。按照bwiki排序，截止2024.3.21
+-- 使用哈希表，时间复杂度低
 local genshin_names = {
   ["凯亚"] = true,
   ["重云"] = true,
@@ -2123,30 +2097,34 @@ local genshin_names = {
   ["阿蕾奇诺"] = true,
 }
 
-local function is_genshin_name(name)
-  return genshin_names[Fk:translate(name)]
-end
-
 local function is_genshin(player)
-  return is_genshin_name(player.general) or is_genshin_name(player.deputyGeneral)
+  return genshin_names[Fk:translate(player.general)] or
+      genshin_names[Fk:translate(player.deputyGeneral)]
+end
+local function is_majsoul(player)
+  return player.kingdom == "que"
 end
 
-local genshin = fk.CreateTriggerSkill {
-  name = "jy_genshin",
-  events = { fk.EventPhaseProceeding, fk.TargetConfirming, fk.Damage },
-  can_trigger = function(self, event, target, player, data)
+local function is_moe(player)
+  return player.kingdom == "shu"
+end
+
+local master_events = { fk.EventPhaseProceeding, fk.TargetConfirming, fk.Damage }
+
+local function master_can_trigger(is_fun, property)
+  return function(self, event, target, player, data)
     if not player:hasSkill(self) then return false end
     if event == fk.EventPhaseProceeding then
       if not (target == player and player.phase == Player.Start) then return false end
       local room = player.room
-      local is_genshin_exist = false
+      local is_exist = false
       for _, p in ipairs(room:getAlivePlayers()) do
-        if is_genshin(p) then
-          is_genshin_exist = true
+        if is_fun(p) then
+          is_exist = true
           break
         end
       end
-      if is_genshin_exist then return false end
+      if is_exist then return false end
       -- 确认自己有没有哪个武将牌有这个技能
       local generals
       if player.deputyGeneral == "" then
@@ -2162,22 +2140,29 @@ local genshin = fk.CreateTriggerSkill {
       end
     elseif event == fk.TargetConfirming then
       return data.from == player.id and
-          (data.card:isCommonTrick() or data.card.type == Card.TypeBasic) and player:getMark("jy_genshin") == 0
+          (data.card:isCommonTrick() or data.card.type == Card.TypeBasic) and
+          player:getMark("jy_master_" .. property) == 0
     else
-      return target and is_genshin(target)
+      return target and is_fun(target)
     end
-  end,
-  on_cost = function(self, event, target, player, data)
+  end
+end
+
+local function master_on_cost(property)
+  return function(self, event, target, player, data)
     if event == fk.EventPhaseProceeding then
       return true
     elseif event == fk.TargetConfirming then
-      player.room:setPlayerMark(player, "jy_genshin", true)
+      player.room:setPlayerMark(player, "jy_master_" .. property, true)
       return player.room:askForSkillInvoke(player, self.name)
     else
       player:drawCards(1, self.name)
     end
-  end,
-  on_use = function(self, event, target, player, data)
+  end
+end
+
+local function master_on_use(is_fun)
+  return function(self, event, target, player, data)
     local room = player.room
     if event == fk.EventPhaseProceeding then
       -- local generals = Fk.packages["jianyu_standard"]  -- TODO:自动检索所有简浴，但是先懒得写了
@@ -2185,49 +2170,103 @@ local genshin = fk.CreateTriggerSkill {
       local general = room:askForGeneral(player, generals, 1)
       room:changeHero(player, general, false, self.is_deputy, true)
     else
-      local guina_players = {} -- 用来画指示线的
+      local indicate_players = {} -- 用来画指示线的
       local targets = AimGroup:getAllTargets(data.tos)
-      for _, p in ipairs(room:getAlivePlayers()) do
-        if is_genshin(p) and not table.contains(targets, p.id) then -- 抄的room.lua142行
+      for _, p in ipairs(room:getOtherPlayers(player)) do
+        if is_fun(p) and not table.contains(targets, p.id) then -- 抄的room.lua142行
           -- 判断目标是否不能成为这张牌的目标
           if not Self:isProhibited(p, data.card) then
             AimGroup:addTargets(player.room, data, p.id)
-            table.insert(guina_players, p.id)
+            table.insert(indicate_players, p.id)
           end
         end
       end
-      if #guina_players ~= 0 then
+      if #indicate_players ~= 0 then
         room:doAnimate("InvokeSkill", {
           name = self.name,
           player = player.id,
           skill_type = "offensive",
         })
-        room:doIndicate(data.from, guina_players)
+        room:doIndicate(data.from, indicate_players)
       end
     end
-  end,
-  refresh_events = { fk.CardUseFinished },
-  can_refresh = function(self, event, target, player, data)
-    return player:hasSkill(self) and player:getMark("jy_genshin") ~= 0
-  end,
-  on_refresh = function(self, event, target, player, data)
-    player.room:setPlayerMark(player, "jy_genshin", 0)
-  end,
-}
+  end
+end
 
-local ysgs = General(extension, "jy__ysgs", "qun", 4, 4, General.Female)
-ysgs:addSkill(genshin)
+local master_refresh_events = { fk.CardUseFinished }
+
+local function master_can_refresh(property)
+  return function(self, event, target, player, data)
+    return player:hasSkill(self) and
+        player:getMark("jy_master_" .. property) ~= 0
+  end
+end
+
+local function master_on_refresh(property)
+  return function(self, event, target, player, data) player.room:setPlayerMark(player, "jy_master_" .. property, 0) end
+end
+
+-- 生成一个对应的技能。
+local function master_createTriggerSkill(is_fun, property)
+  return fk.CreateTriggerSkill {
+    name = "jy_master_" .. property,
+    events = master_events,
+    can_trigger = master_can_trigger(is_fun, property),
+    on_cost = master_on_cost(property),
+    on_use = master_on_use(is_fun),
+    refresh_events = master_refresh_events,
+    can_refresh = master_can_refresh(property),
+    on_refresh = master_on_refresh(property)
+  }
+end
+
+local ysgs = General(extension, "jy__genshin__master", "qun", 4, 4, General.Female)
+qhgs:addSkill(master_createTriggerSkill(is_majsoul, "genshin"))
+
+local qhgs = General(extension, "jy__que__master", "que", 4, 4, General.Female)
+qhgs:addSkill(master_createTriggerSkill(is_majsoul, "majsoul"))
+
+local mgs = General(extension, "jy__moe__master", "moe", 4, 4, General.Female)
+mgs:addSkill(master_createTriggerSkill(is_moe, "moe"))
+
+
+local function master_des(property)
+  return [[你使用普通锦囊牌和基本牌可以额外指定除你以外的所有其他]] ..
+      property ..
+      [[角色为目标；]] ..
+      property ..
+      [[角色造成伤害时，你摸一张牌。准备阶段，若场上没有存活的]] ..
+      property ..
+      [[角色且你武将牌上有该技能，你将该武将牌替换为五个简浴包武将之一。<br><font color="grey">可选的简浴包武将：刘仙（复制男性角色）、藿藿（治疗与解控）、考公大学生（自选牌）、考公专家（自选牌与群体效果）、观者（摸牌与近战输出）。]]
+end
 
 Fk:loadTranslationTable {
   ["jy__ysgs"] = "原神高手",
-  ["#jy__ysgs"] = "天理",
+  ["#jy__ysgs"] = "天理！！",
   ["designer:jy__ysgs"] = "考公专家",
   ["cv:jy__ysgs"] = "无",
   ["illustrator:jy__ysgs"] = "德丽傻",
 
-  ["jy_genshin"] = "原友",
-  [":jy_genshin"] = [[你使用普通锦囊牌和基本牌可以额外指定所有原神角色为目标；原神角色造成伤害时，你摸一张牌。准备阶段，若场上没有存活的原神角色且你武将牌上有该技能，你将该武将牌替换为五个简浴包武将之一。<br><font color="grey">可选的简浴包武将：刘仙（复制男性角色）、藿藿（治疗与解控）、考公大学生（自选牌）、考公专家（自选牌与群体效果）、观者（摸牌与近战输出）。]], -- <br><font color="grey">原神武将牌的判定标准是基于该武将的名字。</font>
-  ["#jy_genshin_ask"] = [[原友：从简浴包精选武将中选择一张武将牌替换原神高手]]
+  ["jy_genshin_master"] = "原友",
+  [":jy_master_genshin"] = master_des("原神"),
+
+  ["jy__que__master"] = "雀魂高手",
+  ["#jy__que__master"] = "祈！！",
+  ["designer:jy__que__master"] = "考公专家",
+  ["cv:jy__que__master"] = "无",
+  ["illustrator:jy__que__master"] = "德丽傻",
+
+  ["jy_master_majsoul"] = "雀魂",
+  [":jy_master_majsoul"] = master_des("雀势力"),
+
+  ["jy__moe__master"] = "萌萌高手",
+  ["#jy__moe__master"] = "喑黒毁灭emo公主！！",
+  ["designer:jy__moe__master"] = "考公专家",
+  ["cv:jy__moe__master"] = "无",
+  ["illustrator:jy__moe__master"] = "德丽傻",
+
+  ["jy_master_moe"] = "萌萌",
+  [":jy_master_moe"] = master_des("萌势力"),
 }
 
 return extension

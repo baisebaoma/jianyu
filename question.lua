@@ -3,6 +3,8 @@ local Question = require 'packages/jianyu/_base'
 -- 把randomseed定在这里，不用放到函数里去，反正有一个种子就够了，不用每次都换新的种子。
 math.randomseed(os.time())
 
+-- TODO：换一个占用空间更小的方式来存储题目及答案，目前有点太大了
+
 Question.question_set = require "packages/jianyu/questions/init"
 
 -- 随机返回一个问题
