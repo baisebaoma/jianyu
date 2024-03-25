@@ -2259,6 +2259,8 @@ Fk:loadTranslationTable {
 
   ["jy_master_genshin"] = "原友",
   [":jy_master_genshin"] = master_des("原神"),
+  ["$jy_master_genshin1"] = [[玩原神玩的！]],
+  ["$jy_master_genshin2"] = [[不玩原神导致的！]],
 
   ["jy__que__master"] = "雀魂高手",
   ["#jy__que__master"] = "祈！！",
@@ -2268,6 +2270,8 @@ Fk:loadTranslationTable {
 
   ["jy_master_majsoul"] = "雀魂",
   [":jy_master_majsoul"] = master_des("雀势力"),
+  ["$jy_master_majsoul1"] = [[玩雀魂玩的！]],
+  ["$jy_master_majsoul2"] = [[不玩雀魂导致的！]],
 
   ["jy__moe__master"] = "萌包高手",
   ["#jy__moe__master"] = "喑黒毁灭emo公主！！",
@@ -2277,6 +2281,8 @@ Fk:loadTranslationTable {
 
   ["jy_master_moe"] = "萌神",
   [":jy_master_moe"] = master_des("萌势力"),
+  ["$jy_master_moe1"] = [[玩萌包玩的！]],
+  ["$jy_master_moe2"] = [[不玩萌包导致的！]],
 }
 
 return extension
