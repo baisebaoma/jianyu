@@ -2254,8 +2254,8 @@ Fk:loadTranslationTable {
   ["jy__genshin__master"] = "原神高手",
   ["#jy__genshin__master"] = "考公专家！！",
   ["designer:jy__genshin__master"] = "考公专家",
-  ["cv:jy__genshin__master"] = "暂无",
-  ["illustrator:jy__genshin__master"] = "德丽莎·阿波卡利斯",
+  ["cv:jy__genshin__master"] = "AI德丽莎",
+  ["illustrator:jy__genshin__master"] = "德丽莎",
 
   ["jy_master_genshin"] = "原友",
   [":jy_master_genshin"] = master_des("原神"),
@@ -2265,8 +2265,8 @@ Fk:loadTranslationTable {
   ["jy__que__master"] = "雀魂高手",
   ["#jy__que__master"] = "祈！！",
   ["designer:jy__que__master"] = "考公专家",
-  ["cv:jy__que__master"] = "暂无",
-  ["illustrator:jy__que__master"] = "德丽莎·阿波卡利斯",
+  ["cv:jy__que__master"] = "AI德丽莎",
+  ["illustrator:jy__que__master"] = "德丽莎",
 
   ["jy_master_majsoul"] = "雀魂",
   [":jy_master_majsoul"] = master_des("雀势力"),
@@ -2276,8 +2276,8 @@ Fk:loadTranslationTable {
   ["jy__moe__master"] = "萌包高手",
   ["#jy__moe__master"] = "喑黒毁灭emo公主！！",
   ["designer:jy__moe__master"] = "考公专家",
-  ["cv:jy__moe__master"] = "暂无",
-  ["illustrator:jy__moe__master"] = "德丽莎·阿波卡利斯",
+  ["cv:jy__moe__master"] = "AI德丽莎",
+  ["illustrator:jy__moe__master"] = "德丽莎",
 
   ["jy_master_moe"] = "萌神",
   [":jy_master_moe"] = master_des("萌势力"),
