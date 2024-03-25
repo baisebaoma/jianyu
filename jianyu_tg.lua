@@ -1328,7 +1328,7 @@ Fk:loadTranslationTable {
   ["jy__tjzs"] = [[铁甲战士]],
   ["#jy__tjzs"] = [[铁甲战士]],
   ["designer:jy__tjzs"] = [[Kasa]],
-  ["cv:jy__tjzs"] = [[高达一号]],
+  ["cv:jy__tjzs"] = [[AI莱依拉]],
   ["illustrator:jy__tjzs"] = [[未知]],
 }
 

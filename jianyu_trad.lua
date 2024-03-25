@@ -655,7 +655,7 @@ Fk:loadTranslationTable {
   ["jy__trad__tjzs"] = [[经典铁甲战士]],
   ["#jy__trad__tjzs"] = pve,
   ["designer:jy__trad__tjzs"] = [[Kasa]],
-  ["cv:jy__trad__tjzs"] = [[高达一号]],
+  ["cv:jy__trad__tjzs"] = [[AI莱依拉]],
   ["illustrator:jy__trad__tjzs"] = [[未知]],
 
   ["jy_trad_heiyong"] = [[黑拥]],

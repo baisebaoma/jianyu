@@ -2248,6 +2248,7 @@ Fk:loadTranslationTable {
   ["designer:jy__genshin__master"] = "考公专家",
   ["cv:jy__genshin__master"] = "AI德丽莎",
   ["illustrator:jy__genshin__master"] = "德丽莎",
+  ["~jy__genshin__master"] = "不该……",
 
   ["jy_master_genshin"] = "原友",
   [":jy_master_genshin"] = master_des("原神"),
@@ -2259,6 +2260,7 @@ Fk:loadTranslationTable {
   ["designer:jy__que__master"] = "考公专家",
   ["cv:jy__que__master"] = "AI德丽莎",
   ["illustrator:jy__que__master"] = "德丽莎",
+  ["~jy__que__master"] = "不该……",
 
   ["jy_master_majsoul"] = "雀魂",
   [":jy_master_majsoul"] = master_des("雀势力"),
@@ -2270,6 +2272,7 @@ Fk:loadTranslationTable {
   ["designer:jy__moe__master"] = "考公专家",
   ["cv:jy__moe__master"] = "AI德丽莎",
   ["illustrator:jy__moe__master"] = "德丽莎",
+  ["~jy__moe__master"] = "不该……",
 
   ["jy_master_moe"] = "萌神",
   [":jy_master_moe"] = master_des("萌势力"),
