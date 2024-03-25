@@ -2154,7 +2154,7 @@ local function master_can_trigger(is_fun, property)
         end
       end
     else
-      return target and is_fun(target)
+      return target and is_fun(target) and target ~= player
     end
   end
 end
@@ -2243,9 +2243,9 @@ mgs:addSkill(master_createTriggerSkill(is_moe, "moe"))
 local function master_des(property)
   return [[你使用普通锦囊牌和基本牌可以额外指定除你以外所有]] ..
       property ..
-      [[角色为目标；]] ..
+      [[角色为目标；除你以外的]] ..
       property ..
-      [[角色造成伤害时，你摸一张牌。准备阶段，若场上没有存活的其他]] ..
+      [[角色造成伤害时，你摸一张牌。准备阶段，若场上除你以外没有存活的]] ..
       property ..
       [[角色且你武将牌上有该技能，你变更该武将。<br><font color="grey">可选变更武将：雷电将军（队友伤害）、刘仙（复制男性角色）、藿藿（治疗与辅助）、考公大学生（自选牌与使命技）、考公专家（自选牌与群体效果）。]]
 end
