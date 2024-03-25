@@ -340,11 +340,7 @@ local jy_huxiao_xiao = fk.CreateTriggerSkill {
   on_use = function(self, event, target, player, data)
     local room = player.room
     player:broadcastSkillInvoke("jy_huxiao")
-    room:doAnimate("InvokeSkill", {
-      name = "jy_huxiao",
-      player = player.id,
-      skill_type = "offensive",
-    })
+    room:notifySkillInvoked(player, self.name, "drawcard")
     local dummy = Fk:cloneCard("dilu")
     dummy:addSubcards(room:getNCards(1))
     player:addToPile("jy__liyuanhao_xiao", dummy, true, self.name)
@@ -2190,11 +2186,7 @@ local function master_on_use(is_fun)
         end
       end
       if #indicate_players ~= 0 then
-        room:doAnimate("InvokeSkill", {
-          name = self.name,
-          player = player.id,
-          skill_type = "offensive",
-        })
+        room:notifySkillInvoked(player, self.name, "offensive")
         room:doIndicate(data.from, indicate_players)
       end
     else

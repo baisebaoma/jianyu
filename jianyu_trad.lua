@@ -120,11 +120,7 @@ local trad_zhushe = fk.CreateTriggerSkill {
     local room = player.room
     if event == fk.EventPhaseStart then
       player:broadcastSkillInvoke(self.name)
-      room:doAnimate("InvokeSkill", {
-        name = self.name,
-        player = player.id,
-        skill_type = "drawcard",
-      })
+      room:notifySkillInvoked(player, self.name, "drawcard")
       local cards = room:askForCard(player, 1, 999, true, self.name, true, nil, "#jy_trad_zhushe_prompt", nil, true)
       if #cards > 0 then
         room:throwCard(cards, self.name, player, player)
@@ -135,20 +131,12 @@ local trad_zhushe = fk.CreateTriggerSkill {
       end
     elseif event == fk.CardUsing then
       -- player:broadcastSkillInvoke(self.name)  -- 这个就别播语音了，不然无法响应+造成伤害一张牌播两遍语音很吵
-      room:doAnimate("InvokeSkill", {
-        name = self.name,
-        player = player.id,
-        skill_type = "offensive",
-      })
+      room:notifySkillInvoked(player, self.name, "offensive")
       data.disresponsiveList = table.map(room.alive_players, Util.IdMapper)
     else              -- fk.Damaged
       room:delay(200) -- 不加delay的话，在放AOE卡牌时一瞬间有太多事件，会出现卡顿
       player:broadcastSkillInvoke(self.name)
-      room:doAnimate("InvokeSkill", {
-        name = self.name,
-        player = player.id,
-        skill_type = "drawcard",
-      })
+      room:notifySkillInvoked(player, self.name, "drawcard")
       room:recover({
         who = data.to,
         num = data.damage,

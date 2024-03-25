@@ -27,11 +27,7 @@ local jy_budeng_damaged = fk.CreateTriggerSkill {
   end,
   on_use = function(self, event, target, player, data)
     player:broadcastSkillInvoke("jy_budeng")
-    player.room:doAnimate("InvokeSkill", {
-      name = "jy_budeng",
-      player = player.id,
-      skill_type = "defensive",
-    })
+    room:notifySkillInvoked(player, "jy_budeng", "defensive")
 
     return true
   end,
@@ -54,11 +50,7 @@ local jy_budeng_discard = fk.CreateTriggerSkill {
   end,
   on_use = function(self, event, target, player, data)
     player:broadcastSkillInvoke("jy_budeng")
-    player.room:doAnimate("InvokeSkill", {
-      name = "jy_budeng",
-      player = player.id,
-      skill_type = "defensive",
-    })
+    room:notifySkillInvoked(player, "jy_budeng", "defensive")
 
     return true
   end
@@ -82,11 +74,7 @@ local jy_budeng_card = fk.CreateTriggerSkill {
   end,
   on_use = function(self, event, target, player, data)
     player:broadcastSkillInvoke("jy_budeng")
-    player.room:doAnimate("InvokeSkill", {
-      name = "jy_budeng",
-      player = player.id,
-      skill_type = "offensive",
-    })
+    room:notifySkillInvoked(player, "jy_budeng", "defensive")
 
     local room = player.room
     -- room:loseHp(room.current, 1)
@@ -229,11 +217,7 @@ local zhushe = fk.CreateTriggerSkill {
     local room = player.room
     if event == fk.EventPhaseStart then
       player:broadcastSkillInvoke(self.name)
-      room:doAnimate("InvokeSkill", {
-        name = self.name,
-        player = player.id,
-        skill_type = "drawcard",
-      })
+      room:notifySkillInvoked(player, self.name, "drawcard")
       local cards = room:askForCard(player, 1, 999, true, self.name, true, nil, "#jy_zhushe_prompt", nil, true)
       if #cards > 0 then
         room:throwCard(cards, self.name, player, player)
@@ -244,20 +228,12 @@ local zhushe = fk.CreateTriggerSkill {
       end
     elseif event == fk.CardUsing then
       -- player:broadcastSkillInvoke(self.name)  -- 这个就别播语音了，不然无法响应+造成伤害一张牌播两遍语音很吵
-      room:doAnimate("InvokeSkill", {
-        name = self.name,
-        player = player.id,
-        skill_type = "offensive",
-      })
+      room:notifySkillInvoked(player, self.name, "drawcard")
       data.disresponsiveList = table.map(room.alive_players, Util.IdMapper)
     else              -- fk.Damaged
       room:delay(200) -- 不加delay的话，在放AOE卡牌时一瞬间有太多事件，会出现卡顿
       player:broadcastSkillInvoke(self.name)
-      room:doAnimate("InvokeSkill", {
-        name = self.name,
-        player = player.id,
-        skill_type = "drawcard",
-      })
+      room:notifySkillInvoked(player, self.name, "drawcard")
       room:recover({
         who = data.to,
         num = data.damage,
@@ -359,11 +335,7 @@ local xingtu_draw = fk.CreateTriggerSkill {
   end,
   on_use = function(self, event, target, player, data)
     player:broadcastSkillInvoke(xingtu.name)
-    player.room:doAnimate("InvokeSkill", {
-      name = xingtu.name,
-      player = player.id,
-      skill_type = "drawcard",
-    })
+    room:notifySkillInvoked(player, xingtu.name, "drawcard")
     player:drawCards(1, self.name)
   end,
 }
@@ -393,11 +365,7 @@ local zhunwang_mod = fk.CreateTriggerSkill {
   on_refresh = function(self, event, target, player, data)
     if player:hasSkill(self) and translateCardType(data.card.type) == player:getMark("@jy_zhunwang") then
       player:broadcastSkillInvoke("jy_zhunwang")
-      player.room:doAnimate("InvokeSkill", {
-        name = "jy_zhunwang",
-        player = player.id,
-        skill_type = "control",
-      })
+      room:notifySkillInvoked(player, "jy_zhunwang", "drawcard")
     else
       player.room:setPlayerMark(player, "@jy_zhunwang", translateCardType(data.card.type))
     end

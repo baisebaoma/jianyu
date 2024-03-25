@@ -26,11 +26,7 @@ local jy_zuoti = fk.CreateActiveSkill {
   on_use = function(self, room, effect)
     local player = room:getPlayerById(effect.from)
     player:broadcastSkillInvoke(self.name, math.random(4))
-    room:doAnimate("InvokeSkill", {
-      name = self.name,
-      player = effect.from,
-      skill_type = "control",
-    })
+    room:notifySkillInvoked(player, self.name, "drawcard")
     -- 随机从题库拿一道题
     local questionFull = Q.getRandomQuestion()
 
@@ -257,11 +253,7 @@ local jy_guina = fk.CreateActiveSkill {
   on_use = function(self, room, effect)
     local me = room:getPlayerById(effect.from)
     me:broadcastSkillInvoke(self.name, math.random(4))
-    room:doAnimate("InvokeSkill", {
-      name = self.name,
-      player = effect.from,
-      skill_type = "offensive",
-    })
+    room:notifySkillInvoked(player, self.name, "drawcard")
     local player = room:getPlayerById(effect.tos[1])
     -- 随机从题库拿一道题
     local questionFull = Q.getRandomQuestion()
@@ -425,19 +417,11 @@ local jy_guina_refresh = fk.CreateTriggerSkill {
         end
       end
       if #guina_players ~= 0 then
-        room:doAnimate("InvokeSkill", {
-          name = "jy_guina",
-          player = player.id,
-          skill_type = "offensive",
-        })
+        room:notifySkillInvoked(player, "jy_guina", "drawcard")
         room:doIndicate(data.from, guina_players)
       end
     else
-      room:doAnimate("InvokeSkill", {
-        name = "jy_guina",
-        player = player.id,
-        skill_type = "offensive",
-      })
+      room:notifySkillInvoked(player, "jy_guina", "drawcard")
       player:drawCards(2, "jy_guina")
     end
   end,
