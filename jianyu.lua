@@ -2108,13 +2108,13 @@ end
 
 -- 下面这一堆函数是用来快速制作高手系列的。
 
-local master_events = { fk.EventPhaseProceeding, fk.TargetConfirming, fk.Damage }
+local master_events = { fk.EventPhaseProceeding, fk.TargetConfirming, fk.Damage, fk.Damaged }
 
 local function master_can_trigger(is_fun, property)
   return function(self, event, target, player, data)
     if not player:hasSkill(self) then return false end
     if event == fk.EventPhaseProceeding then
-      if not (target == player and player.phase == Player.Start) then return false end
+      if not (target == player and (player.phase == Player.Start or player.phase == Player.Finish)) then return false end
       local room = player.room
       local is_exist = false
       for _, p in ipairs(room:getOtherPlayers(player)) do
@@ -2149,8 +2149,10 @@ local function master_can_trigger(is_fun, property)
           end
         end
       end
-    else
+    elseif event == fk.Damage then
       return target and is_fun(target) and target ~= player
+    else
+      return is_fun(target) and target ~= player
     end
   end
 end
@@ -2173,7 +2175,10 @@ local function master_on_use(is_fun)
     local room = player.room
     if event == fk.EventPhaseProceeding then
       -- local generals = Fk.packages["jianyu_standard"]  -- TODO:自动检索所有简浴，但是先懒得写了
-      local generals = { "jy__raiden", "jy__liuxian", "jy__huohuo", "jy__kgdxs", "jy__kgds" }
+      local generals = { "jy__genshin__master", "jy__que__master",
+        "jy__moe__master", "jy__liuxian", "jy__huohuo", "jy__kgdxs", "jy__kgds" }
+      table.removeOne(generals, self.general)
+      table.insert(generals, room:getNGenerals(6))
       local general = room:askForGeneral(player, generals, 1)
       room:changeHero(player, general, false, self.general == player.deputyGeneral, true)
     elseif event == fk.TargetConfirming then
@@ -2190,7 +2195,7 @@ local function master_on_use(is_fun)
         room:doIndicate(data.from, indicate_players)
       end
     else
-      player:drawCards(1, self.name)
+      player:drawCards(data.damage, self.name)
     end
   end
 end
@@ -2237,9 +2242,9 @@ local function master_des(property)
       property ..
       [[角色为目标；除你以外的]] ..
       property ..
-      [[角色造成伤害时，你摸一张牌。准备阶段，若场上除你以外没有存活的]] ..
+      [[角色造成或受到伤害时，你摸等同于伤害值张牌。准备阶段或结束阶段，若场上除你以外没有存活的]] ..
       property ..
-      [[角色且你武将牌上有该技能，你变更该武将。<br><font color="grey">可选变更武将：雷电将军（队友伤害）、刘仙（复制男性角色）、藿藿（治疗与辅助）、考公大学生（自选牌与使命技）、考公专家（自选牌与群体效果）。]]
+      [[角色且你武将牌上有该技能，你变更该武将。]]
 end
 
 Fk:loadTranslationTable {
@@ -2270,7 +2275,7 @@ Fk:loadTranslationTable {
   ["$jy_master_majsoul3"] = [[雀魂，启动！]],
 
   ["jy__moe__master"] = "萌包高手",
-  ["#jy__moe__master"] = "喑黒毁灭emo公主！！",
+  ["#jy__moe__master"] = "emo公主！！",
   ["designer:jy__moe__master"] = "考公专家",
   ["cv:jy__moe__master"] = "AI德丽莎",
   ["illustrator:jy__moe__master"] = "德丽莎",
