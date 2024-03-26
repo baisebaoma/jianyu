@@ -2178,7 +2178,7 @@ local function master_on_use(is_fun)
       local generals = { "jy__genshin__master", "jy__que__master",
         "jy__moe__master", "jy__liuxian", "jy__huohuo", "jy__kgdxs", "jy__kgds" }
       table.removeOne(generals, self.general)
-      table.insert(generals, room:getNGenerals(6))
+      -- TODO：连接两个表，目前先这样吧
       local general = room:askForGeneral(player, generals, 1)
       room:changeHero(player, general, false, self.general == player.deputyGeneral, true)
     elseif event == fk.TargetConfirming then
