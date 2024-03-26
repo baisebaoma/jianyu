@@ -712,9 +712,12 @@ Fk:loadTranslationTable {
   ["designer:jy__guojia"] = [[rolin]],
   ["cv:jy__guojia"] = [[暂无]],
   ["illustrator:jy__guojia"] = [[未知]],
+  ["$jy__guojia"] = [[咳咳……]],
 
   ["jy_tiandu"] = [[天妒]],
   [":jy_tiandu"] = [[锁定技，回合开始时，若你体力值不为全场最低，你受到一点无来源伤害。]],
+  ["$jy_tiandu1"] = [[就这样吧。]],
+  ["$jy_tiandu2"] = [[哦？]],
 
   ["jy_yiji"] = [[遗计]],
   [":jy_yiji"] = [[当你受到一点伤害时，你可以选择一项：摸两张牌；将一张牌当一张本轮未以此法使用过的非伤害类普通锦囊牌使用。]],
@@ -723,6 +726,8 @@ Fk:loadTranslationTable {
   ["@$jy_yiji-round"] = [[遗计]],
   ["#jy_yiji_viewas"] = [[遗计]],
   ["#jy_yiji_draw2"] = [[<font color="gold">摸两张牌</font>]],
+  ["$jy_yiji1"] = [[也好。]],
+  ["$jy_yiji2"] = [[罢了。]],
 
   -- ["jy_yingcai"] = [[英才]],
   -- [":jy_yingcai"] = [[当你使用普通锦囊牌时，你可以为此牌增加或减少一个目标（无距离限制，目标数至少为1）。]],
@@ -830,17 +835,6 @@ local jianyan = fk.CreateTriggerSkill {
         (data.card.type == Card.TypeBasic or data.card:isCommonTrick()) and data.card.is_damage_card
   end,
   on_use = function(self, event, target, player, data)
-    -- local room = player.room
-    -- local choice = room:askForChoice()
-    -- if choice == "#jy_jianyan_do_extra" then
-    -- 让它结算两次
-    -- 给它打上标记
-    --  data.card.is_jy_jianyan = true
-    -- else
-    -- 令此牌无效
-    -- 你获得此牌（参考奸雄）
-    -- 若为锦囊牌，获得一点护甲
-    -- end
     data.card.is_jy_jianyan = true
   end,
   refresh_events = { fk.Damaged, fk.CardUsing },
@@ -885,11 +879,9 @@ Fk:loadTranslationTable {
 
   ["jy_jianyan"] = [[谏言]],
   [":jy_jianyan"] = [[锁定技，一名角色于其回合内首次使用伤害类基本牌或普通锦囊牌时，该牌每造成一点伤害，你摸一张牌。]],
-  -- [":jy_jianyan"] = [[一名角色于其回合内首次使用牌时，你可以选择一项：①令此牌额外结算一次，然后该牌每造成一点伤害，你摸一张牌；②令此牌无效且你获得此牌，若该牌为锦囊牌，你获得一点护甲]],
 
   ["jy_jimin"] = [[济民]],
   [":jy_jimin"] = [[锁定技，每名角色限一次，一名角色使用【杀】指定你为目标时，该牌对你无效，然后你摸两张牌。]],
-  -- [":jy_jimin"] = [[锁定技，一名角色于其回合内首次使用【杀】指定你为目标时，你取消之，然后你摸两张牌。若你本回合发动过【谏言】，则你可以令一名角色摸一张牌。]],
 }
 
 -- TODO：还没写
@@ -1323,6 +1315,7 @@ Fk:loadTranslationTable {
 
 local tjzs = General(extension, "jy__tjzs", "shu", 3, 3, General.Female)
 tjzs:addSkill("jy_trad_heiyong")
+tjzs:addSkill("jy_juewu")
 
 Fk:loadTranslationTable {
   ["jy__tjzs"] = [[铁甲战士]],

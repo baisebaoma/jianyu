@@ -333,7 +333,7 @@ local jy_guina = fk.CreateActiveSkill {
     if choice[1] == correct_answer then                     -- 仅判断choice[1]，因为答案只保留正确选项的选项名字（ABCD）
       me:broadcastSkillInvoke(self.name, math.random(5, 6)) -- 播放选择正确的语音
 
-      room:addPlayerMark(player, "@jy_zuoti_correct_count")
+      -- room:addPlayerMark(player, "@jy_zuoti_correct_count")
       room:doBroadcastNotify("ShowToast", Fk:translate("#jy_guina_correct"))
       room:sendLog {
         type = "#jy_zuoti_correct_log",
@@ -375,7 +375,7 @@ local jy_guina = fk.CreateActiveSkill {
     else
       me:broadcastSkillInvoke(self.name, math.random(7, 8)) -- 播放选择错误的语音
 
-      room:addPlayerMark(player, "@jy_zuoti_incorrect_count")
+      -- room:addPlayerMark(player, "@jy_zuoti_incorrect_count")
       room:doBroadcastNotify("ShowToast", Fk:translate("#jy_guina_incorrect"))
       room:sendLog {
         type = "#jy_zuoti_incorrect_log",
@@ -496,7 +496,6 @@ Fk:loadTranslationTable {
   ["#jy_guina_correct"] = [[答对了！你可以自选一张牌获得！<br>你可以在战报中查看正确答案。]],
   ["#jy_guina_incorrect"] = [[答错了，本阶段的所有牌会额外指定你为目标！<br>你可以在战报中查看正确答案。]],
   ["#jy_guina_choose_card"] = [[自选一张牌（尽量不要是自己区域内同牌名的牌）]],
-  -- 可能是不能太多语音吧，如果你在这里放了11条语音，在武将一览的时候点开这个武将就会卡死
   ["$jy_guina1"] = [[让我来考考你。]],
   ["$jy_guina2"] = [[由我提问了。]],
   ["$jy_guina3"] = [[期待各位的应答。]],
@@ -504,7 +503,7 @@ Fk:loadTranslationTable {
   ["$jy_guina5"] = [[不错，加五分。]],
   ["$jy_guina6"] = [[做得好，加十分。]],
   ["$jy_guina7"] = [[零分，下一个！]],
-  ["$jy_guina8"] = [[负分！]], -- 已经和谐了这个语音了
+  ["$jy_guina8"] = [[负分！]],
 }
 
 return extension

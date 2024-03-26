@@ -572,7 +572,7 @@ local heiyong = fk.CreateTriggerSkill {
   can_trigger = function(self, event, target, player, data)
     if not (player:hasSkill(self.name) and target == player) then return false end
 
-    local mark = player:getMark("@$jy_trad_heiyong-turn")
+    local mark = player:getMark("$jy_trad_heiyong-turn")
     if type(mark) ~= "table" then
       mark = {}
     end
@@ -585,15 +585,15 @@ local heiyong = fk.CreateTriggerSkill {
   end,
   on_use = function(self, event, target, player, data)
     if event ~= fk.EventPhaseProceeding then
-      local mark = player:getMark("@$jy_trad_heiyong-turn")
+      local mark = player:getMark("$jy_trad_heiyong-turn")
       if type(mark) ~= "table" then
         mark = {}
-        player.room:setPlayerMark(player, "@$jy_trad_heiyong-turn", mark)
+        player.room:setPlayerMark(player, "$jy_trad_heiyong-turn", mark)
       end
 
       player:drawCards(1, self.name)
       table.insert(mark, data.card.name)
-      player.room:setPlayerMark(player, "@$jy_trad_heiyong-turn", mark)
+      player.room:setPlayerMark(player, "$jy_trad_heiyong-turn", mark)
     else
       player.room:loseHp(player, 1)
     end
@@ -661,7 +661,7 @@ Fk:loadTranslationTable {
   ["jy_trad_heiyong"] = [[黑拥]],
   [":jy_trad_heiyong"] = [[锁定技，每个牌名每回合限一次，你使用或打出一张牌时，你摸一张牌；每名角色的结束阶段，若你本回合以此法获得的牌数大于你的体力上限，你失去一点体力。]],
   ["$jy_trad_heiyong1"] = [[龙战于野，其血玄黄！]],
-  ["@$jy_trad_heiyong-turn"] = [[黑拥]],
+  ["$jy_trad_heiyong-turn"] = [[黑拥]],
 
   ["jy_trad_silie"] = [[撕裂]],
   [":jy_trad_silie"] = [[锁定技，你失去一点体力时，获得1枚“撕裂”；你造成伤害时，弃1枚“撕裂”令此伤害+1。]],
