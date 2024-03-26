@@ -27,7 +27,7 @@ local jy_budeng_damaged = fk.CreateTriggerSkill {
   end,
   on_use = function(self, event, target, player, data)
     player:broadcastSkillInvoke("jy_budeng")
-    room:notifySkillInvoked(player, "jy_budeng", "defensive")
+    player.room:notifySkillInvoked(player, "jy_budeng", "defensive")
 
     return true
   end,
@@ -50,8 +50,7 @@ local jy_budeng_discard = fk.CreateTriggerSkill {
   end,
   on_use = function(self, event, target, player, data)
     player:broadcastSkillInvoke("jy_budeng")
-    room:notifySkillInvoked(player, "jy_budeng", "defensive")
-
+    player.room:notifySkillInvoked(player, "jy_budeng", "defensive")
     return true
   end
 }
@@ -74,7 +73,7 @@ local jy_budeng_card = fk.CreateTriggerSkill {
   end,
   on_use = function(self, event, target, player, data)
     player:broadcastSkillInvoke("jy_budeng")
-    room:notifySkillInvoked(player, "jy_budeng", "defensive")
+    player.room:notifySkillInvoked(player, "jy_budeng", "defensive")
 
     local room = player.room
     -- room:loseHp(room.current, 1)
@@ -335,7 +334,7 @@ local xingtu_draw = fk.CreateTriggerSkill {
   end,
   on_use = function(self, event, target, player, data)
     player:broadcastSkillInvoke(xingtu.name)
-    room:notifySkillInvoked(player, xingtu.name, "drawcard")
+    player.room:notifySkillInvoked(player, xingtu.name, "drawcard")
     player:drawCards(1, self.name)
   end,
 }
@@ -365,7 +364,7 @@ local zhunwang_mod = fk.CreateTriggerSkill {
   on_refresh = function(self, event, target, player, data)
     if player:hasSkill(self) and translateCardType(data.card.type) == player:getMark("@jy_zhunwang") then
       player:broadcastSkillInvoke("jy_zhunwang")
-      room:notifySkillInvoked(player, "jy_zhunwang", "drawcard")
+      player.room:notifySkillInvoked(player, "jy_zhunwang", "drawcard")
     else
       player.room:setPlayerMark(player, "@jy_zhunwang", translateCardType(data.card.type))
     end

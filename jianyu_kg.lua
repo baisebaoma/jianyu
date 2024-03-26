@@ -253,7 +253,7 @@ local jy_guina = fk.CreateActiveSkill {
   on_use = function(self, room, effect)
     local me = room:getPlayerById(effect.from)
     me:broadcastSkillInvoke(self.name, math.random(4))
-    room:notifySkillInvoked(player, self.name, "drawcard")
+    room:notifySkillInvoked(me, self.name, "drawcard")
     local player = room:getPlayerById(effect.tos[1])
     -- 随机从题库拿一道题
     local questionFull = Q.getRandomQuestion()
