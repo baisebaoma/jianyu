@@ -1254,7 +1254,7 @@ local maochong_other = fk.CreateActiveSkill {
     -- 给target更改阴阳状态
     player.room:setPlayerMark(target, MarkEnum.SwithSkillPreName .. maochong.name,
       target:getSwitchSkillState(maochong.name, true))
-    target:addSkillUseHistory(maochong.name)
+    -- target:addSkillUseHistory(maochong.name)
 
     room:moveCardTo(effect.cards, Player.Hand, target, fk.ReasonGive, self.name, nil, true)
     player:drawCards(1, maochong.name)
@@ -1276,7 +1276,7 @@ local muhuo = fk.CreateTriggerSkill {
     player:drawCards(math.min(player.maxHp - player.hp, 5), self.name)
     player.room:setPlayerMark(target, MarkEnum.SwithSkillPreName .. maochong.name,
       fk.SwitchYin)
-    player:addSkillUseHistory(maochong.name)
+    -- player:addSkillUseHistory(maochong.name)
     if target ~= player then
       player.room:setPlayerMark(target, "jy_muhuo-turn", "")
     end
@@ -1303,7 +1303,7 @@ Fk:loadTranslationTable {
   ["illustrator:jy__ylmc"] = [[Nexon]],
 
   ["jy_maochong"] = [[冒充]],
-  [":jy_maochong"] = [[转换技，阳：你可将X（X由你选择且至少为1）张牌当【杀】使用，该【杀】无次数限制，当你使用该【杀】指定一个目标后，该角色需依次使用X张【闪】才能抵消此【杀】，若你的装备区有武器牌，该【杀】伤害+1；阴：其他角色的出牌阶段限一次，其可以将一张【杀】或武器牌正面朝上交给你，然后其摸一张牌。]],
+  [":jy_maochong"] = [[转换技，阳：你可将任意张牌当【杀】使用，该【杀】无次数限制且需依次使用等量张【闪】才能抵消，若你的装备区有武器牌，该【杀】伤害+1；阴：其他角色的出牌阶段限一次，其可以将一张【杀】或武器牌正面朝上交给你，然后其摸一张牌。]],
   ["#jy_maochong-active"] = [[你可以将一张【杀】或武器牌交给御稜名草，然后你摸一张牌]],
   ["jy_maochong_other&"] = [[冒充]],
   [":jy_maochong_other&"] = [[出牌阶段限一次，当御稜名草的〖冒充〗状态为阴时，你可以将一张【杀】或武器牌正面向上交给其，然后你摸一张牌。]],
