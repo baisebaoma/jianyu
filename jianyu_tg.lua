@@ -1253,8 +1253,8 @@ local maochong_other = fk.CreateActiveSkill {
 
     -- 给target更改阴阳状态
     player.room:setPlayerMark(target, MarkEnum.SwithSkillPreName .. maochong.name,
-      target:getSwitchSkillState(maochong.name, true))
-    -- target:addSkillUseHistory(maochong.name)
+      fk.SwitchYin)
+    target:addSkillUseHistory(maochong.name) -- 加上这个更新UI
 
     room:moveCardTo(effect.cards, Player.Hand, target, fk.ReasonGive, self.name, nil, true)
     player:drawCards(1, maochong.name)
@@ -1265,6 +1265,7 @@ maochong:addRelatedSkill(maochong_extra)
 maochong:addRelatedSkill(maochong_bypass)
 maochong:addRelatedSkill(maochong_skills)
 
+-- TODO：即使是秦宜禄（https://gitee.com/qsgs-fans/tenyear/blob/master/tenyear_activity.lua）也会有显示bug，但是结算没有问题。
 local muhuo = fk.CreateTriggerSkill {
   name = "jy_muhuo",
   events = { fk.Damaged },
@@ -1275,8 +1276,8 @@ local muhuo = fk.CreateTriggerSkill {
   on_use = function(self, event, target, player, data)
     player:drawCards(math.min(player.maxHp - player.hp, 5), self.name)
     player.room:setPlayerMark(target, MarkEnum.SwithSkillPreName .. maochong.name,
-      fk.SwitchYin)
-    -- player:addSkillUseHistory(maochong.name)
+      fk.SwitchYin) -- 仅包含该行，结算没有问题，仅显示问题
+    player:addSkillUseHistory(maochong.name)
     if target ~= player then
       player.room:setPlayerMark(target, "jy_muhuo-turn", "")
     end
@@ -1303,13 +1304,13 @@ Fk:loadTranslationTable {
   ["illustrator:jy__ylmc"] = [[Nexon]],
 
   ["jy_maochong"] = [[冒充]],
-  [":jy_maochong"] = [[转换技，阳：你可将任意张牌当【杀】使用，该【杀】无次数限制且需依次使用等量张【闪】才能抵消，若你的装备区有武器牌，该【杀】伤害+1；阴：其他角色的出牌阶段限一次，其可以将一张【杀】或武器牌正面朝上交给你，然后其摸一张牌。]],
+  [":jy_maochong"] = [[转换技，阳：你可将任意张牌当【杀】使用，该【杀】需依次使用等量张【闪】才能抵消且无次数限制，若你的装备区有武器牌，该【杀】伤害+1；阴：其他角色的出牌阶段限一次，其可以将一张【杀】或武器牌正面朝上交给你并摸一张牌。]],
   ["#jy_maochong-active"] = [[你可以将一张【杀】或武器牌交给御稜名草，然后你摸一张牌]],
   ["jy_maochong_other&"] = [[冒充]],
   [":jy_maochong_other&"] = [[出牌阶段限一次，当御稜名草的〖冒充〗状态为阴时，你可以将一张【杀】或武器牌正面向上交给其，然后你摸一张牌。]],
 
   ["jy_muhuo"] = [[目祸]],
-  [":jy_muhuo"] = [[当一名角色受到伤害后，若你与其距离1以内且其未死亡，你可以摸X张牌（X为你已损失的体力值且至多为5）并将〖冒充〗状态改为阴。若其不为你，你本回合不能再对其使用牌。]],
+  [":jy_muhuo"] = [[当一名角色受到伤害后，若你与其距离1以内且其未死亡，你可以摸X张牌（X为你已损失的体力值且至多为5）并将〖冒充〗状态改为阴。若其不为你，本回合其不是你使用牌的合法目标。]],
 }
 
 local tjzs = General(extension, "jy__tjzs", "shu", 3, 3, General.Female)

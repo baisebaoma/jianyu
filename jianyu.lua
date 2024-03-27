@@ -2353,16 +2353,15 @@ local function master_on_use(is_fun)
       -- local generals = Fk.packages["jianyu_standard"]  -- TODO:自动检索所有简浴，但是先懒得写了
       local generals = { "jy__genshin__master", "jy__que__master",
         "jy__moe__master", "jy__lol__master", "jy__liuxian", "jy__huohuo",
-        "jy__kgdxs", "jy__kgds", "jy__yangfan",
-        "jy__ayato" }
+        "jy__kgdxs", "jy__kgds", }
       -- 不能选择场上已有的武将
       table.removeOne(generals, self.general)
       for _, p in ipairs(room:getAlivePlayers()) do
         table.removeOne(generals, p.general)
         table.removeOne(generals, p.deputyGeneral)
       end
-      generals = table.connect(generals, room:getNGenerals(9))
-      local general = room:askForGeneral(player, generals, 1)
+      generals = table.connect(generals, room:getNGenerals(7))
+      local general = room:askForGeneral(player, generals, 1, true) -- true 才是禁止替换
       room:changeHero(player, general, false, self.general == player.deputyGeneral, true)
       room:recover({
         who = player,
