@@ -1645,24 +1645,22 @@ local jy__ayato = General(extension, "jy__ayato", "qun", 4)
 local jy_jinghua = fk.CreateTriggerSkill {
   name = "jy_jinghua",
   anim_type = "offensive",
-  events = { fk.CardResponding, fk.CardUseFinished },
+  events = { fk.CardRespondFinished, fk.CardUseFinished },
   can_trigger = function(self, event, target, player, data)
     return player:hasSkill(self) and data.card and data.card.type == Card.TypeBasic and
-        target == player and player:getMark("jy_jinghua-turn") == 0
+        target == player and player:usedSkillTimes(self.name, Player.HistoryTurn) == 0
+  end,
+  on_cost = function(self, event, target, player, data)
+    local extraData = { bypass_times = true }                                                                      -- 加上这个，就可以让它就算之前使用过杀，也可以再使用了
+    self.jinghua_use = player.room:askForUseCard(player, "slash", "slash|.|.", "#jy_jinghua_use", true, extraData) -- 这里填false也没用，反正是可以取消的
+    return self.jinghua_use
   end,
   on_use = function(self, event, target, player, data)
     local room = player.room
-
-    room:setPlayerMark(player, "jy_jinghua-turn", true)
-    local extraData = { bypass_times = true, bypass_distances = true } -- 加上这个，就可以让它就算之前使用过杀，也可以再使用了
     local disresponsiveList = table.map(room.alive_players, Util.IdMapper)
-
-    local jinghua_use = room:askForUseCard(player, "slash", "slash|.|.", "#jy_jinghua_use", true, extraData) -- 这里填false也没用，反正是可以取消的
-    if jinghua_use then
-      jinghua_use.extraUse = true                                                                            -- 加上这个，就可以让它不计入次数了，也就是说还可以再使用一张杀
-      jinghua_use.disresponsiveList = disresponsiveList
-      room:useCard(jinghua_use)
-    end
+    self.jinghua_use.extraUse = true -- 加上这个，就可以让它不计入次数了，也就是说还可以再使用一张杀
+    self.jinghua_use.disresponsiveList = disresponsiveList
+    room:useCard(self.jinghua_use)
   end,
 }
 
@@ -1699,13 +1697,13 @@ Fk:loadTranslationTable {
   ["~jy__ayato"] = "世事无常……",
 
   ["jy_jinghua"] = "镜花",
-  [":jy_jinghua"] = [[每回合限一次，你使用或打出一张基本牌后，可以使用一张【杀】，以此法使用的【杀】无距离和次数限制且不可被响应。]],
+  [":jy_jinghua"] = [[每回合限一次，你使用或打出一张基本牌后，可以使用一张【杀】，以此法使用的【杀】无次数限制且不可被响应。]],
   ["$jy_jinghua1"] = "苍流水影。",
   ["$jy_jinghua2"] = "剑影。",
-  ["#jy_jinghua_use"] = "镜花：你可以使用一张不计入使用次数、无距离限制、不可响应的【杀】",
+  ["#jy_jinghua_use"] = "镜花：你可以使用一张无距离和次数限制的【杀】",
 
   ["jy_jianying"] = "渐盈",
-  [":jy_jianying"] = [[锁定技，所有角色的结束阶段，若你的手牌数小于2，你摸一张牌。]],
+  [":jy_jianying"] = [[锁定技，每名角色的结束阶段，若你的手牌数小于2，你摸一张牌。]],
   ["$jy_jianying1"] = "冒进是大忌。",
   ["$jy_jianying2"] = "呵……余兴节目。",
 }
@@ -2176,9 +2174,10 @@ local function master_on_use(is_fun)
     if event == fk.EventPhaseProceeding then
       -- local generals = Fk.packages["jianyu_standard"]  -- TODO:自动检索所有简浴，但是先懒得写了
       local generals = { "jy__genshin__master", "jy__que__master",
-        "jy__moe__master", "jy__liuxian", "jy__huohuo", "jy__kgdxs", "jy__kgds" }
+        "jy__moe__master", "jy__liuxian", "jy__huohuo", "jy__kgdxs", "jy__kgds", "jy__jianzihao", "jy__yangfan",
+        "jy__ayato" }
       table.removeOne(generals, self.general)
-      -- TODO：连接两个表，目前先这样吧
+      generals = table.connect(generals, room:getNGenerals(9))
       local general = room:askForGeneral(player, generals, 1)
       room:changeHero(player, general, false, self.general == player.deputyGeneral, true)
     elseif event == fk.TargetConfirming then
