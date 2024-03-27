@@ -2149,8 +2149,10 @@ local function master_can_trigger(is_fun, property)
       end
     elseif event == fk.Damage then
       return target and is_fun(target) and target ~= player
-    else
+    elseif event == fk.Damaged then
       return is_fun(target) and target ~= player
+    elseif event == fk.HpRecover then
+      return is_fun(target) and target ~= player and player.hp ~= player.maxHp
     end
   end
 end
@@ -2180,6 +2182,12 @@ local function master_on_use(is_fun)
       generals = table.connect(generals, room:getNGenerals(9))
       local general = room:askForGeneral(player, generals, 1)
       room:changeHero(player, general, false, self.general == player.deputyGeneral, true)
+      room:recover({
+        who = player,
+        num = player.maxHp - player.hp,
+        recoverBy = player,
+        skillName = self.name,
+      })
     elseif event == fk.TargetConfirming then
       local indicate_players = {} -- 用来画指示线的
       local targets = AimGroup:getAllTargets(data.tos)
@@ -2194,7 +2202,7 @@ local function master_on_use(is_fun)
         room:doIndicate(data.from, indicate_players)
       end
     else
-      player:drawCards(data.damage, self.name)
+      player:drawCards(1, self.name)
     end
   end
 end
@@ -2241,14 +2249,14 @@ local function master_des(property)
       property ..
       [[角色为目标；除你以外的]] ..
       property ..
-      [[角色造成或受到伤害时，你摸等同于伤害值张牌。准备阶段或结束阶段，若场上除你以外没有存活的]] ..
+      [[角色造成或受到伤害、回复体力后，你摸一张牌。准备阶段或结束阶段，若场上除你以外没有存活的]] ..
       property ..
-      [[角色且你武将牌上有该技能，你变更该武将。]]
+      [[角色且你武将牌上有该技能，你变更该武将并将体力回复至上限。]]
 end
 
 Fk:loadTranslationTable {
   ["jy__genshin__master"] = "原神高手",
-  ["#jy__genshin__master"] = "考公专家！！",
+  ["#jy__genshin__master"] = "考公专家",
   ["designer:jy__genshin__master"] = "考公专家",
   ["cv:jy__genshin__master"] = "AI德丽莎",
   ["illustrator:jy__genshin__master"] = "德丽莎",
@@ -2261,7 +2269,7 @@ Fk:loadTranslationTable {
   ["$jy_master_genshin3"] = [[原神，启动！]],
 
   ["jy__que__master"] = "雀魂高手",
-  ["#jy__que__master"] = "祈！！",
+  ["#jy__que__master"] = "祈",
   ["designer:jy__que__master"] = "考公专家",
   ["cv:jy__que__master"] = "AI德丽莎",
   ["illustrator:jy__que__master"] = "德丽莎",
@@ -2274,7 +2282,7 @@ Fk:loadTranslationTable {
   ["$jy_master_majsoul3"] = [[雀魂，启动！]],
 
   ["jy__moe__master"] = "萌包高手",
-  ["#jy__moe__master"] = "emo公主！！",
+  ["#jy__moe__master"] = "emo公主",
   ["designer:jy__moe__master"] = "考公专家",
   ["cv:jy__moe__master"] = "AI德丽莎",
   ["illustrator:jy__moe__master"] = "德丽莎",
