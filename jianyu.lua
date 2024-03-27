@@ -2106,7 +2106,7 @@ end
 
 -- 下面这一堆函数是用来快速制作高手系列的。
 
-local master_events = { fk.EventPhaseProceeding, fk.TargetConfirming, fk.Damage, fk.Damaged }
+local master_events = { fk.EventPhaseProceeding, fk.TargetConfirming, fk.Damage }
 
 local function master_can_trigger(is_fun, property)
   return function(self, event, target, player, data)
@@ -2149,10 +2149,6 @@ local function master_can_trigger(is_fun, property)
       end
     elseif event == fk.Damage then
       return target and is_fun(target) and target ~= player
-    elseif event == fk.Damaged then
-      return is_fun(target) and target ~= player
-    elseif event == fk.HpRecover then
-      return is_fun(target) and target ~= player and player.hp ~= player.maxHp
     end
   end
 end
@@ -2178,13 +2174,18 @@ local function master_on_use(is_fun)
       local generals = { "jy__genshin__master", "jy__que__master",
         "jy__moe__master", "jy__liuxian", "jy__huohuo", "jy__kgdxs", "jy__kgds", "jy__jianzihao", "jy__yangfan",
         "jy__ayato" }
+      -- 不能选择场上已有的武将
       table.removeOne(generals, self.general)
+      for _, p in room:getAlivePlayers() do
+        table.removeOne(generals, p.general)
+        table.removeOne(generals, p.deputyGeneral)
+      end
       generals = table.connect(generals, room:getNGenerals(9))
       local general = room:askForGeneral(player, generals, 1)
       room:changeHero(player, general, false, self.general == player.deputyGeneral, true)
       room:recover({
         who = player,
-        num = player.maxHp - player.hp,
+        num = 2,
         recoverBy = player,
         skillName = self.name,
       })
@@ -2249,9 +2250,9 @@ local function master_des(property)
       property ..
       [[角色为目标；除你以外的]] ..
       property ..
-      [[角色造成或受到伤害、回复体力后，你摸一张牌。准备阶段或结束阶段，若场上除你以外没有存活的]] ..
+      [[角色造成伤害后，你摸一张牌。准备阶段或结束阶段，若场上除你以外没有存活的]] ..
       property ..
-      [[角色且你武将牌上有该技能，你变更该武将并将体力回复至上限。]]
+      [[角色且你武将牌上有该技能，你变更该武将并回复2点体力。]]
 end
 
 Fk:loadTranslationTable {
