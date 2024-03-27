@@ -1251,9 +1251,9 @@ local maochong_other = fk.CreateActiveSkill {
     player:broadcastSkillInvoke("jy_maochong")
     room:doIndicate(effect.from, { target.id })
 
-    -- 给target更改阴阳状态
+    -- 给target更改为阳（因为只有阴的时候才能发动这个技能）
     player.room:setPlayerMark(target, MarkEnum.SwithSkillPreName .. maochong.name,
-      fk.SwitchYin)
+      fk.SwitchYang)
     target:addSkillUseHistory(maochong.name) -- 加上这个更新UI
 
     room:moveCardTo(effect.cards, Player.Hand, target, fk.ReasonGive, self.name, nil, true)
@@ -1275,9 +1275,11 @@ local muhuo = fk.CreateTriggerSkill {
   end,
   on_use = function(self, event, target, player, data)
     player:drawCards(math.min(player.maxHp - player.hp, 5), self.name)
-    player.room:setPlayerMark(target, MarkEnum.SwithSkillPreName .. maochong.name,
-      fk.SwitchYin) -- 仅包含该行，结算没有问题，仅显示问题
-    player:addSkillUseHistory(maochong.name)
+    if player:getSwitchSkillState(maochong.name) == fk.SwitchYang then -- 加个这个可能好些，这个转换技显示确实容易犯病
+      player.room:setPlayerMark(target, MarkEnum.SwithSkillPreName .. maochong.name,
+        fk.SwitchYin)
+      player:addSkillUseHistory(maochong.name) -- 加上这个更新UI
+    end
     if target ~= player then
       player.room:setPlayerMark(target, "jy_muhuo-turn", "")
     end
