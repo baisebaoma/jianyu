@@ -2357,7 +2357,7 @@ local function master_on_use(is_fun)
         "jy__ayato" }
       -- 不能选择场上已有的武将
       table.removeOne(generals, self.general)
-      for _, p in room:getAlivePlayers() do
+      for _, p in ipairs(room:getAlivePlayers()) do
         table.removeOne(generals, p.general)
         table.removeOne(generals, p.deputyGeneral)
       end
