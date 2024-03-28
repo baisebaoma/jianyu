@@ -1253,12 +1253,12 @@ local maochong_other = fk.CreateActiveSkill {
 
     -- 给target更改为阳（因为只有阴的时候才能发动这个技能）
     -- 这个技能目前可以正常触发转换
-    player.room:setPlayerMark(target, MarkEnum.SwithSkillPreName .. maochong.switch_skill_name,
+    player.room:setPlayerMark(target, MarkEnum.SwithSkillPreName .. "jy_maochong",
       fk.SwitchYang)
-    target:addSkillUseHistory(maochong.name) -- 加上这个更新UI
+    target:addSkillUseHistory("jy_maochong") -- 加上这个更新UI
 
     room:moveCardTo(effect.cards, Player.Hand, target, fk.ReasonGive, self.name, nil, true)
-    player:drawCards(1, maochong.name)
+    player:drawCards(1, "jy_maochong")
   end,
 }
 Fk:addSkill(maochong_other)
@@ -1277,9 +1277,9 @@ local muhuo = fk.CreateTriggerSkill {
   end,
   on_use = function(self, event, target, player, data)
     player:drawCards(math.min(player.maxHp - player.hp, 5), self.name)
-    player.room:setPlayerMark(player, MarkEnum.SwithSkillPreName .. maochong.switch_skill_name,
+    player.room:setPlayerMark(player, MarkEnum.SwithSkillPreName .. "jy_maochong",
       fk.SwitchYin)
-    player:addSkillUseHistory(maochong.name) -- 加上这个更新UI
+    player:addSkillUseHistory("jy_maochong") -- 加上这个更新UI
     if target ~= player then
       player.room:setPlayerMark(target, "jy_muhuo-turn", true)
     end
