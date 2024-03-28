@@ -1768,9 +1768,18 @@ local jy_jieyin = fk.CreateActiveSkill {
       if #skills > 0 then
         room:handleAddLoseSkills(player, table.concat(skills, "|"), nil, true, false)
       end
+
+      room:setPlayerMark(p, "jy_jieyin-phase", true)
     end
   end,
 }
+local jieyin_prohibit = fk.CreateProhibitSkill {
+  name = "#jy_jieyin_prohibit",
+  is_prohibited = function(self, from, to, card)
+    return from:hasSkill(self) and to:getMark("jy_jieyin-phase") ~= 0
+  end,
+}
+jy_jieyin:addRelatedSkill(jieyin_prohibit)
 
 jy__liuxian:addSkill(jy_jieyin)
 
@@ -1782,7 +1791,7 @@ Fk:loadTranslationTable {
   ["illustrator:jy__liuxian"] = "意间AI",
 
   ["jy_jieyin"] = "结姻",
-  [":jy_jieyin"] = [[限定技，出牌阶段，你可以令一名已受伤的男性角色与你各回复1点体力，然后你获得其所有牌并拥有其所有技能。]],
+  [":jy_jieyin"] = [[限定技，出牌阶段，你可以令一名已受伤的男性角色与你各回复1点体力、你获得其所有牌并视为拥有其所有技能、其不是你本阶段使用牌的合法目标。]],
   ["$jy_jieyin1"] = [[夫君，身体要紧。]],
   ["$jy_jieyin2"] = [[他好，我也好。]],
 }

@@ -1287,7 +1287,6 @@ local muhuo = fk.CreateTriggerSkill {
 }
 local muhuo_prohibit = fk.CreateProhibitSkill {
   name = "#jy_muhuo_prohibit",
-  frequency = Skill.Compulsory,
   is_prohibited = function(self, from, to, card)
     return from:hasSkill(self) and to:getMark("jy_muhuo-turn") ~= 0
   end,
