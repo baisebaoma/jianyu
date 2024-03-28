@@ -8,8 +8,7 @@ Fk:loadTranslationTable {
   ["jianyu_tg"] = [[简浴-投稿]],
 }
 
-local jy__tangniu = General(extension, "jy__tangniu", "qun", 1, 1, General.Female)
-jy__tangniu.hidden = true
+local jy__tangniu = General(extension, "jy__tangniu", "qun", 3, 3, General.Female)
 
 -- 主函数啥也不做，只是为了承载下面的
 local jy_budeng = fk.CreateTriggerSkill {
@@ -62,7 +61,7 @@ local jy_budeng_card = fk.CreateTriggerSkill {
   anim_type = "offensive",
   events = { fk.AfterCardsMove },
   can_trigger = function(self, event, target, player, data)
-    if not player:hasSkill(self) then return end
+    if not (player:hasSkill(self) and player:usedSkillTimes(self.name) == 0) then return end
     if player.phase == Player.NotActive then
       for _, move in ipairs(data) do
         if move.to == player.id and move.from ~= player.id then
@@ -77,7 +76,8 @@ local jy_budeng_card = fk.CreateTriggerSkill {
 
     local room = player.room
     -- room:loseHp(room.current, 1)
-    room:loseHp(player, player.hp)
+    room.current:drawCards(2, jy_budeng.name)
+    room:loseHp(player, 1)
   end
 }
 jy_budeng:addRelatedSkill(jy_budeng_damaged)
@@ -119,7 +119,7 @@ Fk:loadTranslationTable {
   ["illustrator:jy__tangniu"] = "看不腻的妞",
 
   ["jy_budeng"] = "不等",
-  [":jy_budeng"] = [[锁定技，防止你受到的伤害；你跳过弃牌阶段；你于其他角色的回合内获得牌（包括有牌进入你的判定区）时，你失去所有体力。<br><font color="grey">受到伤害≠我掉血；弃牌阶段≠我要弃；接受礼物≠我同意。</font>]],
+  [":jy_budeng"] = [[锁定技，防止你受到的伤害；你跳过弃牌阶段；每回合限一次，你于其他角色的回合内获得牌（包括有牌进入你的判定区）时，其摸两张牌，你失去一点体力。<br><font color="grey">受到伤害≠我掉血；弃牌阶段≠我要弃；接受礼物≠我同意。</font>]],
 
   ["jy_duili"] = "对立",
   [":jy_duili"] = [[当你指定男性角色为【杀】的目标后，你可以令其选择一项：弃置一张手牌，或令你摸一张牌。]],
