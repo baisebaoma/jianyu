@@ -1997,7 +1997,7 @@ local quanyu = fk.CreateTriggerSkill {
     if #max_targets > 1 then
       local result = room:askForChoosePlayers(player, max_targets, 1, 1, "#jy_quanyu_discard-prompt", self.name)
       if #result > 0 then
-        self.cost_data = result
+        self.cost_data = result[1]
         return true
       end
     elseif #max_targets == 1 then
