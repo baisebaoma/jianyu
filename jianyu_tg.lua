@@ -2179,4 +2179,117 @@ Fk:loadTranslationTable {
   [":jy_jimin"] = [[锁定技，一名角色于其回合内首次使用【杀】指定你为目标时，此【杀】对你无效，然后你摸两张牌。]],
 }
 
+local guanxi = fk.CreateTriggerSkill {
+  name = "jy_guanxi",
+  mute = true,
+
+  refresh_events = { fk.CardUseFinished },
+  can_refresh = function(self, event, target, player, data)
+    return player:hasSkill(self) and target == player and player:getMark("@jy_guanxi") > 0
+  end,
+  on_refresh = function(self, event, target, player, data)
+    player.room:addPlayerMark(player, "@jy_guanxi", -1)
+  end,
+
+  events = { fk.RoundStart, fk.CardUseFinished },
+  can_trigger = function(self, event, target, player, data)
+    if player:hasSkill(self) then
+      if event == fk.RoundStart then
+        return true
+      else
+        return target == player and player:getMark("@jy_guanxi") == 0 and
+            player:getMark("jy_guanxi_used-round") == 0
+      end
+    end
+  end,
+  on_cost = function(self, event, target, player, data)
+    if event == fk.RoundStart then
+      return player.room:askForSkillInvoke(player, self.name)
+    else
+      return true
+    end
+  end,
+  on_use = function(self, event, target, player, data)
+    local room = player.room
+    if event == fk.RoundStart then
+      player:broadcastSkillInvoke(self.name, math.random(2))
+      room:notifySkillInvoked(player, self.name, "control")
+      local guanxing = room:askForGuanxing(player, room:getNCards(3))
+      if #guanxing["bottom"] > 0 then
+        room:setPlayerMark(player, "@jy_guanxi", #guanxing["bottom"])
+      end
+    else
+      player:broadcastSkillInvoke(self.name, math.random(3, 4))
+      room:notifySkillInvoked(player, self.name, "support")
+      -- 洞烛先机未必开了
+      room:useVirtualCard("foresight", nil, room.current, room.current, self.name)
+      room:setPlayerMark(player, "jy_guanxi_used-round", true)
+    end
+  end,
+}
+
+local huilan = fk.CreateViewAsSkill {
+  name = "jy_huilan",
+  anim_type = "defensive",
+  pattern = "nullification",
+  prompt = "#jy_huilan-prompt",
+  view_as = function(self, cards)
+    local card = Fk:cloneCard("nullification")
+    card.skillName = self.name
+    return card
+  end,
+  before_use = function(self, player, use)
+    if #player.room:askForDiscard(player, 2, 2, true, self.name, true, nil, "#jy_huilan-ask") == 0 then
+      player:drawCards(2, self.name)
+    end
+  end,
+  after_use = function(self, player, use)
+    local min, max = findHandCardMinMax(player.room:getAlivePlayers())
+    local card_num = #player:getCardIds("h")
+    if card_num == min then
+      player:drawCards(max - min, self.name)
+    elseif card_num == max then
+      player.room:askForDiscard(player, max - min, max - min, false, self.name, false, nil, "#jy_huilan-discard:::" ..
+        min)
+    end
+  end,
+  enabled_at_play = function(self, player)
+    return player:usedSkillTimes(self.name, Player.HistoryRound) == 0
+  end,
+  enabled_at_response = function(self, player, response)
+    return player:usedSkillTimes(self.name, Player.HistoryRound) == 0
+  end
+}
+
+-- 本武将需开启gamemode包（https://gitee.com/qsgs-fans/gamemode）才能游玩
+local fuxuan = General(extension, "jy__fuxuan", "shu", 3, 3, General.Female)
+fuxuan:addSkill(guanxi)
+fuxuan:addSkill(huilan)
+
+Fk:loadTranslationTable {
+  ["jy__fuxuan"] = [[符玄]],
+  ["#jy__fuxuan"] = [[法眼无遗]],
+  ["designer:jy__fuxuan"] = [[三秋]],
+  ["cv:jy__fuxuan"] = [[花玲]],
+  ["illustrator:jy__fuxuan"] = [[米哈游]],
+  ["~jy__fuxuan"] = [[事已前定……么……]],
+
+  ["jy_guanxi"] = [[观歙]],
+  [":jy_guanxi"] = [[轮次开始时，你可以卜算3。若如此做，本轮内你使用第X张牌结算后，当前回合角色视为使用【洞烛先机】（X为你卜算时置于牌堆底牌的数量）。]],
+  ["@jy_guanxi"] = [[观歙]],
+  ["$jy_guanxi1"] = [[以额间之眼观之……]],
+  ["$jy_guanxi2"] = [[本座先算一卦。]],
+  ["$jy_guanxi3"] = [[如我所愿。]],
+  ["$jy_guanxi4"] = [[卦象之内。]],
+
+  ["jy_huilan"] = [[会览]],
+  [":jy_huilan"] = [[每轮限一次，你可以摸两张牌或弃两张牌，视为使用【无懈可击】。然后若你的手牌数为全场最多，你弃至全场最少；若你的手牌数为全场最少，你摸至全场最多。]],
+  ["#jy_huilan-prompt"] = [[会览：你可以发动该技能，视为使用【无懈可击】]],
+  ["#jy_huilan-ask"] = [[会览：弃两张牌视为使用【无懈可击】，点击取消摸两张牌视为使用【无懈可击】]],
+  ["#jy_huilan-discard"] = [[会览：将手牌弃至%arg张]],
+  ["$jy_huilan1"] = [[相与为一。]],
+  ["$jy_huilan2"] = [[上下相易。]],
+  ["$jy_huilan3"] = [[否极泰来。]],
+}
+
 return extension
