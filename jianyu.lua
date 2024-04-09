@@ -2551,7 +2551,7 @@ Fk:loadTranslationTable {
   ["#jy_guiyi-use"] = [[命弈：将一张牌当【决斗】使用，若你因此受伤则你死亡]],
 }
 
-local gambler = General(extension, "jy__gambler", "qun", 5)
+local gambler = General(extension, "jy__gambler", "qun", 6)
 gambler:addSkill(guiyi)
 
 return extension

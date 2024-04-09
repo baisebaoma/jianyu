@@ -2221,9 +2221,9 @@ local guanxi = fk.CreateTriggerSkill {
     else
       player:broadcastSkillInvoke(self.name, math.random(3, 4))
       room:notifySkillInvoked(player, self.name, "support")
+      room:setPlayerMark(player, "jy_guanxi_used-round", true) -- 必须要先设这个，不然死循环
       -- 洞烛先机未必开了
       room:useVirtualCard("foresight", nil, room.current, room.current, self.name)
-      room:setPlayerMark(player, "jy_guanxi_used-round", true)
     end
   end,
 }
@@ -2262,7 +2262,7 @@ local huilan = fk.CreateViewAsSkill {
 }
 
 -- 本武将需开启gamemode包（https://gitee.com/qsgs-fans/gamemode）才能游玩
-local fuxuan = General(extension, "jy__fuxuan", "shu", 3, 3, General.Female)
+local fuxuan = General(extension, "jy__fuxuan", "qun", 3, 3, General.Female)
 fuxuan:addSkill(guanxi)
 fuxuan:addSkill(huilan)
 
@@ -2275,17 +2275,17 @@ Fk:loadTranslationTable {
   ["~jy__fuxuan"] = [[事已前定……么……]],
 
   ["jy_guanxi"] = [[观歙]],
-  [":jy_guanxi"] = [[轮次开始时，你可以卜算3。若如此做，本轮内你使用第X张牌结算后，当前回合角色视为使用【洞烛先机】（X为你卜算时置于牌堆底牌的数量）。]],
+  [":jy_guanxi"] = [[轮次开始时，你可以卜算3。若如此做，本轮你使用第X张牌结算后，当前回合角色视为使用【洞烛先机】（X为你卜算时置于牌堆底牌的数量）。]],
   ["@jy_guanxi"] = [[观歙]],
   ["$jy_guanxi1"] = [[以额间之眼观之……]],
-  ["$jy_guanxi2"] = [[本座先算一卦。]],
+  ["$jy_guanxi2"] = [[本座先卜上一卦。]],
   ["$jy_guanxi3"] = [[如我所愿。]],
   ["$jy_guanxi4"] = [[卦象之内。]],
 
   ["jy_huilan"] = [[会览]],
   [":jy_huilan"] = [[每轮限一次，你可以摸两张牌或弃两张牌，视为使用【无懈可击】。然后若你的手牌数为全场最多，你弃至全场最少；若你的手牌数为全场最少，你摸至全场最多。]],
-  ["#jy_huilan-prompt"] = [[会览：你可以发动该技能，视为使用【无懈可击】]],
-  ["#jy_huilan-ask"] = [[会览：弃两张牌视为使用【无懈可击】，点击取消摸两张牌视为使用【无懈可击】]],
+  ["#jy_huilan-prompt"] = [[会览：你可以视为使用【无懈可击】]],
+  ["#jy_huilan-ask"] = [[会览：弃两张牌，点击取消摸两张牌]],
   ["#jy_huilan-discard"] = [[会览：将手牌弃至%arg张]],
   ["$jy_huilan1"] = [[相与为一。]],
   ["$jy_huilan2"] = [[上下相易。]],
