@@ -2000,7 +2000,7 @@ local quanyu = fk.CreateTriggerSkill {
         self.cost_data = result
         return true
       end
-    elseif max_targets == 1 then
+    elseif #max_targets == 1 then
       self.cost_data = max_targets[1]
       return true
     end
