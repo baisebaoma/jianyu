@@ -2007,7 +2007,7 @@ local quanyu = fk.CreateTriggerSkill {
   end,
   on_use = function(self, event, target, player, data)
     local room = player.room
-    local p_player = room:getPlayerById(self.cost_data[1])
+    local p_player = room:getPlayerById(self.cost_data)
     local cid = room:askForCardChosen(player, p_player, "hej", self.name)
     room:throwCard({ cid }, self.name, p_player, player)
 
