@@ -2302,7 +2302,7 @@ local zhanshu = fk.CreateTriggerSkill {
   anim_type = "offensive",
   events = { fk.EventPhaseProceeding },
   can_trigger = function(self, event, target, player, data)
-    return player:hasSkill(self) and
+    return player:hasSkill(self) and target == player and
         target.phase == Player.Play and not player:isNude()
   end,
   on_cost = function(self, event, target, player, data)
