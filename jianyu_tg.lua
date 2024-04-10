@@ -2217,6 +2217,8 @@ local guanxi = fk.CreateTriggerSkill {
       local guanxing = room:askForGuanxing(player, room:getNCards(3))
       if #guanxing["bottom"] > 0 then
         room:setPlayerMark(player, "@jy_guanxi", #guanxing["bottom"])
+      else
+        room:setPlayerMark(player, "jy_guanxi_used-round", true)
       end
     else
       player:broadcastSkillInvoke(self.name, math.random(3, 4))
@@ -2275,7 +2277,7 @@ Fk:loadTranslationTable {
   ["~jy__fuxuan"] = [[事已前定……么……]],
 
   ["jy_guanxi"] = [[观歙]],
-  [":jy_guanxi"] = [[轮次开始时，你可以卜算3。若如此做，本轮你使用第X张牌结算后，当前回合角色视为使用【洞烛先机】（X为你卜算时置于牌堆底牌的数量）。]],
+  [":jy_guanxi"] = [[每轮开始时，你可以卜算3。若如此做，本轮你使用第X张牌结算后，当前回合角色视为使用【洞烛先机】（X为你卜算时置于牌堆底牌的数量）。]],
   ["@jy_guanxi"] = [[观歙]],
   ["$jy_guanxi1"] = [[以额间之眼观之……]],
   ["$jy_guanxi2"] = [[本座先卜上一卦。]],
@@ -2284,7 +2286,7 @@ Fk:loadTranslationTable {
 
   ["jy_huilan"] = [[会览]],
   [":jy_huilan"] = [[每轮限一次，你可以摸两张牌或弃两张牌，视为使用【无懈可击】。然后若你的手牌数为全场最多，你弃至全场最少；若你的手牌数为全场最少，你摸至全场最多。]],
-  ["#jy_huilan-prompt"] = [[会览：你可以视为使用【无懈可击】]],
+  ["#jy_huilan-prompt"] = [[会览：视为使用【无懈可击】]],
   ["#jy_huilan-ask"] = [[会览：弃两张牌，点击取消摸两张牌]],
   ["#jy_huilan-discard"] = [[会览：将手牌弃至%arg张]],
   ["$jy_huilan1"] = [[相与为一。]],
