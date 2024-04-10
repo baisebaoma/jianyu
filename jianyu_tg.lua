@@ -937,7 +937,10 @@ qexbj:addSkill(xidi)
 
 Fk:loadTranslationTable {
   ["jy__qexbj"] = [[切尔西伯爵]],
+  ["#jy__qexbj"] = [[暴发户]],
   ["designer:jy__qexbj"] = [[emo公主]],
+  ["cv:jy__qexbj"] = [[大汪]],
+  ["illustrator:jy__qexbj"] = [[未知]],
   ["~jy__qexbj"] = [[怎么会……这样……]],
 
   ["jy_zhijin"] = [[掷金]],
@@ -2377,7 +2380,7 @@ Fk:loadTranslationTable {
 
   ["jy_zixing"] = [[自省]],
   ["#jy_zixing-prompt"] = [[自省：%src 响应了你的牌，是否发动 自省]],
-  [":jy_zixing"] = [[当一名角色使用或打出牌响应你的牌时，你可以摸两张牌，然后本阶段其不是你使用牌的合法目标。]],
+  [":jy_zixing"] = [[一名角色使用或打出牌响应你的牌时，你可以摸两张牌，然后本阶段其不是你使用牌的合法目标。]],
   ["$jy_zixing1"] = [[啊……难道说太大声了吗？影响到您了，对不起！]],
   ["$jy_zixing2"] = [[果……果然还是算了吧……会被认为是奇怪的人……]],
 }
