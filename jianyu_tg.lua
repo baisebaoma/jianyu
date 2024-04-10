@@ -2341,7 +2341,7 @@ local zixing = fk.CreateTriggerSkill {
     return player:hasSkill(self) and data.responseToEvent and data.responseToEvent.from == player.id and not target.dead
   end,
   on_cost = function(self, event, target, player, data)
-    return player.room:askForSkillInvoke(player, self.name, nil, "#jy_zixing-prompt")
+    return player.room:askForSkillInvoke(player, self.name, data, "#jy_zixing-prompt:" .. target.id)
   end,
   on_use = function(self, event, target, player, data)
     player:drawCards(2, self.name)
