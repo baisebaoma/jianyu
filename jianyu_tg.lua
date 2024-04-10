@@ -2340,6 +2340,9 @@ local zixing = fk.CreateTriggerSkill {
   can_trigger = function(self, event, target, player, data)
     return player:hasSkill(self) and data.responseToEvent and data.responseToEvent.from == player.id and not target.dead
   end,
+  on_cost = function(self, event, target, player, data)
+    return player.room:askForSkillInvoke(player, self.name, nil, "#jy_zixing-prompt")
+  end,
   on_use = function(self, event, target, player, data)
     player:drawCards(2, self.name)
     player.room:setPlayerMark(target, "jy_zixing-phase", true)
@@ -2373,6 +2376,7 @@ Fk:loadTranslationTable {
   ["$jy_zhanshu2"] = [[一决胜负！]],
 
   ["jy_zixing"] = [[自省]],
+  ["#jy_zixing-prompt"] = [[自省：%src 响应了你的牌，是否发动 自省]],
   [":jy_zixing"] = [[当一名角色使用或打出牌响应你的牌时，你可以摸两张牌，然后本阶段其不是你使用牌的合法目标。]],
   ["$jy_zixing1"] = [[啊……难道说太大声了吗？影响到您了，对不起！]],
   ["$jy_zixing2"] = [[果……果然还是算了吧……会被认为是奇怪的人……]],
