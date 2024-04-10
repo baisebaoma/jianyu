@@ -2303,7 +2303,7 @@ local zhanshu = fk.CreateTriggerSkill {
   events = { fk.EventPhaseProceeding },
   can_trigger = function(self, event, target, player, data)
     return player:hasSkill(self) and target == player and
-        target.phase == Player.Play and not player:isNude()
+        target.phase == Player.Play
   end,
   on_cost = function(self, event, target, player, data)
     local room = player.room
