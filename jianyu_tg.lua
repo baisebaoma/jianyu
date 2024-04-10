@@ -451,7 +451,7 @@ local zitai = fk.CreateTriggerSkill {
 local yujian = fk.CreateTriggerSkill {
   name = "jy_yujian",
   anim_type = "control",
-  events = { fk.EventPhaseStart },
+  events = { fk.EventPhaseProceeding },
   can_trigger = function(self, event, target, player, data)
     return target == player and player:hasSkill(self) and
         player.phase == Player.Start
@@ -481,7 +481,7 @@ Fk:loadTranslationTable {
   [":jy_zitai"] = [[转换技，锁定技，当你造成或受到伤害时，阳：你判定，若为红色，防止之；阴：该伤害+1。然后你摸两张牌。]],
 
   ["jy_yujian"] = [[预见]],
-  [":jy_yujian"] = [[准备阶段开始时，你可以观看牌堆顶的X张牌，然后将任意数量的牌置于牌堆顶，将其余的牌置于牌堆底。（X为游戏轮数且至多为5）。]],
+  [":jy_yujian"] = [[准备阶段，你可以卜算X（X为游戏轮数且至多为5）。]],
 }
 
 local tiandu = fk.CreateTriggerSkill {
@@ -2277,7 +2277,7 @@ Fk:loadTranslationTable {
   ["~jy__fuxuan"] = [[事已前定……么……]],
 
   ["jy_guanxi"] = [[观歙]],
-  [":jy_guanxi"] = [[每轮开始时，你可以卜算3。若如此做，本轮你使用第X张牌结算后，当前回合角色视为使用【洞烛先机】（X为你卜算时置于牌堆底牌的数量）。]],
+  [":jy_guanxi"] = [[每轮开始时，你可以卜算3。若如此做，本轮你使用第X张牌结算后，当前回合角色视为使用【洞烛先机】（X为你卜算时置于牌堆底的牌数）。]],
   ["@jy_guanxi"] = [[观歙]],
   ["$jy_guanxi1"] = [[以额间之眼观之……]],
   ["$jy_guanxi2"] = [[本座先卜上一卦。]],
@@ -2292,6 +2292,89 @@ Fk:loadTranslationTable {
   ["$jy_huilan1"] = [[相与为一。]],
   ["$jy_huilan2"] = [[上下相易。]],
   ["$jy_huilan3"] = [[否极泰来。]],
+}
+
+local zhanshu = fk.CreateTriggerSkill {
+  name = "jy_zhanshu",
+  anim_type = "offensive",
+  events = { fk.EventPhaseProceeding },
+  can_trigger = function(self, event, target, player, data)
+    return player:hasSkill(self) and
+        target.phase == Player.Finish and not player:isNude()
+  end,
+  on_cost = function(self, event, target, player, data)
+    local room = player.room
+    local success, dat = room:askForUseActiveSkill(player, "#jy_zhanshu_viewas", "#jy_zhanshu-use", true)
+    self.cost_data = dat
+    return success
+  end,
+  on_use = function(self, event, target, player, data)
+    local room = player.room
+    local card = Fk:cloneCard("duel")
+    card:addSubcards(self.cost_data.cards)
+    card.skillName = self.name
+    room:useCard({
+      from = player.id,
+      tos = table.map(self.cost_data.targets, function(p) return { p } end),
+      card = card,
+    })
+  end,
+}
+local zhanshu_viewas = fk.CreateViewAsSkill {
+  name = "#jy_zhanshu_viewas",
+  anim_type = "offensive",
+  pattern = "duel",
+  card_filter = Util.FalseFunc,
+  view_as = function(self, cards)
+    local c = Fk:cloneCard("duel")
+    c.skillName = self.name
+    return c
+  end,
+}
+zhanshu:addRelatedSkill(zhanshu_viewas)
+
+local zixing = fk.CreateTriggerSkill {
+  name = "jy_zixing",
+  anim_type = "drawcard",
+  events = { fk.CardUseFinished },
+  can_trigger = function(self, event, target, player, data)
+    return player:hasSkill(self) and data.responseToEvent and data.responseToEvent.from == player.id and not target.dead
+  end,
+  on_use = function(self, event, target, player, data)
+    player:drawCards(2, self.name)
+    player.room:setPlayerMark(target, "jy_zixing-phase", true)
+  end,
+}
+local zixing_prohibit = fk.CreateProhibitSkill {
+  name = "#jy_zixing_prohibit",
+  is_prohibited = function(self, from, to, card)
+    return from:hasSkill(self) and to:getMark("jy_zixing-phase") ~= 0
+  end,
+}
+zixing:addRelatedSkill(zixing_prohibit)
+
+local yzls = General(extension, "jy__yzls", "shu", 4, 4, General.Female)
+yzls:addSkill(zhanshu)
+yzls:addSkill(zixing)
+
+Fk:loadTranslationTable {
+  ["jy__yzls"] = [[宇泽玲纱]],
+  ["#jy__yzls"] = [[正义自警团员]],
+  ["designer:jy__yzls"] = [[白洲]],
+  ["cv:jy__yzls"] = [[根本京里]],
+  ["illustrator:jy__yzls"] = [[seu]],
+  ["~jy__yzls"] = [[唔……抱歉……]],
+
+  ["jy_zhanshu"] = [[战书]],
+  [":jy_zhanshu"] = [[出牌阶段开始时，你可以视为使用【决斗】。]],
+  ["#jy_zhanshu-use"] = [[战书：你可以视为使用【决斗】]],
+  ["$jy_zhanshu1"] = [[在此参上！]],
+  ["$jy_zhanshu2"] = [[一决胜负！]],
+
+  ["jy_zixing"] = [[自省]],
+  [":jy_zixing"] = [[当一名角色使用牌响应你的牌时，你可以摸两张牌，然后本阶段其不是你使用牌的合法目标。]],
+  ["$jy_zixing1"] = [[啊……难道说太大声了吗？影响到您了，对不起！]],
+  ["$jy_zixing2"] = [[果……果然还是算了吧……会被认为是奇怪的人……]],
 }
 
 return extension

@@ -1607,7 +1607,7 @@ Fk:loadTranslationTable {
   ["~jy__raiden"] = "浮世一梦……",
 
   ["jy_leiyan"] = "雷眼",
-  [":jy_leiyan"] = [[出牌阶段限一次，你可以令至少一名角色获得<font color="Fuchsia">雷眼</font>；持有<font color="Fuchsia">雷眼</font>的角色造成伤害后，若目标未死亡，你判定，若为黑色，你对目标造成1点雷电伤害，该伤害不会触发〖雷眼〗。]],
+  [":jy_leiyan"] = [[出牌阶段限一次，你可以令至少一名角色获得<font color="Fuchsia">雷眼</font>；持有<font color="Fuchsia">雷眼</font>的角色造成伤害后，若目标未死亡，你判定，若为黑色，你对目标造成1点雷电伤害（不会触发〖雷眼〗）。]],
   ["@jy_raiden_leiyan"] = [[<font color="Fuchsia">雷眼</font>]],
   ["#jy_leiyan_trigger"] = "雷眼",
   ["$jy_leiyan1"] = "泡影看破！",
@@ -1615,7 +1615,7 @@ Fk:loadTranslationTable {
   ["$jy_leiyan3"] = "威光无赦！",
 
   ["jy_zhenshuo"] = "真说",
-  [":jy_zhenshuo"] = [[出牌阶段限一次，你可以弃3张牌对一名攻击范围内的角色造成1点雷电伤害。]],
+  [":jy_zhenshuo"] = [[出牌阶段限一次，你可以弃三张牌对一名攻击范围内的角色造成一点雷电伤害。]],
   ["$jy_zhenshuo1"] = "此刻，寂灭之时！",
   ["$jy_zhenshuo2"] = "稻光，亦是永恒！",
   ["$jy_zhenshuo3"] = "无念，断绝！",
@@ -1678,7 +1678,7 @@ Fk:loadTranslationTable {
   ["~jy__ayato"] = "世事无常……",
 
   ["jy_jinghua"] = "镜花",
-  [":jy_jinghua"] = [[每回合限一次，你使用或打出一张基本牌后，可以使用一张【杀】，以此法使用的【杀】无次数限制且不可被响应。]],
+  [":jy_jinghua"] = [[每回合限一次，你使用或打出一张基本牌后，可以使用一张无次数限制且不可被响应的【杀】。]],
   ["$jy_jinghua1"] = "苍流水影。",
   ["$jy_jinghua2"] = "剑影。",
   ["#jy_jinghua_use"] = "镜花：你可以使用一张无次数限制且不可响应的【杀】",
@@ -1779,6 +1779,7 @@ Fk:loadTranslationTable {
 
 local jy__huohuo = General(extension, "jy__huohuo", "wu", 3, 3, General.Female)
 
+-- TODO：可以不写这个
 local jy_bazhen = fk.CreateTriggerSkill {
   name = "jy_bazhen",
   events = { fk.AskForCardUse, fk.AskForCardResponse },
@@ -2083,6 +2084,7 @@ local genshin_names = {
   -- 以下是已知的怪物
   ["兽境猎犬"] = true,
   ["深渊咏者"] = true,
+  ["海乱鬼"] = true,
 }
 
 local function is_genshin(player)
@@ -2493,7 +2495,7 @@ local guiyi = fk.CreateTriggerSkill {
   anim_type = "offensive",
   events = { fk.EventPhaseProceeding },
   can_trigger = function(self, event, target, player, data)
-    return player:hasSkill(self) and target ~= player and
+    return player:hasSkill(self) and
         target.phase == Player.Finish and not player:isNude()
   end,
   on_use = function(self, event, target, player, data)
@@ -2530,7 +2532,6 @@ local guiyi_viewas = fk.CreateViewAsSkill {
       return nil
     end
     local c = Fk:cloneCard("duel")
-
     c.skillName = self.name
     c:addSubcard(cards[1])
     return c
@@ -2546,9 +2547,9 @@ Fk:loadTranslationTable {
   ["illustrator:jy__gambler"] = "米哈游",
 
   ["jy_guiyi"] = [[命弈]],
-  [":jy_guiyi"] = [[其他角色的结束阶段，你可以将一张牌当【决斗】使用。若你因此【决斗】受到伤害，你死亡。]],
+  [":jy_guiyi"] = [[每名角色的结束阶段，你可以将一张牌当【决斗】使用。若此【决斗】对你造成伤害，你死亡。]],
   ["#jy_guiyi_viewas"] = [[命弈]],
-  ["#jy_guiyi-use"] = [[命弈：将一张牌当【决斗】使用，若你因此受伤则你死亡]],
+  ["#jy_guiyi-use"] = [[命弈：将一张牌当【决斗】使用，若其对你造成伤害则你死亡]],
 }
 
 local gambler = General(extension, "jy__gambler", "qun", 6)
