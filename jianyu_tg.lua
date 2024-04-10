@@ -2300,7 +2300,7 @@ local zhanshu = fk.CreateTriggerSkill {
   events = { fk.EventPhaseProceeding },
   can_trigger = function(self, event, target, player, data)
     return player:hasSkill(self) and
-        target.phase == Player.Finish and not player:isNude()
+        target.phase == Player.Play and not player:isNude()
   end,
   on_cost = function(self, event, target, player, data)
     local room = player.room
@@ -2336,7 +2336,7 @@ zhanshu:addRelatedSkill(zhanshu_viewas)
 local zixing = fk.CreateTriggerSkill {
   name = "jy_zixing",
   anim_type = "drawcard",
-  events = { fk.CardUseFinished },
+  events = { fk.CardUseFinished, fk.CardRespondFinished },
   can_trigger = function(self, event, target, player, data)
     return player:hasSkill(self) and data.responseToEvent and data.responseToEvent.from == player.id and not target.dead
   end,
@@ -2366,13 +2366,14 @@ Fk:loadTranslationTable {
   ["~jy__yzls"] = [[唔……抱歉……]],
 
   ["jy_zhanshu"] = [[战书]],
+  ["#jy_zhanshu_viewas"] = [[战书]],
   [":jy_zhanshu"] = [[出牌阶段开始时，你可以视为使用【决斗】。]],
   ["#jy_zhanshu-use"] = [[战书：你可以视为使用【决斗】]],
   ["$jy_zhanshu1"] = [[在此参上！]],
   ["$jy_zhanshu2"] = [[一决胜负！]],
 
   ["jy_zixing"] = [[自省]],
-  [":jy_zixing"] = [[当一名角色使用牌响应你的牌时，你可以摸两张牌，然后本阶段其不是你使用牌的合法目标。]],
+  [":jy_zixing"] = [[当一名角色使用或打出牌响应你的牌时，你可以摸两张牌，然后本阶段其不是你使用牌的合法目标。]],
   ["$jy_zixing1"] = [[啊……难道说太大声了吗？影响到您了，对不起！]],
   ["$jy_zixing2"] = [[果……果然还是算了吧……会被认为是奇怪的人……]],
 }
