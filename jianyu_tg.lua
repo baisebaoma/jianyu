@@ -1360,8 +1360,7 @@ local yingyuan = fk.CreateTriggerSkill {
       end), Util.IdMapper)
       if #targets == 0 then return false end
       local result = room:askForChoosePlayers(player, targets, 1, 1, "#jy_yingyuan-prompt",
-        self.name,
-        false, false)
+        self.name, false, false)
       if #result ~= 0 then
         local to = room:getPlayerById(result[1])
         if not to.dead then
@@ -1476,7 +1475,7 @@ Fk:loadTranslationTable {
   ["illustrator:jy__yjds"] = [[未知]],
 
   ["jy_yingyuan"] = [[应援]],
-  [":jy_yingyuan"] = [[锁定技，当你的牌不因使用或〖施援〗进入弃牌堆<font color="red">或处理区</font>后，你令一名其他角色摸一张牌；每回合限一次，当你失去最后的手牌后，你<font color="red">失去一点体力</font>并摸等同于体力上限张牌。]],
+  [":jy_yingyuan"] = [[锁定技，当你的牌不因使用或〖施援〗进入弃牌堆或处理区后，你令一名其他角色摸一张牌；每回合限一次，当你失去最后的手牌后，你<font color="red">失去一点体力</font>并摸等同于体力上限张牌。]],
   ["#jy_yingyuan-prompt"] = [[应援：令一名其他角色摸一张牌]],
 
   ["jy_shiyuan"] = [[施援]],

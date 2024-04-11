@@ -2498,24 +2498,27 @@ local guiyi = fk.CreateTriggerSkill {
     return player:hasSkill(self) and
         target.phase == Player.Finish and not player:isNude()
   end,
+  on_cost = function(self, event, target, player, data)
+    local success, dat = player.room:askForUseActiveSkill(player, "#jy_guiyi_viewas", "#jy_guiyi-use", true)
+    if success then
+      self.cost_data = dat
+      return true
+    end
+  end,
   on_use = function(self, event, target, player, data)
     local room = player.room
-    local success, dat = room:askForUseActiveSkill(player, "#jy_guiyi_viewas", "#jy_guiyi-use", true,
-      { bypass_distances = true })
-    if success then
-      local card = Fk:cloneCard("duel")
-      card:addSubcards(dat.cards)
-      card.skillName = self.name
-      local use = {
-        from = player.id,
-        tos = table.map(dat.targets, function(p) return { p } end),
-        card = card,
-        extraData = { bypass_distances = true },
-      }
-      room:useCard(use)
-      if use.damageDealt and use.damageDealt[player.id] then
-        room:killPlayer({ who = player.id })
-      end
+    local card = Fk:cloneCard("duel")
+    card:addSubcards(self.cost_data.cards)
+    card.skillName = self.name
+    local use = {
+      from = player.id,
+      tos = table.map(self.cost_data.targets, function(p) return { p } end),
+      card = card,
+      extraData = { bypass_distances = true },
+    }
+    room:useCard(use)
+    if use.damageDealt and use.damageDealt[player.id] then
+      room:killPlayer({ who = player.id })
     end
   end,
 }
@@ -2552,7 +2555,8 @@ Fk:loadTranslationTable {
   ["#jy_guiyi-use"] = [[命弈：将一张牌当【决斗】使用，若其对你造成伤害则你死亡]],
 }
 
-local gambler = General(extension, "jy__gambler", "qun", 6)
+local gambler = General(extension, "jy__gambler", "qun", 8)
 gambler:addSkill(guiyi)
+gambler:addSkill("benghuai")
 
 return extension
