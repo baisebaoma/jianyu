@@ -1336,7 +1336,8 @@ local yingyuan = fk.CreateTriggerSkill {
         if move.from == player.id then
           for _, info in ipairs(move.moveInfo) do
             -- 不因使用而失去
-            if move.toArea == Card.DiscardPile and move.moveReason ~= fk.ReasonUse and move.from and (info.fromArea == Card.PlayerHand or info.fromArea == Card.PlayerEquip) and room:getCardArea(info.cardId) == Card.DiscardPile then
+            -- TODO：参考乐蔡重新写这个
+            if (move.toArea == Card.DiscardPile or move.toArea == Card.Processing) and move.moveReason ~= fk.ReasonUse and move.from and (info.fromArea == Card.PlayerHand or info.fromArea == Card.PlayerEquip) and (room:getCardArea(info.cardId) == Card.DiscardPile or room:getCardArea(info.cardId) == Card.Processing) then
               data.is_jy_yingyuan_first = true
             end
             -- 连营
@@ -1446,9 +1447,10 @@ shiyuan:addRelatedSkill(shiyuan_mod)
 local mouyuan = fk.CreateTriggerSkill {
   name = "jy_mouyuan",
   frequency = Skill.Wake,
-  events = { fk.RoundStart },
+  events = { fk.EventPhaseProceeding },
   can_trigger = function(self, event, target, player, data)
-    return player:hasSkill(self) and player:usedSkillTimes(self.name, Player.HistoryGame) == 0
+    return player:hasSkill(self) and target == player and player.phase == Player.Finish and
+        player:usedSkillTimes(self.name, Player.HistoryGame) == 0
   end,
   can_wake = function(self, event, target, player, data)
     return type(player:getMark("@jy_mouyuan")) == "table" and #player:getMark("@jy_mouyuan") == 3
@@ -1474,17 +1476,17 @@ Fk:loadTranslationTable {
   ["illustrator:jy__yjds"] = [[未知]],
 
   ["jy_yingyuan"] = [[应援]],
-  [":jy_yingyuan"] = [[锁定技，当你的牌不因使用或〖施援〗进入弃牌堆后，你令一名其他角色摸一张牌；每回合限一次，当你失去最后的手牌后，你<font color="red">失去一点体力</font>并摸等同于体力上限张牌。]],
+  [":jy_yingyuan"] = [[锁定技，当你的牌不因使用或〖施援〗进入弃牌堆<font color="red">或处理区</font>后，你令一名其他角色摸一张牌；每回合限一次，当你失去最后的手牌后，你<font color="red">失去一点体力</font>并摸等同于体力上限张牌。]],
   ["#jy_yingyuan-prompt"] = [[应援：令一名其他角色摸一张牌]],
 
   ["jy_shiyuan"] = [[施援]],
-  [":jy_shiyuan"] = [[出牌阶段限一次，你可以弃一张牌。若此牌与你使用的上一张牌类型相同，你令一名其他角色从牌堆正面朝上获得一张同类型的牌并重置此技能。]],
+  [":jy_shiyuan"] = [[出牌阶段限一次，你可以弃一张牌。若此牌与你使用的上一张牌类型相同，你令一名其他角色从牌堆获得一张同类型的牌（正面朝上）并重置此技能。]],
   ["@jy_shiyuan"] = [[施援]],
   ["#jy_shiyuan-prompt"] = [[施援：令一名其他角色获得一张%arg]],
 
   ["jy_mouyuan"] = [[谋援]],
   ["@jy_mouyuan"] = [[谋援]],
-  [":jy_mouyuan"] = [[觉醒技，每轮开始时，若〖施援〗已令其他角色获得三种类型的牌，你减一点体力上限令〖应援〗改为失去最后的手牌后<font color="red">不再失去体力</font>。]],
+  [":jy_mouyuan"] = [[觉醒技，结束阶段，若〖施援〗已令其他角色获得三种类型的牌，你减一点体力上限令〖应援〗改为失去最后的手牌后<font color="red">不再失去体力</font>。]],
   ["$jy_mouyuan1"] = [[援神，启动！]],
   ["$jy_mouyuan2"] = [[援神，启动！]],
 }

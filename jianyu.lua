@@ -471,7 +471,7 @@ local jy_yuyu = fk.CreateTriggerSkill {
     if self.choice == "#jy_yuyu_draw3" then
       player:drawCards(3, self.name)
     else
-      player:drawCards(4, self.name)
+      player:drawCards(2, self.name)
       player:turnOver()
       Fk:currentRoom():damage({
         from = player,
@@ -512,11 +512,11 @@ Fk:loadTranslationTable {
   ["illustrator:jy__gaotianliang"] = "高天亮",
 
   ["jy_yuyu"] = "玉玉",
-  [":jy_yuyu"] = [[当有角色对你使用【杀】造成了伤害时，其获得“致郁”。受到没有“致郁”的角色或因本次伤害而获得“致郁”的角色造成的伤害时，你可以选择一项：摸3张牌；摸4张牌并翻面，然后对自己造成1点伤害。你对持有“致郁”的角色造成的非传导伤害+1。]],
+  [":jy_yuyu"] = [[当有角色对你使用【杀】造成了伤害时，其获得“致郁”。受到没有“致郁”的角色或因本次伤害而获得“致郁”的角色造成的伤害时，你可以选择一项：摸三张牌；摸两张牌并翻面，然后对自己造成一点伤害。你对有“致郁”的角色造成的非传导伤害+1。]],
   ["@jy_yuyu_enemy"] = "致郁",
-  ["#jy_yuyu_ask_which"] = "玉玉：请选择你要触发的效果",
-  ["#jy_yuyu_draw3"] = "摸3张牌",
-  ["#jy_yuyu_draw4turnover"] = "摸4张牌并翻面，然后对自己造成1点伤害",
+  ["#jy_yuyu_ask_which"] = "玉玉：请选择",
+  ["#jy_yuyu_draw3"] = "摸三张牌",
+  ["#jy_yuyu_draw4turnover"] = "摸两张牌并翻面，然后对自己造成一点伤害",
   ["$jy_yuyu1"] = "我……我真的很想听到你们说话……",
   ["$jy_yuyu2"] = "我天天被队霸欺负，他们天天骂我。",
   ["$jy_yuyu3"] = "有什么话是真的不能讲的……为什么一定……每次都是……一个人在讲……",
