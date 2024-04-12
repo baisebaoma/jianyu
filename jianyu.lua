@@ -2345,7 +2345,8 @@ local function master_on_cost(is_fun, property)
                 not Self:isProhibited(p, data.card)
           end),
         Util.IdMapper)
-      local result = room:askForChoosePlayers(player, targets, 1, room.alive_players, "#jy_master_" .. property .. "-ask",
+      local result = room:askForChoosePlayers(player, targets, 1, #room.alive_players,
+        "#jy_master_" .. property .. "-ask",
         self.name)
       if #result > 0 then
         data.cost_data = result
