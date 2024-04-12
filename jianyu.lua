@@ -2315,7 +2315,7 @@ local function master_can_trigger(is_fun, property)
     elseif event == fk.TargetConfirming then
       if data.from == player.id and
           (data.card:isCommonTrick() or data.card.type == Card.TypeBasic) and
-          player:getMark("jy_master_" .. property) == 0 then
+          player:getMark("jy_master_" .. property) == 0 then -- 这个标记是为了防止同一张牌指定多个目标时问询多次
         -- 检查是否所有的目标角色已经被选中。只要有一个没被选中，那就return true
         local targets = AimGroup:getAllTargets(data.tos)
         for _, p in ipairs(player.room:getOtherPlayers(player)) do
@@ -2330,13 +2330,27 @@ local function master_can_trigger(is_fun, property)
   end
 end
 
-local function master_on_cost(property)
+local function master_on_cost(is_fun, property)
   return function(self, event, target, player, data)
     if event == fk.EventPhaseProceeding then
       return true
     elseif event == fk.TargetConfirming then
-      player.room:setPlayerMark(player, "jy_master_" .. property, true)
-      return player.room:askForSkillInvoke(player, self.name)
+      local room = player.room
+      room:setPlayerMark(player, "jy_master_" .. property, true)
+      -- 直接询问是否要指定别的目标
+      local initial_targets = AimGroup:getAllTargets(data.tos)
+      local targets = table.map(table.filter(room:getOtherPlayers(player),
+          function(p)
+            return is_fun(p) and not table.contains(initial_targets, p.id) and
+                not Self:isProhibited(p, data.card)
+          end),
+        Util.IdMapper)
+      local result = room:askForChoosePlayers(player, targets, 1, room.alive_players, "#jy_master_" .. property .. "-ask",
+        self.name)
+      if #result > 0 then
+        data.cost_data = result
+        return true
+      end
     else
       return true
     end
@@ -2367,18 +2381,10 @@ local function master_on_use(is_fun)
         skillName = self.name,
       })
     elseif event == fk.TargetConfirming then
-      local indicate_players = {} -- 用来画指示线的
-      local targets = AimGroup:getAllTargets(data.tos)
-      for _, p in ipairs(room:getOtherPlayers(player)) do
-        if is_fun(p) and not table.contains(targets, p.id) and not Self:isProhibited(p, data.card) then -- 抄的room.lua142行
-          AimGroup:addTargets(player.room, data, p.id)
-          table.insert(indicate_players, p.id)
-        end
+      for _, pid in ipairs(data.cost_data) do
+        AimGroup:addTargets(room, data, pid)
       end
-      if #indicate_players ~= 0 then
-        room:notifySkillInvoked(player, self.name, "offensive")
-        room:doIndicate(data.from, indicate_players)
-      end
+      room:doIndicate(data.from, data.cost_data)
     else
       player:drawCards(1, self.name)
     end
@@ -2404,7 +2410,7 @@ local function master_createTriggerSkill(is_fun, property)
     name = "jy_master_" .. property,
     events = master_events,
     can_trigger = master_can_trigger(is_fun, property),
-    on_cost = master_on_cost(property),
+    on_cost = master_on_cost(is_fun, property),
     on_use = master_on_use(is_fun),
     refresh_events = master_refresh_events,
     can_refresh = master_can_refresh(property),
@@ -2425,7 +2431,7 @@ local lmgs = General(extension, "jy__lol__master", "qun", 4, 4, General.Female)
 lmgs:addSkill(master_createTriggerSkill(is_lol, "lol"))
 
 local function master_des(property)
-  return [[你使用普通锦囊牌和基本牌可以额外指定除你以外所有]] ..
+  return [[你使用普通锦囊牌和基本牌可以额外指定任意]] ..
       property ..
       [[角色为目标。除你以外的]] ..
       property ..
@@ -2447,6 +2453,7 @@ Fk:loadTranslationTable {
   ["$jy_master_genshin1"] = [[玩原神玩的！]],
   ["$jy_master_genshin2"] = [[不玩原神导致的！]],
   ["$jy_master_genshin3"] = [[原神，启动！]],
+  ["#jy_master_genshin-ask"] = [[原神：你可以额外指定任意原神角色为目标]],
 
   ["jy__que__master"] = "雀魂高手",
   ["#jy__que__master"] = "祈",
@@ -2460,6 +2467,7 @@ Fk:loadTranslationTable {
   ["$jy_master_majsoul1"] = [[玩雀魂玩的！]],
   ["$jy_master_majsoul2"] = [[不玩雀魂导致的！]],
   ["$jy_master_majsoul3"] = [[雀魂，启动！]],
+  ["#jy_master_majsoul-ask"] = [[雀神：你可以额外指定任意雀势力角色为目标]],
 
   ["jy__moe__master"] = "萌包高手",
   ["#jy__moe__master"] = "emo公主",
@@ -2473,6 +2481,7 @@ Fk:loadTranslationTable {
   ["$jy_master_moe1"] = [[玩萌包玩的！]],
   ["$jy_master_moe2"] = [[不玩萌包导致的！]],
   ["$jy_master_moe3"] = [[萌包，启动！]],
+  ["#jy_master_moe-ask"] = [[萌神：你可以额外指定任意萌势力角色为目标]],
 
   ["jy__lol__master"] = "联盟高手",
   ["#jy__lol__master"] = "考公专家",
@@ -2486,6 +2495,7 @@ Fk:loadTranslationTable {
   ["$jy_master_lol1"] = [[玩英雄联盟玩的！]],
   ["$jy_master_lol2"] = [[不玩英雄联盟导致的！]],
   ["$jy_master_lol3"] = [[英雄联盟，启动！]],
+  ["#jy_master_lol-ask"] = [[盟神：你可以额外指定任意英雄联盟角色为目标]],
 }
 
 --- masters end here
