@@ -512,8 +512,8 @@ Fk:loadTranslationTable {
   ["illustrator:jy__gaotianliang"] = "高天亮",
 
   ["jy_yuyu"] = "玉玉",
-  [":jy_yuyu"] = [[当有角色对你使用【杀】造成了伤害时，其获得“致郁”。受到没有“致郁”的角色或因本次伤害而获得“致郁”的角色造成的伤害时，你可以选择一项：摸三张牌；摸两张牌并翻面，然后对自己造成一点伤害。你对有“致郁”的角色造成的非传导伤害+1。]],
-  ["@jy_yuyu_enemy"] = "致郁",
+  [":jy_yuyu"] = [[当你因【杀】受到伤害时，伤害来源获得“玉玉”。受到没有“玉玉”的角色或因本次伤害而获得“玉玉”的角色造成的伤害时，你可以选择一项：摸三张牌；摸两张牌并翻面，然后对自己造成一点伤害。你对有“玉玉”的角色造成的非传导伤害+1。]],
+  ["@jy_yuyu_enemy"] = "玉玉",
   ["#jy_yuyu_ask_which"] = "玉玉：请选择",
   ["#jy_yuyu_draw3"] = "摸三张牌",
   ["#jy_yuyu_draw4turnover"] = "摸两张牌并翻面，然后对自己造成一点伤害",
@@ -2289,7 +2289,7 @@ local function master_can_trigger(is_fun, property)
   return function(self, event, target, player, data)
     if not player:hasSkill(self) then return false end
     if event == fk.EventPhaseProceeding then
-      if not (target == player and (player.phase == Player.Start or player.phase == Player.Finish)) then return false end
+      if not (target == player and (player.phase == Player.Start or player.phase == Player.Finish) and player:getMark("jy_masters-phase") == 0) then return false end
       local room = player.room
       local is_exist = false
       for _, p in ipairs(room:getOtherPlayers(player)) do
@@ -2325,7 +2325,7 @@ local function master_can_trigger(is_fun, property)
         end
       end
     elseif event == fk.Damage then
-      return target and is_fun(target) and target ~= player
+      return (target and is_fun(target) and target ~= player) or (target == player and is_fun(data.to))
     end
   end
 end
@@ -2362,7 +2362,7 @@ local function master_on_use(is_fun)
   return function(self, event, target, player, data)
     local room = player.room
     if event == fk.EventPhaseProceeding then
-      -- local generals = Fk.packages["jianyu_standard"]  -- TODO:自动检索所有简浴，但是先懒得写了
+      room:setPlayerMark(player, "jy_masters-phase", true) -- 防止你因为选择高手而继续刷将和回复体力
       local generals = { "jy__genshin__master", "jy__que__master",
         "jy__moe__master", "jy__lol__master", "jy__liuxian", "jy__huohuo",
         "jy__kgdxs", "jy__kgds", }
@@ -2436,7 +2436,9 @@ local function master_des(property)
       property ..
       [[角色为目标。除你以外的]] ..
       property ..
-      [[角色造成伤害后，你摸一张牌。准备阶段或结束阶段，若场上除你以外没有存活的]] ..
+      [[角色造成伤害后或你对]] ..
+      property ..
+      [[角色造成伤害后，你摸一张牌。准备阶段或结束阶段，若除你以外没有存活的]] ..
       property ..
       [[角色且你武将牌上有该技能，你变更该武将并回复一点体力。]]
 end
