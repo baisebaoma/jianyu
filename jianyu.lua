@@ -2299,7 +2299,8 @@ local function master_can_trigger(is_fun, property)
         end
       end
       if is_exist then return false end
-      -- 确认自己有没有哪个武将牌有这个技能
+      -- 确认自己有没有哪个武将牌有这个技能。
+      -- TODO：感觉这个可以写一个函数！别的技能也用得上！
       local generals
       if player.deputyGeneral == "" then
         generals = { player.general }
