@@ -2556,7 +2556,7 @@ local zhaoyong = fk.CreateActiveSkill {
       card_name = "fire_attack"
     end
     return player:usedSkillTimes(self.name, Player.HistoryPhase) == 0 and
-        U.canUseCardTo(player.room, player, player, Fk:cloneCard(card_name)) -- 感觉可能用不了
+        U.canUseCardTo(player.room, player, player, Fk:cloneCard(card_name)) -- 虽然是传的ClientPlayer，但是可以用！
   end,
   card_filter = Util.FalseFunc,
   on_use = function(self, room, effect)
@@ -2581,7 +2581,7 @@ local zhaoyong_trigger = fk.CreateTriggerSkill {
   can_trigger = function(self, event, target, player, data)
     local room = player.room
     if player:hasSkill(self) then
-      -- 因为火攻或以逸待劳而弃牌，而他们的父事件是zhaoyong
+      -- 因为火攻或以逸待劳而弃牌，而且他们的父事件是zhaoyong
       local e = room.logic:getCurrentEvent():findParent(GameEvent.UseCard)
       if e then
         local use = e.data[1]
@@ -2654,7 +2654,7 @@ local dingfei = fk.CreateTriggerSkill {
       end
     end
     player:showCards(hands)
-    local discardedSuit = suitCount(player.room:askForDiscard(data.from, 0, #data.from:getCardIds("h"), false, self.name,
+    local discardedSuit = suitCount(player.room:askForDiscard(data.from, 1, #data.from:getCardIds("h"), false, self.name,
       true, nil,
       "#jy_dingfei-discard:" .. player.id .. "::" .. hint))
     for i = 1, 4 do
@@ -2684,7 +2684,7 @@ Fk:loadTranslationTable {
   ["~jy__guinaifen"] = [[哎呀，演砸了……]],
 
   ["jy_zhaoyong"] = "肇涌",
-  [":jy_zhaoyong"] = [[转换技，出牌阶段限一次，你可以翻面并视为对自己使用①【以逸待劳】；②【火攻】。若你因此弃置了红色牌，你可以将手牌摸至四张或令此技能视为未发动过。]],
+  [":jy_zhaoyong"] = [[转换技，出牌阶段限一次，你可以翻面并视为对自己使用①【以逸待劳】；②【火攻】（你需有手牌）。若你因此弃置了红色牌，你可以将手牌摸至四张或令此技能视为未发动过。]],
   ["#jy_zhaoyong"] = [[肇涌：翻面并视为对自己使用【%arg】（弃置<font color="red">红色牌</font>以触发后续效果）]],
   ["#jy_zhaoyong_choose"] = "肇涌：选择后续效果",
   ["#jy_zhaoyong_draw_to_4"] = "将手牌摸至四张",
@@ -2694,7 +2694,7 @@ Fk:loadTranslationTable {
 
   ["jy_dingfei"] = "鼎沸",
   [":jy_dingfei"] = [[每回合限一次，你受到伤害后，可以展示所有手牌并令伤害来源可以弃置任意张手牌。除非其弃置的牌中每种你手牌中没有的花色至少各有一张，否则你回复一点体力。]],
-  ["#jy_dingfei-prompt"] = [[鼎沸：是否展示手牌并令 %dest 弃牌，若其弃牌未满足条件则你回复一点体力]],
+  ["#jy_dingfei-prompt"] = [[鼎沸：是否展示手牌并令 %dest 弃牌，若其弃的牌未满足条件则你回复一点体力]],
   ["#jy_dingfei-discard"] = [[鼎沸：弃置 %arg 手牌至少各一张，否则 %src 回复一点体力]],
   ["$jy_dingfei1"] = [[哎哟，您可别放水。]],
   ["$jy_dingfei2"] = [[幸亏我练过！]],
