@@ -2664,14 +2664,15 @@ local dingfei = fk.CreateTriggerSkill {
       end
     end
     if is_4_suits then
-      player.room:askForDiscard(data.from, 1, #data.from:getCardIds("h"), false, self.name,
-        true, nil,
-        "#jy_dingfei-discard:" .. player.id .. "::" .. hint)
-    else
-      local discardedSuit = suitCount(player.room:askForDiscard(data.from, 1, #data.from:getCardIds("h"), false,
+      player.room:askForDiscard(data.from, 1, #data.from:getCardIds("h"), false,
         self.name,
         true, nil,
-        "#jy_dingfei-discard-no-recover"))
+        "#jy_dingfei-discard-no-recover")
+    else
+      local discardedSuit = suitCount(
+        player.room:askForDiscard(data.from, 1, #data.from:getCardIds("h"), false, self.name,
+          true, nil,
+          "#jy_dingfei-discard:" .. player.id .. "::" .. hint))
       for i = 1, 4 do
         if handsSuit[i] == 0 and discardedSuit[i] == 0 then
           room:recover({
@@ -2711,8 +2712,8 @@ Fk:loadTranslationTable {
   ["jy_dingfei"] = "鼎沸",
   [":jy_dingfei"] = [[每回合限一次，你受到伤害后，可以展示所有手牌并令伤害来源可以弃置任意张手牌。除非你展示的牌与其弃置的牌的花色一共有四种，否则你回复一点体力。]],
   ["#jy_dingfei-prompt"] = [[鼎沸：是否展示手牌并令 %dest 弃牌，若其弃的牌未满足条件则你回复一点体力]],
-  ["#jy_dingfei-discard"] = [[鼎沸：弃置 %arg 手牌至少各一张，否则 %src 回复一点体力]],
-  ["#jy_dingfei-discard-no-recover"] = [[鼎沸：%src 令你弃牌，你可以不弃，其不会因此回复体力]],
+  ["#jy_dingfei-discard"] = [[鼎沸：%src 令你弃任意张牌，弃置 %arg 手牌至少各一张，否则 %src 回复一点体力]],
+  ["#jy_dingfei-discard-no-recover"] = [[鼎沸：%src 令你弃任意张牌]],
   ["$jy_dingfei1"] = [[哎哟，您可别放水。]],
   ["$jy_dingfei2"] = [[幸亏我练过！]],
   ["$jy_dingfei3"] = [[还来劲了啊你！]],
