@@ -2366,22 +2366,24 @@ local function master_on_use(is_fun)
       room:setPlayerMark(player, "jy_masters-phase", true) -- 防止你因为选择高手而继续刷将和回复体力
       local generals = { "jy__genshin__master", "jy__que__master",
         "jy__moe__master", "jy__lol__master", "jy__liuxian", "jy__huohuo",
-        "jy__kgdxs", "jy__kgds", }
+        "jy__kgdxs", "jy__kgds", "jy__gambler", "jy__qexbj" }
       -- 不能选择场上已有的武将
       table.removeOne(generals, self.general)
       for _, p in ipairs(room:getAlivePlayers()) do
         table.removeOne(generals, p.general)
         table.removeOne(generals, p.deputyGeneral)
       end
-      generals = table.connect(generals, room:getNGenerals(14 - #generals))
+      generals = table.connect(generals, room:getNGenerals(18 - #generals))
       local general = room:askForGeneral(player, generals, 1, true) -- true 才是禁止替换
       room:changeHero(player, general, false, self.general == player.deputyGeneral, true)
-      room:recover({
-        who = player,
-        num = 1,
-        recoverBy = player,
-        skillName = self.name,
-      })
+      if player.phase == Player.Start then
+        room:recover({
+          who = player,
+          num = 1,
+          recoverBy = player,
+          skillName = self.name,
+        })
+      end
     elseif event == fk.TargetConfirming then
       for _, pid in ipairs(data.cost_data) do
         AimGroup:addTargets(room, data, pid)
@@ -2441,7 +2443,7 @@ local function master_des(property)
       property ..
       [[角色造成伤害后，你摸一张牌。准备阶段或结束阶段，若除你以外没有存活的]] ..
       property ..
-      [[角色且你武将牌上有该技能，你变更该武将并回复一点体力。]]
+      [[角色且你武将牌上有该技能，你变更该武将，若为准备阶段，你回复一点体力。]]
 end
 
 Fk:loadTranslationTable {
