@@ -2486,6 +2486,7 @@ local zhuojing = fk.CreateViewAsSkill {
       local target = room:getPlayerById(result[1])
       room:askForDiscard(target, #use.card.subcards, #use.card.subcards, true, self.name, false, nil,
         "#jy_zhuojing-discard:" .. player.id .. "::" .. #use.card.subcards)
+      -- TODO：合法性检测
       local skill_name = room:askForChoice(target, { "jy_suzhan", "jy_zhuojing" }, self.name,
         "#jy_zhuojing-skill:" .. player.id) -- TODO：感觉可以用更好的UI
       room:askForUseActiveSkill(target, skill_name,
@@ -2638,6 +2639,8 @@ local dingfei = fk.CreateTriggerSkill {
     local room = player.room
     -- 统计花色
     local hands = player:getCardIds("h")
+    player:showCards(hands)
+
     local handsSuit = suitCount(hands)
     local hint = ""
     for c, s in ipairs(handsSuit) do
@@ -2653,19 +2656,32 @@ local dingfei = fk.CreateTriggerSkill {
         end
       end
     end
-    player:showCards(hands)
-    local discardedSuit = suitCount(player.room:askForDiscard(data.from, 1, #data.from:getCardIds("h"), false, self.name,
-      true, nil,
-      "#jy_dingfei-discard:" .. player.id .. "::" .. hint))
+    local is_4_suits = true
     for i = 1, 4 do
-      if handsSuit[i] == 0 and discardedSuit[i] == 0 then
-        room:recover({
-          who = player,
-          num = 1,
-          recoverBy = player,
-          skillName = self.name,
-        })
+      if handsSuit[i] == 0 then
+        is_4_suits = false
         break
+      end
+    end
+    if is_4_suits then
+      player.room:askForDiscard(data.from, 1, #data.from:getCardIds("h"), false, self.name,
+        true, nil,
+        "#jy_dingfei-discard:" .. player.id .. "::" .. hint)
+    else
+      local discardedSuit = suitCount(player.room:askForDiscard(data.from, 1, #data.from:getCardIds("h"), false,
+        self.name,
+        true, nil,
+        "#jy_dingfei-discard-no-recover"))
+      for i = 1, 4 do
+        if handsSuit[i] == 0 and discardedSuit[i] == 0 then
+          room:recover({
+            who = player,
+            num = 1,
+            recoverBy = player,
+            skillName = self.name,
+          })
+          break
+        end
       end
     end
   end,
@@ -2693,9 +2709,10 @@ Fk:loadTranslationTable {
   ["$jy_zhaoyong2"] = "花开富贵！",
 
   ["jy_dingfei"] = "鼎沸",
-  [":jy_dingfei"] = [[每回合限一次，你受到伤害后，可以展示所有手牌并令伤害来源可以弃置任意张手牌。除非其弃置的牌中每种你手牌中没有的花色至少各有一张，否则你回复一点体力。]],
+  [":jy_dingfei"] = [[每回合限一次，你受到伤害后，可以展示所有手牌并令伤害来源可以弃置任意张手牌。除非你展示的牌与其弃置的牌的花色一共有四种，否则你回复一点体力。]],
   ["#jy_dingfei-prompt"] = [[鼎沸：是否展示手牌并令 %dest 弃牌，若其弃的牌未满足条件则你回复一点体力]],
   ["#jy_dingfei-discard"] = [[鼎沸：弃置 %arg 手牌至少各一张，否则 %src 回复一点体力]],
+  ["#jy_dingfei-discard-no-recover"] = [[鼎沸：%src 令你弃牌，你可以不弃，其不会因此回复体力]],
   ["$jy_dingfei1"] = [[哎哟，您可别放水。]],
   ["$jy_dingfei2"] = [[幸亏我练过！]],
   ["$jy_dingfei3"] = [[还来劲了啊你！]],
