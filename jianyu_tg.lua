@@ -2501,6 +2501,10 @@ local zhuojing = fk.CreateViewAsSkill {
   end
 }
 
+local luocha = General(extension, "jy__luocha", "qun", 2, 3)
+luocha:addSkill(suzhan)
+luocha:addSkill(zhuojing)
+
 Fk:loadTranslationTable {
   ["jy__luocha"] = [[罗刹]],
   ["#jy__luocha"] = [[化外羁旅]],
@@ -2530,8 +2534,163 @@ Fk:loadTranslationTable {
   ["$jy_zhuojing2"] = [[逝者将再临！]],
 }
 
-local luocha = General(extension, "jy__luocha", "qun", 2, 3)
-luocha:addSkill(suzhan)
-luocha:addSkill(zhuojing)
+local zhaoyong = fk.CreateActiveSkill {
+  name = "jy_zhaoyong",
+  switch_skill_name = "jy_zhaoyong",
+  anim_type = "switch",
+  prompt = function(self, selected_cards, selected_targets)
+    local card_name
+    if Self:getSwitchSkillState(self.name, true) == fk.SwitchYang then
+      card_name = Fk:translate("await_exhausted")
+    else
+      card_name = Fk:translate("fire_attack")
+    end
+    return "#jy_zhaoyong:::" .. card_name
+  end,
+  can_use = function(self, player)
+    return player:usedSkillTimes(self.name, Player.HistoryPhase) == 0
+  end,
+  card_filter = Util.FalseFunc,
+  on_use = function(self, room, effect)
+    local from = room:getPlayerById(effect.from)
+    from:turnOver()
+    local card_name
+    if from:getSwitchSkillState(self.name, true) == fk.SwitchYang then
+      card_name = "await_exhausted"
+    else
+      card_name = "fire_attack"
+    end
+    if from:isAlive() then
+      room:useVirtualCard(card_name, nil, from, from, self.name, false)
+    end
+  end,
+}
+local zhaoyong_trigger = fk.CreateTriggerSkill {
+  name = "#jy_zhaoyong_trigger",
+  events = { fk.AfterCardsMove },
+  frequency = Skill.Compulsory,
+  mute = true,
+  can_trigger = function(self, event, target, player, data)
+    local room = player.room
+    if player:hasSkill(self) then
+      -- 因为火攻或以逸待劳而弃牌，而他们的父事件是zhaoyong
+      local e = room.logic:getCurrentEvent():findParent(GameEvent.UseCard)
+      if e then
+        local use = e.data[1]
+        if use and use.card.name == "fire_attack" or use.card.name == "await_exhausted" then
+          local ep = e.parent
+          if ep and ep.event == GameEvent.SkillEffect then
+            local _skill = ep.data[3]
+            local skill = _skill.main_skill and _skill.main_skill or _skill
+            if skill.name == "jy_zhaoyong" then
+              for _, move in ipairs(data) do
+                if move.from == player.id then
+                  for _, info in ipairs(move.moveInfo) do
+                    if move.toArea == Card.DiscardPile and move.moveReason == fk.ReasonDiscard and move.from and (info.fromArea == Card.PlayerHand or info.fromArea == Card.PlayerEquip) and room:getCardArea(info.cardId) == Card.DiscardPile and Fk:getCardById(info.cardId).color == Card.Red then
+                      return true
+                    end
+                  end
+                end
+              end
+            end
+          end
+        end
+      end
+    end
+  end,
+  on_use = function(self, event, target, player, data)
+    local choices = { "#jy_zhaoyong_draw_to_4", "#jy_zhaoyong_reset" }
+    local hand_num = #player:getCardIds("h")
+    if hand_num >= 4 then
+      table.removeOne(choices, "#jy_zhaoyong_draw_to_4")
+    end
+    local choice = player.room:askForChoice(player, choices, "jy_zhaoyong",
+      "#jy_zhaoyong_choose", false, { "#jy_zhaoyong_draw_to_4", "#jy_zhaoyong_reset" })
+    if choice == "#jy_zhaoyong_draw_to_4" then
+      player:drawCards(4 - hand_num, self.name)
+    else
+      player:setSkillUseHistory("jy_zhaoyong", 0, Player.HistoryPhase)
+    end
+  end,
+}
+zhaoyong:addRelatedSkill(zhaoyong_trigger)
+
+local dingfei = fk.CreateTriggerSkill {
+  name = "jy_dingfei",
+  anim_type = "defensive",
+  prompt = "#jy_dingfei-propmt",
+  events = { fk.Damaged },
+  can_trigger = function(self, event, target, player, data)
+    return player:hasSkill(self) and data.from and target == player and
+        player:usedSkillTimes(self.name, Player.HistoryTurn) == 0
+  end,
+  on_use = function(self, event, target, player, data)
+    local room = player.room
+    -- 统计花色
+    local hands = player:getCardIds("h")
+    local handsSuit = suitCount(hands)
+    local hint = ""
+    for c, s in ipairs(handsSuit) do
+      if s == 0 then
+        if c == Card.Spade then
+          hint = hint .. [[♠]]
+        elseif c == Card.Heart then
+          hint = hint .. [[<font color="red">♥</font>]]
+        elseif c == Card.Club then
+          hint = hint .. [[♣]]
+        elseif c == Card.Diamond then
+          hint = hint .. [[<font color="red">♦️</font>]]
+        end
+      end
+    end
+    player:showCards(hands)
+    local discardedSuit = suitCount(player.room:askForDiscard(data.from, 0, #data.from:getCardIds("h"), false, self.name,
+      true, nil,
+      "#jy_dingfei-discard:" .. player.id .. "::" .. hint))
+    for i = 1, 4 do
+      if handsSuit[i] == 0 and discardedSuit[i] == 0 then
+        room:recover({
+          who = player,
+          num = 1,
+          recoverBy = player,
+          skillName = self.name,
+        })
+        break
+      end
+    end
+  end,
+}
+local guinaifen = General(extension, "jy__lukai", "wu", 4)
+guinaifen:addSkill(dingfei)
+
+local gnf = General(extension, "jy__guinaifen", "qun", 3, 3, General.Female)
+gnf:addSkill(zhaoyong)
+gnf:addSkill(dingfei)
+
+Fk:loadTranslationTable {
+  ["jy__guinaifen"] = "桂乃芬",
+  ["#jy__guinaifen"] = "「街头行为表演艺术家」",
+  ["designer:jy__guinaifen"] = "三秋",
+  ["cv:jy__guinaifen"] = "小敢",
+  ["illustrator:jy__guinaifen"] = "米哈游",
+  ["~jy__guinaifen"] = [[哎呀，演砸了……]],
+
+  ["jy_zhaoyong"] = "肇涌",
+  [":jy_zhaoyong"] = [[转换技，出牌阶段限一次，你可以翻面并视为对自己使用①【以逸待劳】；②【火攻】。若你因此弃置了红色牌，你可以将手牌摸至四张或令此技能视为未发动过。]],
+  ["#jy_zhaoyong"] = "肇涌：翻面并视为对自己使用【%arg】，若弃置红色牌则可将手牌摸至4张或令此技能视为未发动过",
+  ["#jy_zhaoyong_choose"] = "肇涌：选择后续效果",
+  ["#jy_zhaoyong_draw_to_4"] = "将手牌摸至四张",
+  ["#jy_zhaoyong_reset"] = "此技能视为未发动过",
+  ["$jy_zhaoyong1"] = "恭喜发财！",
+  ["$jy_zhaoyong2"] = "花开富贵！",
+
+  ["jy_dingfei"] = "鼎沸",
+  [":jy_dingfei"] = [[每回合限一次，你受到伤害后，可以展示所有手牌并令伤害来源可以弃置任意张手牌。除非其弃置的牌中每种你手牌没有的花色至少各有一张，否则你回复一点体力。]],
+  ["#jy_dingfei-prompt"] = [[鼎沸：是否展示手牌并令伤害来源弃牌，若其弃牌未满足条件则你回复一点体力]],
+  ["#jy_dingfei-discard"] = [[鼎沸：弃置 %arg 手牌至少各一张，否则 %src 回复一点体力]],
+  ["$jy_dingfei1"] = [[哎哟，您可别放水。]],
+  ["$jy_dingfei2"] = [[幸亏我练过！]],
+  ["$jy_dingfei3"] = [[还来劲了啊你！]],
+}
 
 return extension
