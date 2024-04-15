@@ -2619,11 +2619,13 @@ zhaoyong:addRelatedSkill(zhaoyong_trigger)
 local dingfei = fk.CreateTriggerSkill {
   name = "jy_dingfei",
   anim_type = "defensive",
-  prompt = "#jy_dingfei-propmt",
   events = { fk.Damaged },
   can_trigger = function(self, event, target, player, data)
     return player:hasSkill(self) and data.from and target == player and
         player:usedSkillTimes(self.name, Player.HistoryTurn) == 0
+  end,
+  on_cost = function(self, event, target, player, data)
+    return player.room:askForSkillInvoke(player, self.name, nil, "#jy_dingfei-prompt::" .. data.from.id)
   end,
   on_use = function(self, event, target, player, data)
     local room = player.room
@@ -2684,8 +2686,8 @@ Fk:loadTranslationTable {
   ["$jy_zhaoyong2"] = "花开富贵！",
 
   ["jy_dingfei"] = "鼎沸",
-  [":jy_dingfei"] = [[每回合限一次，你受到伤害后，可以展示所有手牌并令伤害来源可以弃置任意张手牌。除非其弃置的牌中每种你手牌没有的花色至少各有一张，否则你回复一点体力。]],
-  ["#jy_dingfei-prompt"] = [[鼎沸：是否展示手牌并令伤害来源弃牌，若其弃牌未满足条件则你回复一点体力]],
+  [":jy_dingfei"] = [[每回合限一次，你受到伤害后，可以展示所有手牌并令伤害来源可以弃置任意张手牌。除非其弃置的牌中每种你手牌中没有的花色至少各有一张，否则你回复一点体力。]],
+  ["#jy_dingfei-prompt"] = [[鼎沸：是否展示手牌并令 %dest 弃牌，若其弃牌未满足条件则你回复一点体力]],
   ["#jy_dingfei-discard"] = [[鼎沸：弃置 %arg 手牌至少各一张，否则 %src 回复一点体力]],
   ["$jy_dingfei1"] = [[哎哟，您可别放水。]],
   ["$jy_dingfei2"] = [[幸亏我练过！]],
