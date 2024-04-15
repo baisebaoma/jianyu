@@ -2540,7 +2540,8 @@ local zhaoyong = fk.CreateActiveSkill {
   anim_type = "switch",
   prompt = function(self, selected_cards, selected_targets)
     local card_name
-    if Self:getSwitchSkillState(self.name, true) == fk.SwitchYang then
+    -- 因为此时还没有发动技能，所以不需要计算下一步
+    if Self:getSwitchSkillState(self.name) == fk.SwitchYang then
       card_name = Fk:translate("await_exhausted")
     else
       card_name = Fk:translate("fire_attack")
@@ -2660,8 +2661,6 @@ local dingfei = fk.CreateTriggerSkill {
     end
   end,
 }
-local guinaifen = General(extension, "jy__lukai", "wu", 4)
-guinaifen:addSkill(dingfei)
 
 local gnf = General(extension, "jy__guinaifen", "qun", 3, 3, General.Female)
 gnf:addSkill(zhaoyong)
