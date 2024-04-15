@@ -2403,21 +2403,21 @@ local suzhan = fk.CreateActiveSkill {
   card_num = 0,
   card_filter = Util.FalseFunc,
   interaction = function(self)
-    return UI.ComboBox { choices = { "1", "2" }, default = "2" }
+    return UI.ComboBox { choices = { "摸一张牌", "摸两张牌" }, default = "摸两张牌" }
   end,
   on_use = function(self, room, effect)
     local player = room:getPlayerById(effect.from)
     player:broadcastSkillInvoke(self.name, math.random(3))
     room:notifySkillInvoked(player, self.name, "support")
     local n
-    if self.interaction.data == "1" then
+    if self.interaction.data == "摸一张牌" then
       n = 1
     else
       n = 2
     end
     local to = room:getPlayerById(effect.tos[1])
     to:drawCards(n, self.name, "bottom")
-    room:setPlayerMark(to, "@jy_suzhan-round", n)
+    room:setPlayerMark(to, "jy_suzhan_" .. player.id .. "-turn", n) -- 先用这种笨办法吧，哈希表用起来不太对的样子
   end,
 }
 local suzhan_trigger = fk.CreateTriggerSkill {
@@ -2427,10 +2427,10 @@ local suzhan_trigger = fk.CreateTriggerSkill {
   events = { fk.AfterCardsMove },
   can_trigger = function(self, event, target, player, data)
     local room = player.room
-    if not player:hasSkill(self) then return false end
+    -- if not player:hasSkill(self) then return false end
     for _, move in ipairs(data) do
       local from = room:getPlayerById(move.from)
-      if from and from:getMark("@jy_suzhan-round") ~= 0 then
+      if from and from:getMark("jy_suzhan_" .. player.id .. "-turn") ~= 0 then
         self.cost_data = from
         for _, info in ipairs(move.moveInfo) do
           if info.fromArea == Card.PlayerHand then
@@ -2444,8 +2444,8 @@ local suzhan_trigger = fk.CreateTriggerSkill {
     local from = self.cost_data
     player:broadcastSkillInvoke("jy_suzhan", math.random(4, 5))
     player.room:notifySkillInvoked(player, "jy_suzhan", "drawcard")
-    player:drawCards(2 * from:getMark("@jy_suzhan-round"), self.name)
-    player.room:setPlayerMark(from, "@jy_suzhan-round", 0)
+    player:drawCards(2 * from:getMark("jy_suzhan_" .. player.id .. "-turn"), self.name)
+    player.room:setPlayerMark(from, "jy_suzhan_" .. player.id .. "-turn", 0)
   end,
 }
 suzhan:addRelatedSkill(suzhan_trigger)
@@ -2486,12 +2486,11 @@ local zhuojing = fk.CreateViewAsSkill {
       local target = room:getPlayerById(result[1])
       room:askForDiscard(target, #use.card.subcards, #use.card.subcards, true, self.name, false, nil,
         "#jy_zhuojing-discard:" .. player.id .. "::" .. #use.card.subcards)
-      -- local skill_name = room:askForChoice(target, { "jy_suzhan", "jy_zhuojing" }, self.name,
-      --   "#jy_zhuojing-skill:" .. player.id) -- TODO：感觉可以用更好的UI
-      room:askForUseActiveSkill(player, "jy_suzhan",
-        "#jy_zhuojing-use::" .. target.id .. ":" .. Fk:translate("jy_suzhan"))
+      local skill_name = room:askForChoice(target, { "jy_suzhan", "jy_zhuojing" }, self.name,
+        "#jy_zhuojing-skill:" .. player.id) -- TODO：感觉可以用更好的UI
+      room:askForUseActiveSkill(target, skill_name,
+        "#jy_zhuojing-use::" .. target.id .. ":" .. Fk:translate(skill_name))
       -- 这个函数会直接执行这个技能。问题是如果有的技能是有多个时机的，怎么办？如果有的是被动的，怎么办？所以我建议限定成只能用这两个技能。
-      -- 我觉得这里肯定有问题，因为没写时机。目前暂时仅可触发素绽
     end
   end,
   enabled_at_play = function(self, player)
@@ -2511,7 +2510,7 @@ Fk:loadTranslationTable {
   ["~jy__luocha"] = [[没能……实现啊……]],
 
   ["jy_suzhan"] = [[素绽]],
-  [":jy_suzhan"] = [[出牌阶段限一次，你可以令一名没有手牌的角色从牌堆底摸X张牌（X由你选择且至多为2）。若如此做，本轮其下次失去最后的手牌后，你摸2X张牌。]],
+  [":jy_suzhan"] = [[出牌阶段限一次，你可以令一名没有手牌的角色从牌堆底摸X张牌（X由你选择且至多为2）。若如此做，本回合其下次失去最后的手牌后，你摸2X张牌。]],
   ["#jy_suzhan-prompt"] = [[素绽：选择一名没有手牌的角色摸一或两张牌]],
   ["@jy_suzhan-round"] = [[<font color="yellow">素绽</font>]],
   ["$jy_suzhan1"] = [[白花盛放。]],
@@ -2521,11 +2520,11 @@ Fk:loadTranslationTable {
   ["$jy_suzhan5"] = [[清算的时刻到了。]],
 
   ["jy_zhuojing"] = [[濯荆]],
-  [":jy_zhuojing"] = [[每回合限一次，你可以将所有手牌当【桃】使用。若此【桃】无颜色且你武将牌上有该技能，你可以令一名其他角色弃置等量的牌，且你可以视为发动〖素绽〗。]],
+  [":jy_zhuojing"] = [[每回合限一次，你可以将所有手牌当【桃】使用。若此【桃】无颜色且你武将牌上有该技能，你可以令一名其他角色弃置等量的牌，然后其可以视为发动〖素绽〗或〖濯荆〗。]],
   ["#jy_zhuojing-prompt"] = [[濯荆：你可以将所有手牌当【桃】使用]],
   ["#jy_zhuojing-choose"] = [[濯荆：你可以令一名目标弃置%arg张牌]],
   ["#jy_zhuojing-discard"] = [[濯荆：弃置%arg张牌]],
-  -- ["#jy_zhuojing-skill"] = [[濯荆：选择令 %src 发动〖素绽〗]],
+  ["#jy_zhuojing-skill"] = [[濯荆：选择发动〖素绽〗或〖濯荆〗]],
   ["#jy_zhuojing-use"] = [[濯荆：%dest 令你发动 %arg，请指定目标]],
   ["$jy_zhuojing1"] = [[永眠非终焉……]],
   ["$jy_zhuojing2"] = [[逝者将再临！]],
