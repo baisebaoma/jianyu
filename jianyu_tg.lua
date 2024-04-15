@@ -2549,7 +2549,14 @@ local zhaoyong = fk.CreateActiveSkill {
     return "#jy_zhaoyong:::" .. card_name
   end,
   can_use = function(self, player)
-    return player:usedSkillTimes(self.name, Player.HistoryPhase) == 0
+    local card_name
+    if Self:getSwitchSkillState(self.name) == fk.SwitchYang then
+      card_name = Fk:translate("await_exhausted")
+    else
+      card_name = Fk:translate("fire_attack")
+    end
+    return player:usedSkillTimes(self.name, Player.HistoryPhase) == 0 and
+        U.canUseCardTo(player.room, player, player, Fk:cloneCard(card_name)) -- 感觉可能用不了
   end,
   card_filter = Util.FalseFunc,
   on_use = function(self, room, effect)
