@@ -687,8 +687,8 @@ local jy_fuzhu = fk.CreateTriggerSkill {
     -- TODO：UI变好看一点
     local skill_name = room:askForCustomDialog(player, self.name,
       "packages/jianyu/qml/fuzhu.qml")
-    if #skill_name > 15 then return false end
-    if not skill_name:match("^[a-zA-Z_]+$") then return false end
+    if #skill_name > 12 then return false end
+    if not skill_name:match("^[a-z_]+$") then return false end
     local sk = Fk.skills[skill_name] -- 可以用 Util.Name2SkillMapper(skill_name)，原理一样
     if sk then
       room:handleAddLoseSkills(player, skill_name, nil, true, false)
@@ -706,7 +706,7 @@ Fk:loadTranslationTable {
   ["illustrator:jy__trad__god"] = [[未知]],
 
   ["jy_fuzhu"] = "哇袄",
-  [":jy_fuzhu"] = [[每局游戏限两次，你的回合结束时，你可以获得一个想要的技能。<br><font color="grey">你需要知道这个技能的name参数（如paoxiao），你的输入必须仅含英文字母和下划线且长度不得超过15。若输入错误，你不会获得技能。</font>]],
+  [":jy_fuzhu"] = [[每局游戏限两次，你的回合结束时，你可以获得一个想要的技能。<br><font color="grey">输入这个技能的name参数（如paoxiao）以获得技能，你的输入必须仅含小写英文字母和下划线，且长度不得超过12。若输入错误，你不会获得技能。</font>]],
 }
 
 return extension

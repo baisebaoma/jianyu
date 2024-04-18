@@ -20,12 +20,13 @@ GraphicsBox {
     anchors.rightMargin: 20
     anchors.bottomMargin: 40
 
-    Row {
-      Layout.alignment: Qt.AlignHCenter
-      spacing: 20
+    RowLayout {
+      anchors.rightMargin: 8
+      spacing: 16
 
       TextField {
         id: word
+        maximumLength: 12
         placeholderText: "技能名"
         clip: true
         verticalAlignment: Qt.AlignVCenter
