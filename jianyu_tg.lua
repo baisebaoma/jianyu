@@ -2489,7 +2489,7 @@ local zhuojing = fk.CreateViewAsSkill {
       -- TODO：合法性检测
       local feasible = { "jy_suzhan", "jy_zhuojing" }
       if target.hp == target.maxHp then table.removeOne(feasible, "jy_suzhan") end
-      if #table.filter(player.room.alive_players, function(p) return #p:getCardIds("h") == 0 end) > 0 then
+      if #table.filter(player.room.alive_players, function(p) return #p:getCardIds("h") == 0 end) == 0 then
         table.removeOne(feasible, "jy_zhuojing")
       end
       if #feasible > 0 then
@@ -2535,7 +2535,7 @@ Fk:loadTranslationTable {
   ["jy_zhuojing"] = [[濯荆]],
   [":jy_zhuojing"] = [[每回合限一次，你可以将所有手牌当【桃】使用。若此【桃】无颜色且你武将牌上有该技能，你可以令一名其他角色弃置等量的牌，然后其可以视为发动〖素绽〗或〖濯荆〗。]],
   ["#jy_zhuojing-prompt"] = [[濯荆：你可以将所有手牌当【桃】使用]],
-  ["#jy_zhuojing-choose"] = [[濯荆：你可以令一名目标弃置%arg张牌]],
+  ["#jy_zhuojing-choose"] = [[濯荆：你可以令一名角色弃置%arg张牌]],
   ["#jy_zhuojing-discard"] = [[濯荆：弃置%arg张牌]],
   ["#jy_zhuojing-skill"] = [[濯荆：选择发动〖素绽〗或〖濯荆〗]],
   ["#jy_zhuojing-use"] = [[濯荆：%dest 令你发动 %arg，请指定目标]],
