@@ -2475,25 +2475,28 @@ local zhuojing = fk.CreateViewAsSkill {
   after_use = function(self, player, use)
     if use.card.color == Card.NoColor and is_general_skill(player, self.name) then
       local room = player.room
-      -- 选择一名角色
-      local result = room:askForChoosePlayers(player,
-        table.map(table.filter(room:getOtherPlayers(player), function(p) return #p:getCardIds("he") > 0 end),
-          Util.IdMapper),
-        1, 1,
-        "#jy_zhuojing-choose:::" .. #use.card.subcards)
+      -- 选择一名有牌的角色。如果没有任何一个人满足要求，就不让他选。
+      local targets = table.map(
+        table.filter(room:getOtherPlayers(player), function(p) return #p:getCardIds("he") > 0 end),
+        Util.IdMapper)
+      if #targets == 0 then return end
+      local result = room:askForChoosePlayers(player, targets, 1, 1, "#jy_zhuojing-choose:::" .. #use.card.subcards)
       if #result == 0 then return end
       local target = room:getPlayerById(result[1])
       room:askForDiscard(target, #use.card.subcards, #use.card.subcards, true, self.name, false, nil,
         "#jy_zhuojing-discard:" .. player.id .. "::" .. #use.card.subcards)
       local feasible = {}
       local total = {}
+      -- 通过缩减描述达到更好的用户体验。
+      -- 可以发动素绽？
       if #table.filter(player.room.alive_players, function(p) return #p:getCardIds("h") == 0 end) > 0 then
         table.insert(feasible, "jy_suzhan-short")
         table.insert(total, "jy_suzhan-short")
       end
+      -- 可以发动濯荆？
       if target:canUse(Fk:cloneCard("peach")) and #target:getCardIds("h") ~= 0 then
-        if is_general_skill(target, "jy_zhuojing") then
-          table.insert(feasible, "jy_zhuojing-long") -- 只是相对short稍微长一点
+        if is_general_skill(target, "jy_zhuojing") then --
+          table.insert(feasible, "jy_zhuojing-long")    -- 只是相对short稍微长一点
           table.insert(total, "jy_zhuojing-long")
         else
           table.insert(feasible, "jy_zhuojing-short")
