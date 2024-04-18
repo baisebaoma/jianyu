@@ -2486,11 +2486,10 @@ local zhuojing = fk.CreateViewAsSkill {
       local target = room:getPlayerById(result[1])
       room:askForDiscard(target, #use.card.subcards, #use.card.subcards, true, self.name, false, nil,
         "#jy_zhuojing-discard:" .. player.id .. "::" .. #use.card.subcards)
-      -- TODO：合法性检测
       local feasible = { "jy_suzhan", "jy_zhuojing" }
-      if target.hp == target.maxHp then table.removeOne(feasible, "jy_suzhan") end
       if #table.filter(player.room.alive_players, function(p) return #p:getCardIds("h") == 0 end) == 0 then
-        table.removeOne(feasible, "jy_zhuojing")
+        table.removeOne(feasible, "jy_suzhan")
+        if target.hp == target.maxHp then table.removeOne(feasible, "jy_zhuojing") end
       end
       if #feasible > 0 then
         local skill_name = room:askForChoice(target, feasible, self.name,
@@ -2498,7 +2497,7 @@ local zhuojing = fk.CreateViewAsSkill {
         room:askForUseActiveSkill(target, skill_name,
           "#jy_zhuojing-use::" .. target.id .. ":" .. Fk:translate(skill_name))
       else
-        room:doBroadcastNotify("ShowToast", "#jy_zhuojing-fail::" .. target.id, { player, target })
+        room:doBroadcastNotify("ShowToast", Fk:translate("#jy_zhuojing-fail::" .. target.id), { player, target })
       end
     end
   end,
