@@ -2486,16 +2486,15 @@ local zhuojing = fk.CreateViewAsSkill {
       local target = room:getPlayerById(result[1])
       room:askForDiscard(target, #use.card.subcards, #use.card.subcards, true, self.name, false, nil,
         "#jy_zhuojing-discard:" .. player.id .. "::" .. #use.card.subcards)
-      local feasible = { "jy_suzhan", "jy_zhuojing" }
-      if #table.filter(player.room.alive_players, function(p) return #p:getCardIds("h") == 0 end) == 0 then
-        table.removeOne(feasible, "jy_suzhan")
-        if not target:canUse(Fk:cloneCard("peach")) or #target:getCardIds("h") == 0 then
-          table.removeOne(feasible,
-            "jy_zhuojing")
-        end
+      local feasible = {}
+      if #table.filter(player.room.alive_players, function(p) return #p:getCardIds("h") == 0 end) > 0 then
+        table.insert(feasible, "jy_suzhan")
+      end
+      if target:canUse(Fk:cloneCard("peach")) and #target:getCardIds("h") ~= 0 then
+        table.insert(feasible, "jy_zhuojing")
       end
       if #feasible > 0 then
-        local skill_name = room:askForChoice(target, feasible, self.name,
+        local skill_name = room:askForChoice(target, feasible, "#jy_zhuojing-skill",
           "#jy_zhuojing-skill:" .. player.id, true, { "jy_suzhan", "jy_zhuojing" })
         room:askForUseActiveSkill(target, skill_name,
           "#jy_zhuojing-use::" .. target.id .. ":" .. Fk:translate(skill_name))
