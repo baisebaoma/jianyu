@@ -2538,7 +2538,7 @@ Fk:loadTranslationTable {
   ["#jy_zhuojing-prompt"] = [[濯荆：你可以将所有手牌当【桃】使用]],
   ["#jy_zhuojing-choose"] = [[濯荆：你可以令一名角色弃置%arg张牌]],
   ["#jy_zhuojing-discard"] = [[濯荆：弃置%arg张牌]],
-  ["#jy_zhuojing-skill"] = [[发动一个技能]],
+  ["#jy_zhuojing-skill"] = [[濯荆发动]],
   ["#jy_zhuojing-use"] = [[濯荆：%dest 令你发动 %arg，请指定目标]],
   ["#jy_zhuojing-fail"] = [[濯荆：%dest 不满足任何一个技能的发动条件，无法发动〖素绽〗或〖濯荆〗]],
   ["$jy_zhuojing1"] = [[永眠非终焉……]],
