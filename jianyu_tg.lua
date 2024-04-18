@@ -98,17 +98,13 @@ end
 
 -- 一个玩家的武将牌上有没有这个技能？
 local function is_general_skill(player, skill_name)
-  local generals
+  local generals = { player.general, player.deputyGeneral }
+  table.removeOne(generals, "")
   local general_skills = {}
-  if player.deputyGeneral == "" then
-    generals = { player.general }
-  else
-    generals = { player.general, player.deputyGeneral }
-  end
   for _, g in ipairs(generals) do
     general_skills = table.connect(general_skills, Fk.generals[g].skills)
   end
-  if not table.contains(general_skills, Fk.skills[skill_name]) then return end
+  return table.contains(general_skills, Fk.skills[skill_name])
 end
 
 local zaisheng = fk.CreateTriggerSkill {
