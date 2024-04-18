@@ -2487,11 +2487,19 @@ local zhuojing = fk.CreateViewAsSkill {
       room:askForDiscard(target, #use.card.subcards, #use.card.subcards, true, self.name, false, nil,
         "#jy_zhuojing-discard:" .. player.id .. "::" .. #use.card.subcards)
       -- TODO：合法性检测
-      local skill_name = room:askForChoice(target, { "jy_suzhan", "jy_zhuojing" }, self.name,
-        "#jy_zhuojing-skill:" .. player.id) -- TODO：感觉可以用更好的UI
-      room:askForUseActiveSkill(target, skill_name,
-        "#jy_zhuojing-use::" .. target.id .. ":" .. Fk:translate(skill_name))
-      -- 这个函数会直接执行这个技能。问题是如果有的技能是有多个时机的，怎么办？如果有的是被动的，怎么办？所以我建议限定成只能用这两个技能。
+      local feasible = { "jy_suzhan", "jy_zhuojing" }
+      if target.hp == target.maxHp then table.removeOne(feasible, "jy_suzhan") end
+      if #table.filter(player.room.alive_players, function(p) return #p:getCardIds("h") == 0 end) > 0 then
+        table.removeOne(feasible, "jy_zhuojing")
+      end
+      if #feasible > 0 then
+        local skill_name = room:askForChoice(target, feasible, self.name,
+          "#jy_zhuojing-skill:" .. player.id, true, { "jy_suzhan", "jy_zhuojing" })
+        room:askForUseActiveSkill(target, skill_name,
+          "#jy_zhuojing-use::" .. target.id .. ":" .. Fk:translate(skill_name))
+      else
+        room:doBroadcastNotify("ShowToast", "#jy_zhuojing-fail::" .. target.id, { player, target })
+      end
     end
   end,
   enabled_at_play = function(self, player)
@@ -2531,6 +2539,7 @@ Fk:loadTranslationTable {
   ["#jy_zhuojing-discard"] = [[濯荆：弃置%arg张牌]],
   ["#jy_zhuojing-skill"] = [[濯荆：选择发动〖素绽〗或〖濯荆〗]],
   ["#jy_zhuojing-use"] = [[濯荆：%dest 令你发动 %arg，请指定目标]],
+  ["#jy_zhuojing-fail"] = [[濯荆：%dest 不满足任何一个技能的发动条件，无法发动〖素绽〗或〖濯荆〗]],
   ["$jy_zhuojing1"] = [[永眠非终焉……]],
   ["$jy_zhuojing2"] = [[逝者将再临！]],
 }
