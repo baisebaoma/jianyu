@@ -96,6 +96,21 @@ local function findHandCardMinMax(players)
   return min, max -- 返回最小值和最大值
 end
 
+-- 一个玩家的武将牌上有没有这个技能？
+local function is_general_skill(player, skill_name)
+  local generals
+  local general_skills = {}
+  if player.deputyGeneral == "" then
+    generals = { player.general }
+  else
+    generals = { player.general, player.deputyGeneral }
+  end
+  for _, g in ipairs(generals) do
+    general_skills = table.connect(general_skills, Fk.generals[g].skills)
+  end
+  if not table.contains(general_skills, Fk.skills[skill_name]) then return end
+end
+
 local zaisheng = fk.CreateTriggerSkill {
   name = "jy_zaisheng",
   anim_type = "support",
@@ -2462,20 +2477,8 @@ local zhuojing = fk.CreateViewAsSkill {
     return card
   end,
   after_use = function(self, player, use)
-    if use.card.color == Card.NoColor then
+    if use.card.color == Card.NoColor and is_general_skill(player, self.name) then
       local room = player.room
-      -- 所有我武将牌上的技能有哪些
-      local generals
-      local general_skills = {}
-      if player.deputyGeneral == "" then
-        generals = { player.general }
-      else
-        generals = { player.general, player.deputyGeneral }
-      end
-      for _, g in ipairs(generals) do
-        general_skills = table.connect(general_skills, Fk.generals[g].skills)
-      end
-      if not table.contains(general_skills, self) then return end
       -- 选择一名角色
       local result = room:askForChoosePlayers(player,
         table.map(table.filter(room:getOtherPlayers(player), function(p) return #p:getCardIds("he") > 0 end),
@@ -2488,14 +2491,23 @@ local zhuojing = fk.CreateViewAsSkill {
         "#jy_zhuojing-discard:" .. player.id .. "::" .. #use.card.subcards)
       local feasible = {}
       if #table.filter(player.room.alive_players, function(p) return #p:getCardIds("h") == 0 end) > 0 then
-        table.insert(feasible, "jy_suzhan")
+        table.insert(feasible, "jy_suzhan-short")
       end
       if target:canUse(Fk:cloneCard("peach")) and #target:getCardIds("h") ~= 0 then
-        table.insert(feasible, "jy_zhuojing")
+        if is_general_skill(target, "jy_zhuojing") then
+          table.insert(feasible, "jy_zhuojing-long") -- 只是相对short稍微长一点
+        else
+          table.insert(feasible, "jy_zhuojing-short")
+        end
       end
       if #feasible > 0 then
         local skill_name = room:askForChoice(target, feasible, "#jy_zhuojing-skill",
-          "#jy_zhuojing-skill:" .. player.id, true, { "jy_suzhan", "jy_zhuojing" })
+          "#jy_zhuojing-skill:" .. player.id, true, { "jy_suzhan-short", "jy_zhuojing-short" })
+
+        -- 因为上面可能是传的short，在这里把short翻译回来
+        if skill_name == "jy_suzhan-short" then skill_name = "jy_suzhan" end
+        if skill_name == "jy_zhuojing-short" or skill_name == "jy_zhuojing-long" then skill_name = "jy_zhuojing" end
+
         room:askForUseActiveSkill(target, skill_name,
           "#jy_zhuojing-use::" .. target.id .. ":" .. Fk:translate(skill_name))
       else
@@ -2525,6 +2537,8 @@ Fk:loadTranslationTable {
 
   ["jy_suzhan"] = [[素绽]],
   [":jy_suzhan"] = [[出牌阶段限一次，你可以令一名没有手牌的角色从牌堆底摸X张牌（X由你选择且至多为2）。若如此做，本回合其下次失去最后的手牌后，你摸2X张牌。]],
+  ["jy_suzhan-short"] = [[素绽]],
+  [":jy_suzhan-short"] = [[你可以令一名没有手牌的角色从牌堆底摸X张牌（X由你选择且至多为2）。若如此做，本回合其下次失去最后的手牌后，你摸2X张牌。]],
   ["#jy_suzhan-prompt"] = [[素绽：选择一名没有手牌的角色摸一或两张牌]],
   ["@jy_suzhan-round"] = [[<font color="yellow">素绽</font>]],
   ["$jy_suzhan1"] = [[白花盛放。]],
@@ -2535,6 +2549,10 @@ Fk:loadTranslationTable {
 
   ["jy_zhuojing"] = [[濯荆]],
   [":jy_zhuojing"] = [[每回合限一次，你可以将所有手牌当【桃】使用。若此【桃】无颜色且你武将牌上有该技能，你可以令一名其他角色弃置等量牌，然后其可以视为发动〖素绽〗或〖濯荆〗。]],
+  ["jy_zhuojing-long"] = [[濯荆]],
+  [":jy_zhuojing-long"] = [[你可以将所有手牌当【桃】使用。若此【桃】无颜色，你可以令一名其他角色弃置等量牌，然后其可以视为发动〖素绽〗或〖濯荆〗。]],
+  ["jy_zhuojing-short"] = [[濯荆]],
+  [":jy_zhuojing-short"] = [[你可以将所有手牌当【桃】使用。]],
   ["#jy_zhuojing-prompt"] = [[濯荆：你可以将所有手牌当【桃】使用]],
   ["#jy_zhuojing-choose"] = [[濯荆：你可以令一名角色弃置%arg张牌]],
   ["#jy_zhuojing-discard"] = [[濯荆：弃置%arg张牌]],
