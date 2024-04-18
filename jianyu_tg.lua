@@ -2489,7 +2489,10 @@ local zhuojing = fk.CreateViewAsSkill {
       local feasible = { "jy_suzhan", "jy_zhuojing" }
       if #table.filter(player.room.alive_players, function(p) return #p:getCardIds("h") == 0 end) == 0 then
         table.removeOne(feasible, "jy_suzhan")
-        if target.hp == target.maxHp then table.removeOne(feasible, "jy_zhuojing") end
+        if not target:canUse(Fk:cloneCard("peach")) or #target:getCardIds("h") == 0 then
+          table.removeOne(feasible,
+            "jy_zhuojing")
+        end
       end
       if #feasible > 0 then
         local skill_name = room:askForChoice(target, feasible, self.name,
@@ -2532,7 +2535,7 @@ Fk:loadTranslationTable {
   ["$jy_suzhan5"] = [[清算的时刻到了。]],
 
   ["jy_zhuojing"] = [[濯荆]],
-  [":jy_zhuojing"] = [[每回合限一次，你可以将所有手牌当【桃】使用。若此【桃】无颜色且你武将牌上有该技能，你可以令一名其他角色弃置等量的牌，然后其可以视为发动〖素绽〗或〖濯荆〗。]],
+  [":jy_zhuojing"] = [[每回合限一次，你可以将所有手牌当【桃】使用。若此【桃】无颜色且你武将牌上有该技能，你可以令一名其他角色弃置等量牌，然后其可以视为发动〖素绽〗或〖濯荆〗。]],
   ["#jy_zhuojing-prompt"] = [[濯荆：你可以将所有手牌当【桃】使用]],
   ["#jy_zhuojing-choose"] = [[濯荆：你可以令一名角色弃置%arg张牌]],
   ["#jy_zhuojing-discard"] = [[濯荆：弃置%arg张牌]],
