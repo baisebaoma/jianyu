@@ -2486,19 +2486,25 @@ local zhuojing = fk.CreateViewAsSkill {
       room:askForDiscard(target, #use.card.subcards, #use.card.subcards, true, self.name, false, nil,
         "#jy_zhuojing-discard:" .. player.id .. "::" .. #use.card.subcards)
       local feasible = {}
+      local total = {}
       if #table.filter(player.room.alive_players, function(p) return #p:getCardIds("h") == 0 end) > 0 then
         table.insert(feasible, "jy_suzhan-short")
+        table.insert(total, "jy_suzhan-short")
       end
       if target:canUse(Fk:cloneCard("peach")) and #target:getCardIds("h") ~= 0 then
         if is_general_skill(target, "jy_zhuojing") then
           table.insert(feasible, "jy_zhuojing-long") -- 只是相对short稍微长一点
+          table.insert(total, "jy_zhuojing-long")
         else
           table.insert(feasible, "jy_zhuojing-short")
+          table.insert(total, "jy_zhuojing-short")
         end
+      else
+        table.insert(total, "jy_zhuojing-short")
       end
       if #feasible > 0 then
         local skill_name = room:askForChoice(target, feasible, "#jy_zhuojing-skill",
-          "#jy_zhuojing-skill:" .. player.id, true, { "jy_suzhan-short", "jy_zhuojing-short" })
+          "#jy_zhuojing-skill:" .. player.id, true, total)
 
         -- 因为上面可能是传的short，在这里把short翻译回来
         if skill_name == "jy_suzhan-short" then skill_name = "jy_suzhan" end
