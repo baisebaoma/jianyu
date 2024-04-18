@@ -1150,7 +1150,7 @@ Fk:loadTranslationTable {
 
 local tjzs = General(extension, "jy__tjzs", "shu", 3, 3, General.Female)
 tjzs:addSkill("jy_trad_heiyong")
-tjzs:addSkill("jy_trad_silie")
+-- tjzs:addSkill("jy_trad_silie")
 
 Fk:loadTranslationTable {
   ["jy__tjzs"] = [[铁甲战士]],
