@@ -587,7 +587,7 @@ local yiji = fk.CreateTriggerSkill {
       card.skillName = self.name
       room:useCard {
         from = to.id,
-        tos = table.map(dat.targets, function(p) return { p } end),
+        tos = table.map(dat.targets, function(p) return { p } end), -- TODO: 这有啥用？
         card = card,
       }
       room:setPlayerMark(to, "jy_yiji-tmp", 0)
@@ -683,7 +683,7 @@ local taoqiu = fk.CreateTriggerSkill {
       card.skillName = self.name
       local use = {
         from = player.id,
-        tos = table.map(dat.targets, function(p) return { p } end),
+        tos = table.map(dat.targets, function(p) return { p } end), -- TODO: 这有啥用？
         card = card,
         extraData = { bypass_distances = true },
       }
@@ -911,7 +911,7 @@ local xidi = fk.CreateTriggerSkill {
         card.is_jy_xidi = true
         room:useCard {
           from = player.id,
-          tos = table.map(dat.targets, function(p) return { p } end),
+          tos = table.map(dat.targets, function(p) return { p } end), -- TODO: 这有啥用？
           card = card,
         }
       end
@@ -2330,7 +2330,7 @@ local zhanshu = fk.CreateTriggerSkill {
     card.skillName = self.name
     room:useCard({
       from = player.id,
-      tos = table.map(self.cost_data.targets, function(p) return { p } end),
+      tos = table.map(self.cost_data.targets, function(p) return { p } end), -- TODO: 这有啥用？
       card = card,
     })
   end,
@@ -2513,8 +2513,19 @@ local zhuojing = fk.CreateViewAsSkill {
         if skill_name == "jy_suzhan-short" then skill_name = "jy_suzhan" end
         if skill_name == "jy_zhuojing-short" or skill_name == "jy_zhuojing-long" then skill_name = "jy_zhuojing" end
 
-        room:askForUseActiveSkill(target, skill_name,
+        local success, dat = room:askForUseActiveSkill(target, skill_name,
           "#jy_zhuojing-use::" .. target.id .. ":" .. Fk:translate(skill_name))
+        -- TODO:没实际测过能不能用！
+        if skill_name == "jy_zhuojing" and success and dat.cards then
+          local card = Fk:cloneCard("peach")
+          card:addSubcards(dat.cards)
+          card.skillName = self.name
+          room:useCard {
+            from = player.id,
+            tos = dat.targets,
+            card = card,
+          }
+        end
       else
         room:doBroadcastNotify("ShowToast", Fk:translate("#jy_zhuojing-fail::" .. target.id), { player, target })
       end
