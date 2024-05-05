@@ -2517,7 +2517,8 @@ local zhuojing = fk.CreateViewAsSkill {
           "#jy_zhuojing-use::" .. target.id .. ":" .. Fk:translate(skill_name))
         if skill_name == "jy_zhuojing" and success and dat.cards then
           local card = Fk:cloneCard("peach")
-          card:addSubcards(dat.cards)
+          -- card:addSubcards(dat.cards)
+          card:addSubcards(target:getCardIds("h")) -- 因为zhuojing没有选手牌这个动作，手牌数据不会传过来，所以在这里手动处理
           card.skillName = self.name
           room:useCard {
             from = target.id,
