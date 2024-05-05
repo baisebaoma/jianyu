@@ -2656,14 +2656,14 @@ xusheng:addSkill(jiedao)
 
 Fk:loadTranslationTable {
   ["jy__xusheng"] = [[简徐盛]],
-  ["#jy__xusheng"] = "专打999护甲怪",
+  ["#jy__xusheng"] = "专打护甲怪",
   ["designer:jy__xusheng"] = "考公专家",
   ["~jy__xusheng"] = "盛只恨，不能再为主公，破敌致胜了。",
 
-  ["$jy__pojun1"] = "犯大吴疆土者，盛必击而破之！",
-  ["$jy__pojun2"] = "若敢来犯，必叫你大败而归！",
+  ["$jy_pojun1"] = "犯大吴疆土者，盛必击而破之！",
+  ["$jy_pojun2"] = "若敢来犯，必叫你大败而归！",
 
-  ["#jy_pojun-invoke"] = "是否对%dest发动 破军",
+  ["#jy_pojun-invoke"] = "是否对%dest发动 破甲",
   ["jy_pojun"] = [[破甲]],
   [":jy_pojun"] = [[当你使用【杀】指定一个目标后，你可以移除目标所有护甲并将其区域内至多X张牌扣置于该角色的武将牌旁（X为其体力值与以此法移除的护甲值之和）；若如此做，当前回合结束时，该角色获得这些牌。]],
 
