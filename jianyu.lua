@@ -2702,6 +2702,7 @@ local jiedao_weapon = fk.CreateTriggerSkill {
     local dummy = Fk:cloneCard("dilu")
     dummy:addSubcards(ids)
     room:obtainCard(player, dummy, true, fk.ReasonPrey)
+    room:askForUseCard(player, "slash", nil, "#jy_jiedao_slash", true)
   end,
 }
 jiedao:addRelatedSkill(jiedao_weapon)
@@ -2725,9 +2726,10 @@ Fk:loadTranslationTable {
   [":jy_pojun"] = [[当你使用【杀】指定一个目标后，你可以移除目标所有护甲并将其区域内至多X张牌扣置于该角色的武将牌旁（X为其体力值与以此法移除的护甲值之和）；若如此做，当前回合结束时，该角色获得这些牌。一名角色死亡时，若其武将牌旁有以此法扣置的牌，你获得这些牌。]],
 
   ["jy_jiedao"] = [[劫军]],
-  ["#jy_jiedao"] = "劫军：将一张武器牌当【酒】使用或打出",
+  ["#jy_jiedao"] = "劫军：将一张武器牌当【杀】或【酒】使用或打出",
   ["#jy_jiedao_weapon"] = [[劫军]],
-  [":jy_jiedao"] = [[当有武器牌移至其他角色的装备区时，你可以失去一点体力并获得之。你可以将一张武器牌当【杀】或【酒】使用或打出。]],
+  ["#jy_jiedao_slash"] = [[劫军：你可以使用一张【杀】]],
+  [":jy_jiedao"] = [[当有武器牌移至其他角色的装备区时，你可以失去一点体力并获得之，然后可以使用一张【杀】。你可以将一张武器牌当【杀】或【酒】使用或打出。]],
   ["$jy_jiedao1"] = [[战将临阵，斩关刈城！]],
 }
 
