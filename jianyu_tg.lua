@@ -2174,7 +2174,7 @@ local jimin = fk.CreateTriggerSkill {
   end,
 }
 
-local luotong = General(extension, "jy__luotong", "wu", 3)
+local luotong = General(extension, "jy__luotong", "wu", 4)
 luotong:addSkill(jianyan)
 luotong:addSkill(jimin)
 

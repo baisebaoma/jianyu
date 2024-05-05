@@ -2593,9 +2593,13 @@ local pojun = fk.CreateTriggerSkill {
     room:doIndicate(player.id, { data.to })
     local to = room:getPlayerById(data.to)
     local sheild = to.shield
-    room:changeShield(to, -to.shield)
-    local cards = room:askForCardsChosen(player, to, 1, to.hp, "hej", self.name)
+    local to_pojun = to.hp
+    if sheild == 0 then
+      to_pojun = to.maxHp
+    end
+    local cards = room:askForCardsChosen(player, to, 1, to_pojun, "hej", self.name)
     to:addToPile(self.name, cards, false, self.name)
+    room:changeShield(to, -sheild)
   end,
 }
 local pojun_delay = fk.CreateTriggerSkill {
@@ -2703,17 +2707,7 @@ local jiedao_weapon = fk.CreateTriggerSkill {
     if use then room:useCard(use) end
   end,
 }
-local jiedao_mod = fk.CreateTargetModSkill {
-  name = "#jy_jiedao_mod",
-  bypass_times = function(self, player, skill, scope, card, to)
-    return player:hasSkill("jy_jiedao") and card.name == "analeptic" and to
-  end,
-  bypass_distances = function(self, player, skill, scope, card, to)
-    return player:hasSkill("jy_jiedao") and (card.trueName == "slash" or skill.trueName == "slash_skill") and to
-  end
-}
 jiedao:addRelatedSkill(jiedao_weapon)
-jiedao:addRelatedSkill(jiedao_mod)
 
 local xusheng = General(extension, "jy__xusheng", "wu", 4)
 xusheng:addSkill(pojun)
@@ -2731,13 +2725,13 @@ Fk:loadTranslationTable {
   ["#jy_pojun-invoke"] = "破军：你可以移除 %dest 所有护甲并暂时移除其区域内一部分牌",
   ["jy_pojun"] = [[破军]],
   ["#jy_pojun_delay"] = [[破军]],
-  [":jy_pojun"] = [[当你使用【杀】指定一个目标后，你可以移除其所有护甲并将其区域内至多X张牌扣置于该角色的武将牌旁（X为其体力值）；若如此做，当前回合结束时，其获得这些牌。一名角色进入濒死状态时，若其武将牌旁有以此法扣置的牌，你获得这些牌。]],
+  [":jy_pojun"] = [[当你使用【杀】指定一个目标后，你可以移除其所有护甲并将其区域内至多X张牌扣置于该角色的武将牌旁（X为其体力值，若其没有护甲则改为其体力上限）；若如此做，当前回合结束时，其获得这些牌。一名角色进入濒死状态时，若其武将牌旁有以此法扣置的牌，你获得这些牌。]],
 
   ["jy_jiedao"] = [[借刀]],
-  ["#jy_jiedao"] = "借刀：将一张武器牌当【杀】或【酒】使用或打出",
+  ["#jy_jiedao"] = "借刀：将一张装备牌当【杀】或【酒】使用或打出",
   ["#jy_jiedao_weapon"] = [[借刀]],
   ["#jy_jiedao_slash"] = [[借刀：你可以使用一张【杀】]],
-  [":jy_jiedao"] = [[你使用【杀】无距离限制、使用【酒】无次数限制；你可以将一张装备牌当【杀】或【酒】使用或打出；当武器牌移至其他角色的装备区时，你可以失去一点体力并获得之，若如此做，你可以使用一张【杀】。]],
+  [":jy_jiedao"] = [[你可以将一张装备牌当【杀】或【酒】使用或打出。当武器牌移至其他角色的装备区时，你可以失去一点体力并获得之，若如此做，你可以使用一张【杀】。]],
   ["$jy_jiedao1"] = [[战将临阵，斩关刈城！]],
 }
 
