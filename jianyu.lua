@@ -1208,10 +1208,10 @@ local jy_jiangbei = fk.CreateTriggerSkill {
 local jy_jiangbei_club = fk.CreateTargetModSkill {
   name = "#jy_jiangbei_club",
   bypass_times = function(self, player, skill, scope, card, to)
-    return player:hasSkill(self) and card.suit == Card.Club and to
+    return player:hasSkill("jy_jiangbei") and card.suit == Card.Club and to
   end,
   bypass_distances = function(self, player, skill, card, to)
-    return player:hasSkill(self) and card.suit == Card.Club and to
+    return player:hasSkill("jy_jiangbei") and card.suit == Card.Club and to
   end,
 }
 -- ♣无视防具
@@ -2706,10 +2706,10 @@ local jiedao_weapon = fk.CreateTriggerSkill {
 local jiedao_mod = fk.CreateTargetModSkill {
   name = "#jy_jiedao_mod",
   bypass_times = function(self, player, skill, scope, card, to)
-    return player:hasSkill(self) and card.trueName == "analeptic" and to
+    return player:hasSkill("jy_jiedao") and card.name == "analeptic" and to
   end,
   bypass_distances = function(self, player, skill, scope, card, to)
-    return player:hasSkill(self) and card.trueName == "slash" and to
+    return player:hasSkill("jy_jiedao") and (card.trueName == "slash" or skill.trueName == "slash_skill") and to
   end
 }
 jiedao:addRelatedSkill(jiedao_weapon)
