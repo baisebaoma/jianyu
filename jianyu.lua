@@ -2674,7 +2674,7 @@ xusheng:addSkill(pojun)
 xusheng:addSkill(jiedao)
 
 Fk:loadTranslationTable {
-  ["jy__xusheng"] = [[简徐盛]],
+  ["jy__xusheng"] = [[劫徐盛]],
   ["#jy__xusheng"] = "专打护甲怪",
   ["designer:jy__xusheng"] = "考公专家",
   ["~jy__xusheng"] = "盛只恨，不能再为主公，破敌致胜了。",
@@ -2687,10 +2687,10 @@ Fk:loadTranslationTable {
   ["#jy_pojun_delay"] = [[破甲]],
   [":jy_pojun"] = [[当你使用【杀】指定一个目标后，你可以<font color="red">移除目标所有护甲</font>并将其区域内至多X张牌扣置于该角色的武将牌旁（X为其体力值与以此法移除的护甲值之和）；若如此做，当前回合结束时，该角色获得这些牌。]],
 
-  ["jy_jiedao"] = [[借刀]],
-  ["#jy_jiedao_weapon"] = [[借刀]],
+  ["jy_jiedao"] = [[劫军]],
+  ["#jy_jiedao_weapon"] = [[劫军]],
   [":jy_jiedao"] = [[当有武器牌移至其他角色的装备区时，你可以失去一点体力并获得之。你可以将一张武器牌当【酒】使用或打出。]],
-  ["$jy_jiedao1"] = [[战将临阵，斩关易城！]],
+  ["$jy_jiedao1"] = [[战将临阵，斩关刈城！]],
 }
 
 return extension
