@@ -2515,13 +2515,12 @@ local zhuojing = fk.CreateViewAsSkill {
 
         local success, dat = room:askForUseActiveSkill(target, skill_name,
           "#jy_zhuojing-use::" .. target.id .. ":" .. Fk:translate(skill_name))
-        -- TODO:没实际测过能不能用！
         if skill_name == "jy_zhuojing" and success and dat.cards then
           local card = Fk:cloneCard("peach")
           card:addSubcards(dat.cards)
           card.skillName = self.name
           room:useCard {
-            from = player.id,
+            from = target.id,
             tos = dat.targets,
             card = card,
           }
