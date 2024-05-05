@@ -2703,7 +2703,8 @@ local jiedao_weapon = fk.CreateTriggerSkill {
     local dummy = Fk:cloneCard("dilu")
     dummy:addSubcards(ids)
     room:obtainCard(player, dummy, true, fk.ReasonPrey)
-    room:askForUseCard(player, "slash", nil, "#jy_jiedao_slash", true)
+    local use = room:askForUseCard(player, "slash", nil, "#jy_jiedao_slash", true)
+    if use then room:useCard(use) end
   end,
 }
 jiedao:addRelatedSkill(jiedao_weapon)
