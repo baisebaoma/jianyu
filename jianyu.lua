@@ -2575,4 +2575,100 @@ local gambler = General(extension, "jy__gambler", "qun", 8)
 gambler:addSkill(guiyi)
 gambler:addSkill("benghuai")
 
+local pojun = fk.CreateTriggerSkill {
+  name = "jy_pojun",
+  anim_type = "offensive",
+  events = { fk.TargetSpecified },
+  can_trigger = function(self, event, target, player, data)
+    if target == player and player:hasSkill(self) and data.card and data.card.trueName == "slash" then
+      local to = player.room:getPlayerById(data.to)
+      return not to.dead and to.hp > 0 and not to:isNude()
+    end
+  end,
+  on_cost = function(self, event, target, player, data)
+    return player.room:askForSkillInvoke(player, self.name, nil, "#jy_pojun-invoke::" .. data.to)
+  end,
+  on_use = function(self, event, target, player, data)
+    local room = player.room
+    room:doIndicate(player.id, { data.to })
+    local to = room:getPlayerById(data.to)
+    local sheild = to.shield
+    room:changeShield(to, -to.shield)
+    local cards = room:askForCardsChosen(player, to, 1, to.hp + sheild, "hej", self.name)
+    to:addToPile(self.name, cards, false, self.name)
+  end,
+}
+local pojun_delay = fk.CreateTriggerSkill {
+  name = "#jy_pojun_delay",
+  mute = true,
+  events = { fk.TurnEnd },
+  can_trigger = function(self, event, target, player, data)
+    return #player:getPile("jy_pojun") > 0
+  end,
+  on_cost = Util.TrueFunc,
+  on_use = function(self, event, target, player, data)
+    player.room:moveCardTo(player:getPile("jy_pojun"), Player.Hand, player, fk.ReasonPrey, "jy_pojun")
+  end,
+}
+pojun:addRelatedSkill(pojun_delay)
+
+local jiedao = fk.CreateTriggerSkill {
+  name = "jy_jiedao",
+  anim_type = 'drawcard',
+  events = { fk.AfterCardsMove },
+  can_trigger = function(self, event, target, player, data)
+    if not player:hasSkill(self) then return false end
+    if player:usedSkillTimes(self.name, Player.HistoryGame) ~= 0 then return false end
+    for _, move in ipairs(data) do
+      if move.to ~= player.id and (move.toArea == Card.PlayerEquip or move.toArea == Card.DiscardPile) then
+        for _, info in ipairs(move.moveInfo) do
+          local c = Fk:getCardById(info.cardId)
+          if c.type == Card.TypeEquip and c.sub_type == Card.SubtypeWeapon then
+            return true
+          end
+        end
+      end
+    end
+  end,
+  on_use = function(self, event, target, player, data)
+    local room = player.room
+    room:changeMaxHp(player, -1)
+    local ids = {}
+    for _, move in ipairs(data) do
+      if move.to ~= player.id and (move.toArea == Card.PlayerEquip or move.toArea == Card.DiscardPile) then
+        for _, info in ipairs(move.moveInfo) do
+          local c = Fk:getCardById(info.cardId)
+          if c.type == Card.TypeEquip and c.sub_type == Card.SubtypeWeapon then
+            table.insert(ids, info.cardId)
+          end
+        end
+      end
+    end
+    local dummy = Fk:cloneCard("dilu")
+    dummy:addSubcards(ids)
+    room:obtainCard(player, dummy, true, fk.ReasonPrey)
+  end,
+}
+
+local xusheng = General(extension, "jy__xusheng", "wu", 4)
+xusheng:addSkill(pojun)
+xusheng:addSkill(jiedao)
+
+Fk:loadTranslationTable {
+  ["jy__xusheng"] = [[简徐盛]],
+  ["#jy__xusheng"] = "专打999护甲怪",
+  ["designer:jy__xusheng"] = "考公专家",
+  ["~jy__xusheng"] = "盛只恨，不能再为主公，破敌致胜了。",
+
+  ["$jy__pojun1"] = "犯大吴疆土者，盛必击而破之！",
+  ["$jy__pojun2"] = "若敢来犯，必叫你大败而归！",
+
+  ["#jy_pojun-invoke"] = "是否对%dest发动 破军",
+  ["jy_pojun"] = [[破甲]],
+  [":jy_pojun"] = [[当你使用【杀】指定一个目标后，你可以移除目标所有护甲并将其区域内至多X张牌扣置于该角色的武将牌旁（X为其体力值与以此法移除的护甲值之和）；若如此做，当前回合结束时，该角色获得这些牌。]],
+
+  ["jy_jiedao"] = [[借刀]],
+  [":jy_jiedao"] = [[当有武器牌移至弃牌堆或其他角色的装备区时，你可以减一点体力上限并获得其中所有武器牌。]],
+}
+
 return extension
