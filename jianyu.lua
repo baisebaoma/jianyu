@@ -2625,21 +2625,18 @@ local jiedao = fk.CreateViewAsSkill {
   mute = true,
   anim_type = "offensive",
   pattern = "slash,analeptic",
-
   enabled_at_play = function(self, player, response)
     return #table.filter(player:getCardIds("he"), function(c)
       local card = Fk:getCardById(c)
       return card.type == Card.TypeEquip and card.sub_type == Card.SubtypeWeapon
     end) ~= 0
   end,
-
   enabled_at_response = function(self, player, response)
     return #table.filter(player:getCardIds("he"), function(c)
       local card = Fk:getCardById(c)
       return card.type == Card.TypeEquip and card.sub_type == Card.SubtypeWeapon
     end) ~= 0
   end,
-
   interaction = function()
     local names = {}
     for _, name in ipairs({ "slash", "analeptic" }) do
@@ -2651,13 +2648,11 @@ local jiedao = fk.CreateViewAsSkill {
     end
     return UI.ComboBox { choices = names }
   end,
-
   card_filter = function(self, to_select, selected)
     if #selected == 1 then return false end
     local card = Fk:getCardById(to_select)
     return card.type == Card.TypeEquip and card.sub_type == Card.SubtypeWeapon
   end,
-
   view_as = function(self, cards)
     if not self.interaction.data then return nil end
     if #cards ~= 1 then
@@ -2708,8 +2703,8 @@ local jiedao_weapon = fk.CreateTriggerSkill {
     if use then room:useCard(use) end
   end,
 }
-local pojun_mod = fk.CreateTargetModSkill {
-  name = "#jy_pojun_mod",
+local jiedao_mod = fk.CreateTargetModSkill {
+  name = "#jy_jiedao_mod",
   bypass_times = function(self, player, skill, scope, card, to)
     return player:hasSkill(self) and card.trueName == "analeptic" and to
   end,
@@ -2718,6 +2713,7 @@ local pojun_mod = fk.CreateTargetModSkill {
   end
 }
 jiedao:addRelatedSkill(jiedao_weapon)
+jiedao:addRelatedSkill(jiedao_mod)
 
 local xusheng = General(extension, "jy__xusheng", "wu", 4)
 xusheng:addSkill(pojun)
