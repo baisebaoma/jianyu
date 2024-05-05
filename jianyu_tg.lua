@@ -2539,7 +2539,7 @@ local zhuojing = fk.CreateViewAsSkill {
   end
 }
 
-local luocha = General(extension, "jy__luocha", "qun", 2, 3)
+local luocha = General(extension, "jy__luocha", "qun", 3, 4)
 luocha:addSkill(suzhan)
 luocha:addSkill(zhuojing)
 
