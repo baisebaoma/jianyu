@@ -2638,7 +2638,7 @@ local jiedao_weapon = fk.CreateTriggerSkill {
   can_trigger = function(self, event, target, player, data)
     if not player:hasSkill(self) then return false end
     for _, move in ipairs(data) do
-      if move.to ~= player.id and (move.toArea == Card.PlayerEquip or move.toArea == Card.DiscardPile) then
+      if move.to ~= player.id and move.toArea == Card.PlayerEquip then
         for _, info in ipairs(move.moveInfo) do
           local c = Fk:getCardById(info.cardId)
           if c.type == Card.TypeEquip and c.sub_type == Card.SubtypeWeapon then
@@ -2689,8 +2689,8 @@ Fk:loadTranslationTable {
 
   ["jy_jiedao"] = [[借刀]],
   ["#jy_jiedao_weapon"] = [[借刀]],
-  [":jy_jiedao"] = [[当有武器牌移至弃牌堆或其他角色的装备区时，你可以失去一点体力并获得其中所有武器牌。你可以将一张武器牌当【酒】使用或打出。]],
-  ["$jy_jiedao"] = [[战将临阵，斩关易城！]],
+  [":jy_jiedao"] = [[当有武器牌移至其他角色的装备区时，你可以失去一点体力并获得之。你可以将一张武器牌当【酒】使用或打出。]],
+  ["$jy_jiedao1"] = [[战将临阵，斩关易城！]],
 }
 
 return extension
