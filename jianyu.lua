@@ -2612,13 +2612,31 @@ local pojun_delay = fk.CreateTriggerSkill {
 }
 pojun:addRelatedSkill(pojun_delay)
 
-local jiedao = fk.CreateTriggerSkill {
+local jiedao = fk.CreateViewAsSkill {
   name = "jy_jiedao",
+  anim_type = "offensive",
+  pattern = "slash",
+  card_filter = function(self, to_select, selected)
+    if #selected == 1 then return false end
+    local card = Fk:getCardById(to_select)
+    return card.type == Card.TypeEquip and card.sub_type == Card.SubtypeWeapon
+  end,
+  view_as = function(self, cards)
+    if #cards ~= 1 then
+      return nil
+    end
+    local c = Fk:cloneCard("analeptic")
+    c.skillName = self.name
+    c:addSubcard(cards[1])
+    return c
+  end,
+}
+local jiedao_weapon = fk.CreateTriggerSkill {
+  name = "#jy_jiedao_weapon",
   anim_type = 'drawcard',
   events = { fk.AfterCardsMove },
   can_trigger = function(self, event, target, player, data)
     if not player:hasSkill(self) then return false end
-    if player:usedSkillTimes(self.name, Player.HistoryGame) ~= 0 then return false end
     for _, move in ipairs(data) do
       if move.to ~= player.id and (move.toArea == Card.PlayerEquip or move.toArea == Card.DiscardPile) then
         for _, info in ipairs(move.moveInfo) do
@@ -2632,7 +2650,7 @@ local jiedao = fk.CreateTriggerSkill {
   end,
   on_use = function(self, event, target, player, data)
     local room = player.room
-    room:changeMaxHp(player, -1)
+    room:loseHp(player, 1)
     local ids = {}
     for _, move in ipairs(data) do
       if move.to ~= player.id and (move.toArea == Card.PlayerEquip or move.toArea == Card.DiscardPile) then
@@ -2649,6 +2667,7 @@ local jiedao = fk.CreateTriggerSkill {
     room:obtainCard(player, dummy, true, fk.ReasonPrey)
   end,
 }
+jiedao:addRelatedSkill(jiedao_weapon)
 
 local xusheng = General(extension, "jy__xusheng", "wu", 4)
 xusheng:addSkill(pojun)
@@ -2669,7 +2688,9 @@ Fk:loadTranslationTable {
   [":jy_pojun"] = [[当你使用【杀】指定一个目标后，你可以<font color="red">移除目标所有护甲</font>并将其区域内至多X张牌扣置于该角色的武将牌旁（X为其体力值与以此法移除的护甲值之和）；若如此做，当前回合结束时，该角色获得这些牌。]],
 
   ["jy_jiedao"] = [[借刀]],
-  [":jy_jiedao"] = [[当有武器牌移至弃牌堆或其他角色的装备区时，你可以减一点体力上限并获得其中所有武器牌。]],
+  ["#jy_jiedao_weapon"] = [[借刀]],
+  [":jy_jiedao"] = [[当有武器牌移至弃牌堆或其他角色的装备区时，你可以失去一点体力并获得其中所有武器牌。你可以将一张武器牌当【酒】使用或打出。]],
+  ["$jy_jiedao"] = [[战将临阵，斩关易城！]],
 }
 
 return extension
