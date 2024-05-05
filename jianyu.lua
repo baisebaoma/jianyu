@@ -2628,13 +2628,13 @@ local jiedao = fk.CreateViewAsSkill {
   enabled_at_play = function(self, player, response)
     return #table.filter(player:getCardIds("he"), function(c)
       local card = Fk:getCardById(c)
-      return card.type == Card.TypeEquip and card.sub_type == Card.SubtypeWeapon
+      return card.type == Card.TypeEquip
     end) ~= 0
   end,
   enabled_at_response = function(self, player, response)
     return #table.filter(player:getCardIds("he"), function(c)
       local card = Fk:getCardById(c)
-      return card.type == Card.TypeEquip and card.sub_type == Card.SubtypeWeapon
+      return card.type == Card.TypeEquip
     end) ~= 0
   end,
   interaction = function()
@@ -2651,7 +2651,7 @@ local jiedao = fk.CreateViewAsSkill {
   card_filter = function(self, to_select, selected)
     if #selected == 1 then return false end
     local card = Fk:getCardById(to_select)
-    return card.type == Card.TypeEquip and card.sub_type == Card.SubtypeWeapon
+    return card.type == Card.TypeEquip
   end,
   view_as = function(self, cards)
     if not self.interaction.data then return nil end
@@ -2731,13 +2731,13 @@ Fk:loadTranslationTable {
   ["#jy_pojun-invoke"] = "破军：你可以移除 %dest 所有护甲并暂时移除其区域内一部分牌",
   ["jy_pojun"] = [[破军]],
   ["#jy_pojun_delay"] = [[破军]],
-  [":jy_pojun"] = [[当你使用【杀】指定一个目标后，你可以移除目标所有护甲并将其区域内至多X张牌扣置于该角色的武将牌旁（X为其体力值）；若如此做，当前回合结束时，该角色获得这些牌。一名角色进入濒死状态时，若其武将牌旁有以此法扣置的牌，你获得这些牌。]],
+  [":jy_pojun"] = [[当你使用【杀】指定一个目标后，你可以移除其所有护甲并将其区域内至多X张牌扣置于该角色的武将牌旁（X为其体力值）；若如此做，当前回合结束时，其获得这些牌。一名角色进入濒死状态时，若其武将牌旁有以此法扣置的牌，你获得这些牌。]],
 
   ["jy_jiedao"] = [[借刀]],
   ["#jy_jiedao"] = "借刀：将一张武器牌当【杀】或【酒】使用或打出",
   ["#jy_jiedao_weapon"] = [[借刀]],
   ["#jy_jiedao_slash"] = [[借刀：你可以使用一张【杀】]],
-  [":jy_jiedao"] = [[你使用【杀】无距离限制，你使用【酒】无次数限制；你可以将一张武器牌当【杀】或【酒】使用或打出；当武器牌移至其他角色的装备区时，你可以失去一点体力并获得之，若如此做，你可以使用一张【杀】。]],
+  [":jy_jiedao"] = [[你使用【杀】无距离限制、使用【酒】无次数限制；你可以将一张装备牌当【杀】或【酒】使用或打出；当武器牌移至其他角色的装备区时，你可以失去一点体力并获得之，若如此做，你可以使用一张【杀】。]],
   ["$jy_jiedao1"] = [[战将临阵，斩关刈城！]],
 }
 
