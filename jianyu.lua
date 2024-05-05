@@ -2689,6 +2689,7 @@ local jiedao_weapon = fk.CreateTriggerSkill {
   on_use = function(self, event, target, player, data)
     local room = player.room
     room:loseHp(player, 1)
+    if not player:isAlive() then return end
     local ids = {}
     for _, move in ipairs(data) do
       if move.to ~= player.id and (move.toArea == Card.PlayerEquip or move.toArea == Card.DiscardPile) then
@@ -2706,6 +2707,15 @@ local jiedao_weapon = fk.CreateTriggerSkill {
     local use = room:askForUseCard(player, "slash", nil, "#jy_jiedao_slash", true)
     if use then room:useCard(use) end
   end,
+}
+local pojun_mod = fk.CreateTargetModSkill {
+  name = "#jy_pojun_mod",
+  bypass_times = function(self, player, skill, scope, card, to)
+    return player:hasSkill(self) and card.trueName == "analeptic" and to
+  end,
+  bypass_distances = function(self, player, skill, scope, card, to)
+    return player:hasSkill(self) and card.trueName == "slash" and to
+  end
 }
 jiedao:addRelatedSkill(jiedao_weapon)
 
@@ -2731,7 +2741,7 @@ Fk:loadTranslationTable {
   ["#jy_jiedao"] = "借刀：将一张武器牌当【杀】或【酒】使用或打出",
   ["#jy_jiedao_weapon"] = [[借刀]],
   ["#jy_jiedao_slash"] = [[借刀：你可以使用一张【杀】]],
-  [":jy_jiedao"] = [[你可以将一张武器牌当【杀】或【酒】使用或打出。当武器牌移至其他角色的装备区时，你可以失去一点体力并获得之，然后可以使用一张【杀】。]],
+  [":jy_jiedao"] = [[你使用【杀】无距离限制，你使用【酒】无次数限制；你可以将一张武器牌当【杀】或【酒】使用或打出；当武器牌移至其他角色的装备区时，你可以失去一点体力并获得之，若如此做，你可以使用一张【杀】。]],
   ["$jy_jiedao1"] = [[战将临阵，斩关刈城！]],
 }
 
