@@ -2594,14 +2594,14 @@ local pojun = fk.CreateTriggerSkill {
     local to = room:getPlayerById(data.to)
     local sheild = to.shield
     room:changeShield(to, -to.shield)
-    local cards = room:askForCardsChosen(player, to, 1, to.hp + sheild, "hej", self.name)
+    local cards = room:askForCardsChosen(player, to, 1, to.hp, "hej", self.name)
     to:addToPile(self.name, cards, false, self.name)
   end,
 }
 local pojun_delay = fk.CreateTriggerSkill {
   name = "#jy_pojun_delay",
   mute = true,
-  events = { fk.TurnEnd, fk.Death },
+  events = { fk.TurnEnd, fk.EnterDying },
   can_trigger = function(self, event, target, player, data)
     if event == fk.TurnEnd then
       return #player:getPile("jy_pojun") > 0
@@ -2623,6 +2623,7 @@ pojun:addRelatedSkill(pojun_delay)
 local jiedao = fk.CreateViewAsSkill {
   name = "jy_jiedao",
   mute = true,
+  anim_type = "offensive",
   pattern = "slash,analeptic",
 
   enabled_at_play = function(self, player, response)
@@ -2670,7 +2671,7 @@ local jiedao = fk.CreateViewAsSkill {
 }
 local jiedao_weapon = fk.CreateTriggerSkill {
   name = "#jy_jiedao_weapon",
-  anim_type = 'drawcard',
+  anim_type = 'control',
   events = { fk.AfterCardsMove },
   can_trigger = function(self, event, target, player, data)
     if not player:hasSkill(self) then return false end
@@ -2713,23 +2714,23 @@ xusheng:addSkill(jiedao)
 
 Fk:loadTranslationTable {
   ["jy__xusheng"] = [[劫徐盛]],
-  ["#jy__xusheng"] = "专打护甲怪",
+  ["#jy__xusheng"] = "诸武精通",
   ["designer:jy__xusheng"] = "考公专家",
-  ["~jy__xusheng"] = "盛只恨，不能再为主公，破敌致胜了。",
+  ["~jy__xusheng"] = "盛只恨，不能再为主公，破敌致胜了！",
 
   ["$jy_pojun1"] = "犯大吴疆土者，盛必击而破之！",
   ["$jy_pojun2"] = "若敢来犯，必教你大败而归！",
 
-  ["#jy_pojun-invoke"] = "破甲：是否移除 %dest 的所有护甲并扣置其区域内一部分牌",
-  ["jy_pojun"] = [[破甲]],
-  ["#jy_pojun_delay"] = [[破甲]],
-  [":jy_pojun"] = [[当你使用【杀】指定一个目标后，你可以移除目标所有护甲并将其区域内至多X张牌扣置于该角色的武将牌旁（X为其体力值与以此法移除的护甲值之和）；若如此做，当前回合结束时，该角色获得这些牌。一名角色死亡时，若其武将牌旁有以此法扣置的牌，你获得这些牌。]],
+  ["#jy_pojun-invoke"] = "破军：你可以移除 %dest 所有护甲并暂时移除其区域内一部分牌",
+  ["jy_pojun"] = [[破军]],
+  ["#jy_pojun_delay"] = [[破军]],
+  [":jy_pojun"] = [[当你使用【杀】指定一个目标后，你可以移除目标所有护甲并将其区域内至多X张牌扣置于该角色的武将牌旁（X为其体力值）；若如此做，当前回合结束时，该角色获得这些牌。一名角色进入濒死状态时，若其武将牌旁有以此法扣置的牌，你获得这些牌。]],
 
-  ["jy_jiedao"] = [[劫军]],
-  ["#jy_jiedao"] = "劫军：将一张武器牌当【杀】或【酒】使用或打出",
-  ["#jy_jiedao_weapon"] = [[劫军]],
-  ["#jy_jiedao_slash"] = [[劫军：你可以使用一张【杀】]],
-  [":jy_jiedao"] = [[当有武器牌移至其他角色的装备区时，你可以失去一点体力并获得之，然后可以使用一张【杀】。你可以将一张武器牌当【杀】或【酒】使用或打出。]],
+  ["jy_jiedao"] = [[借刀]],
+  ["#jy_jiedao"] = "借刀：将一张武器牌当【杀】或【酒】使用或打出",
+  ["#jy_jiedao_weapon"] = [[借刀]],
+  ["#jy_jiedao_slash"] = [[借刀：你可以使用一张【杀】]],
+  [":jy_jiedao"] = [[你可以将一张武器牌当【杀】或【酒】使用或打出。当武器牌移至其他角色的装备区时，你可以失去一点体力并获得之，然后可以使用一张【杀】。]],
   ["$jy_jiedao1"] = [[战将临阵，斩关刈城！]],
 }
 
