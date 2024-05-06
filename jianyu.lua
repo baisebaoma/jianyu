@@ -2622,7 +2622,6 @@ pojun:addRelatedSkill(pojun_delay)
 
 local jiedao = fk.CreateViewAsSkill {
   name = "jy_jiedao",
-  mute = true,
   anim_type = "offensive",
   pattern = "slash,analeptic",
   enabled_at_play = function(self, player, response)

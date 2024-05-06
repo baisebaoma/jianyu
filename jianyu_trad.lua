@@ -308,7 +308,6 @@ local trad__guanzhe = General(extension, "jy__trad__guanzhe", "jin", 3, 3, Gener
 trad__guanzhe.hidden = true
 trad__guanzhe:addSkill(trad_xiuxing)
 trad__guanzhe:addSkill(trad_zitai)
--- trad__guanzhe:addSkill(mumang)
 trad__guanzhe:addSkill("jy_zhaoyong")
 trad__guanzhe:addSkill("jy_yujian")
 
