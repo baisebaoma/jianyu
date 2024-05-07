@@ -512,7 +512,7 @@ Fk:loadTranslationTable {
   ["illustrator:jy__gaotianliang"] = "高天亮",
 
   ["jy_yuyu"] = "玉玉",
-  [":jy_yuyu"] = [[当你因【杀】受到伤害时，伤害来源获得“玉玉”。受到没有“玉玉”的角色或因本次伤害而获得“玉玉”的角色造成的伤害时，你可以选择一项：摸三张牌；摸两张牌并翻面，然后对自己造成一点伤害。你对有“玉玉”的角色造成的非传导伤害+1。]],
+  [":jy_yuyu"] = [[当你因【杀】受到伤害时，伤害来源获得“玉玉”标记。受到没有“玉玉”的角色或因本次伤害而获得“玉玉”的角色造成的伤害时，你可以选择一项：摸三张牌；摸两张牌并翻面，然后对自己造成一点伤害。你对有“玉玉”的角色造成的非传导伤害+1。]],
   ["@jy_yuyu_enemy"] = "玉玉",
   ["#jy_yuyu_ask_which"] = "玉玉：请选择",
   ["#jy_yuyu_draw3"] = "摸三张牌",
@@ -931,21 +931,19 @@ local jy_sichi = fk.CreateTriggerSkill {
   name = "jy_sichi",
   anim_type = "masochism",
   events = { fk.Damaged },
+  on_cost = function(self, event, target, player, data)
+    return player.room:askForSkillInvoke(player, self.name, nil, "#jy_sichi-invoke")
+  end,
   on_use = function(self, event, target, player, data)
     local room = player.room
-
     -- 亮出四张牌
     local card_ids = room:getNCards(4)
-
     -- 放到过程区
     room:moveCards({
       ids = card_ids,
       toArea = Card.Processing,
       moveReason = fk.ReasonPut,
     })
-
-    -- player:showCards(card_ids)  -- 这个和上面的是一个效果，区别在于这个可以在牌上显示是自己展示的
-
     -- 看花色有多少种，测试通过
     local dict = { false, false, false, false }
     local suit_count = 0
@@ -956,9 +954,7 @@ local jy_sichi = fk.CreateTriggerSkill {
         suit_count = suit_count + 1
       end
     end
-
     assert(suit_count <= 4 and suit_count >= 1)
-
     -- TODO:其实主要是担心如果用..它不会翻译成中文。有空可以试一下
     local msg
     if suit_count == 1 then
@@ -1307,14 +1303,15 @@ Fk:loadTranslationTable {
   ["illustrator:jy__yangfan"] = "杨藩",
 
   ["jy_sichi"] = "四吃",
-  [":jy_sichi"] = [[你受到伤害后，可以展示牌堆顶的4张牌，根据其花色数：1，令一名角色获得之；2，获得其中一张可以使用的牌并可以使用之，若都无法使用，你弃一张牌；3，获得3/2张同类型/不同类型的牌，然后其他角色摸一张牌；4，你与至多3名角色各失去一点体力。]],
+  [":jy_sichi"] = [[你受到伤害后，可以展示牌堆顶的4张牌，根据其花色数：1，令一名角色获得之；2，获得其中一张可以使用的牌并可以使用之，若都无法使用，你弃一张牌；3，获得3张同类型或2张不同类型的牌，然后其他角色摸一张牌；4，你与至多3名角色各失去一点体力。]],
+  ["#jy_sichi-invoke"] = [[四吃：你可以大概率获得增益效果、小概率获得减益效果]],
 
   ["#jy_sichi_suits_1"] = "四吃：1种花色，选择一名角色获得这些牌",
   ["#jy_sichi_suits_2"] = "四吃：2种花色，获得一张可使用的牌并可以使用",
   ["#jy_sichi_suits_3"] = "四吃：3种花色，获得3张同类型或2张不同类型的牌，然后其他角色各摸一张牌",
   ["#jy_sichi_suits_4"] = "四吃：4种花色，选择至多3名角色一起失去1点体力",
 
-  ["#jy_sichi_1"] = "四吃：选择一名角色获得所有牌，点击取消选择自己",
+  ["#jy_sichi_1"] = "四吃：选择一名角色获得这些牌，点击取消选择自己",
   ["#jy_sichi_2"] = "四吃：获得其中一张牌并可以使用",
   ["#jy_sichi_2_use"] = "四吃：你可以使用这张牌",
   ["#jy_sichi_2_failed_toast"] = "四吃：2种花色，没有可使用的牌，弃一张牌",
@@ -1327,11 +1324,11 @@ Fk:loadTranslationTable {
   [":jy_huapen"] = [[锁定技，其他角色使用♣普通锦囊牌或基本牌指定了有且仅有一个不为你的目标时，你判定，若为<font color="red">♥</font>，额外指定你为目标。]],
 
   ["jy_boshi"] = "搏时",
-  [":jy_boshi"] = [[觉醒技，准备阶段，若你已判定过至少X次，你增加一点体力上限、失去〖花盆〗，然后获得〖奖杯〗，X等于存活角色数。]],
+  [":jy_boshi"] = [[觉醒技，准备阶段，若你已判定过至少X次，你增加一点体力上限、失去〖花盆〗并获得〖奖杯〗，X等于存活角色数。]],
   ["@jy_boshi_judge_count"] = "搏时",
 
   ["jy_jiangbei"] = "奖杯",
-  [":jy_jiangbei"] = [[锁定技，你的基本牌和锦囊牌花色若为：♣，无视距离、次数限制和防具；<font color="red">♥</font>，不可响应；出牌阶段结束时，你摸X张牌（X为你出牌阶段使用或打出的♣和<font color="red">♥</font>牌数）。]],
+  [":jy_jiangbei"] = [[锁定技，你的♣基本牌和锦囊牌无距离和次数限制且无视防具；你的<font color="red">♥</font>基本牌和锦囊牌不可被响应；出牌阶段结束时，你摸X张牌（X为你出牌阶段使用或打出的♣和<font color="red">♥</font>牌数）。]],
   ["#jy_jiangbei_heart"] = "奖杯",
   ["#jy_jiangbei_club"] = "奖杯",
   ["#jy_jiangbei_club_2"] = "奖杯",
@@ -1342,7 +1339,6 @@ Fk:loadTranslationTable {
 
 -- 参考：廖化，英姿，蛊惑，血裔
 local jy__mou__gaotianliang = General(extension, "jy__mou__gaotianliang", "god", 4)
-
 
 local jy_tianling = fk.CreateViewAsSkill {
   name = "jy_tianling",
@@ -1514,7 +1510,7 @@ local jy_leiyan = fk.CreateActiveSkill {
   target_filter = function(self, to_select, selected)
     return Fk:currentRoom():getPlayerById(to_select):getMark("@jy_raiden_leiyan") == 0
   end,
-  min_target_num = 1,
+  target_num = 1,
   on_use = function(self, room, use)
     for _, to in ipairs(use.tos) do
       local p = room:getPlayerById(to)
@@ -1531,7 +1527,8 @@ local jy_leiyan_trigger = fk.CreateTriggerSkill {
   can_trigger = function(self, event, target, player, data)
     if not data.from then return false end -- 如果这次伤害没有伤害来源，就不用看了
     local from = data.from
-    return from:getMark("@jy_raiden_leiyan") ~= 0 and player:hasSkill(self)
+    return player:usedSkillTimes(self.name, Player.HistoryTurn) == 0 and from:getMark("@jy_raiden_leiyan") ~= 0 and
+        player:hasSkill(self)
         and not data.is_leiyan
   end,
   on_use = function(self, event, target, player, data)
@@ -1581,9 +1578,7 @@ local jy_zhenshuo = fk.CreateActiveSkill {
     local player = room:getPlayerById(use.from)
     local to = room:getPlayerById(use.tos[1])
     room:throwCard(use.cards, self.name, player, player)
-
     room:delay(900)
-
     room:damage({
       from = player,
       to = to,
@@ -1591,8 +1586,19 @@ local jy_zhenshuo = fk.CreateActiveSkill {
       damageType = fk.ThunderDamage,
       skillName = self.name,
     })
+    room:setPlayerMark(player, "@jy_zhenshuo-phase", "")
   end,
 }
+local zhenshuo_paoxiao = fk.CreateTargetModSkill {
+  name = "#jy_zhenshuo_paoxiao",
+  frequency = Skill.Compulsory,
+  bypass_times = function(self, player, skill, scope)
+    return player:hasSkill(self) and skill.trueName == "slash_skill" and
+        player:getMark("@jy_zhenshuo-phase") ~= 0 and
+        scope == Player.HistoryPhase
+  end,
+}
+jy_zhenshuo:addRelatedSkill(zhenshuo_paoxiao)
 
 jy__raiden:addSkill(jy_leiyan)
 jy__raiden:addSkill(jy_zhenshuo)
@@ -1607,7 +1613,7 @@ Fk:loadTranslationTable {
   ["~jy__raiden"] = "浮世一梦……",
 
   ["jy_leiyan"] = "雷眼",
-  [":jy_leiyan"] = [[出牌阶段限一次，你可以令至少一名角色获得<font color="Fuchsia">雷眼</font>；持有<font color="Fuchsia">雷眼</font>的角色造成伤害后，若目标未死亡，你判定，若为黑色，你对目标造成1点雷电伤害（不会触发〖雷眼〗）。]],
+  [":jy_leiyan"] = [[出牌阶段限一次，你可以令一名没有<font color="Fuchsia">雷眼</font>标记的角色获得<font color="Fuchsia">雷眼</font>。每回合限一次，持有<font color="Fuchsia">雷眼</font>的角色造成伤害后，若目标未死亡，你判定，若为黑色，你对目标造成一点雷电伤害（不会触发〖雷眼〗）。]],
   ["@jy_raiden_leiyan"] = [[<font color="Fuchsia">雷眼</font>]],
   ["#jy_leiyan_trigger"] = "雷眼",
   ["$jy_leiyan1"] = "泡影看破！",
@@ -1615,7 +1621,8 @@ Fk:loadTranslationTable {
   ["$jy_leiyan3"] = "威光无赦！",
 
   ["jy_zhenshuo"] = "真说",
-  [":jy_zhenshuo"] = [[出牌阶段限一次，你可以弃三张牌对一名攻击范围内的角色造成一点雷电伤害。]],
+  ["@jy_zhenshuo-phase"] = [[<font color="Fuchsia">真说</font>]],
+  [":jy_zhenshuo"] = [[出牌阶段限一次，你可以弃三张牌对一名攻击范围内的角色造成一点雷电伤害，然后本阶段你使用【杀】无次数限制。]],
   ["$jy_zhenshuo1"] = "此刻，寂灭之时！",
   ["$jy_zhenshuo2"] = "稻光，亦是永恒！",
   ["$jy_zhenshuo3"] = "无念，断绝！",
@@ -2720,7 +2727,7 @@ Fk:loadTranslationTable {
   ["#jy_pojun-invoke"] = "破军：你可以移除 %dest 所有护甲并暂时移除其区域内一部分牌",
   ["jy_pojun"] = [[破军]],
   ["#jy_pojun_delay"] = [[破军]],
-  [":jy_pojun"] = [[当你使用【杀】指定一个目标后，你可以将其区域内至多X张牌扣置于该角色的武将牌旁（X为其体力值）并移除其所有护甲；若如此做，当前回合结束时，其获得这些牌。一名角色进入濒死状态时，若其武将牌旁有以此法扣置的牌，你获得这些牌。]],
+  [":jy_pojun"] = [[当你使用【杀】指定一个目标后，你可以将其区域内至多X张牌扣置于该角色的武将牌旁（X为其体力值）并<font color="red">移除其所有护甲</font>；若如此做，当前回合结束时，其获得这些牌。一名角色进入濒死状态时，若其武将牌旁有以此法扣置的牌，你获得这些牌。]],
 
   ["jy_jiedao"] = [[劫刀]],
   ["#jy_jiedao"] = "劫刀：将一张武器牌当【杀】或【酒】使用或打出",
