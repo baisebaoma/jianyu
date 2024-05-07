@@ -1508,7 +1508,7 @@ local jy_leiyan = fk.CreateActiveSkill {
   end,
   card_num = 0,
   target_filter = function(self, to_select, selected)
-    return Fk:currentRoom():getPlayerById(to_select):getMark("@jy_raiden_leiyan") == 0
+    return Fk:currentRoom():getPlayerById(to_select):getMark("@jy_raiden_leiyan") == 0 and #selected == 0
   end,
   target_num = 1,
   on_use = function(self, room, use)
@@ -1527,7 +1527,7 @@ local jy_leiyan_trigger = fk.CreateTriggerSkill {
   can_trigger = function(self, event, target, player, data)
     if not data.from then return false end -- 如果这次伤害没有伤害来源，就不用看了
     local from = data.from
-    return player:usedSkillTimes(self.name, Player.HistoryTurn) == 0 and from:getMark("@jy_raiden_leiyan") ~= 0 and
+    return from:getMark("@jy_raiden_leiyan") ~= 0 and
         player:hasSkill(self)
         and not data.is_leiyan
   end,
@@ -1593,12 +1593,28 @@ local zhenshuo_paoxiao = fk.CreateTargetModSkill {
   name = "#jy_zhenshuo_paoxiao",
   frequency = Skill.Compulsory,
   bypass_times = function(self, player, skill, scope)
-    return player:hasSkill(self) and skill.trueName == "slash_skill" and
+    return player:hasSkill("jy_zhenshuo") and skill.trueName == "slash_skill" and
         player:getMark("@jy_zhenshuo-phase") ~= 0 and
         scope == Player.HistoryPhase
   end,
 }
+local zhenshuo_enter_dying = fk.CreateTriggerSkill {
+  name = "#jy_zhenshuo_enter_dying",
+  mute = true,
+  frequency = Skill.Compulsory,
+  refresh_events = { fk.EnterDying },
+  can_refresh = function(self, event, target, player, data)
+    return player:hasSkill("jy_zhenshuo") and target == player
+  end,
+  on_refresh = function(self, event, target, player, data)
+    local room = player.room
+    for _, p in ipairs(table.filter(room:getAlivePlayers(), function(p) return p:getMark("@jy_raiden_leiyan") ~= 0 end)) do
+      room:setPlayerMark(p, "@jy_raiden_leiyan", 0)
+    end
+  end,
+}
 jy_zhenshuo:addRelatedSkill(zhenshuo_paoxiao)
+jy_zhenshuo:addRelatedSkill(zhenshuo_enter_dying)
 
 jy__raiden:addSkill(jy_leiyan)
 jy__raiden:addSkill(jy_zhenshuo)
@@ -1613,7 +1629,7 @@ Fk:loadTranslationTable {
   ["~jy__raiden"] = "浮世一梦……",
 
   ["jy_leiyan"] = "雷眼",
-  [":jy_leiyan"] = [[出牌阶段限一次，你可以令一名没有<font color="Fuchsia">雷眼</font>标记的角色获得<font color="Fuchsia">雷眼</font>。每回合限一次，持有<font color="Fuchsia">雷眼</font>的角色造成伤害后，若目标未死亡，你判定，若为黑色，你对目标造成一点雷电伤害（不会触发〖雷眼〗）。]],
+  [":jy_leiyan"] = [[出牌阶段限一次，你可以令一名没有<font color="Fuchsia">雷眼</font>标记的角色获得<font color="Fuchsia">雷眼</font>。持有<font color="Fuchsia">雷眼</font>的角色造成伤害后，若目标未死亡，你判定，若为黑色，你对目标造成一点雷电伤害（不会触发〖雷眼〗）；你进入濒死状态时，移除所有<font color="Fuchsia">雷眼</font>。]],
   ["@jy_raiden_leiyan"] = [[<font color="Fuchsia">雷眼</font>]],
   ["#jy_leiyan_trigger"] = "雷眼",
   ["$jy_leiyan1"] = "泡影看破！",
