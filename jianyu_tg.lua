@@ -1325,7 +1325,6 @@ Fk:loadTranslationTable {
 }
 local zsg = General(extension, "jy__zhanshige", "shu", 4, 4, General.Female)
 zsg:addSkill(jiaofeng)
-zsg:addSkill("jy_zhenshuo")
 
 local yingyuan = fk.CreateTriggerSkill {
   name = "jy_yingyuan",

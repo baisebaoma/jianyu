@@ -702,10 +702,10 @@ Fk:loadTranslationTable {
   ["#jy__trad__god"] = rjhd,
   ["designer:jy__trad__god"] = [[考公专家]],
   ["cv:jy__trad__god"] = [[无]],
-  ["illustrator:jy__trad__god"] = [[未知]],
+  ["illustrator:jy__trad__god"] = [[侯国玉]],
 
   ["jy_fuzhu"] = "哇袄",
-  [":jy_fuzhu"] = [[每局游戏限两次，你的回合结束时，你可以获得一个想要的技能。<br><font color="grey">输入这个技能的name参数（如paoxiao）以获得技能，你的输入必须仅含小写英文字母和下划线，且长度不得超过12。若输入错误，你不会获得技能。</font>]],
+  [":jy_fuzhu"] = [[每局游戏限两次，你的回合结束时，你可以获得一个想要的技能。<br><font color="grey">输入这个技能的name参数（如paoxiao）以获得技能，你的输入必须仅含小写英文字母和下划线且长度不得超过12。若输入错误，你不会获得技能。<br>不知道拿什么？试试输入：cheat！</font>]],
 }
 
 return extension
