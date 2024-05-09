@@ -1110,19 +1110,19 @@ local muhuo = fk.CreateTriggerSkill {
         player:distanceTo(target) >= 0 -- 需要判断 >= 0，因为如果目标因该伤害而死就是-1了
   end,
   on_use = function(self, event, target, player, data)
-    player:drawCards(math.min(player.maxHp - player.hp, 5), self.name)
+    player:drawCards(player.maxHp - player.hp, self.name)
     player.room:setPlayerMark(player, MarkEnum.SwithSkillPreName .. "jy_maochong",
       fk.SwitchYang)
     player:addSkillUseHistory("jy_maochong") -- 加上这个更新UI
     if target ~= player then
-      player.room:setPlayerMark(target, "jy_muhuo-turn", true)
+      player.room:setPlayerMark(target, "@jy_muhuo-turn", true)
     end
   end,
 }
 local muhuo_prohibit = fk.CreateProhibitSkill {
   name = "#jy_muhuo_prohibit",
   is_prohibited = function(self, from, to, card)
-    return from:hasSkill(self) and to:getMark("jy_muhuo-turn") ~= 0
+    return from:hasSkill(self) and to:getMark("@jy_muhuo-turn") ~= 0
   end,
 }
 muhuo:addRelatedSkill(muhuo_prohibit)
@@ -1139,13 +1139,15 @@ Fk:loadTranslationTable {
   ["illustrator:jy__ylmc"] = [[Nexon]],
 
   ["jy_maochong"] = [[冒充]],
+  ["#jy_maochong_extra"] = [[冒充]],
   [":jy_maochong"] = [[转换技，阳：你可将任意张牌当【杀】使用，该【杀】需使用等量张【闪】才能抵消且无次数限制，若你装备区有武器牌，该【杀】伤害+1；阴：其他角色的出牌阶段限一次，其可以将一张【杀】或武器牌正面朝上交给你并摸一张牌。]],
   ["#jy_maochong-active"] = [[你可以将一张【杀】或武器牌交给御稜名草，然后你摸一张牌]],
   ["jy_maochong_other&"] = [[冒充]],
   [":jy_maochong_other&"] = [[出牌阶段限一次，当御稜名草的〖冒充〗状态为阴时，你可以将一张【杀】或武器牌正面向上交给其，然后你摸一张牌。]],
 
   ["jy_muhuo"] = [[目祸]],
-  [":jy_muhuo"] = [[当一名角色受到伤害后，若你与其距离1以内且其未死亡，你可以摸X张牌（X为你已损失的体力值且至多为5）并将〖冒充〗改为阳。若其不为你，本回合其不是你使用牌的合法目标。]],
+  ["@jy_muhuo-turn"] = [[目祸]],
+  [":jy_muhuo"] = [[当一名角色受到伤害后，若你与其距离1以内且其未死亡，你可以摸X张牌（X为你已损失的体力值）并将〖冒充〗改为阳。若其不为你，本回合其不是你使用牌的合法目标。]],
 }
 
 local tjzs = General(extension, "jy__tjzs", "shu", 3, 3, General.Female)
