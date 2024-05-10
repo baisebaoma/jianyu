@@ -1115,7 +1115,7 @@ local muhuo = fk.CreateTriggerSkill {
       fk.SwitchYang)
     player:addSkillUseHistory("jy_maochong") -- 加上这个更新UI
     if target ~= player then
-      player.room:setPlayerMark(target, "@jy_muhuo-turn", true)
+      player.room:setPlayerMark(target, "@jy_muhuo-turn", "")
     end
   end,
 }
