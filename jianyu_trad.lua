@@ -237,7 +237,7 @@ local trad_zitai = fk.CreateTriggerSkill {
   frequency = Skill.Compulsory,
   events = { fk.DamageInflicted },
   can_trigger = function(self, event, target, player, data)
-    return player:hasSkill(self) and (data.to == player or data.from == player)
+    return player:hasSkill(self) and data.from == player
   end,
   on_use = function(self, event, target, player, data)
     local isYang = player:getSwitchSkillState(self.name, true) ==
@@ -325,7 +325,7 @@ Fk:loadTranslationTable {
   [":jy_trad_mumang"] = [[锁定技，你的攻击范围始终为1。]],
 
   ["jy_trad_zitai"] = [[姿态]],
-  [":jy_trad_zitai"] = [[转换技，锁定技，当你造成或受到伤害时，阳：你判定，若为红色，防止之；阴：该伤害+1。]],
+  [":jy_trad_zitai"] = [[转换技，锁定技，当你造成伤害时，阳：你判定，若为红色，防止之；阴：该伤害+1。]],
 }
 
 local tiandu = fk.CreateTriggerSkill {
@@ -679,7 +679,7 @@ local jy_fuzhu = fk.CreateTriggerSkill {
   events = { fk.EventPhaseChanging },
   can_trigger = function(self, event, target, player, data)
     return target == player and player:hasSkill(self)
-        and data.to == Player.Finish and player:usedSkillTimes(self.name, Player.HistoryGame) < 2
+        and data.to == Player.Start
   end,
   on_use = function(self, event, target, player, data)
     local room = player.room
@@ -705,7 +705,7 @@ Fk:loadTranslationTable {
   ["illustrator:jy__trad__god"] = [[侯国玉]],
 
   ["jy_fuzhu"] = "哇袄",
-  [":jy_fuzhu"] = [[每局游戏限两次，你的回合结束时，你可以获得一个想要的技能。<br><font color="grey">输入这个技能的name参数（如paoxiao）以获得技能，你的输入必须仅含小写英文字母和下划线且长度不得超过12。若输入错误，你不会获得技能。<br>不知道拿什么？试试输入：cheat！</font>]],
+  [":jy_fuzhu"] = [[你的回合开始时，你可以获得一个想要的技能。<br><font color="grey">输入这个技能的name参数（如paoxiao）以获得技能，你的输入必须仅含小写英文字母和下划线且长度不得超过12。若输入错误，你不会获得技能。<br>不知道拿什么？试试输入：cheat！</font>]],
 }
 
 return extension
