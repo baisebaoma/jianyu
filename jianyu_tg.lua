@@ -1367,16 +1367,15 @@ local yingyuan = fk.CreateTriggerSkill {
   on_use = function(self, event, target, player, data)
     local room = player.room
     if data.is_jy_yingyuan_first then
-      local targets = table.map(table.filter(room:getOtherPlayers(player), function(p)
-        return true
-      end), Util.IdMapper)
-      if #targets == 0 then return false end
-      local result = room:askForChoosePlayers(player, targets, 1, 1, "#jy_yingyuan-prompt",
-        self.name, false, false)
-      if #result ~= 0 then
-        local to = room:getPlayerById(result[1])
-        if not to.dead then
-          to:drawCards(1, self.name)
+      local targets = table.map(room:getOtherPlayers(player), Util.IdMapper)
+      if #targets ~= 0 then
+        local result = room:askForChoosePlayers(player, targets, 1, 1, "#jy_yingyuan-prompt",
+          self.name, false, false)
+        if #result ~= 0 then
+          local to = room:getPlayerById(result[1])
+          if not to.dead then
+            to:drawCards(1, self.name)
+          end
         end
       end
     end
@@ -2571,11 +2570,11 @@ Fk:loadTranslationTable {
   ["jy_zhuojing-short"] = [[濯荆]],
   [":jy_zhuojing-short"] = [[你可以将所有手牌当【桃】使用。]],
   ["#jy_zhuojing-prompt"] = [[濯荆：你可以将所有手牌当【桃】使用]],
-  ["#jy_zhuojing-choose"] = [[濯荆：你可以令一名角色弃置%arg张牌]],
-  ["#jy_zhuojing-discard"] = [[濯荆：弃置%arg张牌]],
+  ["#jy_zhuojing-choose"] = [[濯荆：你可以令一名角色弃置 %arg 张牌，随后其可以视为发动〖素绽〗或〖濯荆〗]],
+  ["#jy_zhuojing-discard"] = [[濯荆：弃置 %arg 张牌，随后你可以令一名没有手牌的角色摸牌或将所有手牌当【桃】使用]],
   ["#jy_zhuojing-skill"] = [[濯荆发动]],
   ["#jy_zhuojing-use"] = [[濯荆：%dest 令你发动 %arg，请指定目标]],
-  ["#jy_zhuojing-fail"] = [[濯荆：%dest 不满足任何一个技能的发动条件，无法发动〖素绽〗或〖濯荆〗]],
+  ["#jy_zhuojing-fail"] = [[濯荆：%dest 不满足〖素绽〗或〖濯荆〗的发动条件，无法发动]],
   ["$jy_zhuojing1"] = [[永眠非终焉……]],
   ["$jy_zhuojing2"] = [[逝者将再临！]],
 }
