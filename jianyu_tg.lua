@@ -855,7 +855,7 @@ local zhijin = fk.CreateTriggerSkill {
   end,
   refresh_events = { fk.CardUsing },
   can_refresh = function(self, event, target, player, data)
-    return target == player and player:hasSkill(self)
+    return target == player and player:hasSkill(self) and player:getMark("@jy_zhijin-phase") ~= 0
   end,
   on_refresh = function(self, event, target, player, data)
     player.room:addPlayerMark(player, "jy_zhijin_card-phase", -1)
