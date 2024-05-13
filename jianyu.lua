@@ -2615,21 +2615,9 @@ local pojun = fk.CreateTriggerSkill {
     local room = player.room
     room:doIndicate(player.id, { data.to })
     local to = room:getPlayerById(data.to)
-    local sheild = to.shield
-    local cards = room:askForCardsChosen(player, to, 1, 2, "hej", self.name)
-    to:addToPile(self.name, cards, false, self.name)
-    room:setPlayerMark(to, "jy_pojun_who", player.id)
-    -- room:changeShield(to, -sheild)
-  end,
-  refresh_events = { fk.TurnEnd, fk.Death },
-  can_refresh = function(self, event, target, player, data)
-    return #player:getPile("jy_pojun") > 0
-  end,
-  on_refresh = function(self, event, target, player, data)
-    local room = player.room
-    room:moveCardTo(player:getPile("jy_pojun"), Player.Hand,
-      room:getPlayerById(player:getMark("jy_pojun_who")), fk.ReasonPrey, "jy_pojun")
-    room:setPlayerMark(player, "jy_pojun_who", 0)
+    local cards = room:askForCardsChosen(player, to, 1, to.hp, "hej", self.name)
+    room:moveCardTo(cards, Player.Hand,
+      player, fk.ReasonPrey, "jy_pojun")
   end,
 }
 
@@ -2733,7 +2721,7 @@ Fk:loadTranslationTable {
   ["#jy_pojun-invoke"] = "破军：你可以暂时移除 %dest 区域内至多两张牌，回合结束或其死亡时你获得这些牌",
   ["jy_pojun"] = [[破军]],
   ["#jy_pojun_delay"] = [[破军]],
-  [":jy_pojun"] = [[当你使用【杀】指定一个目标后，你可以将其区域内至多两张牌扣置于该角色的武将牌旁；若如此做，当前回合结束时或其死亡时，你获得这些牌。]],
+  [":jy_pojun"] = [[当你使用【杀】指定一个目标后，你可以获得其区域内至多X张牌（X为其体力值）。]],
 
   -- ["jy_jiedao"] = [[劫刀]],
   -- ["#jy_jiedao"] = "劫刀：将一张武器牌当【杀】或【酒】使用或打出",
