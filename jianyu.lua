@@ -2624,112 +2624,104 @@ local pojun = fk.CreateTriggerSkill {
 local pojun_delay = fk.CreateTriggerSkill {
   name = "#jy_pojun_delay",
   mute = true,
-  events = { fk.TurnEnd, fk.EnterDying },
+  events = { fk.TurnEnd },
   can_trigger = function(self, event, target, player, data)
-    if event == fk.TurnEnd then
-      return #player:getPile("jy_pojun") > 0
-    else
-      return player:hasSkill(self) and #target:getPile("jy_pojun") > 0
-    end
+    return player:hasSkill(self) and #target:getPile("jy_pojun") > 0
   end,
   on_cost = Util.TrueFunc,
   on_use = function(self, event, target, player, data)
-    if event == fk.TurnEnd then
-      player.room:moveCardTo(player:getPile("jy_pojun"), Player.Hand, player, fk.ReasonPrey, "jy_pojun")
-    else
-      player.room:moveCardTo(target:getPile("jy_pojun"), Player.Hand, player, fk.ReasonPrey, "jy_pojun")
-    end
+    player.room:moveCardTo(target:getPile("jy_pojun"), Player.Hand, player, fk.ReasonPrey, "jy_pojun")
   end,
 }
 pojun:addRelatedSkill(pojun_delay)
 
-local jiedao = fk.CreateViewAsSkill {
-  name = "jy_jiedao",
-  anim_type = "offensive",
-  pattern = "slash,analeptic",
-  enabled_at_play = function(self, player, response)
-    return #table.filter(player:getCardIds("he"), function(c)
-      local card = Fk:getCardById(c)
-      return card.type == Card.TypeEquip and card.sub_type == Card.SubtypeWeapon
-    end) ~= 0
-  end,
-  enabled_at_response = function(self, player, response)
-    return #table.filter(player:getCardIds("he"), function(c)
-      local card = Fk:getCardById(c)
-      return card.type == Card.TypeEquip and card.sub_type == Card.SubtypeWeapon
-    end) ~= 0
-  end,
-  interaction = function()
-    local names = {}
-    for _, name in ipairs({ "slash", "analeptic" }) do
-      local c = Fk:cloneCard(name)
-      if (Fk.currentResponsePattern == nil and c.skill:canUse(Self, c)) or
-          (Fk.currentResponsePattern and Exppattern:Parse(Fk.currentResponsePattern):match(c)) then
-        table.insertIfNeed(names, name)
-      end
-    end
-    return UI.ComboBox { choices = names }
-  end,
-  card_filter = function(self, to_select, selected)
-    if #selected == 1 then return false end
-    local card = Fk:getCardById(to_select)
-    return card.type == Card.TypeEquip and card.sub_type == Card.SubtypeWeapon
-  end,
-  view_as = function(self, cards)
-    if not self.interaction.data then return nil end
-    if #cards ~= 1 then
-      return nil
-    end
-    local card = Fk:cloneCard(self.interaction.data)
-    card.skillName = self.name
-    card:addSubcards(cards)
-    return card
-  end,
-}
-local jiedao_weapon = fk.CreateTriggerSkill {
-  name = "#jy_jiedao_weapon",
-  anim_type = 'control',
-  events = { fk.AfterCardsMove },
-  can_trigger = function(self, event, target, player, data)
-    if not player:hasSkill(self) then return false end
-    for _, move in ipairs(data) do
-      if move.to ~= player.id and move.toArea == Card.PlayerEquip then
-        for _, info in ipairs(move.moveInfo) do
-          local c = Fk:getCardById(info.cardId)
-          if c.type == Card.TypeEquip and c.sub_type == Card.SubtypeWeapon then
-            return true
-          end
-        end
-      end
-    end
-  end,
-  on_use = function(self, event, target, player, data)
-    local room = player.room
-    room:loseHp(player, 1)
-    if not player:isAlive() then return end
-    local ids = {}
-    for _, move in ipairs(data) do
-      if move.to ~= player.id and (move.toArea == Card.PlayerEquip or move.toArea == Card.DiscardPile) then
-        for _, info in ipairs(move.moveInfo) do
-          local c = Fk:getCardById(info.cardId)
-          if c.type == Card.TypeEquip and c.sub_type == Card.SubtypeWeapon then
-            table.insert(ids, info.cardId)
-          end
-        end
-      end
-    end
-    local dummy = Fk:cloneCard("dilu")
-    dummy:addSubcards(ids)
-    room:obtainCard(player, dummy, true, fk.ReasonPrey)
-    local use = room:askForUseCard(player, "slash", nil, "#jy_jiedao_slash", true)
-    if use then room:useCard(use) end
-  end,
-}
-jiedao:addRelatedSkill(jiedao_weapon)
+-- local jiedao = fk.CreateViewAsSkill {
+--   name = "jy_jiedao",
+--   anim_type = "offensive",
+--   pattern = "slash,analeptic",
+--   enabled_at_play = function(self, player, response)
+--     return #table.filter(player:getCardIds("he"), function(c)
+--       local card = Fk:getCardById(c)
+--       return card.type == Card.TypeEquip and card.sub_type == Card.SubtypeWeapon
+--     end) ~= 0
+--   end,
+--   enabled_at_response = function(self, player, response)
+--     return #table.filter(player:getCardIds("he"), function(c)
+--       local card = Fk:getCardById(c)
+--       return card.type == Card.TypeEquip and card.sub_type == Card.SubtypeWeapon
+--     end) ~= 0
+--   end,
+--   interaction = function()
+--     local names = {}
+--     for _, name in ipairs({ "slash", "analeptic" }) do
+--       local c = Fk:cloneCard(name)
+--       if (Fk.currentResponsePattern == nil and c.skill:canUse(Self, c)) or
+--           (Fk.currentResponsePattern and Exppattern:Parse(Fk.currentResponsePattern):match(c)) then
+--         table.insertIfNeed(names, name)
+--       end
+--     end
+--     return UI.ComboBox { choices = names }
+--   end,
+--   card_filter = function(self, to_select, selected)
+--     if #selected == 1 then return false end
+--     local card = Fk:getCardById(to_select)
+--     return card.type == Card.TypeEquip and card.sub_type == Card.SubtypeWeapon
+--   end,
+--   view_as = function(self, cards)
+--     if not self.interaction.data then return nil end
+--     if #cards ~= 1 then
+--       return nil
+--     end
+--     local card = Fk:cloneCard(self.interaction.data)
+--     card.skillName = self.name
+--     card:addSubcards(cards)
+--     return card
+--   end,
+-- }
+-- local jiedao_weapon = fk.CreateTriggerSkill {
+--   name = "#jy_jiedao_weapon",
+--   anim_type = 'control',
+--   events = { fk.AfterCardsMove },
+--   can_trigger = function(self, event, target, player, data)
+--     if not player:hasSkill(self) then return false end
+--     for _, move in ipairs(data) do
+--       if move.to ~= player.id and move.toArea == Card.PlayerEquip then
+--         for _, info in ipairs(move.moveInfo) do
+--           local c = Fk:getCardById(info.cardId)
+--           if c.type == Card.TypeEquip and c.sub_type == Card.SubtypeWeapon then
+--             return true
+--           end
+--         end
+--       end
+--     end
+--   end,
+--   on_use = function(self, event, target, player, data)
+--     local room = player.room
+--     room:loseHp(player, 1)
+--     if not player:isAlive() then return end
+--     local ids = {}
+--     for _, move in ipairs(data) do
+--       if move.to ~= player.id and (move.toArea == Card.PlayerEquip or move.toArea == Card.DiscardPile) then
+--         for _, info in ipairs(move.moveInfo) do
+--           local c = Fk:getCardById(info.cardId)
+--           if c.type == Card.TypeEquip and c.sub_type == Card.SubtypeWeapon then
+--             table.insert(ids, info.cardId)
+--           end
+--         end
+--       end
+--     end
+--     local dummy = Fk:cloneCard("dilu")
+--     dummy:addSubcards(ids)
+--     room:obtainCard(player, dummy, true, fk.ReasonPrey)
+--     local use = room:askForUseCard(player, "slash", nil, "#jy_jiedao_slash", true)
+--     if use then room:useCard(use) end
+--   end,
+-- }
+-- jiedao:addRelatedSkill(jiedao_weapon)
 
 local xusheng = General(extension, "jy__xusheng", "wu", 4)
 xusheng:addSkill(pojun)
-xusheng:addSkill(jiedao)
+-- xusheng:addSkill(jiedao)
 
 Fk:loadTranslationTable {
   ["jy__xusheng"] = [[劫徐盛]],
@@ -2743,14 +2735,14 @@ Fk:loadTranslationTable {
   ["#jy_pojun-invoke"] = "破军：你可以移除 %dest 所有护甲并暂时移除其区域内一部分牌",
   ["jy_pojun"] = [[破军]],
   ["#jy_pojun_delay"] = [[破军]],
-  [":jy_pojun"] = [[当你使用【杀】指定一个目标后，你可以将其区域内至多X张牌扣置于该角色的武将牌旁（X为其体力值）并<font color="red">移除其所有护甲</font>；若如此做，当前回合结束时，其获得这些牌。一名角色进入濒死状态时，若其武将牌旁有以此法扣置的牌，你获得这些牌。]],
+  [":jy_pojun"] = [[当你使用【杀】指定一个目标后，你可以将其区域内至多X张牌扣置于该角色的武将牌旁（X为其体力值）并<font color="red">移除其所有护甲</font>；若如此做，当前回合结束时，<font color="red">你</font>获得这些牌。]],
 
-  ["jy_jiedao"] = [[劫刀]],
-  ["#jy_jiedao"] = "劫刀：将一张武器牌当【杀】或【酒】使用或打出",
-  ["#jy_jiedao_weapon"] = [[劫刀]],
-  ["#jy_jiedao_slash"] = [[劫刀：你可以使用一张【杀】]],
-  [":jy_jiedao"] = [[你可以将一张武器牌当【杀】或【酒】使用或打出。当武器牌移至其他角色的装备区时，你可以失去一点体力并获得之，若如此做，你可以使用一张【杀】。]],
-  ["$jy_jiedao1"] = [[战将临阵，斩关刈城！]],
+  -- ["jy_jiedao"] = [[劫刀]],
+  -- ["#jy_jiedao"] = "劫刀：将一张武器牌当【杀】或【酒】使用或打出",
+  -- ["#jy_jiedao_weapon"] = [[劫刀]],
+  -- ["#jy_jiedao_slash"] = [[劫刀：你可以使用一张【杀】]],
+  -- [":jy_jiedao"] = [[你可以将一张武器牌当【杀】或【酒】使用或打出。当武器牌移至其他角色的装备区时，你可以失去一点体力并获得之，若如此做，你可以使用一张【杀】。]],
+  -- ["$jy_jiedao1"] = [[战将临阵，斩关刈城！]],
 }
 
 return extension
