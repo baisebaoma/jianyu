@@ -2609,7 +2609,8 @@ local pojun = fk.CreateTriggerSkill {
     end
   end,
   on_cost = function(self, event, target, player, data)
-    return player.room:askForSkillInvoke(player, self.name, nil, "#jy_pojun-invoke::" .. data.to)
+    return player.room:askForSkillInvoke(player, self.name, nil,
+      "#jy_pojun-invoke::" .. data.to .. ":" .. player.room:getPlayerById(data.to).hp)
   end,
   on_use = function(self, event, target, player, data)
     local room = player.room
@@ -2718,7 +2719,7 @@ Fk:loadTranslationTable {
   ["$jy_pojun1"] = "犯大吴疆土者，盛必击而破之！",
   ["$jy_pojun2"] = "若敢来犯，必教你大败而归！",
 
-  ["#jy_pojun-invoke"] = "破军：你可以暂时移除 %dest 区域内至多两张牌，回合结束或其死亡时你获得这些牌",
+  ["#jy_pojun-invoke"] = "破军：你可以获得 %dest 区域内至多 %arg 张牌",
   ["jy_pojun"] = [[破军]],
   ["#jy_pojun_delay"] = [[破军]],
   [":jy_pojun"] = [[当你使用【杀】指定一个目标后，你可以获得其区域内至多X张牌（X为其体力值）。]],
