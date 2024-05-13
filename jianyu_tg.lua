@@ -2124,17 +2124,17 @@ local jianyan = fk.CreateTriggerSkill {
         data.card.is_jy_jianyan = true
       else
         player.room:obtainCard(player, data.card, false, fk.ReasonPrey, player.id)
-        -- if data.card.type == Card.TypeTrick then
-        --   player.room:changeShield(player, 1)
-        -- end
+        if data.card.type == Card.TypeTrick then
+          player.room:changeShield(player, 1)
+        end
         return true
       end
     end
   end,
-  refresh_events = { fk.Damaged, fk.CardUsing, fk.CardUseFinished },
+  refresh_events = { fk.Damage, fk.CardUsing, fk.CardUseFinished },
   can_refresh = function(self, event, target, player, data)
     if player:hasSkill(self) then
-      if event == fk.Damaged then
+      if event == fk.Damage then
         return data.card and data.card.is_jy_jianyan
       elseif event == fk.CardUsing then
         return target.phase ~= Player.NotActive and
@@ -2147,7 +2147,7 @@ local jianyan = fk.CreateTriggerSkill {
     end
   end,
   on_refresh = function(self, event, target, player, data)
-    if event == fk.Damaged then
+    if event == fk.Damage then
       player:drawCards(data.damage)
     elseif event == fk.CardUsing then
       player.room:addPlayerMark(target, "jy_jianyan-turn")
@@ -2185,9 +2185,9 @@ Fk:loadTranslationTable {
   ["cv:jy__luotong"] = [[无]],
 
   ["jy_jianyan"] = [[谏言]],
-  [":jy_jianyan"] = [[一名角色于其回合内首次使用基本牌或普通锦囊牌时，你可以失去一点体力并选择一项：①此牌额外结算一次，其每造成一点伤害，你摸一张牌；②此牌无效，你获得此牌。]],
-  ["#jy_jianyan_1"] = [[此牌额外结算一次，其每造成一点伤害，你摸一张牌]],
-  ["#jy_jianyan_2"] = [[此牌无效，你获得此牌]],
+  [":jy_jianyan"] = [[一名角色于其回合内首次使用基本牌或普通锦囊牌时，你可以失去一点体力并选择一项：①此牌额外结算一次，其每造成一点伤害时，你摸一张牌；②此牌无效且你获得此牌，若为锦囊牌，你获得一点护甲。]],
+  ["#jy_jianyan_1"] = [[此牌额外结算一次，其每造成一点伤害时，你摸一张牌]],
+  ["#jy_jianyan_2"] = [[此牌无效且你获得此牌，若为锦囊牌，你获得一点护甲]],
   ["#jy_jianyan-ask"] = [[谏言：选择要对 %src 使用的 %arg 发动的效果]],
 
   ["jy_jimin"] = [[济民]],
@@ -2240,6 +2240,7 @@ local guanxi = fk.CreateTriggerSkill {
       room:notifySkillInvoked(player, self.name, "support")
       room:setPlayerMark(player, "jy_guanxi_used-round", true) -- 必须要先设这个，不然死循环
       -- 洞烛先机未必开了
+      room:doIndicate(player.id, { room.current.id })
       room:useVirtualCard("foresight", nil, room.current, room.current, self.name)
     end
   end,
@@ -2256,7 +2257,8 @@ local huilan = fk.CreateViewAsSkill {
     return card
   end,
   before_use = function(self, player, use)
-    if #player.room:askForDiscard(player, 2, 2, true, self.name, true, nil, "#jy_huilan-ask") == 0 then
+    local min, max = findHandCardMinMax(player.room:getAlivePlayers())
+    if #player.room:askForDiscard(player, 2, 2, true, self.name, true, nil, "#jy_huilan-ask:::" .. min .. ":" .. max) == 0 then
       player:drawCards(2, self.name)
     end
   end,
@@ -2280,6 +2282,7 @@ local huilan = fk.CreateViewAsSkill {
 
 -- 本武将需开启gamemode包（https://gitee.com/qsgs-fans/gamemode）才能游玩
 local fuxuan = General(extension, "jy__fuxuan", "qun", 3, 3, General.Female)
+fuxuan.hidden = true -- 正在测试
 fuxuan:addSkill(guanxi)
 fuxuan:addSkill(huilan)
 
@@ -2302,8 +2305,8 @@ Fk:loadTranslationTable {
   ["jy_huilan"] = [[会览]],
   [":jy_huilan"] = [[每轮限一次，你可以摸两张牌或弃两张牌，视为使用【无懈可击】。然后若你的手牌数为全场最多，你弃至全场最少；若你的手牌数为全场最少，你摸至全场最多。]],
   ["#jy_huilan-prompt"] = [[会览：视为使用【无懈可击】]],
-  ["#jy_huilan-ask"] = [[会览：弃两张牌，点击取消摸两张牌]],
-  ["#jy_huilan-discard"] = [[会览：将手牌弃至%arg张]],
+  ["#jy_huilan-ask"] = [[会览：弃两张牌，或点击取消摸两张牌。当前手牌数全场最少：%arg，全场最多：%arg2]],
+  ["#jy_huilan-discard"] = [[会览：将手牌弃至 %arg 张]],
   ["$jy_huilan1"] = [[相与为一。]],
   ["$jy_huilan2"] = [[上下相易。]],
   ["$jy_huilan3"] = [[否极泰来。]],
@@ -2690,13 +2693,13 @@ local dingfei = fk.CreateTriggerSkill {
     for c, s in ipairs(handsSuit) do
       if s == 0 then
         if c == Card.Spade then
-          hint = hint .. [[♠]]
+          hint = hint .. [[♠ ]]
         elseif c == Card.Heart then
-          hint = hint .. [[<font color="red">♥</font>]]
+          hint = hint .. [[<font color="red">♥</font> ]]
         elseif c == Card.Club then
-          hint = hint .. [[♣]]
+          hint = hint .. [[♣ ]]
         elseif c == Card.Diamond then
-          hint = hint .. [[<font color="red">♦️</font>]]
+          hint = hint .. [[<font color="red">♦️</font> ]]
         end
       end
     end
@@ -2754,9 +2757,9 @@ Fk:loadTranslationTable {
   ["$jy_zhaoyong2"] = "花开富贵！",
 
   ["jy_dingfei"] = "鼎沸",
-  [":jy_dingfei"] = [[每回合限一次，你受到伤害后，可以展示所有手牌并令伤害来源可以弃置任意张手牌。若你展示的手牌与其弃置的牌花色一共不足四种，你回复一点体力。]],
-  ["#jy_dingfei-prompt"] = [[鼎沸：是否展示手牌并令 %dest 弃牌，若其弃的牌未满足条件则你回复一点体力]],
-  ["#jy_dingfei-discard"] = [[鼎沸：%src 令你弃任意张牌，弃置 %arg 手牌至少各一张，否则 %src 回复一点体力]],
+  [":jy_dingfei"] = [[每回合限一次，你受到伤害后，可以展示所有手牌并令伤害来源弃置手牌。若你展示的手牌与其弃置的牌花色一共不足四种，你回复一点体力。]],
+  ["#jy_dingfei-prompt"] = [[鼎沸：是否展示手牌并令 %dest 弃牌，你有概率回复一点体力]],
+  ["#jy_dingfei-discard"] = [[鼎沸：%src 令你弃任意张牌，弃置 %arg手牌至少各一张，否则 %src 回复一点体力]], -- 这里%arg后没留空格是故意的，因为%arg里本身最后就带空格
   ["#jy_dingfei-discard-no-recover"] = [[鼎沸：%src 令你弃任意张牌]],
   ["$jy_dingfei1"] = [[哎哟，您可别放水。]],
   ["$jy_dingfei2"] = [[幸亏我练过！]],
