@@ -2618,7 +2618,7 @@ local pojun = fk.CreateTriggerSkill {
     local sheild = to.shield
     local cards = room:askForCardsChosen(player, to, 1, to.hp, "hej", self.name)
     to:addToPile(self.name, cards, false, self.name)
-    room:setPlayerMark(to, "@jy_pojun_who-turn", player.id)
+    room:setPlayerMark(to, "jy_pojun_who", player.id)
     room:changeShield(to, -sheild)
   end,
   refresh_events = { fk.TurnEnd },
@@ -2627,8 +2627,9 @@ local pojun = fk.CreateTriggerSkill {
   end,
   on_refresh = function(self, event, target, player, data)
     local room = player.room
-    player.room:moveCardTo(target:getPile("jy_pojun"), Player.Hand,
-      room:getPlayerById(player:getMark("@jy_pojun_who-turn")), fk.ReasonPrey, "jy_pojun")
+    room:moveCardTo(player:getPile("jy_pojun"), Player.Hand,
+      room:getPlayerById(player:getMark("jy_pojun_who")), fk.ReasonPrey, "jy_pojun")
+    room:setPlayerMark(player, "jy_pojun_who", 0)
   end,
 }
 
