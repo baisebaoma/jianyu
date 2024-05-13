@@ -2530,7 +2530,7 @@ local zhuojing = fk.CreateViewAsSkill {
           }
         end
       else
-        room:doBroadcastNotify("ShowToast", Fk:translate("#jy_zhuojing-fail::" .. target.id), { player, target })
+        room:doBroadcastNotify("ShowToast", Fk:translate("#jy_zhuojing-fail"), { player, target })
       end
     end
   end,
@@ -2577,7 +2577,7 @@ Fk:loadTranslationTable {
   ["#jy_zhuojing-discard"] = [[濯荆：弃置 %arg 张牌，随后你可以令一名没有手牌的角色摸牌或将所有手牌当【桃】使用]],
   ["#jy_zhuojing-skill"] = [[濯荆发动]],
   ["#jy_zhuojing-use"] = [[濯荆：%dest 令你发动 %arg，请指定目标]],
-  ["#jy_zhuojing-fail"] = [[濯荆：%dest 不满足〖素绽〗或〖濯荆〗的发动条件，无法发动]],
+  ["#jy_zhuojing-fail"] = [[濯荆：不满足〖素绽〗或〖濯荆〗的发动条件，无法发动]],
   ["$jy_zhuojing1"] = [[永眠非终焉……]],
   ["$jy_zhuojing2"] = [[逝者将再临！]],
 }
