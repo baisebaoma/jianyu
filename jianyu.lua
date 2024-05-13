@@ -2619,7 +2619,7 @@ local pojun = fk.CreateTriggerSkill {
     local cards = room:askForCardsChosen(player, to, 1, to.hp, "hej", self.name)
     to:addToPile(self.name, cards, false, self.name)
     room:setPlayerMark(to, "jy_pojun_who", player.id)
-    room:changeShield(to, -sheild)
+    -- room:changeShield(to, -sheild)
   end,
   refresh_events = { fk.TurnEnd },
   can_refresh = function(self, event, target, player, data)
@@ -2733,7 +2733,7 @@ Fk:loadTranslationTable {
   ["#jy_pojun-invoke"] = "破军：你可以移除 %dest 所有护甲并暂时移除其区域内一部分牌",
   ["jy_pojun"] = [[破军]],
   ["#jy_pojun_delay"] = [[破军]],
-  [":jy_pojun"] = [[当你使用【杀】指定一个目标后，你可以将其区域内至多X张牌扣置于该角色的武将牌旁（X为其体力值）并<font color="red">移除其所有护甲</font>；若如此做，当前回合结束时，<font color="red">你</font>获得这些牌。]],
+  [":jy_pojun"] = [[当你使用【杀】指定一个目标后，你可以将其区域内至多X张牌扣置于该角色的武将牌旁（X为其体力值）；若如此做，当前回合结束时，你获得这些牌。]],
 
   -- ["jy_jiedao"] = [[劫刀]],
   -- ["#jy_jiedao"] = "劫刀：将一张武器牌当【杀】或【酒】使用或打出",
