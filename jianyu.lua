@@ -2618,6 +2618,7 @@ local pojun = fk.CreateTriggerSkill {
     local sheild = to.shield
     local cards = room:askForCardsChosen(player, to, 1, to.hp, "hej", self.name)
     to:addToPile(self.name, cards, false, self.name)
+    room:setPlayerMark(to, "jy_pojun_who-turn", player.id)
     room:changeShield(to, -sheild)
   end,
 }
@@ -2626,11 +2627,13 @@ local pojun_delay = fk.CreateTriggerSkill {
   mute = true,
   events = { fk.TurnEnd },
   can_trigger = function(self, event, target, player, data)
-    return player:hasSkill(self) and #target:getPile("jy_pojun") > 0
+    return #player:getPile("jy_pojun") > 0
   end,
   on_cost = Util.TrueFunc,
   on_use = function(self, event, target, player, data)
-    player.room:moveCardTo(target:getPile("jy_pojun"), Player.Hand, player, fk.ReasonPrey, "jy_pojun")
+    local room = player.room
+    player.room:moveCardTo(target:getPile("jy_pojun"), Player.Hand,
+      room:getPlayerById(player:getMark("jy_pojun_who-turn")), fk.ReasonPrey, "jy_pojun")
   end,
 }
 pojun:addRelatedSkill(pojun_delay)
