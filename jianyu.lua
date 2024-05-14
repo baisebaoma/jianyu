@@ -1468,13 +1468,13 @@ Fk:loadTranslationTable {
   ["cv:jy__mou__gaotianliang"] = "暂无",
   ["illustrator:jy__mou__gaotianliang"] = "高天亮",
 
-  ["jy_tianling"] = "天灵",
+  ["jy_tianling"] = "开朗",
   [":jy_tianling"] = [[弃牌阶段开始时，你可以弃两张牌或失去一点体力。若如此做，你的下一个回合：准备阶段后执行一个额外的出牌阶段；判定阶段结束前，你的手牌可当作所有锦囊牌使用，至多5次。]],
-  ["@jy_tianling"] = "天灵",
+  ["@jy_tianling"] = "开朗",
   ["#jy_tianling_1hp"] = "失去一点体力",
   ["#jy_tianling_2cards"] = "弃置2张牌",
-  ["#jy_tianling_dangxian"] = "天灵",
-  ["#jy_tianling_yuyu"] = "天灵",
+  ["#jy_tianling_dangxian"] = "开朗",
+  ["#jy_tianling_yuyu"] = "开朗",
 
   ["jy_yali"] = "压力",
   [":jy_yali"] = [[锁定技，你的摸牌阶段改为摸X张牌，X为你的体力值与手牌数之差且至少为1；你的手牌上限等于你的体力上限。]],
@@ -2610,14 +2610,26 @@ local pojun = fk.CreateTriggerSkill {
   end,
   on_cost = function(self, event, target, player, data)
     local to = player.room:getPlayerById(data.to)
+    local x = 0
+    if data.to > 0 then
+      x = 2
+    else
+      x = to.maxHp
+    end
     return player.room:askForSkillInvoke(player, self.name, nil,
-      "#jy_pojun-invoke::" .. data.to .. ":" .. math.min(to.hp, #to:getCardIds("hej")))
+      "#jy_pojun-invoke::" .. data.to .. ":" .. math.min(x, #to:getCardIds("hej")))
   end,
   on_use = function(self, event, target, player, data)
     local room = player.room
     room:doIndicate(player.id, { data.to })
     local to = room:getPlayerById(data.to)
-    local cards = room:askForCardsChosen(player, to, 1, to.hp, "hej", self.name)
+    local x = 0
+    if data.to > 0 then
+      x = 2
+    else
+      x = to.maxHp
+    end
+    local cards = room:askForCardsChosen(player, to, 1, x, "hej", self.name)
     room:moveCardTo(cards, Player.Hand,
       player, fk.ReasonPrey, "jy_pojun")
   end,
@@ -2723,7 +2735,7 @@ Fk:loadTranslationTable {
   ["#jy_pojun-invoke"] = "破军：你可以获得 %dest 区域内至多 %arg 张牌",
   ["jy_pojun"] = [[破军]],
   ["#jy_pojun_delay"] = [[破军]],
-  [":jy_pojun"] = [[当你使用【杀】指定一个目标后，你可以获得其区域内至多X张牌（X为其体力值）。]],
+  [":jy_pojun"] = [[当你使用【杀】指定一个目标后，你可以获得其区域内至多两张牌（若目标为机器人，则改为其体力上限）。]],
 
   -- ["jy_jiedao"] = [[劫刀]],
   -- ["#jy_jiedao"] = "劫刀：将一张武器牌当【杀】或【酒】使用或打出",
