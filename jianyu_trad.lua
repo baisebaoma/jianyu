@@ -209,6 +209,7 @@ local trad_xiuxing = fk.CreateTriggerSkill {
           player.room:setPlayerMark(player, MarkEnum.SwithSkillPreName .. s.name,
             player:getSwitchSkillState(s.name, true)) -- 经测试这个是没问题的
           player:addSkillUseHistory(s.name)           -- 加这个，在UI上更新
+          -- TODO：使用addSkillUseHistory会导致一些限制使用次数的技能无法继续发动
           local t = {}
           t[0] = "阳"
           t[1] = "阴"
@@ -308,7 +309,7 @@ local trad__guanzhe = General(extension, "jy__trad__guanzhe", "jin", 3, 3, Gener
 trad__guanzhe.hidden = true
 trad__guanzhe:addSkill(trad_xiuxing)
 trad__guanzhe:addSkill(trad_zitai)
-trad__guanzhe:addSkill("jy_zhaoyong")
+-- trad__guanzhe:addSkill("jy_zhaoyong")
 trad__guanzhe:addSkill("jy_yujian")
 
 Fk:loadTranslationTable {
@@ -634,7 +635,7 @@ local silie = fk.CreateTriggerSkill {
 local juewu = fk.CreateTriggerSkill {
   name = "jy_juewu",
   anim_type = "offensive",
-  events = { fk.DamageInflicted },
+  events = { fk.DamageCaused },
   frequency = Skill.Compulsory,
   can_trigger = function(self, event, target, player, data)
     return player:hasSkill(self) and data.from and data.from == player and data.to.maxHp >= 6
