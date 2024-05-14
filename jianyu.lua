@@ -2610,28 +2610,21 @@ local pojun = fk.CreateTriggerSkill {
   end,
   on_cost = function(self, event, target, player, data)
     local to = player.room:getPlayerById(data.to)
-    local x = 0
-    if data.to > 0 then
-      x = 2
-    else
-      x = to.maxHp
-    end
     return player.room:askForSkillInvoke(player, self.name, nil,
-      "#jy_pojun-invoke::" .. data.to .. ":" .. math.min(x, #to:getCardIds("hej")))
+      "#jy_pojun-invoke::" .. data.to .. ":" .. math.min(2, #to:getCardIds("hej")))
   end,
   on_use = function(self, event, target, player, data)
     local room = player.room
     room:doIndicate(player.id, { data.to })
     local to = room:getPlayerById(data.to)
-    local x = 0
     if data.to > 0 then
-      x = 2
+      local cards = room:askForCardsChosen(player, to, 1, 2, "hej", self.name)
+      room:moveCardTo(cards, Player.Hand,
+        player, fk.ReasonPrey, "jy_pojun")
     else
-      x = to.maxHp
+      room:moveCardTo(to:getCardIds("hej"), Player.Hand,
+        player, fk.ReasonPrey, "jy_pojun")
     end
-    local cards = room:askForCardsChosen(player, to, 1, x, "hej", self.name)
-    room:moveCardTo(cards, Player.Hand,
-      player, fk.ReasonPrey, "jy_pojun")
   end,
 }
 
@@ -2735,7 +2728,7 @@ Fk:loadTranslationTable {
   ["#jy_pojun-invoke"] = "破军：你可以获得 %dest 区域内至多 %arg 张牌",
   ["jy_pojun"] = [[破军]],
   ["#jy_pojun_delay"] = [[破军]],
-  [":jy_pojun"] = [[当你使用【杀】指定一个目标后，你可以获得其区域内至多两张牌（若目标为机器人，则改为其体力上限）。]],
+  [":jy_pojun"] = [[当你使用【杀】指定一个目标后，你可以获得其区域内至多两张牌。]],
 
   -- ["jy_jiedao"] = [[劫刀]],
   -- ["#jy_jiedao"] = "劫刀：将一张武器牌当【杀】或【酒】使用或打出",
