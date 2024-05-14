@@ -2282,7 +2282,6 @@ local huilan = fk.CreateViewAsSkill {
 
 -- 本武将需开启gamemode包（https://gitee.com/qsgs-fans/gamemode）才能游玩
 local fuxuan = General(extension, "jy__fuxuan", "qun", 3, 3, General.Female)
-fuxuan.hidden = true -- 正在测试
 fuxuan:addSkill(guanxi)
 fuxuan:addSkill(huilan)
 
@@ -2748,7 +2747,7 @@ Fk:loadTranslationTable {
   ["~jy__guinaifen"] = [[哎呀，演砸了……]],
 
   ["jy_zhaoyong"] = "肇涌",
-  [":jy_zhaoyong"] = [[转换技，出牌阶段限一次，你可以翻面并视为对自己使用①【以逸待劳】；②【火攻】（你需有手牌）。若你因此弃置了红色牌，你可以将手牌摸至四张或令此技能视为未发动过。]],
+  [":jy_zhaoyong"] = [[转换技，出牌阶段限一次，你可以翻面并视为对自己使用①【以逸待劳】；②【火攻】（你需有手牌）。若你以此法弃置了红色牌，你可以将手牌摸至四张或令此技能视为未发动过。]],
   ["#jy_zhaoyong"] = [[肇涌：翻面并视为对自己使用【%arg】（弃置<font color="red">红色牌</font>以触发后续效果）]],
   ["#jy_zhaoyong_choose"] = "肇涌：选择后续效果",
   ["#jy_zhaoyong_draw_to_4"] = "将手牌摸至四张",
