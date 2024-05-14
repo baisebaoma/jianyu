@@ -2610,8 +2610,13 @@ local pojun = fk.CreateTriggerSkill {
   end,
   on_cost = function(self, event, target, player, data)
     local to = player.room:getPlayerById(data.to)
-    return player.room:askForSkillInvoke(player, self.name, nil,
-      "#jy_pojun-invoke::" .. data.to .. ":" .. math.min(2, #to:getCardIds("hej")))
+    if data.to > 0 then
+      return player.room:askForSkillInvoke(player, self.name, nil,
+        "#jy_pojun-invoke::" .. data.to .. ":" .. math.min(2, #to:getCardIds("hej")))
+    else
+      return player.room:askForSkillInvoke(player, self.name, nil,
+        "#jy_pojun-invoke::" .. data.to .. ":" .. #to:getCardIds("hej"))
+    end
   end,
   on_use = function(self, event, target, player, data)
     local room = player.room
