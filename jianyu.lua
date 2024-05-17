@@ -1518,6 +1518,7 @@ jy_fengnu:addRelatedSkill(jy_fengnu_trigger)
 -- jy__mou__gaotianliang:addSkill(jy_yali)
 -- jy__mou__gaotianliang:addSkill(jy_tianling)
 jy__mou__gaotianliang:addSkill(jy_fengnu)
+jy__mou__gaotianliang:addSkill("tiandu")
 
 Fk:loadTranslationTable {
   ["jy__mou__gaotianliang"] = "神高天亮",
