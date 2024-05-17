@@ -1445,8 +1445,79 @@ local jy_yali_maxcards = fk.CreateMaxCardsSkill {
 }
 jy_yali:addRelatedSkill(jy_yali_maxcards)
 
-jy__mou__gaotianliang:addSkill(jy_yali)
-jy__mou__gaotianliang:addSkill(jy_tianling)
+local jy_fengnu = fk.CreateViewAsSkill {
+  name = "jy_fengnu",
+  anim_type = "special",
+  pattern = ".",
+  interaction = function()
+    local names = {}
+    for _, id in ipairs(Fk:getAllCardIds()) do
+      local card = Fk:getCardById(id)
+      if card.type == Card.TypeTrick
+          and not card.is_derived and
+          ((Fk.currentResponsePattern == nil and Self:canUse(card)) or
+            (Fk.currentResponsePattern and Exppattern:Parse(Fk.currentResponsePattern):match(card))) then
+        table.insertIfNeed(names, card.name)
+      end
+    end
+    if #names == 0 then return false end
+    return UI.ComboBox { choices = names }
+  end,
+  card_filter = function(self, to_select, selected)
+    return #selected == 0 and Fk:currentRoom():getCardArea(to_select) ~= Card.PlayerEquip
+  end,
+  view_as = function(self, cards)
+    if #cards ~= 1 or not self.interaction.data then return end
+    local card = Fk:cloneCard(self.interaction.data)
+    self.cost_data = cards
+    card.skillName = self.name
+    return card
+  end,
+  before_use = function(self, player, use)
+    local cards = self.cost_data
+    local card_id = cards[1]
+    use.card:addSubcard(card_id)
+  end,
+  after_use = function(self, player, use)
+    player.room:removePlayerMark(player, "@jy_fengnu-turn")
+  end,
+  enabled_at_play = function(self, player)
+    return player:getMark("@jy_fengnu-turn") ~= 0 and not player:isKongcheng() and player.phase ~= Player.NotActive and
+        player:usedSkillTimes(self.name, Player.HistoryTurn) < 5
+  end,
+  enabled_at_response = function(self, player, response)
+    return player:getMark("@jy_fengnu-turn") ~= 0 and player.phase ~= Player.NotActive and not response and
+        not player:isKongcheng() and player:usedSkillTimes(self.name, Player.HistoryTurn) < 5
+  end,
+}
+local jy_fengnu_trigger = fk.CreateTriggerSkill {
+  name = "#jy_fengnu_trigger",
+  anim_type = "masochism",
+  frequency = Skill.Compulsory,
+  events = { fk.TurnStart },
+  can_trigger = function(self, event, target, player, data)
+    return player:hasSkill(self) and target == player
+  end,
+  on_use = function(self, event, target, player, data)
+    local room = player.room
+    local judge = {
+      who = player,
+      reason = self.name,
+      pattern = ".|.|club,spade",
+    }
+    room:judge(judge)
+    if judge.card.color == Card.Red then
+      room:setPlayerMark(player, "@jy_fengnu-turn", 5)
+    else
+      room:changeMaxHp(player, -1)
+    end
+  end,
+}
+jy_fengnu:addRelatedSkill(jy_fengnu_trigger)
+
+-- jy__mou__gaotianliang:addSkill(jy_yali)
+-- jy__mou__gaotianliang:addSkill(jy_tianling)
+jy__mou__gaotianliang:addSkill(jy_fengnu)
 
 Fk:loadTranslationTable {
   ["jy__mou__gaotianliang"] = "神高天亮",
@@ -1464,6 +1535,10 @@ Fk:loadTranslationTable {
 
   ["jy_yali"] = "压力",
   [":jy_yali"] = [[锁定技，你的摸牌阶段改为摸X张牌，X为你的体力值与手牌数之差且至少为1；你的手牌上限等于你的体力上限。]],
+
+  ["jy_fengnu"] = [[凤怒]],
+  ["#jy_fengnu_trigger"] = [[凤怒]],
+  [":jy_fengnu"] = [[锁定技，你的回合开始时，你进行一次判定，若为红色，本回合你可以将一张手牌当任意锦囊牌使用，至多5次；若为黑色，你失去一点体力上限。]],
 }
 
 local jy__raiden = General(extension, "jy__raiden", "god", 4, 4, General.Female)
