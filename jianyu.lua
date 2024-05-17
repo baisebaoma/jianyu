@@ -1432,18 +1432,18 @@ local jy_yali = fk.CreateTriggerSkill {
   events = { fk.DrawNCards },
   on_cost = Util.TrueFunc,
   on_use = function(self, event, target, player, data)
-    data.n = math.max(player.hp - #player:getCardIds(Player.Hand), 1)
+    data.n = math.max(player.maxHp - #player:getCardIds(Player.Hand), 0)
   end,
 }
-local jy_yali_maxcards = fk.CreateMaxCardsSkill {
-  name = "#jy_yali_maxcards",
-  fixed_func = function(self, player)
-    if player:hasSkill(self) then
-      return player.maxHp
-    end
-  end,
-}
-jy_yali:addRelatedSkill(jy_yali_maxcards)
+-- local jy_yali_maxcards = fk.CreateMaxCardsSkill {
+--   name = "#jy_yali_maxcards",
+--   fixed_func = function(self, player)
+--     if player:hasSkill(self) then
+--       return player.maxHp
+--     end
+--   end,
+-- }
+-- jy_yali:addRelatedSkill(jy_yali_maxcards)
 
 local jy_fengnu = fk.CreateViewAsSkill {
   name = "jy_fengnu",
@@ -1477,8 +1477,6 @@ local jy_fengnu = fk.CreateViewAsSkill {
     local cards = self.cost_data
     local card_id = cards[1]
     use.card:addSubcard(card_id)
-  end,
-  after_use = function(self, player, use)
     player.room:removePlayerMark(player, "@jy_fengnu-turn")
   end,
   enabled_at_play = function(self, player)
@@ -1527,7 +1525,7 @@ Fk:loadTranslationTable {
   ["#jy_tianling_yuyu"] = "开朗",
 
   ["jy_yali"] = "压力",
-  [":jy_yali"] = [[锁定技，你的摸牌阶段改为摸X张牌（X为你的体力值与手牌数之差且至少为1）；你的手牌上限等于你的体力上限。]],
+  [":jy_yali"] = [[锁定技，你的摸牌阶段改为将手牌数补至体力上限。]],
 
   ["jy_fengnu"] = [[凤怒]],
   ["@jy_fengnu-turn"] = [[凤怒]],
