@@ -1337,7 +1337,7 @@ Fk:loadTranslationTable {
 }
 
 -- 参考：廖化，英姿，蛊惑，血裔
-local jy__mou__gaotianliang = General(extension, "jy__mou__gaotianliang", "god", 4)
+local jy__mou__gaotianliang = General(extension, "jy__mou__gaotianliang", "god", 3)
 
 local jy_tianling = fk.CreateViewAsSkill {
   name = "jy_tianling",
@@ -1501,7 +1501,7 @@ jy_fengnu:addRelatedSkill(jy_fengnu_trigger)
 -- jy__mou__gaotianliang:addSkill(jy_yali)
 -- jy__mou__gaotianliang:addSkill(jy_tianling)
 jy__mou__gaotianliang:addSkill(jy_fengnu)
-jy__mou__gaotianliang:addSkill(jy_yali)
+-- jy__mou__gaotianliang:addSkill(jy_yali)
 
 Fk:loadTranslationTable {
   ["jy__mou__gaotianliang"] = "神高天亮",
