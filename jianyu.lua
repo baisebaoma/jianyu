@@ -1482,12 +1482,13 @@ local jy_fengnu = fk.CreateViewAsSkill {
     player.room:removePlayerMark(player, "@jy_fengnu-turn")
   end,
   enabled_at_play = function(self, player)
-    return player:getMark("@jy_fengnu-turn") ~= 0 and not player:isKongcheng() and player.phase ~= Player.NotActive and
-        player:usedSkillTimes(self.name, Player.HistoryTurn) < 5
+    return player:getMark("@jy_fengnu-turn") ~= 0 and player:getMark("@jy_fengnu-turn") > 0 and not player:isKongcheng() and
+        player.phase ~= Player.NotActive
   end,
   enabled_at_response = function(self, player, response)
-    return player:getMark("@jy_fengnu-turn") ~= 0 and player.phase ~= Player.NotActive and not response and
-        not player:isKongcheng() and player:usedSkillTimes(self.name, Player.HistoryTurn) < 5
+    return player:getMark("@jy_fengnu-turn") ~= 0 and player:getMark("@jy_fengnu-turn") > 0 and
+        player.phase ~= Player.NotActive and not response and
+        not player:isKongcheng()
   end,
 }
 local jy_fengnu_trigger = fk.CreateTriggerSkill {
@@ -1507,7 +1508,7 @@ local jy_fengnu_trigger = fk.CreateTriggerSkill {
     }
     room:judge(judge)
     if judge.card.color == Card.Red then
-      room:setPlayerMark(player, "@jy_fengnu-turn", 5)
+      room:setPlayerMark(player, "@jy_fengnu-turn", #room.alive_players)
     else
       room:changeMaxHp(player, -1)
     end
@@ -1540,7 +1541,7 @@ Fk:loadTranslationTable {
   ["jy_fengnu"] = [[凤怒]],
   ["@jy_fengnu-turn"] = [[凤怒]],
   ["#jy_fengnu_trigger"] = [[凤怒]],
-  [":jy_fengnu"] = [[锁定技，你的回合开始时，你进行一次判定，若为红色，本回合你可以将一张手牌当任意锦囊牌使用，至多5次；若为黑色，你失去一点体力上限。]],
+  [":jy_fengnu"] = [[锁定技，你的回合开始时，你进行一次判定，若为红色，本回合你可以将一张手牌当任意锦囊牌使用，至多X次（X为存活角色数）；若为黑色，你失去一点体力上限。]],
 }
 
 local jy__raiden = General(extension, "jy__raiden", "god", 4, 4, General.Female)
