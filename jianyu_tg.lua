@@ -423,7 +423,7 @@ local cancel = fk.CreateProhibitSkill {
   name = "#jy_xiuxing_cancel",
   frequency = Skill.Compulsory,
   is_prohibited = function(self, from, to, card)
-    return from:hasSkill(self) and (to:getNextAlive() == from or from:getNextAlive() == to)
+    return from:hasSkill(self) and to:getNextAlive() ~= from and from:getNextAlive() ~= to
   end,
 }
 xiuxing:addRelatedSkill(mumang)

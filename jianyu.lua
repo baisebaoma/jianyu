@@ -2776,6 +2776,7 @@ Fk:loadTranslationTable {
   ["$jy_pojun1"] = "犯大吴疆土者，盛必击而破之！",
   ["$jy_pojun2"] = "若敢来犯，必教你大败而归！",
 
+  ["jy_pojun"] = [[破军]],
   ["#jy_pojun-invoke"] = "破军：你可以获得 %dest 区域内至多 %arg 张牌",
   ["#jy_pojun-invoke-robot"] = "破军：%dest 是机器人，所以你可以获得其区域内所有牌！",
   ["#jy_pojun_delay"] = [[破军]],
