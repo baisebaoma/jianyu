@@ -1503,7 +1503,7 @@ local jy_fengnu_trigger = fk.CreateTriggerSkill {
     local judge = {
       who = player,
       reason = self.name,
-      pattern = ".|.|club,spade",
+      pattern = ".|.|heart,diamond",
     }
     room:judge(judge)
     if judge.card.color == Card.Red then
@@ -1537,6 +1537,7 @@ Fk:loadTranslationTable {
   [":jy_yali"] = [[锁定技，你的摸牌阶段改为摸X张牌，X为你的体力值与手牌数之差且至少为1；你的手牌上限等于你的体力上限。]],
 
   ["jy_fengnu"] = [[凤怒]],
+  ["@jy_fengnu-turn"] = [[凤怒]],
   ["#jy_fengnu_trigger"] = [[凤怒]],
   [":jy_fengnu"] = [[锁定技，你的回合开始时，你进行一次判定，若为红色，本回合你可以将一张手牌当任意锦囊牌使用，至多5次；若为黑色，你失去一点体力上限。]],
 }
