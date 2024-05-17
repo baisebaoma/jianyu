@@ -248,7 +248,7 @@ jy__jianzihao:addSkill("jy_shengnu")
 jy__jianzihao:addSkill("jy_xizao")
 
 Fk:loadTranslationTable {
-  ["jy__new__jianzihao"] = "简自豪",
+  ["jy__new__jianzihao"] = "神简自豪",
   ["#jy__new__jianzihao"] = "无冕之王",
   ["designer:jy__new__jianzihao"] = "考公专家",
   ["cv:jy__new__jianzihao"] = "简自豪",
