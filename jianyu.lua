@@ -1284,7 +1284,6 @@ local jy_jiangbei_draw = fk.CreateTriggerSkill {
     room:setPlayerMark(player, "@jy_jiangbei_draw", 0) -- 无论能不能摸牌，都要清理掉这个标记
   end,
 }
-jy_jiangbei:addRelatedSkill(jy_jiangbei_heart)
 jy_jiangbei:addRelatedSkill(jy_jiangbei_club)
 jy_jiangbei:addRelatedSkill(jy_jiangbei_club_2)
 jy_jiangbei:addRelatedSkill(jy_jiangbei_draw_count)
@@ -1403,21 +1402,9 @@ local jy_tianling_yuyu = fk.CreateTriggerSkill {
   end,
   on_use = function(self, event, target, player, data)
     local room = player.room
-    local choices = { "#jy_tianling_1hp", "#jy_tianling_2cards" }
-    local choice
-
-    -- 检测他是否没有两张牌可以弃了，如果是，就黑掉弃两张牌那个按钮
-    if #player:getCardIds { Player.Hand, Player.Equip } < 2 then
-      choice = room:askForChoice(player, { "#jy_tianling_1hp" }, self.name, nil, nil, choices)
-      -- 如果可以做选择，就让他做选择
-    else
-      choice = room:askForChoice(player, choices, self.name)
-    end
-
-    if choice == "#jy_tianling_1hp" then
+    local cards = room:askForDiscard(player, 2, 2, true, self.name, true, nil, "#jy_tianling-prompt")
+    if #cards == 0 then
       room:loseHp(player, 1, self.name)
-    else
-      room:askForDiscard(player, 2, 2, true, self.name, false)
     end
     room:setPlayerMark(player, "@jy_tianling", "")
   end,
@@ -1462,17 +1449,16 @@ jy__mou__gaotianliang:addSkill(jy_yali)
 jy__mou__gaotianliang:addSkill(jy_tianling)
 
 Fk:loadTranslationTable {
-  ["jy__mou__gaotianliang"] = "高天亮",
+  ["jy__mou__gaotianliang"] = "神高天亮",
   ["#jy__mou__gaotianliang"] = "凤鸣九天",
   ["designer:jy__mou__gaotianliang"] = "拂却心尘 & 考公专家",
   ["cv:jy__mou__gaotianliang"] = "暂无",
   ["illustrator:jy__mou__gaotianliang"] = "高天亮",
 
   ["jy_tianling"] = "开朗",
-  [":jy_tianling"] = [[弃牌阶段开始时，你可以弃两张牌或失去一点体力。若如此做，你的下一个回合：准备阶段后执行一个额外的出牌阶段；判定阶段结束前，你的手牌可当作所有锦囊牌使用，至多5次。]],
+  [":jy_tianling"] = [[弃牌阶段开始时，你可以弃两张牌或失去一点体力。若如此做，你的下一个回合：准备阶段后执行一个额外的出牌阶段；判定阶段结束前，你可以将一张手牌当任意锦囊牌使用，至多5次。]],
   ["@jy_tianling"] = "开朗",
-  ["#jy_tianling_1hp"] = "失去一点体力",
-  ["#jy_tianling_2cards"] = "弃置2张牌",
+  ["#jy_tianling-prompt"] = "开朗：弃置两张牌或点击取消失去一点体力",
   ["#jy_tianling_dangxian"] = "开朗",
   ["#jy_tianling_yuyu"] = "开朗",
 
@@ -1918,7 +1904,7 @@ Fk:loadTranslationTable {
   ["$jy_bazhen4"] = "说不定我也能做到……",
 
   ["jy_lingfu"] = "灵符",
-  [":jy_lingfu"] = [[出牌阶段限一次，你可以弃置X+2张牌并令X（X由你选择，X不小于1且不大于3）名角色回复一点体力、摸两张牌、重置武将牌，然后你获得其判定区的牌。]],
+  [":jy_lingfu"] = [[出牌阶段限一次，你可以弃置X+2张牌并令X名角色回复一点体力、摸两张牌、重置武将牌，然后你获得其判定区的牌（X由你选择，X不小于1且不大于3）。]],
   ["$jy_lingfu1"] = [[驱邪……缚魅……]],
   ["$jy_lingfu2"] = [[灵符……保命……]],
 }
