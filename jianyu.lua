@@ -1337,7 +1337,7 @@ Fk:loadTranslationTable {
 }
 
 -- 参考：廖化，英姿，蛊惑，血裔
-local jy__mou__gaotianliang = General(extension, "jy__mou__gaotianliang", "god", 3)
+local jy__mou__gaotianliang = General(extension, "jy__mou__gaotianliang", "god", 4)
 
 local jy_tianling = fk.CreateViewAsSkill {
   name = "jy_tianling",
@@ -1457,19 +1457,17 @@ local jy_fengnu = fk.CreateViewAsSkill {
     return UI.ComboBox { choices = names }
   end,
   card_filter = function(self, to_select, selected)
-    return #selected == 0 and Fk:currentRoom():getCardArea(to_select) ~= Card.PlayerEquip
+    return #selected < 2 and Fk:currentRoom():getCardArea(to_select) ~= Card.PlayerEquip
   end,
   view_as = function(self, cards)
-    if #cards ~= 1 or not self.interaction.data then return end
+    if #cards ~= 2 or not self.interaction.data then return end
     local card = Fk:cloneCard(self.interaction.data)
     self.cost_data = cards
     card.skillName = self.name
     return card
   end,
   before_use = function(self, player, use)
-    local cards = self.cost_data
-    local card_id = cards[1]
-    use.card:addSubcard(card_id)
+    use.card:addSubcards(self.cost_data)
     player.room:removePlayerMark(player, "@jy_fengnu-turn")
   end,
   enabled_at_play = function(self, player)
@@ -1523,7 +1521,7 @@ Fk:loadTranslationTable {
   ["jy_fengnu"] = [[凤怒]],
   ["@jy_fengnu-turn"] = [[凤怒]],
   ["#jy_fengnu_trigger"] = [[凤怒]],
-  [":jy_fengnu"] = [[锁定技，你的回合开始时，你失去一点体力上限；你的回合内限X次，你可以将一张手牌当任意锦囊牌使用（X为存活角色数）。]],
+  [":jy_fengnu"] = [[锁定技，你的回合开始时，你失去一点体力上限；你的回合内限X次，你可以将两张手牌当任意锦囊牌使用（X为存活角色数）。]],
 }
 
 local jy__raiden = General(extension, "jy__raiden", "god", 4, 4, General.Female)
