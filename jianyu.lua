@@ -1427,23 +1427,16 @@ jy_tianling:addRelatedSkill(jy_tianling_dangxian)
 
 local jy_yali = fk.CreateTriggerSkill {
   name = "jy_yali",
-  anim_type = "drawcard",
+  events = { fk.EventPhaseChanging },
+  anim_type = "negative",
   frequency = Skill.Compulsory,
-  events = { fk.DrawNCards },
-  on_cost = Util.TrueFunc,
+  can_trigger = function(self, event, target, player, data)
+    return player:hasSkill(self) and target == player and data.to == Player.Draw
+  end,
   on_use = function(self, event, target, player, data)
-    data.n = math.max(player.maxHp - #player:getCardIds(Player.Hand), 0)
+    return true
   end,
 }
--- local jy_yali_maxcards = fk.CreateMaxCardsSkill {
---   name = "#jy_yali_maxcards",
---   fixed_func = function(self, player)
---     if player:hasSkill(self) then
---       return player.maxHp
---     end
---   end,
--- }
--- jy_yali:addRelatedSkill(jy_yali_maxcards)
 
 local jy_fengnu = fk.CreateViewAsSkill {
   name = "jy_fengnu",
@@ -1524,8 +1517,8 @@ Fk:loadTranslationTable {
   ["#jy_tianling_dangxian"] = "开朗",
   ["#jy_tianling_yuyu"] = "开朗",
 
-  ["jy_yali"] = "压力",
-  [":jy_yali"] = [[锁定技，你的摸牌阶段改为将手牌数补至体力上限。]],
+  ["jy_yali"] = [[绝境]],
+  [":jy_yali"] = [[锁定技，你跳过摸牌阶段。]],
 
   ["jy_fengnu"] = [[凤怒]],
   ["@jy_fengnu-turn"] = [[凤怒]],
