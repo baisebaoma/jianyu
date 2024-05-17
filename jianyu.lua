@@ -1471,13 +1471,14 @@ local jy_fengnu = fk.CreateViewAsSkill {
     player.room:removePlayerMark(player, "@jy_fengnu-turn")
   end,
   enabled_at_play = function(self, player)
-    return player:getMark("@jy_fengnu-turn") ~= 0 and player:getMark("@jy_fengnu-turn") > 0 and not player:isKongcheng() and
+    return player:getMark("@jy_fengnu-turn") ~= 0 and player:getMark("@jy_fengnu-turn") > 0 and
+        #player:getCardIds("h") >= 2 and
         player.phase ~= Player.NotActive
   end,
   enabled_at_response = function(self, player, response)
     return player:getMark("@jy_fengnu-turn") ~= 0 and player:getMark("@jy_fengnu-turn") > 0 and
         player.phase ~= Player.NotActive and not response and
-        not player:isKongcheng()
+        #player:getCardIds("h") >= 2
   end,
 }
 local jy_fengnu_trigger = fk.CreateTriggerSkill {
