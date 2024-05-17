@@ -422,8 +422,8 @@ local mumang_trigger = fk.CreateTriggerSkill {
 local cancel = fk.CreateProhibitSkill {
   name = "#jy_xiuxing_cancel",
   frequency = Skill.Compulsory,
-  is_prohibited = function(self, from, to, card)
-    return from:hasSkill(self) and to:getNextAlive() ~= from and from:getNextAlive() ~= to
+  is_prohibited = function(self, from, to)
+    return from:hasSkill(self) and not (to == from or to:getNextAlive() == from or from:getNextAlive() == to)
   end,
 }
 xiuxing:addRelatedSkill(mumang)
@@ -449,13 +449,21 @@ local zitai = fk.CreateTriggerSkill {
       }
       player.room:judge(judge)
       if judge.card.color == Card.Red then
-        player:drawCards(2, self.name)
+        player:drawCards(1, self.name)
         return true
       end
     else
-      data.damage = data.damage + 1
+      local judge = {
+        who = player,
+        reason = self.name,
+        pattern = ".|.|spade,club",
+      }
+      player.room:judge(judge)
+      if judge.card.color == Card.Black then
+        data.damage = data.damage + 1
+      end
     end
-    player:drawCards(2, self.name)
+    player:drawCards(1, self.name)
   end
 }
 
@@ -486,10 +494,10 @@ Fk:loadTranslationTable {
   ["illustrator:jy__guanzhe"] = [[未知]],
 
   ["jy_xiuxing"] = [[修行]],
-  [":jy_xiuxing"] = [[锁定技，你使用牌无次数限制；你只能选择你上家和下家为你使用牌的目标；你的攻击范围始终为1。]],
+  [":jy_xiuxing"] = [[锁定技，你使用牌无次数限制；你、你上家和下家之外的角色不是你使用牌的合法目标；你的攻击范围始终为1。]],
 
   ["jy_zitai"] = [[姿态]],
-  [":jy_zitai"] = [[转换技，锁定技，当你造成或受到伤害时，阳：你判定，若为红色，防止之；阴：该伤害+1。然后你摸两张牌。]],
+  [":jy_zitai"] = [[转换技，锁定技，当你造成或受到伤害时，你判定，阳：若为红色，防止之；阴：若为黑色，该伤害+1。然后你摸一张牌。]],
 
   ["jy_yujian"] = [[预见]],
   [":jy_yujian"] = [[准备阶段，你可以卜算X（X为游戏轮数且至多为5）。]],
