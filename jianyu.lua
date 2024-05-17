@@ -1338,6 +1338,7 @@ Fk:loadTranslationTable {
 
 -- 参考：廖化，英姿，蛊惑，血裔
 local jy__mou__gaotianliang = General(extension, "jy__mou__gaotianliang", "god", 4)
+jy__mou__gaotianliang.total_hidden = true
 
 local jy_tianling = fk.CreateViewAsSkill {
   name = "jy_tianling",
