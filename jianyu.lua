@@ -1501,17 +1501,8 @@ local jy_fengnu_trigger = fk.CreateTriggerSkill {
   end,
   on_use = function(self, event, target, player, data)
     local room = player.room
-    local judge = {
-      who = player,
-      reason = self.name,
-      pattern = ".|.|heart,diamond",
-    }
-    room:judge(judge)
-    if judge.card.color == Card.Red then
-      room:setPlayerMark(player, "@jy_fengnu-turn", #room.alive_players)
-    else
-      room:changeMaxHp(player, -1)
-    end
+    room:setPlayerMark(player, "@jy_fengnu-turn", #room.alive_players)
+    room:changeMaxHp(player, -1)
   end,
 }
 jy_fengnu:addRelatedSkill(jy_fengnu_trigger)
@@ -1519,7 +1510,7 @@ jy_fengnu:addRelatedSkill(jy_fengnu_trigger)
 -- jy__mou__gaotianliang:addSkill(jy_yali)
 -- jy__mou__gaotianliang:addSkill(jy_tianling)
 jy__mou__gaotianliang:addSkill(jy_fengnu)
-jy__mou__gaotianliang:addSkill("tiandu")
+jy__mou__gaotianliang:addSkill(jy_yali)
 
 Fk:loadTranslationTable {
   ["jy__mou__gaotianliang"] = "神高天亮",
@@ -1536,12 +1527,12 @@ Fk:loadTranslationTable {
   ["#jy_tianling_yuyu"] = "开朗",
 
   ["jy_yali"] = "压力",
-  [":jy_yali"] = [[锁定技，你的摸牌阶段改为摸X张牌，X为你的体力值与手牌数之差且至少为1；你的手牌上限等于你的体力上限。]],
+  [":jy_yali"] = [[锁定技，你的摸牌阶段改为摸X张牌（X为你的体力值与手牌数之差且至少为1）；你的手牌上限等于你的体力上限。]],
 
   ["jy_fengnu"] = [[凤怒]],
   ["@jy_fengnu-turn"] = [[凤怒]],
   ["#jy_fengnu_trigger"] = [[凤怒]],
-  [":jy_fengnu"] = [[锁定技，你的回合开始时，你进行一次判定，若为红色，本回合你可以将一张手牌当任意锦囊牌使用，至多X次（X为存活角色数）；若为黑色，你失去一点体力上限。]],
+  [":jy_fengnu"] = [[锁定技，你的回合开始时，你失去一点体力上限；你的回合内限X次，你可以将一张手牌当任意锦囊牌使用（X为存活角色数）。]],
 }
 
 local jy__raiden = General(extension, "jy__raiden", "god", 4, 4, General.Female)
