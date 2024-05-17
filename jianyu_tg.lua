@@ -423,7 +423,7 @@ local cancel = fk.CreateProhibitSkill {
   name = "#jy_xiuxing_cancel",
   frequency = Skill.Compulsory,
   is_prohibited = function(self, from, to, card)
-    return from:hasSkill(self) and from:distanceTo(to) > from:getAttackRange()
+    return from:hasSkill(self) and (to:getNextAlive() == from or from:getNextAlive() == to)
   end,
 }
 xiuxing:addRelatedSkill(mumang)
@@ -486,7 +486,7 @@ Fk:loadTranslationTable {
   ["illustrator:jy__guanzhe"] = [[未知]],
 
   ["jy_xiuxing"] = [[修行]],
-  [":jy_xiuxing"] = [[锁定技，你使用牌无次数限制；你攻击范围外的角色不是你使用牌的合法目标；你的攻击范围始终为1。]],
+  [":jy_xiuxing"] = [[锁定技，你使用牌无次数限制；你只能选择你上家和下家为你使用牌的目标；你的攻击范围始终为1。]],
 
   ["jy_zitai"] = [[姿态]],
   [":jy_zitai"] = [[转换技，锁定技，当你造成或受到伤害时，阳：你判定，若为红色，防止之；阴：该伤害+1。然后你摸两张牌。]],
@@ -917,11 +917,9 @@ local xidi = fk.CreateTriggerSkill {
       end
     end
   end,
-  refresh_events = { fk.EventPhaseEnd },
+  refresh_events = { fk.TurnEnd },
   can_refresh = function(self, event, target, player, data)
-    if player:hasSkill(self) then
-      return player.shield > 0
-    end
+    return player:hasSkill(self) and player.shield > 0
   end,
   on_refresh = function(self, event, target, player, data)
     player.room:changeShield(player, -1)
@@ -1265,7 +1263,7 @@ Fk:loadTranslationTable {
 
   ["jy_fenshen"] = [[分身]],
   ["@jy_fenshen"] = [[分身]],
-  [":jy_fenshen"] = [[锁定技，你的首个回合开始时，你进行一次“分身”（将一名角色的副将替换为<font color="Fuchsia">狐狸分身</font>，不改变其体力上限）。当一名角色死亡后，你选择一项：①进行一次“分身”；②摸牌阶段摸牌数+1。<br><font color="grey">狐狸分身 多动：锁定技，每回合你首个出牌阶段结束后，额外执行一个出牌阶段。</font>]],
+  [":jy_fenshen"] = [[锁定技，你首个回合开始时，你进行一次“分身”（将一名角色的副将替换为<font color="Fuchsia">狐狸分身</font>，不改变其体力上限）；当一名角色死亡后，你选择一项：①进行一次“分身”；②摸牌阶段摸牌数+1。<br><font color="grey">狐狸分身 多动：锁定技，每回合你首个出牌阶段结束后，额外执行一个出牌阶段。</font>]],
   ["#jy_fenshen-prompt"] = [[分身：将一名角色的副将替换为狐狸分身]],
   ["#jy_fenshen-choose"] = [[分身：将一名角色的副将替换为狐狸分身，点击取消摸牌阶段摸牌数+1]],
   ["$jy_fenshen1"] = [[这么宽敞的话，就连泉奈流忍术、百八式影分身之术也可以施展了吧。]],
@@ -1474,8 +1472,8 @@ local mouyuan = fk.CreateTriggerSkill {
 }
 
 local yjds = General(extension, "jy__yjds", "wu", 4, 4, General.Female)
-yjds:addSkill(yingyuan)
 yjds:addSkill(shiyuan)
+yjds:addSkill(yingyuan)
 yjds:addSkill(mouyuan)
 
 Fk:loadTranslationTable {
@@ -2393,7 +2391,7 @@ Fk:loadTranslationTable {
   ["$jy_zhanshu2"] = [[一决胜负！]],
 
   ["jy_zixing"] = [[自省]],
-  ["#jy_zixing-prompt"] = [[自省：%src 响应了你的牌，是否发动 自省]],
+  ["#jy_zixing-prompt"] = [[自省：你可以摸两张牌，然后本阶段 %src 不是你使用牌的合法目标]],
   [":jy_zixing"] = [[一名角色使用或打出牌响应你的牌时，你可以摸两张牌，然后本阶段其不是你使用牌的合法目标。]],
   ["$jy_zixing1"] = [[啊……难道说太大声了吗？影响到您了，对不起！]],
   ["$jy_zixing2"] = [[果……果然还是算了吧……会被认为是奇怪的人……]],
@@ -2554,10 +2552,10 @@ Fk:loadTranslationTable {
   ["~jy__luocha"] = [[没能……实现啊……]],
 
   ["jy_suzhan"] = [[素绽]],
-  [":jy_suzhan"] = [[出牌阶段限一次，你可以令一名没有手牌的角色从牌堆底摸X张牌（X由你选择且至多为2）。若如此做，本回合其下次失去最后的手牌后，你摸2X张牌。]],
+  [":jy_suzhan"] = [[出牌阶段限一次，你可以令一名没有手牌的角色从牌堆底摸至多两张牌，本回合其下次失去最后的手牌后，你摸两倍的牌。]],
   ["jy_suzhan-short"] = [[素绽]],
-  [":jy_suzhan-short"] = [[你可以令一名没有手牌的角色从牌堆底摸X张牌（X由你选择且至多为2）。若如此做，本回合其下次失去最后的手牌后，你摸2X张牌。]],
-  ["#jy_suzhan-prompt"] = [[素绽：选择一名没有手牌的角色摸一或两张牌]],
+  [":jy_suzhan-short"] = [[令一名没有手牌的角色从牌堆底摸至多两张牌，其本回合下次失去最后的手牌后，你摸两倍的牌。]],
+  ["#jy_suzhan-prompt"] = [[素绽：选择一名没有手牌的角色摸一或两张牌，其本回合下次失去最后的手牌后你摸两倍的牌]],
   ["@jy_suzhan-round"] = [[<font color="yellow">素绽</font>]],
   ["$jy_suzhan1"] = [[白花盛放。]],
   ["$jy_suzhan2"] = [[领受天赐。]],
@@ -2568,9 +2566,9 @@ Fk:loadTranslationTable {
   ["jy_zhuojing"] = [[濯荆]],
   [":jy_zhuojing"] = [[每回合限一次，你可以将所有手牌当【桃】使用。若此【桃】无颜色且你武将牌上有该技能，你可以令一名其他角色弃置等量牌，然后其可以视为发动〖素绽〗或〖濯荆〗。]],
   ["jy_zhuojing-long"] = [[濯荆]],
-  [":jy_zhuojing-long"] = [[你可以将所有手牌当【桃】使用。若此【桃】无颜色，你可以令一名其他角色弃置等量牌，然后其可以视为发动〖素绽〗或〖濯荆〗。]],
+  [":jy_zhuojing-long"] = [[将所有手牌当【桃】使用。若此【桃】无颜色，你可以令一名其他角色弃置等量牌，然后其可以视为发动〖素绽〗或〖濯荆〗。]],
   ["jy_zhuojing-short"] = [[濯荆]],
-  [":jy_zhuojing-short"] = [[你可以将所有手牌当【桃】使用。]],
+  [":jy_zhuojing-short"] = [[将所有手牌当【桃】使用。]],
   ["#jy_zhuojing-prompt"] = [[濯荆：你可以将所有手牌当【桃】使用]],
   ["#jy_zhuojing-choose"] = [[濯荆：你可以令一名角色弃置 %arg 张牌，随后其可以视为发动〖素绽〗或〖濯荆〗]],
   ["#jy_zhuojing-discard"] = [[濯荆：弃置 %arg 张牌，随后你可以令一名没有手牌的角色摸牌或将所有手牌当【桃】使用]],
@@ -2759,7 +2757,7 @@ Fk:loadTranslationTable {
   [":jy_dingfei"] = [[每回合限一次，你受到伤害后，可以展示所有手牌并令伤害来源弃置手牌。若你展示的手牌与其弃置的牌花色一共不足四种，你回复一点体力。]],
   ["#jy_dingfei-prompt"] = [[鼎沸：是否展示手牌并令 %dest 弃牌，你有概率回复一点体力]],
   ["#jy_dingfei-discard"] = [[鼎沸：%src 令你弃任意张牌，弃置 %arg手牌至少各一张，否则 %src 回复一点体力]], -- 这里%arg后没留空格是故意的，因为%arg里本身最后就带空格
-  ["#jy_dingfei-discard-no-recover"] = [[鼎沸：%src 令你弃任意张牌]],
+  ["#jy_dingfei-discard-no-recover"] = [[鼎沸：%src 令你弃任意张牌，你可以不弃，这次不会有什么效果]],
   ["$jy_dingfei1"] = [[哎哟，您可别放水。]],
   ["$jy_dingfei2"] = [[幸亏我练过！]],
   ["$jy_dingfei3"] = [[还来劲了啊你！]],
