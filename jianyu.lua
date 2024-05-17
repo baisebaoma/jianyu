@@ -512,7 +512,7 @@ Fk:loadTranslationTable {
   ["illustrator:jy__gaotianliang"] = "高天亮",
 
   ["jy_yuyu"] = "玉玉",
-  [":jy_yuyu"] = [[当你因【杀】受到伤害时，伤害来源获得“玉玉”标记。受到没有“玉玉”的角色或因本次伤害而获得“玉玉”的角色造成的伤害时，你可以选择一项：摸三张牌；摸两张牌并翻面，然后对自己造成一点伤害。你对有“玉玉”的角色造成的非传导伤害+1。]],
+  [":jy_yuyu"] = [[当你因【杀】受到伤害时，伤害来源获得“玉玉”标记。受到没有“玉玉”的角色或因本次伤害而获得“玉玉”的角色造成的伤害时，你可以选择一项：摸三张牌；摸两张牌并翻面，然后对自己造成一点伤害。你对有“玉玉”的角色造成非传导伤害时，该伤害+1。]],
   ["@jy_yuyu_enemy"] = "玉玉",
   ["#jy_yuyu_ask_which"] = "玉玉：请选择",
   ["#jy_yuyu_draw3"] = "摸三张牌",
@@ -1323,7 +1323,7 @@ Fk:loadTranslationTable {
   [":jy_huapen"] = [[锁定技，其他角色使用♣普通锦囊牌或基本牌指定了有且仅有一个不为你的目标时，你判定，若为<font color="red">♥</font>，额外指定你为目标。]],
 
   ["jy_boshi"] = "搏时",
-  [":jy_boshi"] = [[觉醒技，准备阶段，若你已判定过至少X次，你增加一点体力上限、失去〖花盆〗并获得〖奖杯〗，X等于存活角色数。]],
+  [":jy_boshi"] = [[觉醒技，准备阶段，若你已判定过至少X次（X为存活角色数），你增加一点体力上限、失去〖花盆〗并获得〖奖杯〗。]],
   ["@jy_boshi_judge_count"] = "搏时",
 
   ["jy_jiangbei"] = "奖杯",
@@ -2601,7 +2601,7 @@ local pojun = fk.CreateTriggerSkill {
         "#jy_pojun-invoke::" .. data.to .. ":" .. math.min(2, #to:getCardIds("hej")))
     else
       return player.room:askForSkillInvoke(player, self.name, nil,
-        "#jy_pojun-invoke::" .. data.to .. ":" .. #to:getCardIds("hej"))
+        "#jy_pojun-invoke-robot::" .. data.to)
     end
   end,
   on_use = function(self, event, target, player, data)
@@ -2709,7 +2709,7 @@ xusheng:addSkill(pojun)
 
 Fk:loadTranslationTable {
   ["jy__xusheng"] = [[劫徐盛]],
-  ["#jy__xusheng"] = "诸武精通",
+  ["#jy__xusheng"] = "杀机器人妙手",
   ["designer:jy__xusheng"] = "考公专家",
   ["~jy__xusheng"] = "盛只恨，不能再为主公，破敌致胜了！",
 
@@ -2717,7 +2717,7 @@ Fk:loadTranslationTable {
   ["$jy_pojun2"] = "若敢来犯，必教你大败而归！",
 
   ["#jy_pojun-invoke"] = "破军：你可以获得 %dest 区域内至多 %arg 张牌",
-  ["jy_pojun"] = [[破军]],
+  ["#jy_pojun-invoke-robot"] = "破军：%dest 是机器人，所以你可以获得其区域内所有牌！",
   ["#jy_pojun_delay"] = [[破军]],
   [":jy_pojun"] = [[当你使用【杀】指定一个目标后，你可以获得其区域内至多两张牌。]],
 
