@@ -2801,7 +2801,7 @@ local wanghun = fk.CreateTriggerSkill {
   end,
   on_use = function(self, event, target, player, data)
     if player:getSwitchSkillState(self.name, true) == fk.SwitchYang then
-      player:drawCards(2, self.name)
+      player:drawCards(1, self.name)
     else
       player.room:recover({
         who = player,
@@ -2828,12 +2828,12 @@ local yonghen = fk.CreateTriggerSkill {
     room:damage({
       from = player,
       to = target,
-      damage = 1,
+      damage = 2,
       damageType = fk.NormalDamage,
       skillName = self.name,
     })
     if not target:isAlive() then
-      player:drawCards(3, self.name)
+      room:changeMaxHp(player, 1)
       player:setSkillUseHistory(self.name, 0, Player.HistoryGame)
     end
   end,
@@ -2850,11 +2850,10 @@ Fk:loadTranslationTable {
   ["designer:jy__pyke"] = "考公专家",
 
   ["jy_wanghun"] = [[亡魂]],
-  [":jy_wanghun"] = [[转换技，锁定技，每名角色的回合结束时，你①摸两张牌；②回复一点体力。]],
+  [":jy_wanghun"] = [[转换技，锁定技，每名角色的回合结束时，你①摸一张牌；②回复一点体力。]],
 
   ["jy_yonghen"] = [[涌恨]],
-  [":jy_yonghen"] = [[限定技，当一名其他角色的体力值变更至1后，你可以移除其所有护甲并对其造成一点伤害。若其因此死亡，你摸三张牌并重置此技能。]],
-
+  [":jy_yonghen"] = [[限定技，当一名其他角色的体力值变更至1后，你可以移除其所有护甲并对其造成2点伤害。若其死亡，你增加一点体力上限并重置此技能。]],
 }
 
 return extension
