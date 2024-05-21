@@ -2808,7 +2808,7 @@ local wanghun = fk.CreateTriggerSkill {
         skillName = self.name,
       })
     else
-      player:drawCards(2, self.name)
+      player:drawCards(1, self.name)
       -- player.room:askForDiscard(player, 4, 4, true, self.name, false, ".", nil, false)
     end
   end,
@@ -2836,6 +2836,7 @@ local yonghen = fk.CreateTriggerSkill {
     })
     if not target:isAlive() then
       player:drawCards(3, self.name)
+      room:handleAddLoseSkills(player, "jy_trad_xiuxing")
       -- room:changeMaxHp(player, 1)
       player:setSkillUseHistory(self.name, 0, Player.HistoryGame)
     end
@@ -2845,7 +2846,7 @@ local yonghen = fk.CreateTriggerSkill {
 local pyke = General(extension, "jy__pyke", "qun", 2)
 pyke:addSkill(wanghun)
 pyke:addSkill(yonghen)
--- pyke:addSkill("jy_trad_xiuxing")
+pyke:addRelatedSkill("jy_trad_xiuxing")
 
 Fk:loadTranslationTable {
   ["jy__pyke"] = [[派克]],
@@ -2853,10 +2854,10 @@ Fk:loadTranslationTable {
   ["designer:jy__pyke"] = "考公专家",
 
   ["jy_wanghun"] = [[绝境]],
-  [":jy_wanghun"] = [[转换技，锁定技，每名角色的回合结束时，你①回复一点体力；②摸两张牌。]],
+  [":jy_wanghun"] = [[转换技，锁定技，每名角色的回合结束时，①你回复一点体力；②摸一张牌。]],
 
   ["jy_yonghen"] = [[亡魂]],
-  [":jy_yonghen"] = [[限定技，当一名其他角色的体力值变更至1后，你可以移除其所有护甲并对其造成2点伤害。若其死亡，你摸三张牌并重置此技能。]],
+  [":jy_yonghen"] = [[限定技，当一名其他角色的体力值改变为1后，你可以移除其所有护甲并对其造成2点伤害。若其死亡，你重置此技能并获得〖修行〗。]],
 }
 
 return extension
