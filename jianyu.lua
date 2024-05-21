@@ -2814,14 +2814,14 @@ local wanghun = fk.CreateTriggerSkill {
   end,
 }
 
-local function doExecute(player, target)
+local function doExecute(player, target, damage)
   local room = player.room
   room:changeShield(target, -target.shield)
   room:doIndicate(player.id, { target.id })
   room:damage({
     from = player,
     to = target,
-    damage = 2,
+    damage = damage,
     damageType = fk.NormalDamage,
     skillName = "jy_yonghen",
   })
@@ -2834,7 +2834,7 @@ local function doExecute(player, target)
     if #result == 0 then
       player:setSkillUseHistory("jy_yonghen", 0, Player.HistoryGame)
     else
-      doExecute(player, Fk:getPlayerById(result[1]))
+      doExecute(player, room:getPlayerById(result[1]), 1)
     end
   end
 end
@@ -2849,7 +2849,7 @@ local yonghen = fk.CreateTriggerSkill {
         player:usedSkillTimes(self.name, Player.HistoryGame) == 0
   end,
   on_use = function(self, event, target, player, data)
-    doExecute(player, target)
+    doExecute(player, target, 2)
   end,
 }
 
@@ -2867,8 +2867,8 @@ Fk:loadTranslationTable {
   [":jy_wanghun"] = [[转换技，锁定技，每名角色的回合结束时，①你回复一点体力；②摸一张牌。]],
 
   ["jy_yonghen"] = [[亡魂]],
-  [":jy_yonghen"] = [[限定技，当一名其他角色的体力值改变为1后，你可以对其进行一次“处决”（移除其所有护甲并对其造成2点伤害，若其死亡，你选择一项：对一名其他角色进行一次“处决”，或重置此技能）。]],
-  ["#jy_yonghen-ask"] = [[亡魂：你可以“处决”一名角色或点击取消重置此技能]]
+  [":jy_yonghen"] = [[限定技，当一名其他角色的体力值改变为1后，你可以对其进行一次伤害为2的“处决”（移除其所有护甲并对其造成伤害，若其死亡，你选择一项：对一名其他角色进行一次伤害为1的“处决”，或重置此技能）。]],
+  ["#jy_yonghen-ask"] = [[亡魂：对一名其他角色进行一次伤害为1的“处决”，点击取消重置此技能]]
   -- 获得〖修行〗
 }
 
