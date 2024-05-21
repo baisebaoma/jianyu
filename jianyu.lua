@@ -2823,7 +2823,7 @@ local function doExecute(player, target)
     to = target,
     damage = 2,
     damageType = fk.NormalDamage,
-    skillName = self.name,
+    skillName = "jy_yonghen",
   })
   if not target:isAlive() then
     -- player:drawCards(3, self.name)
