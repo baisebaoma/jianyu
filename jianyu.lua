@@ -2808,8 +2808,8 @@ local wanghun = fk.CreateTriggerSkill {
         skillName = self.name,
       })
     else
-      -- player:drawCards(1, self.name)
-      player.room:askForDiscard(player, 4, 4, true, self.name, false, ".", nil, false)
+      player:drawCards(2, self.name)
+      -- player.room:askForDiscard(player, 4, 4, true, self.name, false, ".", nil, false)
     end
   end,
 }
@@ -2845,7 +2845,7 @@ local yonghen = fk.CreateTriggerSkill {
 local pyke = General(extension, "jy__pyke", "qun", 2)
 pyke:addSkill(wanghun)
 pyke:addSkill(yonghen)
-pyke:addSkill("jy_trad_xiuxing")
+-- pyke:addSkill("jy_trad_xiuxing")
 
 Fk:loadTranslationTable {
   ["jy__pyke"] = [[派克]],
@@ -2853,7 +2853,7 @@ Fk:loadTranslationTable {
   ["designer:jy__pyke"] = "考公专家",
 
   ["jy_wanghun"] = [[绝境]],
-  [":jy_wanghun"] = [[转换技，锁定技，每名角色的回合结束时，你①回复一点体力；②弃四张牌。]],
+  [":jy_wanghun"] = [[转换技，锁定技，每名角色的回合结束时，你①回复一点体力；②摸两张牌。]],
 
   ["jy_yonghen"] = [[亡魂]],
   [":jy_yonghen"] = [[限定技，当一名其他角色的体力值变更至1后，你可以移除其所有护甲并对其造成2点伤害。若其死亡，你摸三张牌并重置此技能。]],
