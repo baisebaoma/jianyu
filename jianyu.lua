@@ -2814,6 +2814,31 @@ local wanghun = fk.CreateTriggerSkill {
   end,
 }
 
+local function doExecute(player, target)
+  local room = player.room
+  room:changeShield(target, -target.shield)
+  room:doIndicate(player.id, { target.id })
+  room:damage({
+    from = player,
+    to = target,
+    damage = 2,
+    damageType = fk.NormalDamage,
+    skillName = self.name,
+  })
+  if not target:isAlive() then
+    -- player:drawCards(3, self.name)
+    -- room:handleAddLoseSkills(player, "jy_trad_xiuxing")
+    -- room:changeMaxHp(player, -player.maxHp + 1)
+    local targets = table.map(room:getAlivePlayers(), Util.IdMapper)
+    local result = room:askForChoosePlayers(player, targets, 1, 1, "#jy_yonghen-ask", self.name, true, false)
+    if #result == 0 then
+      player:setSkillUseHistory("jy_yonghen", 0, Player.HistoryGame)
+    else
+      doExecute(player, Fk:getPlayerById(result[1]))
+    end
+  end
+end
+
 local yonghen = fk.CreateTriggerSkill {
   name = "jy_yonghen",
   anim_type = "offensive",
@@ -2824,29 +2849,14 @@ local yonghen = fk.CreateTriggerSkill {
         player:usedSkillTimes(self.name, Player.HistoryGame) == 0
   end,
   on_use = function(self, event, target, player, data)
-    local room = player.room
-    room:changeShield(target, -target.shield)
-    room:doIndicate(player.id, { target.id })
-    room:damage({
-      from = player,
-      to = target,
-      damage = 2,
-      damageType = fk.NormalDamage,
-      skillName = self.name,
-    })
-    if not target:isAlive() then
-      player:drawCards(3, self.name)
-      room:handleAddLoseSkills(player, "jy_trad_xiuxing")
-      -- room:changeMaxHp(player, -player.maxHp + 1)
-      -- player:setSkillUseHistory(self.name, 0, Player.HistoryGame)
-    end
+    doExecute(player, target)
   end,
 }
 
 local pyke = General(extension, "jy__pyke", "qun", 2)
 pyke:addSkill(wanghun)
 pyke:addSkill(yonghen)
-pyke:addRelatedSkill("jy_trad_xiuxing")
+-- pyke:addRelatedSkill("jy_trad_xiuxing")
 
 Fk:loadTranslationTable {
   ["jy__pyke"] = [[派克]],
@@ -2857,7 +2867,9 @@ Fk:loadTranslationTable {
   [":jy_wanghun"] = [[转换技，锁定技，每名角色的回合结束时，①你回复一点体力；②摸一张牌。]],
 
   ["jy_yonghen"] = [[亡魂]],
-  [":jy_yonghen"] = [[限定技，当一名其他角色的体力值改变为1后，你可以移除其所有护甲并对其造成2点伤害。若其死亡，你获得〖修行〗。]],
+  [":jy_yonghen"] = [[限定技，当一名其他角色的体力值改变为1后，你可以对其进行一次“处决”（移除其所有护甲并对其造成2点伤害，若其死亡，你选择一项：对一名其他角色进行一次“处决”，或重置此技能）。]],
+  ["#jy_yonghen-ask"] = [[亡魂：你可以“处决”一名角色或点击取消重置此技能]]
+  -- 获得〖修行〗
 }
 
 return extension
