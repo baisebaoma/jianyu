@@ -2826,7 +2826,7 @@ local function doExecute(player, target, damage)
     skillName = "jy_yonghen",
   })
   if not target:isAlive() then
-    player:drawCards(1, "jy_yonghen")
+    -- player:drawCards(1, "jy_yonghen")
     -- room:handleAddLoseSkills(player, "jy_trad_xiuxing")
     -- room:changeMaxHp(player, -player.maxHp + 1)
     local targets = table.map(room:getOtherPlayers(player, true), Util.IdMapper)
@@ -2873,9 +2873,9 @@ Fk:loadTranslationTable {
   [":jy_wanghun"] = [[转换技，锁定技，每名角色的回合结束时，你①回复一点体力；②摸一张牌。]],
 
   ["jy_yonghen"] = [[亡魂]],
-  [":jy_yonghen"] = [[限定技，当一名其他角色的体力值改变为1后，你可以对其进行一次伤害为2的“处决”（移除目标所有护甲并对其造成伤害，若其死亡则你摸一张牌并选择一项：对一名其他角色进行一次伤害为1的“处决”，或重置此技能）。]],
-  ["#jy_yonghen-invoke"] = [[亡魂：你可以对 %dest 进行一次伤害为2的“处决”]],
-  ["#jy_yonghen-ask"] = [[亡魂：对一名其他角色进行一次伤害为1的“处决”，点击取消重置此技能]],
+  [":jy_yonghen"] = [[限定技，当一名其他角色的体力值改变为1后，你可以对其“处决”2（“处决”X：移除目标所有护甲并对其造成X点伤害。若该伤害结算后其死亡，则你选择一项：对一名其他角色“处决”1，或重置此技能）。]],
+  ["#jy_yonghen-invoke"] = [[亡魂：你可以对 %dest 进行“处决”2]],
+  ["#jy_yonghen-ask"] = [[亡魂：对一名其他角色“处决”1，点击取消重置此技能]],
   -- 获得〖修行〗
   ["$jy_yonghen1"] = [[没有痛苦，长眠吧。]],
   ["$jy_yonghen2"] = [[欢迎来到……深渊……]],
