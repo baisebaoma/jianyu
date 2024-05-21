@@ -2812,9 +2812,36 @@ local wanghun = fk.CreateTriggerSkill {
     end
   end,
 }
+
+local yonghen = fk.CreateTriggerSkill {
+  name = "jy_yonghen",
+  anim_type = "offensive",
+  frequency = Skill.Limited,
+  events = { fk.HpChanged },
+  can_trigger = function(self, event, target, player, data)
+    return target.hp == 1 and player:hasSkill(self) and
+        player:usedSkillTimes(self.name, Player.HistoryGame) == 0
+  end,
+  on_use = function(self, event, target, player, data)
+    local room = player.room
+    room:damage({
+      from = player,
+      to = target,
+      damage = 1,
+      damageType = fk.NormalDamage,
+      skillName = self.name,
+    })
+    if not target:isAlive() then
+      player:drawCards(3, self.name)
+      player:setSkillUseHistory(self.name, 0, Player.HistoryGame)
+    end
+  end,
+}
+
 local pyke = General(extension, "jy__pyke", "qun", 2)
 pyke.hidden = true
 pyke:addSkill(wanghun)
+pyke:addSkill(yonghen)
 
 Fk:loadTranslationTable {
   ["jy__pyke"] = [[派克]],
@@ -2823,6 +2850,10 @@ Fk:loadTranslationTable {
 
   ["jy_wanghun"] = [[亡魂]],
   [":jy_wanghun"] = [[转换技，锁定技，每名角色的回合结束时，①你摸两张牌；②你回复一点体力。]],
+
+  ["jy_yonghen"] = [[涌恨]],
+  [":jy_yonghen"] = [[限定技，当一名除你以外的角色的体力值变更至1后，你可以对其造成一点伤害。若其因此死亡，你摸三张牌并重置此技能。]],
+
 }
 
 return extension
