@@ -2800,7 +2800,7 @@ local wanghun = fk.CreateTriggerSkill {
     return player:hasSkill(self)
   end,
   on_use = function(self, event, target, player, data)
-    if player:getSwitchSkillState(self.name) == fk.SwitchYang then
+    if player:getSwitchSkillState(self.name, true) == fk.SwitchYang then
       player:drawCards(2, self.name)
     else
       player.room:recover({
