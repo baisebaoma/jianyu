@@ -251,6 +251,7 @@ local trad_zitai = fk.CreateTriggerSkill {
       }
       player.room:judge(judge)
       if judge.card.color == Card.Red then
+        player.room:changeShield(player, 1)
         return true
       end
     else
@@ -313,7 +314,7 @@ trad__guanzhe:addSkill(trad_zitai)
 trad__guanzhe:addSkill("jy_yujian")
 
 Fk:loadTranslationTable {
-  ["jy__trad__guanzhe"] = [[经典观者]],
+  ["jy__trad__guanzhe"] = [[典观者]],
   ["#jy__trad__guanzhe"] = rjhd,
   ["designer:jy__trad__guanzhe"] = [[Kasa]],
   ["cv:jy__trad__guanzhe"] = [[无]],
@@ -326,7 +327,7 @@ Fk:loadTranslationTable {
   [":jy_trad_mumang"] = [[锁定技，你的攻击范围始终为1。]],
 
   ["jy_trad_zitai"] = [[姿态]],
-  [":jy_trad_zitai"] = [[转换技，锁定技，当你造成伤害时，阳：你判定，若为红色，防止之；阴：该伤害+1。]],
+  [":jy_trad_zitai"] = [[转换技，锁定技，当你造成伤害时，阳：你判定，若为红色，防止之并获得一点护甲；阴：该伤害+1。]],
 }
 
 local tiandu = fk.CreateTriggerSkill {
@@ -537,7 +538,7 @@ guojia:addSkill(yiji)
 guojia:addSkill(yingcai)
 
 Fk:loadTranslationTable {
-  ["jy__trad__guojia"] = [[经典简郭嘉]],
+  ["jy__trad__guojia"] = [[典简郭嘉]],
   ["#jy__trad__guojia"] = rjhd,
   ["designer:jy__trad__guojia"] = [[rolin]],
   ["cv:jy__trad__guojia"] = [[暂无]],
@@ -646,13 +647,13 @@ local juewu = fk.CreateTriggerSkill {
 }
 
 local tjzs = General(extension, "jy__trad__tjzs", "shu", 3, 3, General.Female)
-tjzs.total_hidden = true
+tjzs.hidden = true
 tjzs:addSkill(heiyong)
--- tjzs:addSkill(silie)
+tjzs:addSkill(silie)
 tjzs:addSkill(juewu)
 
 Fk:loadTranslationTable {
-  ["jy__trad__tjzs"] = [[经典铁甲战士]],
+  ["jy__trad__tjzs"] = [[典铁甲战士]],
   ["#jy__trad__tjzs"] = pve,
   ["designer:jy__trad__tjzs"] = [[Kasa]],
   ["cv:jy__trad__tjzs"] = [[高达一号]],
@@ -699,7 +700,7 @@ local jy_fuzhu = fk.CreateTriggerSkill {
 otto:addSkill(jy_fuzhu)
 
 Fk:loadTranslationTable {
-  ["jy__trad__god"] = [[侯国玉]],
+  ["jy__trad__god"] = [[典侯国玉]],
   ["#jy__trad__god"] = rjhd,
   ["designer:jy__trad__god"] = [[考公专家]],
   ["cv:jy__trad__god"] = [[无]],

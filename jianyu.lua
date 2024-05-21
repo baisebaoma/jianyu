@@ -1320,7 +1320,7 @@ Fk:loadTranslationTable {
   ["#jy_sichi_4"] = "四吃：选择至多3名角色，你和他们各失去一点体力",
 
   ["jy_huapen"] = "花盆",
-  [":jy_huapen"] = [[锁定技，其他角色使用♣普通锦囊牌或基本牌指定了有且仅有一个不为你的目标时，你判定，若为<font color="red">♥</font>，额外指定你为目标。]],
+  [":jy_huapen"] = [[锁定技，其他角色使用♣普通锦囊牌或基本牌指定唯一不为你的目标时，你判定，若为<font color="red">♥</font>，额外指定你为目标。]],
 
   ["jy_boshi"] = "搏时",
   [":jy_boshi"] = [[觉醒技，准备阶段，若你已判定过至少X次（X为存活角色数），你增加一点体力上限、失去〖花盆〗并获得〖奖杯〗。]],
@@ -2651,7 +2651,7 @@ local pojun = fk.CreateTriggerSkill {
   can_trigger = function(self, event, target, player, data)
     if target == player and player:hasSkill(self) and data.card and data.card.trueName == "slash" then
       local to = player.room:getPlayerById(data.to)
-      return not to.dead and to.hp > 0 and not to:isNude()
+      return not to.dead and not to:isNude()
     end
   end,
   on_cost = function(self, event, target, player, data)
@@ -2788,6 +2788,41 @@ Fk:loadTranslationTable {
   -- ["#jy_jiedao_slash"] = [[劫刀：你可以使用一张【杀】]],
   -- [":jy_jiedao"] = [[你可以将一张武器牌当【杀】或【酒】使用或打出。当武器牌移至其他角色的装备区时，你可以失去一点体力并获得之，若如此做，你可以使用一张【杀】。]],
   -- ["$jy_jiedao1"] = [[战将临阵，斩关刈城！]],
+}
+
+local wanghun = fk.CreateTriggerSkill {
+  name = "jy_wanghun",
+  switch_skill_name = "jy_wanghun",
+  anim_type = "support",
+  frequency = Skill.Compulsory,
+  events = { fk.TurnEnd },
+  can_trigger = function(self, event, target, player, data)
+    return player:hasSkill(self)
+  end,
+  on_use = function(self, event, target, player, data)
+    if player:getSwitchSkillState(self.name) == fk.SwitchYang then
+      player:drawCard(2, self.name)
+    else
+      player.room:recover({
+        who = player,
+        num = 1,
+        recoverBy = player,
+        skillName = self.name,
+      })
+    end
+  end,
+}
+local pyke = General(extension, "jy__pyke", "qun", 2)
+pyke.hidden = true
+pyke:addSkill(wanghun)
+
+Fk:loadTranslationTable {
+  ["jy__pyke"] = [[派克]],
+  ["#jy__pyke"] = "血港鬼影",
+  ["designer:jy__pyke"] = "考公专家",
+
+  ["jy_wanghun"] = [[亡魂]],
+  [":jy_wanghun"] = [[转换技，锁定技，每名角色的回合结束时，①你摸两张牌；②你回复一点体力。]],
 }
 
 return extension
