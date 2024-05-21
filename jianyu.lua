@@ -2830,7 +2830,7 @@ local function doExecute(player, target)
     -- room:handleAddLoseSkills(player, "jy_trad_xiuxing")
     -- room:changeMaxHp(player, -player.maxHp + 1)
     local targets = table.map(room:getAlivePlayers(), Util.IdMapper)
-    local result = room:askForChoosePlayers(player, targets, 1, 1, "#jy_yonghen-ask", self.name, true, false)
+    local result = room:askForChoosePlayers(player, targets, 1, 1, "#jy_yonghen-ask", "jy_yonghen", true, false)
     if #result == 0 then
       player:setSkillUseHistory("jy_yonghen", 0, Player.HistoryGame)
     else
