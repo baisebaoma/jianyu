@@ -2816,8 +2816,8 @@ local wanghun = fk.CreateTriggerSkill {
 
 local function doExecute(player, target, damage)
   local room = player.room
-  room:changeShield(target, -target.shield)
   room:doIndicate(player.id, { target.id })
+  room:changeShield(target, -target.shield)
   room:damage({
     from = player,
     to = target,
@@ -2834,7 +2834,7 @@ local function doExecute(player, target, damage)
     if #result == 0 then
       player:setSkillUseHistory("jy_yonghen", 0, Player.HistoryGame)
     else
-      doExecute(player, room:getPlayerById(result[1]), 1)
+      doExecute(player, room:getPlayerById(result[1]), 2)
     end
   end
 end
@@ -2869,13 +2869,13 @@ Fk:loadTranslationTable {
   ["cv:jy__pyke"] = "彭博",
   ["illustrator:jy__pyke"] = "Riot",
 
-  ["jy_wanghun"] = [[绝境]],
+  ["jy_wanghun"] = [[亡魂]],
   [":jy_wanghun"] = [[转换技，锁定技，每名角色的回合结束时，你①回复一点体力；②摸一张牌。]],
 
-  ["jy_yonghen"] = [[亡魂]],
-  [":jy_yonghen"] = [[限定技，当一名其他角色的体力值改变为1后，你可以对其“处决”2（“处决”X：移除目标所有护甲并对其造成X点伤害。若该伤害结算后其死亡，则你选择一项：对一名其他角色“处决”1，或重置此技能）。]],
-  ["#jy_yonghen-invoke"] = [[亡魂：你可以对 %dest 进行“处决”2]],
-  ["#jy_yonghen-ask"] = [[亡魂：对一名其他角色“处决”1，点击取消重置此技能]],
+  ["jy_yonghen"] = [[涌恨]],
+  [":jy_yonghen"] = [[限定技，当一名其他角色的体力值改变为1后，你可以移除其所有护甲并对其造成2点伤害。若该伤害结算后其死亡，则你选择一项：对一名其他角色重复此流程，或重置此技能。]],
+  ["#jy_yonghen-invoke"] = [[涌恨：你可以对 %dest 造成2点伤害，若其死亡则可继续或重置该技能！]],
+  ["#jy_yonghen-ask"] = [[涌恨：对一名其他角色造成2点伤害，若其死亡则可继续，点击取消重置该技能]],
   -- 获得〖修行〗
   ["$jy_yonghen1"] = [[没有痛苦，长眠吧。]],
   ["$jy_yonghen2"] = [[欢迎来到……深渊……]],

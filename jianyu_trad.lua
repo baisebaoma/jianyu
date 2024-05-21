@@ -679,11 +679,7 @@ otto.hidden = true
 local jy_fuzhu = fk.CreateTriggerSkill {
   name = "jy_fuzhu",
   anim_type = "support",
-  events = { fk.EventPhaseChanging },
-  can_trigger = function(self, event, target, player, data)
-    return target == player and player:hasSkill(self)
-        and data.to == Player.Start
-  end,
+  events = { fk.TurnStart },
   on_use = function(self, event, target, player, data)
     local room = player.room
     -- TODO：UI变好看一点
@@ -701,7 +697,7 @@ local jy_fuzhu = fk.CreateTriggerSkill {
 otto:addSkill(jy_fuzhu)
 
 Fk:loadTranslationTable {
-  ["jy__trad__god"] = [[典侯国玉]],
+  ["jy__trad__god"] = [[侯国玉]],
   ["#jy__trad__god"] = rjhd,
   ["designer:jy__trad__god"] = [[考公专家]],
   ["cv:jy__trad__god"] = [[无]],
