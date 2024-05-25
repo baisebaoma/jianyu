@@ -208,9 +208,9 @@ local trad_xiuxing = fk.CreateTriggerSkill {
           player.room:delay(200)                      -- 停告诉玩家我们确实由A变B再变A动了一下。延迟降低优化手感
           player.room:setPlayerMark(player, MarkEnum.SwithSkillPreName .. s.name,
             player:getSwitchSkillState(s.name, true)) -- 经测试这个是没问题的
-          -- player:addSkillUseHistory(s.name)           -- 加这个，在UI上更新
+          player:addSkillUseHistory(s.name)           -- 加这个，在UI上更新
           -- 使用addSkillUseHistory会导致一些限制使用次数的技能无法继续发动
-          player:setSkillUseHistory(s.name, player:usedSkillTimes(s.name)) -- 加这个，在UI上更新
+          -- player:setSkillUseHistory(s.name, player:usedSkillTimes(s.name), Player.HistoryTurn) -- 加这个，在UI上更新
           local t = {}
           t[0] = "阳"
           t[1] = "阴"
