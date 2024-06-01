@@ -713,7 +713,7 @@ local pojun = fk.CreateTriggerSkill {
   frequency = Skill.Compulsory,
   events = { fk.TargetSpecified },
   can_trigger = function(self, event, target, player, data)
-    if target == player and player:hasSkill(self) and data.card and data.card.trueName == "slash" then
+    if target == player and player:hasSkill(self) and data.card then -- and data.card.trueName == "slash"
       local to = player.room:getPlayerById(data.to)
       return not to.dead
     end
@@ -724,10 +724,7 @@ local pojun = fk.CreateTriggerSkill {
     local to = room:getPlayerById(data.to)
     room:moveCardTo(to:getCardIds("hej"), Player.Hand,
       player, fk.ReasonPrey, "jy_trad_pojun")
-    local robots = table.filter(room:getAlivePlayers(), function(p) return p.id < 0 end)
-    for _, p in ipairs(robots) do
-      room:changeMaxHp(p, - #player:getCardIds("h"))
-    end
+    room:changeShield(player, 1)
   end,
 }
 
@@ -782,7 +779,7 @@ Fk:loadTranslationTable {
 
   ["jy_trad_pojun"] = [[破军]],
   ["#jy_trad_pojun_delay"] = [[破军]],
-  [":jy_trad_pojun"] = [[锁定技，当你使用【杀】指定一个目标后，你获得其区域内所有牌，然后所有机器人减X点体力上限（X为你的手牌数）。]],
+  [":jy_trad_pojun"] = [[锁定技，当你使用牌指定一个目标后，你获得其区域内所有牌和一点护甲。]],
 
   ["jy__trad__caopi"] = [[典曹丕]],
   ["#jy__trad__caopi"] = pve,
