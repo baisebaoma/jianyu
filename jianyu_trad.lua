@@ -707,4 +707,47 @@ Fk:loadTranslationTable {
   [":jy_fuzhu"] = [[你的回合开始时，你可以获得一个想要的技能。<br><font color="grey">输入这个技能的name参数（如paoxiao）以获得技能，你的输入必须仅含小写英文字母和下划线且长度不得超过12。若输入错误，你不会获得技能。<br>不知道拿什么？试试输入：cheat！</font>]],
 }
 
+local pojun = fk.CreateTriggerSkill {
+  name = "jy_trad_pojun",
+  anim_type = "offensive",
+  events = { fk.TargetSpecified },
+  can_trigger = function(self, event, target, player, data)
+    if target == player and player:hasSkill(self) and data.card and data.card.trueName == "slash" then
+      local to = player.room:getPlayerById(data.to)
+      return not to.dead and not to:isNude()
+    end
+  end,
+  on_cost = function(self, event, target, player, data)
+    return player.room:askForSkillInvoke(player, self.name, nil,
+      "#jy_trad_pojun-invoke::" .. data.to)
+  end,
+  on_use = function(self, event, target, player, data)
+    local room = player.room
+    room:doIndicate(player.id, { data.to })
+    local to = room:getPlayerById(data.to)
+    room:moveCardTo(to:getCardIds("hej"), Player.Hand,
+      player, fk.ReasonPrey, "jy_trad_pojun")
+    room:changeMaxHp(to, -1)
+  end,
+}
+
+local xusheng = General(extension, "jy__trad__xusheng", "wu", 4)
+xusheng.hidden = true
+xusheng:addSkill(pojun)
+
+Fk:loadTranslationTable {
+  ["jy__trad__xusheng"] = [[典劫徐盛]],
+  ["#jy__trad__xusheng"] = pve,
+  ["designer:jy__trad__xusheng"] = "考公专家",
+  ["~jy__trad__xusheng"] = "盛只恨，不能再为主公，破敌致胜了！",
+
+  ["$jy_trad_pojun1"] = "犯大吴疆土者，盛必击而破之！",
+  ["$jy_trad_pojun2"] = "若敢来犯，必教你大败而归！",
+
+  ["jy_trad_pojun"] = [[破军]],
+  ["#jy_trad_pojun-invoke"] = "破军：你可以获得 %dest 区域内所有牌并令其减一点体力上限",
+  ["#jy_trad_pojun_delay"] = [[破军]],
+  [":jy_trad_pojun"] = [[当你使用【杀】指定一个目标后，你可以获得其区域内所有牌并令其减一点体力上限。]],
+}
+
 return extension
