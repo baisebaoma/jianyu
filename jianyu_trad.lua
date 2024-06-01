@@ -717,18 +717,17 @@ local pojun = fk.CreateTriggerSkill {
       return not to.dead
     end
   end,
-  on_cost = function(self, event, target, player, data)
-    return player.room:askForSkillInvoke(player, self.name, nil,
-      "#jy_trad_pojun-invoke::" .. data.to)
-  end,
   on_use = function(self, event, target, player, data)
     local room = player.room
     room:doIndicate(player.id, { data.to })
     local to = room:getPlayerById(data.to)
     room:moveCardTo(to:getCardIds("hej"), Player.Hand,
       player, fk.ReasonPrey, "jy_trad_pojun")
-    for _, p in ipairs(table.filter(room:getAlivePlayers(), function(p) return p.id < 0 end)) do
-      room:changeMaxHp(p, -1)
+    local x = player.getCardIds("hej")
+    player:drawCards(x, self.name)
+    local robots = table.filter(room:getAlivePlayers(), function(p) return p.id < 0 end)
+    for _, p in ipairs(robots) do
+      room:changeMaxHp(p, -x)
     end
   end,
 }
@@ -747,9 +746,8 @@ Fk:loadTranslationTable {
   ["$jy_trad_pojun2"] = "若敢来犯，必教你大败而归！",
 
   ["jy_trad_pojun"] = [[破军]],
-  ["#jy_trad_pojun-invoke"] = "破军：你可以获得 %dest 区域内所有牌并令机器人减体力上限",
   ["#jy_trad_pojun_delay"] = [[破军]],
-  [":jy_trad_pojun"] = [[当你使用【杀】指定一个目标后，你可以获得其区域内所有牌并令所有机器人减一点体力上限。]],
+  [":jy_trad_pojun"] = [[当你使用【杀】指定一个目标后，你可以获得其区域内所有牌，然后摸X张牌并令所有机器人减X点体力上限（X为你区域内的牌数）。]],
 }
 
 return extension
