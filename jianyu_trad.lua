@@ -710,6 +710,7 @@ Fk:loadTranslationTable {
 local pojun = fk.CreateTriggerSkill {
   name = "jy_trad_pojun",
   anim_type = "offensive",
+  frequency = Skill.Compulsory,
   events = { fk.TargetSpecified },
   can_trigger = function(self, event, target, player, data)
     if target == player and player:hasSkill(self) and data.card and data.card.trueName == "slash" then
@@ -725,7 +726,7 @@ local pojun = fk.CreateTriggerSkill {
       player, fk.ReasonPrey, "jy_trad_pojun")
     local robots = table.filter(room:getAlivePlayers(), function(p) return p.id < 0 end)
     for _, p in ipairs(robots) do
-      room:changeMaxHp(p, -1)
+      room:changeMaxHp(p, - #player:getCardIds("h"))
     end
   end,
 }
@@ -738,7 +739,7 @@ local fangzhu = fk.CreateTriggerSkill {
   name = "jy_trad_fangzhu",
   anim_type = "masochism",
   frequency = Skill.Compulsory,
-  events = { fk.Damage, fk.Damaged },
+  events = { fk.Damaged },
   on_use = function(self, event, target, player, data)
     local room = player.room
     local robots = table.filter(room:getAlivePlayers(), function(p) return p.id < 0 end)
@@ -781,14 +782,14 @@ Fk:loadTranslationTable {
 
   ["jy_trad_pojun"] = [[破军]],
   ["#jy_trad_pojun_delay"] = [[破军]],
-  [":jy_trad_pojun"] = [[当你使用【杀】指定一个目标后，你可以获得其区域内所有牌并令所有机器人减一点体力上限。]],
+  [":jy_trad_pojun"] = [[锁定技，当你使用【杀】指定一个目标后，你获得其区域内所有牌，然后所有机器人减X点体力上限（X为你的手牌数）。]],
 
   ["jy__trad__caopi"] = [[典曹丕]],
   ["#jy__trad__caopi"] = pve,
   ["designer:jy__trad__caopi"] = "考公专家",
 
   ["jy_trad_fangzhu"] = [[放逐]],
-  [":jy_trad_fangzhu"] = [[锁定技，你造成或受到伤害后，所有机器人摸X张牌、翻至背面并减X点体力上限（X为伤害值）。]],
+  [":jy_trad_fangzhu"] = [[锁定技，你受到伤害后，所有机器人摸X张牌、翻至背面并减X点体力上限（X为伤害值）。]],
 
   ["jy_trad_xingshang"] = [[行殇]],
   [":jy_trad_xingshang"] = [[锁定技，一名机器人的回合开始时，你获得其区域内所有牌。]],
