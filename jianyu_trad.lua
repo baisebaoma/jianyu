@@ -754,9 +754,9 @@ local xingshang = fk.CreateTriggerSkill {
   name = "jy_trad_xingshang",
   anim_type = "offensive",
   frequency = Skill.Compulsory,
-  events = { fk.HpChanged },
+  events = { fk.HpChanged, fk.MaxHpChanged },
   can_trigger = function(self, event, target, player, data)
-    return target.id < 0 and target.hp <= 0 and player:hasSkill(self)
+    return target.id < 0 and (target.hp <= 0 or target.maxHp <= 0) and player:hasSkill(self)
   end,
   on_use = function(self, event, target, player, data)
     local room = player.room
@@ -791,7 +791,7 @@ Fk:loadTranslationTable {
   [":jy_trad_fangzhu"] = [[锁定技，你造成或受到伤害后，所有机器人摸X张牌、翻至背面并减X点体力上限（X为伤害值）。]],
 
   ["jy_trad_xingshang"] = [[行殇]],
-  [":jy_trad_xingshang"] = [[锁定技，一名机器人体力值改变至0或以下时，你获得其区域内所有牌。]],
+  [":jy_trad_xingshang"] = [[锁定技，一名机器人的体力值或体力上限改变至0或以下后，你获得其区域内所有牌。]],
 }
 
 return extension
