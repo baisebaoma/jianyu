@@ -763,7 +763,7 @@ local xingshang = fk.CreateTriggerSkill {
     room:moveCardTo(target:getCardIds("hej"), Player.Hand,
       player, fk.ReasonPrey, self.name)
     room:recover({
-      who = player.id,
+      who = player,
       num = 1,
       recoverBy = player,
       skillName = self.name,
