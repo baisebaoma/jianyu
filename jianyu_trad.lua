@@ -762,12 +762,6 @@ local xingshang = fk.CreateTriggerSkill {
     local room = player.room
     room:moveCardTo(target:getCardIds("hej"), Player.Hand,
       player, fk.ReasonPrey, self.name)
-    room:recover({
-      who = player,
-      num = 1,
-      recoverBy = player,
-      skillName = self.name,
-    })
   end,
 }
 
@@ -797,7 +791,7 @@ Fk:loadTranslationTable {
   [":jy_trad_fangzhu"] = [[锁定技，你造成或受到伤害后，所有机器人摸X张牌、翻至背面并减X点体力上限（X为伤害值）。]],
 
   ["jy_trad_xingshang"] = [[行殇]],
-  [":jy_trad_xingshang"] = [[锁定技，一名机器人体力值改变至0或以下时，你获得其区域内所有牌并回复一点体力。]],
+  [":jy_trad_xingshang"] = [[锁定技，一名机器人体力值改变至0或以下时，你获得其区域内所有牌。]],
 }
 
 return extension
