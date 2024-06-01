@@ -729,14 +729,14 @@ local pojun = fk.CreateTriggerSkill {
 }
 
 local xusheng = General(extension, "jy__trad__xusheng", "wu", 4)
-xusheng.hidden = true
+xusheng.total_hidden = true
 xusheng:addSkill(pojun)
 
 local fangzhu = fk.CreateTriggerSkill {
   name = "jy_trad_fangzhu",
   anim_type = "masochism",
   frequency = Skill.Compulsory,
-  events = { fk.Damaged },
+  events = { fk.Damage, fk.Damaged },
   on_use = function(self, event, target, player, data)
     local room = player.room
     local robots = table.filter(room:getAlivePlayers(), function(p) return p.id < 0 end)
@@ -786,7 +786,7 @@ Fk:loadTranslationTable {
   ["designer:jy__trad__caopi"] = "考公专家",
 
   ["jy_trad_fangzhu"] = [[放逐]],
-  [":jy_trad_fangzhu"] = [[锁定技，你受到伤害后，所有机器人摸X张牌、翻至背面并减X点体力上限（X为伤害值）。]],
+  [":jy_trad_fangzhu"] = [[锁定技，你造成或受到伤害后，所有机器人摸X张牌、翻至背面并减X点体力上限（X为伤害值）。]],
 
   ["jy_trad_xingshang"] = [[行殇]],
   [":jy_trad_xingshang"] = [[锁定技，一名机器人翻面后，你获得其区域内所有牌。]],
