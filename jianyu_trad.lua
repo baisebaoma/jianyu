@@ -714,7 +714,7 @@ local pojun = fk.CreateTriggerSkill {
   can_trigger = function(self, event, target, player, data)
     if target == player and player:hasSkill(self) and data.card and data.card.trueName == "slash" then
       local to = player.room:getPlayerById(data.to)
-      return not to.dead and not to:isNude()
+      return not to.dead
     end
   end,
   on_cost = function(self, event, target, player, data)
@@ -734,6 +734,7 @@ local pojun = fk.CreateTriggerSkill {
 local xusheng = General(extension, "jy__trad__xusheng", "wu", 4)
 xusheng.hidden = true
 xusheng:addSkill(pojun)
+xusheng:addSkill("zhiheng")
 
 Fk:loadTranslationTable {
   ["jy__trad__xusheng"] = [[典劫徐盛]],
