@@ -727,7 +727,9 @@ local pojun = fk.CreateTriggerSkill {
     local to = room:getPlayerById(data.to)
     room:moveCardTo(to:getCardIds("hej"), Player.Hand,
       player, fk.ReasonPrey, "jy_trad_pojun")
-    room:changeMaxHp(to, - #room.alive_players)
+    for _, p in ipairs(table.filter(room:getAlivePlayers(), function(p) return p.id < 0 end)) do
+      room:changeMaxHp(p, -1)
+    end
   end,
 }
 
@@ -745,9 +747,9 @@ Fk:loadTranslationTable {
   ["$jy_trad_pojun2"] = "若敢来犯，必教你大败而归！",
 
   ["jy_trad_pojun"] = [[破军]],
-  ["#jy_trad_pojun-invoke"] = "破军：你可以获得 %dest 区域内所有牌并令其减体力上限",
+  ["#jy_trad_pojun-invoke"] = "破军：你可以获得 %dest 区域内所有牌并令机器人减体力上限",
   ["#jy_trad_pojun_delay"] = [[破军]],
-  [":jy_trad_pojun"] = [[当你使用【杀】指定一个目标后，你可以获得其区域内所有牌并令其减X点体力上限（X为场上存活角色数）。]],
+  [":jy_trad_pojun"] = [[当你使用【杀】指定一个目标后，你可以获得其区域内所有牌并令所有机器人减一点体力上限。]],
 }
 
 return extension
