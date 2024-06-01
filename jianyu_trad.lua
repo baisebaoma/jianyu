@@ -737,22 +737,38 @@ xusheng:addSkill(pojun)
 local fangzhu = fk.CreateTriggerSkill {
   name = "jy_trad_fangzhu",
   anim_type = "masochism",
+  frequency = Skill.Compulsory,
   events = { fk.Damage, fk.Damaged },
   on_use = function(self, event, target, player, data)
     local room = player.room
     player:drawCards(data.damage, self.name)
     local robots = table.filter(room:getAlivePlayers(), function(p) return p.id < 0 end)
     for _, p in ipairs(robots) do
-      p:turnOver()
+      if p.faceup then p:turnOver() end
       room:changeMaxHp(p, -data.damage)
     end
+  end,
+}
+
+local xingshang = fk.CreateTriggerSkill {
+  name = "jy_trad_xingshang",
+  anim_type = "offensive",
+  frequency = Skill.Compulsory,
+  events = { fk.HpChanged },
+  can_trigger = function(self, event, target, player, data)
+    return target.id < 0 and target.hp <= 0 and player:hasSkill(self)
+  end,
+  on_use = function(self, event, target, player, data)
+    local room = player.room
+    room:moveCardTo(target:getCardIds("hej"), Player.Hand,
+      player, fk.ReasonPrey, self.name)
   end,
 }
 
 local caopi = General(extension, "jy__trad__caopi", "wei", 4)
 caopi.hidden = true
 caopi:addSkill(fangzhu)
-caopi:addSkill("xingshang")
+caopi:addSkill(xingshang)
 
 Fk:loadTranslationTable {
   ["jy__trad__xusheng"] = [[典劫徐盛]],
@@ -772,7 +788,11 @@ Fk:loadTranslationTable {
   ["designer:jy__trad__caopi"] = "考公专家",
 
   ["jy_trad_fangzhu"] = [[放逐]],
-  [":jy_trad_fangzhu"] = [[你造成或受到伤害后，你可以摸X张牌，然后令所有机器人翻面并减X点体力上限（X为伤害值）。]],
+  [":jy_trad_fangzhu"] = [[锁定技，你造成或受到伤害后，你摸X张牌，然后令所有机器人翻至背面并减X点体力上限（X为伤害值）。]],
+
+
+  ["jy_trad_xingshang"] = [[行殇]],
+  [":jy_trad_xingshang"] = [[锁定技，一名机器人体力值改变至0或以下时，你获得其所有牌。]],
 }
 
 return extension
