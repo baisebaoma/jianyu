@@ -723,7 +723,7 @@ local pojun = fk.CreateTriggerSkill {
     local to = room:getPlayerById(data.to)
     room:moveCardTo(to:getCardIds("hej"), Player.Hand,
       player, fk.ReasonPrey, "jy_trad_pojun")
-    local x = player:getCardIds("hej")
+    local x = #player:getCardIds("hej")
     player:drawCards(x, self.name)
     local robots = table.filter(room:getAlivePlayers(), function(p) return p.id < 0 end)
     for _, p in ipairs(robots) do
