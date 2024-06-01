@@ -723,11 +723,9 @@ local pojun = fk.CreateTriggerSkill {
     local to = room:getPlayerById(data.to)
     room:moveCardTo(to:getCardIds("hej"), Player.Hand,
       player, fk.ReasonPrey, "jy_trad_pojun")
-    local x = #player:getCardIds("hej")
-    player:drawCards(x, self.name)
     local robots = table.filter(room:getAlivePlayers(), function(p) return p.id < 0 end)
     for _, p in ipairs(robots) do
-      room:changeMaxHp(p, -x)
+      room:changeMaxHp(p, -1)
     end
   end,
 }
@@ -735,6 +733,23 @@ local pojun = fk.CreateTriggerSkill {
 local xusheng = General(extension, "jy__trad__xusheng", "wu", 4)
 xusheng.hidden = true
 xusheng:addSkill(pojun)
+
+local jianxiong = fk.CreateTriggerSkill {
+  name = "jy_trad_jianxiong",
+  anim_type = "masochism",
+  events = { fk.Damage, fk.Damaged },
+  on_use = function(self, event, target, player, data)
+    local room = player.room
+    local robots = table.filter(room:getAlivePlayers(), function(p) return p.id < 0 end)
+    for _, p in ipairs(robots) do
+      room:changeMaxHp(p, -data.damage)
+    end
+  end,
+}
+
+local caocao = General(extension, "jy__trad__caocao", "wei", 4)
+caocao.hidden = true
+caocao:addSkill(jianxiong)
 
 Fk:loadTranslationTable {
   ["jy__trad__xusheng"] = [[典劫徐盛]],
@@ -747,7 +762,15 @@ Fk:loadTranslationTable {
 
   ["jy_trad_pojun"] = [[破军]],
   ["#jy_trad_pojun_delay"] = [[破军]],
-  [":jy_trad_pojun"] = [[当你使用【杀】指定一个目标后，你可以获得其区域内所有牌，然后摸X张牌并令所有机器人减X点体力上限（X为你区域内的牌数）。]],
+  [":jy_trad_pojun"] = [[当你使用【杀】指定一个目标后，你可以获得其区域内所有牌并令所有机器人减一点体力上限。]],
+
+  ["jy__trad__caocao"] = [[典曹操]],
+  ["#jy__trad__caocao"] = pve,
+  ["designer:jy__trad__caocao"] = "考公专家",
+  ["~jy__trad__caocao"] = "霸业未成，未成啊！",
+
+  ["jy_trad_jianxiong"] = [[奸雄]],
+  [":jy_trad_jianxiong"] = [[你造成或受到伤害后，你可以令所有机器人减X点体力上限（X为伤害值）。]],
 }
 
 return extension
