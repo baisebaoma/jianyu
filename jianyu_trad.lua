@@ -734,22 +734,25 @@ local xusheng = General(extension, "jy__trad__xusheng", "wu", 4)
 xusheng.hidden = true
 xusheng:addSkill(pojun)
 
-local jianxiong = fk.CreateTriggerSkill {
-  name = "jy_trad_jianxiong",
+local fangzhu = fk.CreateTriggerSkill {
+  name = "jy_trad_fangzhu",
   anim_type = "masochism",
   events = { fk.Damage, fk.Damaged },
   on_use = function(self, event, target, player, data)
     local room = player.room
+    player:drawCards(data.damage, self.name)
     local robots = table.filter(room:getAlivePlayers(), function(p) return p.id < 0 end)
     for _, p in ipairs(robots) do
+      p:turnOver()
       room:changeMaxHp(p, -data.damage)
     end
   end,
 }
 
-local caocao = General(extension, "jy__trad__caocao", "wei", 4)
-caocao.hidden = true
-caocao:addSkill(jianxiong)
+local caopi = General(extension, "jy__trad__caopi", "wei", 4)
+caopi.hidden = true
+caopi:addSkill(fangzhu)
+caopi:addSkill("xingshang")
 
 Fk:loadTranslationTable {
   ["jy__trad__xusheng"] = [[典劫徐盛]],
@@ -764,13 +767,12 @@ Fk:loadTranslationTable {
   ["#jy_trad_pojun_delay"] = [[破军]],
   [":jy_trad_pojun"] = [[当你使用【杀】指定一个目标后，你可以获得其区域内所有牌并令所有机器人减一点体力上限。]],
 
-  ["jy__trad__caocao"] = [[典曹操]],
-  ["#jy__trad__caocao"] = pve,
-  ["designer:jy__trad__caocao"] = "考公专家",
-  ["~jy__trad__caocao"] = "霸业未成，未成啊！",
+  ["jy__trad__caopi"] = [[典曹丕]],
+  ["#jy__trad__caopi"] = pve,
+  ["designer:jy__trad__caopi"] = "考公专家",
 
-  ["jy_trad_jianxiong"] = [[奸雄]],
-  [":jy_trad_jianxiong"] = [[你造成或受到伤害后，你可以令所有机器人减X点体力上限（X为伤害值）。]],
+  ["jy_trad_fangzhu"] = [[放逐]],
+  [":jy_trad_fangzhu"] = [[你造成或受到伤害后，你可以摸X张牌，然后令所有机器人翻面并减X点体力上限（X为伤害值）。]],
 }
 
 return extension
