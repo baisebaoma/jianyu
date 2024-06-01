@@ -727,14 +727,13 @@ local pojun = fk.CreateTriggerSkill {
     local to = room:getPlayerById(data.to)
     room:moveCardTo(to:getCardIds("hej"), Player.Hand,
       player, fk.ReasonPrey, "jy_trad_pojun")
-    room:changeMaxHp(to, -1)
+    room:changeMaxHp(to, - #room.alive_players)
   end,
 }
 
 local xusheng = General(extension, "jy__trad__xusheng", "wu", 4)
 xusheng.hidden = true
 xusheng:addSkill(pojun)
-xusheng:addSkill("zhiheng")
 
 Fk:loadTranslationTable {
   ["jy__trad__xusheng"] = [[典劫徐盛]],
@@ -746,9 +745,9 @@ Fk:loadTranslationTable {
   ["$jy_trad_pojun2"] = "若敢来犯，必教你大败而归！",
 
   ["jy_trad_pojun"] = [[破军]],
-  ["#jy_trad_pojun-invoke"] = "破军：你可以获得 %dest 区域内所有牌并令其减一点体力上限",
+  ["#jy_trad_pojun-invoke"] = "破军：你可以获得 %dest 区域内所有牌并令其减体力上限",
   ["#jy_trad_pojun_delay"] = [[破军]],
-  [":jy_trad_pojun"] = [[当你使用【杀】指定一个目标后，你可以获得其区域内所有牌并令其减一点体力上限。]],
+  [":jy_trad_pojun"] = [[当你使用【杀】指定一个目标后，你可以获得其区域内所有牌并令其减X点体力上限（X为场上存活角色数）。]],
 }
 
 return extension
