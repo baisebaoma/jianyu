@@ -742,33 +742,54 @@ local fangzhu = fk.CreateTriggerSkill {
     local robots = table.filter(room:getAlivePlayers(), function(p) return p.id < 0 end)
     for _, p in ipairs(robots) do
       if p.faceup then p:turnOver() end
-      p:drawCards(data.damage, self.name)
-      room:changeMaxHp(p, -data.damage)
+      local x = math.max(player.maxHp - player.hp, 1)
+      p:drawCards(x, self.name)
+      room:changeMaxHp(p, -x)
     end
   end,
 }
 
-local xingshang = fk.CreateTriggerSkill {
-  name = "jy_trad_xingshang",
+-- local xingshang = fk.CreateTriggerSkill {
+--   name = "jy_trad_xingshang",
+--   anim_type = "offensive",
+--   events = { fk.EventPhaseStart },
+--   can_trigger = function(self, event, target, player, data)
+--     return target.id < 0 and player:hasSkill(self) and target.phase == Player.Play
+--   end,
+--   on_trigger = function(self, event, target, player, data)
+--     return player.room:askForSkillInvoke(player, self.name, data, "#jy_trad_xingshang-prompt:" .. target.id)
+--   end,
+--   on_use = function(self, event, target, player, data)
+--     local room = player.room
+--     room:moveCardTo(target:getCardIds("hej"), Player.Hand,
+--       player, fk.ReasonPrey, self.name)
+--   end,
+-- }
+
+local songwei = fk.CreateTriggerSkill {
+  name = "jy_trad_songwei",
   anim_type = "offensive",
-  events = { fk.Death },
+  events = { fk.TurnStart },
   can_trigger = function(self, event, target, player, data)
-    return target.id < 0 and player:hasSkill(self)
+    return target.id < 0 and player:hasSkill(self) and target.kingdom == "wei"
   end,
   on_trigger = function(self, event, target, player, data)
-    return player.room:askForSkillInvoke(player, self.name, data, "#jy_trad_xingshang-prompt:" .. target.id)
+    return player.room:askForSkillInvoke(player, self.name, data, "#jy_trad_songwei-prompt:" .. target.id)
   end,
   on_use = function(self, event, target, player, data)
     local room = player.room
     room:moveCardTo(target:getCardIds("hej"), Player.Hand,
       player, fk.ReasonPrey, self.name)
+    room:changeMaxHp(player, target.maxHp)
   end,
+
 }
 
 local caopi = General(extension, "jy__trad__caopi", "wei", 4)
 caopi.hidden = true
 caopi:addSkill(fangzhu)
-caopi:addSkill(xingshang)
+caopi:addSkill("xingshang")
+caopi:addSkill(songwei)
 
 Fk:loadTranslationTable {
   ["jy__trad__xusheng"] = [[典劫徐盛]],
@@ -788,11 +809,15 @@ Fk:loadTranslationTable {
   ["designer:jy__trad__caopi"] = "考公专家",
 
   ["jy_trad_fangzhu"] = [[放逐]],
-  [":jy_trad_fangzhu"] = [[锁定技，你造成或受到伤害后，所有机器人摸X张牌、翻至背面并减X点体力上限（X为伤害值）。]],
+  [":jy_trad_fangzhu"] = [[锁定技，你造成或受到伤害后，所有机器人摸X张牌、翻至背面并减X点体力上限（X为你已损失的体力值且至少为1）。]],
 
   ["jy_trad_xingshang"] = [[行殇]],
-  [":jy_trad_xingshang"] = [[一名机器人死亡时，你可以获得其区域内所有牌。]],
-  ["#jy_trad_xingshang-prompt"] = [[行殇：你可以获得 %src 区域内所有牌]]
+  [":jy_trad_xingshang"] = [[一名机器人的出牌阶段开始时，你可以获得其区域内所有牌。]],
+  ["#jy_trad_xingshang-prompt"] = [[行殇：你可以获得 %src 区域内所有牌]],
+
+  ["jy_trad_songwei"] = [[颂威]],
+  [":jy_trad_songwei"] = [[魏势力机器人的回合开始时，你可以获得其区域内所有牌并加X点体力上限（X为其体力上限）。]],
+  ["#jy_trad_songwei-prompt"] = [[颂威：你可以获得 %src 区域内所有牌]],
 }
 
 return extension
