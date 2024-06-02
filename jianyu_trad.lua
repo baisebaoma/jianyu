@@ -766,30 +766,30 @@ local fangzhu = fk.CreateTriggerSkill {
 --   end,
 -- }
 
-local songwei = fk.CreateTriggerSkill {
-  name = "jy_trad_songwei",
-  anim_type = "offensive",
-  events = { fk.TurnStart },
-  can_trigger = function(self, event, target, player, data)
-    return target.id < 0 and player:hasSkill(self) and target.kingdom == "wei"
-  end,
-  on_trigger = function(self, event, target, player, data)
-    return player.room:askForSkillInvoke(player, self.name, data, "#jy_trad_songwei-prompt:" .. target.id)
-  end,
-  on_use = function(self, event, target, player, data)
-    local room = player.room
-    room:moveCardTo(target:getCardIds("hej"), Player.Hand,
-      player, fk.ReasonPrey, self.name)
-    room:changeMaxHp(player, target.maxHp)
-  end,
+-- local songwei = fk.CreateTriggerSkill {
+--   name = "jy_trad_songwei",
+--   anim_type = "offensive",
+--   events = { fk.TurnStart },
+--   can_trigger = function(self, event, target, player, data)
+--     return target.id < 0 and player:hasSkill(self) and target.kingdom == "wei"
+--   end,
+--   on_trigger = function(self, event, target, player, data)
+--     return player.room:askForSkillInvoke(player, self.name, data, "#jy_trad_songwei-prompt:" .. target.id)
+--   end,
+--   on_use = function(self, event, target, player, data)
+--     local room = player.room
+--     room:moveCardTo(target:getCardIds("hej"), Player.Hand,
+--       player, fk.ReasonPrey, self.name)
+--     room:changeMaxHp(player, target.maxHp)
+--   end,
 
-}
+-- }
 
-local caopi = General(extension, "jy__trad__caopi", "wei", 4)
+local caopi = General(extension, "jy__trad__caopi", "wei", 3, 6)
 caopi.hidden = true
 caopi:addSkill(fangzhu)
-caopi:addSkill("xingshang")
-caopi:addSkill(songwei)
+-- caopi:addSkill("xingshang")
+-- caopi:addSkill(songwei)
 
 Fk:loadTranslationTable {
   ["jy__trad__xusheng"] = [[典劫徐盛]],
@@ -809,7 +809,7 @@ Fk:loadTranslationTable {
   ["designer:jy__trad__caopi"] = "考公专家",
 
   ["jy_trad_fangzhu"] = [[放逐]],
-  [":jy_trad_fangzhu"] = [[锁定技，你造成或受到伤害后，所有机器人摸X张牌、翻至背面并减X点体力上限（X为你已损失的体力值且至少为1）。]],
+  [":jy_trad_fangzhu"] = [[锁定技，你造成或受到伤害后，所有机器人摸X张牌、翻至背面并减X点体力上限（X为你已损失的体力值）。]],
 
   ["jy_trad_xingshang"] = [[行殇]],
   [":jy_trad_xingshang"] = [[一名机器人的出牌阶段开始时，你可以获得其区域内所有牌。]],
