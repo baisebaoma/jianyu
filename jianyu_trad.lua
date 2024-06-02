@@ -792,7 +792,7 @@ Fk:loadTranslationTable {
 
   ["jy_trad_xingshang"] = [[行殇]],
   [":jy_trad_xingshang"] = [[一名机器人死亡时，你可以获得其区域内所有牌。]],
-  ["#jy_trad_xingshang-prompt:"] = [[行殇：你可以获得 %src 区域内所有牌]]
+  ["#jy_trad_xingshang-prompt"] = [[行殇：你可以获得 %src 区域内所有牌]]
 }
 
 return extension
