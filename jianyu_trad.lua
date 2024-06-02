@@ -809,7 +809,7 @@ Fk:loadTranslationTable {
   ["designer:jy__trad__caopi"] = "考公专家",
 
   ["jy_trad_fangzhu"] = [[放逐]],
-  [":jy_trad_fangzhu"] = [[锁定技，你造成或受到伤害后，所有机器人摸X张牌、翻至背面并减X点体力上限（X为你已损失的体力值）。]],
+  [":jy_trad_fangzhu"] = [[锁定技，你造成或受到伤害后，所有机器人摸X张牌、翻至背面并减X点体力上限（X为你已损失的体力值且至少为1）。]],
 
   ["jy_trad_xingshang"] = [[行殇]],
   [":jy_trad_xingshang"] = [[一名机器人的出牌阶段开始时，你可以获得其区域内所有牌。]],
