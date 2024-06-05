@@ -307,7 +307,7 @@ local mumang_trigger = fk.CreateTriggerSkill {
 }
 mumang:addRelatedSkill(mumang_trigger)
 
-local trad__guanzhe = General(extension, "jy__trad__guanzhe", "jin", 3, 3, General.Female)
+local trad__guanzhe = General(extension, "jy__trad__guanzhe", "jin", 6, 6, General.Female)
 trad__guanzhe.hidden = true
 trad__guanzhe:addSkill(trad_xiuxing)
 trad__guanzhe:addSkill(trad_zitai)
@@ -322,7 +322,7 @@ Fk:loadTranslationTable {
   ["illustrator:jy__trad__guanzhe"] = [[未知]],
 
   ["jy_trad_xiuxing"] = [[修行]],
-  [":jy_trad_xiuxing"] = [[锁定技，你使用牌无次数限制；当你造成或受到伤害后，你改变你所有转换技的状态。你每以此法改变一个转换技的状态或发动一个转换技时，你摸两张牌。]],
+  [":jy_trad_xiuxing"] = [[锁定技，你使用牌无次数限制；当你造成或受到伤害后，改变你所有转换技的状态。你每以此法改变一个转换技的状态或发动一个转换技时，你摸两张牌。]],
 
   ["jy_trad_mumang"] = [[目盲]],
   [":jy_trad_mumang"] = [[锁定技，你的攻击范围始终为1。]],
@@ -643,14 +643,14 @@ local juewu = fk.CreateTriggerSkill {
     return player:hasSkill(self) and data.from and data.from == player and data.to.maxHp >= 6
   end,
   on_use = function(self, event, target, player, data)
-    data.damage = data.damage + data.to.maxHp // 6
+    data.damage = data.damage + data.to.maxHp // 3
   end,
 }
 
-local tjzs = General(extension, "jy__trad__tjzs", "shu", 3, 3, General.Female)
+local tjzs = General(extension, "jy__trad__tjzs", "shu", 6, 6, General.Female)
 tjzs.hidden = true
 tjzs:addSkill(heiyong)
-tjzs:addSkill(silie)
+-- tjzs:addSkill(silie)
 tjzs:addSkill(juewu)
 
 Fk:loadTranslationTable {
@@ -670,7 +670,7 @@ Fk:loadTranslationTable {
   ["@jy_trad_silie"] = [[撕裂]],
 
   ["jy_juewu"] = [[决舞]],
-  [":jy_juewu"] = [[锁定技，你造成伤害时，目标每有6点体力上限，该伤害+1。]],
+  [":jy_juewu"] = [[锁定技，你造成伤害时，目标每有3点体力上限，该伤害+1。]],
 }
 
 local otto = General(extension, "jy__trad__god", "god", 3)
@@ -704,7 +704,7 @@ Fk:loadTranslationTable {
   ["illustrator:jy__trad__god"] = [[侯国玉]],
 
   ["jy_fuzhu"] = "哇袄",
-  [":jy_fuzhu"] = [[你的回合开始时，你可以获得一个想要的技能。<br><font color="grey">输入这个技能的name参数（如paoxiao）以获得技能，你的输入必须仅含小写英文字母和下划线且长度不得超过12。若输入错误，你不会获得技能。<br>不知道拿什么？试试输入：cheat！</font>]],
+  [":jy_fuzhu"] = [[回合开始时，你可以获得一个想要的技能。<br><font color="grey">输入这个技能的name参数（如paoxiao）以获得技能，你的输入必须仅含小写英文字母和下划线且长度不得超过12。若输入错误，你不会获得技能。<br>不知道拿什么？试试输入：cheat！</font>]],
 }
 
 local pojun = fk.CreateTriggerSkill {
@@ -722,15 +722,17 @@ local pojun = fk.CreateTriggerSkill {
     local room = player.room
     room:doIndicate(player.id, { data.to })
     local to = room:getPlayerById(data.to)
-    room:moveCardTo(to:getCardIds("hej"), Player.Hand,
+    local cards = to:getCardIds("hej")
+    room:moveCardTo(cards, Player.Hand,
       player, fk.ReasonPrey, "jy_trad_pojun")
-    room:changeShield(player, 1)
+    room:changeShield(player, #cards)
   end,
 }
 
 local xusheng = General(extension, "jy__trad__xusheng", "wu", 4)
-xusheng.total_hidden = true
+xusheng.hidden = true
 xusheng:addSkill(pojun)
+xusheng:addSkill("jy_juewu")
 
 local fangzhu = fk.CreateTriggerSkill {
   name = "jy_trad_fangzhu",
@@ -785,7 +787,7 @@ local fangzhu = fk.CreateTriggerSkill {
 
 -- }
 
-local caopi = General(extension, "jy__trad__caopi", "wei", 3, 6)
+local caopi = General(extension, "jy__trad__caopi", "wei", 6, 6)
 caopi.hidden = true
 caopi:addSkill(fangzhu)
 -- caopi:addSkill("xingshang")
@@ -802,7 +804,7 @@ Fk:loadTranslationTable {
 
   ["jy_trad_pojun"] = [[破军]],
   ["#jy_trad_pojun_delay"] = [[破军]],
-  [":jy_trad_pojun"] = [[锁定技，当你使用牌指定一个目标后，你获得其区域内所有牌和一点护甲。]],
+  [":jy_trad_pojun"] = [[锁定技，当你使用牌指定一个目标后，你获得其区域内所有牌和X点护甲（X为以此法获得的牌数）。]],
 
   ["jy__trad__caopi"] = [[典曹丕]],
   ["#jy__trad__caopi"] = pve,
