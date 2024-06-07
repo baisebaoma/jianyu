@@ -742,12 +742,16 @@ local fangzhu = fk.CreateTriggerSkill {
   on_use = function(self, event, target, player, data)
     local room = player.room
     local robots = table.filter(room:getAlivePlayers(), function(p) return p.id < 0 end)
+    local x = player.maxHp - player.hp
+    player:drawCards(x, self.name)
+    room:changeMaxHp(player, 1)
     for _, p in ipairs(robots) do
       if p.faceup then p:turnOver() end
-      local x = math.max(player.maxHp - player.hp, 1)
-      p:drawCards(x, self.name)
-      room:changeMaxHp(p, -x)
       -- 因为有的模式判定死亡不是很对，所以这里手动写一下死亡
+      if p.maxHp - x <= 0 then
+        room:killPlayer({ who = p.id })
+      end
+      room:changeMaxHp(p, -x)
       if p.maxHp <= 0 then
         room:killPlayer({ who = p.id })
       end
@@ -794,7 +798,7 @@ local fangzhu = fk.CreateTriggerSkill {
 local caopi = General(extension, "jy__trad__caopi", "wei", 6, 6)
 caopi.hidden = true
 caopi:addSkill(fangzhu)
--- caopi:addSkill("xingshang")
+caopi:addSkill("xingshang")
 -- caopi:addSkill(songwei)
 
 Fk:loadTranslationTable {
@@ -808,14 +812,14 @@ Fk:loadTranslationTable {
 
   ["jy_trad_pojun"] = [[破军]],
   ["#jy_trad_pojun_delay"] = [[破军]],
-  [":jy_trad_pojun"] = [[锁定技，当你使用【杀】指定一个目标后，你获得其区域内所有牌和X点护甲（X为其区域内的牌数）。]],
+  [":jy_trad_pojun"] = [[锁定技，当你使用【杀】指定一个目标后，你获得其区域内所有牌和X点护甲（X为以此法获得的牌数）。]],
 
   ["jy__trad__caopi"] = [[典曹丕]],
   ["#jy__trad__caopi"] = pve,
   ["designer:jy__trad__caopi"] = "考公专家",
 
   ["jy_trad_fangzhu"] = [[放逐]],
-  [":jy_trad_fangzhu"] = [[锁定技，你造成或受到伤害后，所有机器人摸X张牌、翻至背面并减X点体力上限（X为你已损失的体力值且至少为1）。]],
+  [":jy_trad_fangzhu"] = [[锁定技，你造成或受到伤害后，你摸X张牌并加一点体力上限、所有机器人翻至背面并减X点体力上限（X为你已损失的体力值）。]],
 
   ["jy_trad_xingshang"] = [[行殇]],
   [":jy_trad_xingshang"] = [[一名机器人的出牌阶段开始时，你可以获得其区域内所有牌。]],
