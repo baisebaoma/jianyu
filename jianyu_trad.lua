@@ -663,7 +663,7 @@ Fk:loadTranslationTable {
   ["jy_trad_heiyong"] = [[黑拥]],
   [":jy_trad_heiyong"] = [[锁定技，每回合每个牌名限一次，你使用或打出一张牌时，你摸一张牌；每名角色的回合结束时，若你本回合以此法获得的牌数大于你的体力上限，你失去一点体力。]],
   ["$jy_trad_heiyong1"] = [[龙战于野，其血玄黄！]],
-  ["$jy_trad_heiyong-turn"] = [[黑拥]],
+  ["@$jy_trad_heiyong-turn"] = [[黑拥]],
 
   ["jy_trad_silie"] = [[撕裂]],
   [":jy_trad_silie"] = [[锁定技，你失去一点体力时，获得1枚“撕裂”；你造成伤害时，弃1枚“撕裂”令此伤害+1。]],
