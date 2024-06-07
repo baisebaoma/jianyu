@@ -593,11 +593,12 @@ local heiyong = fk.CreateTriggerSkill {
         player.room:setPlayerMark(player, "@$jy_trad_heiyong-turn", mark)
       end
 
-      player:drawCards(1, self.name)
+      player:drawCards(2, self.name)
       table.insert(mark, data.card.name)
       player.room:setPlayerMark(player, "@$jy_trad_heiyong-turn", mark)
     else
-      player.room:loseHp(player, 1)
+      -- player.room:loseHp(player, 1)
+      player.room:changeMaxHp(player, -1)
     end
   end,
 }
@@ -661,7 +662,7 @@ Fk:loadTranslationTable {
   ["illustrator:jy__trad__tjzs"] = [[未知]],
 
   ["jy_trad_heiyong"] = [[黑拥]],
-  [":jy_trad_heiyong"] = [[锁定技，每回合每个牌名限一次，你使用或打出一张牌时，你摸一张牌；每名角色的回合结束时，若你本回合以此法获得的牌数大于你的体力上限，你失去一点体力。]],
+  [":jy_trad_heiyong"] = [[锁定技，每回合每个牌名限一次，你使用或打出一张牌时，你摸两张牌；每名角色的回合结束时，若本回合你发动该技能的牌名数大于你的体力上限，你减少一点体力上限。]],
   ["$jy_trad_heiyong1"] = [[龙战于野，其血玄黄！]],
   ["@$jy_trad_heiyong-turn"] = [[黑拥]],
 

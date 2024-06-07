@@ -1156,7 +1156,7 @@ Fk:loadTranslationTable {
   [":jy_muhuo"] = [[当一名角色受到伤害后，若你与其距离1以内且其未死亡，你可以摸X张牌（X为你已损失的体力值）并将〖冒充〗改为阳。若其不为你，本回合其不是你使用牌的合法目标。]],
 }
 
-local tjzs = General(extension, "jy__tjzs", "shu", 3, 3, General.Female)
+local tjzs = General(extension, "jy__tjzs", "shu", 4, 4, General.Female)
 tjzs:addSkill("jy_trad_heiyong")
 -- tjzs:addSkill("jy_trad_silie")
 
