@@ -569,33 +569,33 @@ Fk:loadTranslationTable {
 local heiyong = fk.CreateTriggerSkill {
   name = "jy_trad_heiyong",
   anim_type = "drawcard",
-  events = { fk.CardUsing, fk.CardResponding, fk.EventPhaseProceeding },
+  events = { fk.CardUsing, fk.CardResponding, fk.TurnEnd },
   frequency = Skill.Compulsory,
   can_trigger = function(self, event, target, player, data)
     if not (player:hasSkill(self) and target == player) then return false end
 
-    local mark = player:getMark("$jy_trad_heiyong-turn")
+    local mark = player:getMark("@$jy_trad_heiyong-turn")
     if type(mark) ~= "table" then
       mark = {}
     end
 
-    if event ~= fk.EventPhaseProceeding then
+    if event ~= fk.TurnEnd then
       return not table.contains(mark, data.card.name)
     else
-      return player.phase == Player.Finish and #mark > player.maxHp
+      return #mark > player.maxHp
     end
   end,
   on_use = function(self, event, target, player, data)
-    if event ~= fk.EventPhaseProceeding then
-      local mark = player:getMark("$jy_trad_heiyong-turn")
+    if event ~= fk.TurnEnd then
+      local mark = player:getMark("@$jy_trad_heiyong-turn")
       if type(mark) ~= "table" then
         mark = {}
-        player.room:setPlayerMark(player, "$jy_trad_heiyong-turn", mark)
+        player.room:setPlayerMark(player, "@$jy_trad_heiyong-turn", mark)
       end
 
       player:drawCards(1, self.name)
       table.insert(mark, data.card.name)
-      player.room:setPlayerMark(player, "$jy_trad_heiyong-turn", mark)
+      player.room:setPlayerMark(player, "@$jy_trad_heiyong-turn", mark)
     else
       player.room:loseHp(player, 1)
     end
@@ -640,7 +640,7 @@ local juewu = fk.CreateTriggerSkill {
   events = { fk.DamageCaused },
   frequency = Skill.Compulsory,
   can_trigger = function(self, event, target, player, data)
-    return player:hasSkill(self) and data.from and data.from == player and data.to.maxHp >= 6
+    return player:hasSkill(self) and data.from and data.from == player and data.to.maxHp >= 3
   end,
   on_use = function(self, event, target, player, data)
     data.damage = data.damage + data.to.maxHp // 3
@@ -661,7 +661,7 @@ Fk:loadTranslationTable {
   ["illustrator:jy__trad__tjzs"] = [[未知]],
 
   ["jy_trad_heiyong"] = [[黑拥]],
-  [":jy_trad_heiyong"] = [[锁定技，每个牌名每回合限一次，你使用或打出一张牌时，你摸一张牌；每名角色的结束阶段，若你本回合以此法获得的牌数大于你的体力上限，你失去一点体力。]],
+  [":jy_trad_heiyong"] = [[锁定技，每回合每个牌名限一次，你使用或打出一张牌时，你摸一张牌；每名角色的回合结束时，若你本回合以此法获得的牌数大于你的体力上限，你失去一点体力。]],
   ["$jy_trad_heiyong1"] = [[龙战于野，其血玄黄！]],
   ["$jy_trad_heiyong-turn"] = [[黑拥]],
 
@@ -669,7 +669,7 @@ Fk:loadTranslationTable {
   [":jy_trad_silie"] = [[锁定技，你失去一点体力时，获得1枚“撕裂”；你造成伤害时，弃1枚“撕裂”令此伤害+1。]],
   ["@jy_trad_silie"] = [[撕裂]],
 
-  ["jy_juewu"] = [[决舞]],
+  ["jy_juewu"] = [[死神]],
   [":jy_juewu"] = [[锁定技，你造成伤害时，目标每有3点体力上限，该伤害+1。]],
 }
 
@@ -747,6 +747,10 @@ local fangzhu = fk.CreateTriggerSkill {
       local x = math.max(player.maxHp - player.hp, 1)
       p:drawCards(x, self.name)
       room:changeMaxHp(p, -x)
+      -- 因为有的模式判定死亡不是很对，所以这里手动写一下死亡
+      if p.maxHp <= 0 then
+        room:killPlayer({ who = p.id })
+      end
     end
   end,
 }
@@ -804,7 +808,7 @@ Fk:loadTranslationTable {
 
   ["jy_trad_pojun"] = [[破军]],
   ["#jy_trad_pojun_delay"] = [[破军]],
-  [":jy_trad_pojun"] = [[锁定技，当你使用【杀】指定一个目标后，你获得其区域内所有牌和X点护甲（X为以此法获得的牌数）。]],
+  [":jy_trad_pojun"] = [[锁定技，当你使用【杀】指定一个目标后，你获得其区域内所有牌和X点护甲（X为其区域内的牌数）。]],
 
   ["jy__trad__caopi"] = [[典曹丕]],
   ["#jy__trad__caopi"] = pve,
