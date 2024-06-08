@@ -2881,4 +2881,32 @@ Fk:loadTranslationTable {
   ["$jy_yonghen2"] = [[欢迎来到……深渊……]],
 }
 
+local kanxi = fk.CreateTriggerSkill {
+  name = "jy_kanxi",
+  anim_type = "drawcard",
+  frequency = Skill.Compulsory,
+  events = { fk.Damaged },
+  can_trigger = function(self, event, target, player, data)
+    return player:hasSkill(self) and target ~= player and data.from ~= player
+  end,
+  on_use = function(self, event, target, player, data)
+    player.drawCards(2, self.name)
+  end,
+}
+
+local test = General(extension, "jy__test", "wu", 5)
+-- test.hidden = true
+test:addSkill(kanxi)
+
+Fk:loadTranslationTable {
+  ["jy__test"] = [[拱火乐子人]],
+  ["#jy__test"] = "测试",
+  ["designer:jy__test"] = "考公专家",
+  ["cv:jy__test"] = "无",
+  ["illustrator:jy__test"] = "无",
+
+  ["jy_kanxi"] = [[看戏]],
+  [":jy_kanxi"] = [[锁定技，一名除你以外的角色受到伤害时，若伤害来源不为你，你摸两张牌。]],
+}
+
 return extension
