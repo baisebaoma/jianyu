@@ -1156,8 +1156,44 @@ Fk:loadTranslationTable {
   [":jy_muhuo"] = [[当一名角色受到伤害后，若你与其距离1以内且其未死亡，你可以摸X张牌（X为你已损失的体力值）并将〖冒充〗改为阳。若其不为你，本回合其不是你使用牌的合法目标。]],
 }
 
-local tjzs = General(extension, "jy__tjzs", "shu", 4, 4, General.Female)
-tjzs:addSkill("jy_trad_heiyong")
+local heiyong = fk.CreateTriggerSkill {
+  name = "jy_heiyong",
+  anim_type = "drawcard",
+  events = { fk.CardUsing, fk.CardResponding, fk.TurnEnd },
+  frequency = Skill.Compulsory,
+  can_trigger = function(self, event, target, player, data)
+    if not (player:hasSkill(self) and target == player) then return false end
+
+    local mark = player:getMark("@$jy_heiyong-turn")
+    if type(mark) ~= "table" then
+      mark = {}
+    end
+
+    if event ~= fk.TurnEnd then
+      return not table.contains(mark, data.card.name)
+    else
+      return #mark > player.maxHp
+    end
+  end,
+  on_use = function(self, event, target, player, data)
+    if event ~= fk.TurnEnd then
+      local mark = player:getMark("@$jy_heiyong-turn")
+      if type(mark) ~= "table" then
+        mark = {}
+        player.room:setPlayerMark(player, "@$jy_heiyong-turn", mark)
+      end
+
+      player:drawCards(1, self.name)
+      table.insert(mark, data.card.name)
+      player.room:setPlayerMark(player, "@$jy_heiyong-turn", mark)
+    else
+      player.room:loseHp(player, 1)
+    end
+  end,
+}
+
+local tjzs = General(extension, "jy__tjzs", "shu", 3, 3, General.Female)
+tjzs:addSkill(heiyong)
 -- tjzs:addSkill("jy_trad_silie")
 
 Fk:loadTranslationTable {
@@ -1166,6 +1202,11 @@ Fk:loadTranslationTable {
   ["designer:jy__tjzs"] = [[Kasa]],
   ["cv:jy__tjzs"] = [[高达一号]],
   ["illustrator:jy__tjzs"] = [[未知]],
+
+  ["jy_heiyong"] = [[黑拥]],
+  [":jy_heiyong"] = [[锁定技，每回合每个牌名限一次，你使用或打出一张牌时，你摸一张牌；每名角色的回合结束时，若本回合你发动该技能的牌名数大于你的体力上限，你失去一点体力。]],
+  ["$jy_heiyong1"] = [[龙战于野，其血玄黄！]],
+  ["@$jy_heiyong-turn"] = [[黑拥]],
 }
 
 local fenshen = fk.CreateTriggerSkill {

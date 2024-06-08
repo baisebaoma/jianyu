@@ -12,7 +12,6 @@ Fk:loadTranslationTable {
 local rjhd = [[<font color="red">人机皇帝<br>因强度过高，本武将<br>不会出现在选将框。</font>]]
 local pve = [[<font color="red">人机皇帝<br>本武将专为PVE设计，<br>不会出现在选将框。</font>]]
 
--- 初版再生！！很强！！
 local trad_zaisheng = fk.CreateTriggerSkill {
   name = "jy_trad_zaisheng",
   anim_type = "support",
@@ -63,7 +62,6 @@ local trad_zaisheng = fk.CreateTriggerSkill {
           room:obtainCard(player.id, data.card, true, fk.ReasonJustMove)
         end
       end
-      -- 该机制非常强！！警告！！
       if data.from then
         local cards = {}
         for _, i in ipairs(data.from:getCardIds(Player.Hand)) do
@@ -72,7 +70,8 @@ local trad_zaisheng = fk.CreateTriggerSkill {
           end
         end
         if #cards > 0 then
-          room:obtainCard(player.id, cards[math.random(#cards)], true, fk.ReasonJustMove)
+          room:moveCardTo(cards, Player.Hand,
+            player, fk.ReasonPrey, self.name)
         end
       end
       room:setPlayerMark(data.to, "jy_trad_zaisheng_triggered-round", 1)
@@ -159,12 +158,12 @@ local trad_zhushe_mod = fk.CreateTargetModSkill {
 trad_zhushe:addRelatedSkill(trad_zhushe_mod)
 
 local trad__xuyu = General(extension, "jy__trad__xuyu", "qun", 3, 3, General.Female)
-trad__xuyu.total_hidden = true
+trad__xuyu.hidden = true
 trad__xuyu:addSkill(trad_zaisheng)
 trad__xuyu:addSkill(trad_zhushe)
 
 Fk:loadTranslationTable {
-  ["jy__trad__xuyu"] = "经典絮雨",
+  ["jy__trad__xuyu"] = "典絮雨",
   ["#jy__trad__xuyu"] = rjhd,
   ["designer:jy__trad__xuyu"] = "emo公主",
   ["cv:jy__trad__xuyu"] = "刘十四",
@@ -174,7 +173,7 @@ Fk:loadTranslationTable {
   ["jy_trad_zaisheng"] = "再生",
   ["@jy_trad_zaisheng"] = "再生",
   ["#jy_trad_zaisheng_prompt"] = [[是否发动〖再生〗令 %dest 回复一点体力且你获得增益效果？]],
-  [":jy_trad_zaisheng"] = [[当一名角色不因使用而失去红色牌时，你可以令其回复一点体力。若如此做，直到你的下回合开始：每回合限一次，当该角色受到伤害后，你获得对其造成伤害的牌，并随机获得伤害来源手牌中一张伤害牌。]],
+  [":jy_trad_zaisheng"] = [[当一名角色不因使用而失去红色牌时，你可以令其回复一点体力。若如此做，直到你的下回合开始，当该角色受到伤害后，你获得对其造成伤害的牌，并获得伤害来源手牌中所有伤害牌。]],
   ["$jy_trad_zaisheng1"] = [[不要害怕。]],
   ["$jy_trad_zaisheng2"] = [[让我来消除痛苦。]],
 
@@ -569,21 +568,15 @@ Fk:loadTranslationTable {
 local heiyong = fk.CreateTriggerSkill {
   name = "jy_trad_heiyong",
   anim_type = "drawcard",
-  events = { fk.CardUsing, fk.CardResponding, fk.TurnEnd },
+  events = { fk.CardUsing, fk.CardResponding },
   frequency = Skill.Compulsory,
   can_trigger = function(self, event, target, player, data)
     if not (player:hasSkill(self) and target == player) then return false end
-
     local mark = player:getMark("@$jy_trad_heiyong-turn")
     if type(mark) ~= "table" then
       mark = {}
     end
-
-    if event ~= fk.TurnEnd then
-      return not table.contains(mark, data.card.name)
-    else
-      return #mark > player.maxHp
-    end
+    return not table.contains(mark, data.card.name)
   end,
   on_use = function(self, event, target, player, data)
     if event ~= fk.TurnEnd then
@@ -592,13 +585,9 @@ local heiyong = fk.CreateTriggerSkill {
         mark = {}
         player.room:setPlayerMark(player, "@$jy_trad_heiyong-turn", mark)
       end
-
       player:drawCards(2, self.name)
       table.insert(mark, data.card.name)
       player.room:setPlayerMark(player, "@$jy_trad_heiyong-turn", mark)
-    else
-      -- player.room:loseHp(player, 1)
-      player.room:changeMaxHp(player, -1)
     end
   end,
 }
@@ -662,7 +651,7 @@ Fk:loadTranslationTable {
   ["illustrator:jy__trad__tjzs"] = [[未知]],
 
   ["jy_trad_heiyong"] = [[黑拥]],
-  [":jy_trad_heiyong"] = [[锁定技，每回合每个牌名限一次，你使用或打出一张牌时，你摸两张牌；每名角色的回合结束时，若本回合你发动该技能的牌名数大于你的体力上限，你减少一点体力上限。]],
+  [":jy_trad_heiyong"] = [[锁定技，每回合每个牌名限一次，你使用或打出一张牌时，你摸两张牌。]],
   ["$jy_trad_heiyong1"] = [[龙战于野，其血玄黄！]],
   ["@$jy_trad_heiyong-turn"] = [[黑拥]],
 
