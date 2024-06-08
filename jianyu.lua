@@ -2887,16 +2887,54 @@ local kanxi = fk.CreateTriggerSkill {
   frequency = Skill.Compulsory,
   events = { fk.Damaged },
   can_trigger = function(self, event, target, player, data)
-    return player:hasSkill(self) and target ~= player and data.from ~= player
+    if player:hasSkill(self) then
+      if player:getMark("@jy_ruju") == 0 then
+        return target ~= player and data.from ~= player
+      else
+        return true
+      end
+    end
   end,
   on_use = function(self, event, target, player, data)
     player:drawCards(2, self.name)
   end,
 }
 
-local test = General(extension, "jy__test", "wu", 5)
--- test.hidden = true
+local ruju = fk.CreateActiveSkill {
+  name = "jy_ruju",
+  anim_type = "offensive",
+  frequency = Skill.Limited,
+  can_use = function(self, player)
+    return player:usedSkillTimes(self.name, Player.HistoryGame) == 0
+  end,
+  card_filter = function(self, card)
+    return false
+  end,
+  card_num = 0,
+  target_filter = function(self, to_select, selected)
+    return false
+  end,
+  target_num = 0,
+  on_use = function(self, room, use)
+    local player = room:getPlayerById(use.from)
+    room:setPlayerMark(player, "@jy_ruju", "")
+  end,
+}
+local ruju_trigger = fk.CreateTriggerSkill {
+  name = "#jy_ruju_trigger",
+  refresh_events = { fk.TurnStart },
+  can_trigger = function(self, event, target, player, data)
+    return target == player and player:hasSkill("jy_ruju") and player:getMark("@jy_ruju") ~= 0
+  end,
+  on_use = function(self, event, target, player, data)
+    player.room:setPlayerMark(player, "@jy_ruju", 0)
+  end,
+}
+ruju:addRelatedSkill(ruju_trigger)
+
+local test = General(extension, "jy__test", "wu", 3)
 test:addSkill(kanxi)
+test:addSkill(ruju)
 
 Fk:loadTranslationTable {
   ["jy__test"] = [[乐子人]],
@@ -2907,6 +2945,12 @@ Fk:loadTranslationTable {
 
   ["jy_kanxi"] = [[看戏]],
   [":jy_kanxi"] = [[锁定技，一名除你以外的角色受到伤害时，若伤害来源不为你，你摸两张牌。]],
+
+  ["jy_ruju"] = [[入局]],
+  ["#jy_ruju_trigger"] = [[入局]],
+  ["@jy_ruju"] = [[入局]],
+  ["#jy_ruju"] = [[入局：你可将〖看戏〗改为所有伤害均可触发摸牌直到你的下个回合开始]],
+  [":jy_ruju"] = [[限定技，出牌阶段，你可以减少一点体力上限，将〖看戏〗改为所有伤害均可触发摸牌直到你的下个回合开始。]],
 }
 
 return extension
