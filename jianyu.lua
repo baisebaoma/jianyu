@@ -2890,7 +2890,7 @@ local kanxi = fk.CreateTriggerSkill {
     return player:hasSkill(self) and target ~= player and data.from ~= player
   end,
   on_use = function(self, event, target, player, data)
-    player.drawCards(2, self.name)
+    player:drawCards(2, self.name)
   end,
 }
 
@@ -2899,7 +2899,7 @@ local test = General(extension, "jy__test", "wu", 5)
 test:addSkill(kanxi)
 
 Fk:loadTranslationTable {
-  ["jy__test"] = [[拱火乐子人]],
+  ["jy__test"] = [[乐子人]],
   ["#jy__test"] = "测试",
   ["designer:jy__test"] = "考公专家",
   ["cv:jy__test"] = "无",
