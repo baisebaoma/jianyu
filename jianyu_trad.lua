@@ -640,7 +640,7 @@ local juewu = fk.CreateTriggerSkill {
 local tjzs = General(extension, "jy__trad__tjzs", "shu", 6, 6, General.Female)
 tjzs.hidden = true
 tjzs:addSkill(heiyong)
--- tjzs:addSkill(silie)
+tjzs:addSkill("longdan")
 tjzs:addSkill(juewu)
 
 Fk:loadTranslationTable {
