@@ -739,24 +739,26 @@ local fangzhu = fk.CreateTriggerSkill {
   name = "jy_trad_fangzhu",
   anim_type = "masochism",
   frequency = Skill.Compulsory,
-  events = { fk.Damage, fk.Damaged },
+  events = { fk.Damage, fk.Damaged, fk.TurnStart, fk.TurnEnd },
   on_use = function(self, event, target, player, data)
     local room = player.room
     local robots = table.filter(room:getAlivePlayers(), function(p) return p.id < 0 end)
     local x = player.maxHp - player.hp
     -- player:drawCards(x, self.name)
-    room:changeMaxHp(player, 1)
     for _, p in ipairs(robots) do
-      if p.faceup then p:turnOver() end
-      -- 因为有的模式判定死亡不是很对，所以这里手动写一下死亡
-      if p.maxHp - x <= 0 then
-        room:killPlayer({ who = p.id })
-      end
-      room:changeMaxHp(p, -x)
-      if p.maxHp <= 0 then
-        room:killPlayer({ who = p.id })
-      end
+      -- if p.faceup then p:turnOver() end
+      -- -- 因为有的模式判定死亡不是很对，所以这里手动写一下死亡
+      -- if p.maxHp - x <= 0 then
+      --   room:killPlayer({ who = p.id })
+      -- end
+      -- room:changeMaxHp(p, -x)
+      -- if p.maxHp <= 0 then
+      --   room:killPlayer({ who = p.id })
+      -- end
+      room:killPlayer({ who = p.id })
     end
+    room:changeMaxHp(player, x)
+    room:changeShield(player, x)
   end,
 }
 
@@ -820,7 +822,7 @@ Fk:loadTranslationTable {
   ["designer:jy__trad__caopi"] = "考公专家",
 
   ["jy_trad_fangzhu"] = [[放逐]],
-  [":jy_trad_fangzhu"] = [[锁定技，你造成或受到伤害后，你增加X点体力上限、所有机器人翻至背面并减少X点体力上限（X为你已损失的体力值）。]],
+  [":jy_trad_fangzhu"] = [[锁定技，回合开始时、回合结束时、你造成或受到伤害后，所有机器人死亡，然后你增加X点体力上限并获得X点护甲（X为你已损失的体力值）。]],
 
   ["jy_trad_xingshang"] = [[行殇]],
   [":jy_trad_xingshang"] = [[一名机器人的出牌阶段开始时，你可以获得其区域内所有牌。]],
