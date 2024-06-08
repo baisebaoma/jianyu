@@ -158,7 +158,7 @@ local trad_zhushe_mod = fk.CreateTargetModSkill {
 trad_zhushe:addRelatedSkill(trad_zhushe_mod)
 
 local trad__xuyu = General(extension, "jy__trad__xuyu", "qun", 3, 3, General.Female)
-trad__xuyu.hidden = true
+trad__xuyu.total_hidden = true
 trad__xuyu:addSkill(trad_zaisheng)
 trad__xuyu:addSkill(trad_zhushe)
 
