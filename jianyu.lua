@@ -2953,7 +2953,7 @@ Fk:loadTranslationTable {
   ["illustrator:jy__test"] = "无",
 
   ["jy_kanxi"] = [[看戏]],
-  [":jy_kanxi"] = [[锁定技，你跳过摸牌阶段；一名除你以外的角色受到伤害时，若伤害来源不为你，你摸两张牌。]],
+  [":jy_kanxi"] = [[锁定技，你跳过摸牌阶段；一名除你以外的角色受到伤害后，若伤害来源不为你，你摸两张牌。]],
 
   ["jy_ruju"] = [[入局]],
   ["#jy_ruju_trigger"] = [[入局]],
