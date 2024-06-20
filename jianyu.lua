@@ -2941,7 +2941,8 @@ local ruju_trigger = fk.CreateTriggerSkill {
 }
 ruju:addRelatedSkill(ruju_trigger)
 
-local test = General(extension, "jy__test", "qun", 2, 2)
+local test = General(extension, "jy__test", "qun", 3, 3)
+test.hidden = true
 test:addSkill(kanxi)
 test:addSkill(ruju)
 

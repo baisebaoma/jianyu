@@ -9,8 +9,8 @@ Fk:loadTranslationTable {
   ["trad"] = [[经典]],
 }
 
-local rjhd = [[<font color="red">人机皇帝<br>因强度过高，本武将<br>不会出现在选将框。</font>]]
-local pve = [[<font color="red">人机皇帝<br>本武将专为PVE设计，<br>不会出现在选将框。</font>]]
+local rjhd = [[<font color="red">人机皇帝<br>因强度过高，本武将不会出现在选将框。</font>]]
+local pve = [[<font color="red">人机皇帝<br>本武将专为PVE设计，不会出现在选将框。</font>]]
 
 local trad_zaisheng = fk.CreateTriggerSkill {
   name = "jy_trad_zaisheng",
@@ -592,37 +592,37 @@ local heiyong = fk.CreateTriggerSkill {
   end,
 }
 
-local silie = fk.CreateTriggerSkill {
-  name = "jy_trad_silie",
-  anim_type = "offensive",
-  events = { fk.HpLost, fk.DamageInflicted },
-  frequency = Skill.Compulsory,
-  can_trigger = function(self, event, target, player, data)
-    if not player:hasSkill(self) then return false end
-    if event == fk.HpLost then
-      return target == player
-    else
-      return data.from and data.from == player and player:getMark("@jy_trad_silie") ~= 0
-    end
-  end,
-  on_trigger = function(self, event, target, player, data)
-    if event == fk.HpLost then
-      for _ = 1, data.num do
-        self:doCost(event, target, player, data)
-      end
-    else
-      self:doCost(event, target, player, data)
-    end
-  end,
-  on_use = function(self, event, target, player, data)
-    if event == fk.HpLost then
-      player.room:addPlayerMark(player, "@jy_trad_silie")
-    else
-      data.damage = data.damage + 1
-      player.room:addPlayerMark(player, "@jy_trad_silie", -1)
-    end
-  end,
-}
+-- local silie = fk.CreateTriggerSkill {
+--   name = "jy_trad_silie",
+--   anim_type = "offensive",
+--   events = { fk.HpLost, fk.DamageInflicted },
+--   frequency = Skill.Compulsory,
+--   can_trigger = function(self, event, target, player, data)
+--     if not player:hasSkill(self) then return false end
+--     if event == fk.HpLost then
+--       return target == player
+--     else
+--       return data.from and data.from == player and player:getMark("@jy_trad_silie") ~= 0
+--     end
+--   end,
+--   on_trigger = function(self, event, target, player, data)
+--     if event == fk.HpLost then
+--       for _ = 1, data.num do
+--         self:doCost(event, target, player, data)
+--       end
+--     else
+--       self:doCost(event, target, player, data)
+--     end
+--   end,
+--   on_use = function(self, event, target, player, data)
+--     if event == fk.HpLost then
+--       player.room:addPlayerMark(player, "@jy_trad_silie")
+--     else
+--       data.damage = data.damage + 1
+--       player.room:addPlayerMark(player, "@jy_trad_silie", -1)
+--     end
+--   end,
+-- }
 
 local juewu = fk.CreateTriggerSkill {
   name = "jy_juewu",
@@ -820,6 +820,40 @@ Fk:loadTranslationTable {
   ["jy_trad_songwei"] = [[颂威]],
   [":jy_trad_songwei"] = [[魏势力机器人的回合开始时，你可以获得其区域内所有牌并加X点体力上限（X为其体力上限）。]],
   ["#jy_trad_songwei-prompt"] = [[颂威：你可以获得 %src 区域内所有牌]],
+}
+
+local yitong = fk.CreateTriggerSkill {
+  name = "jy_trad_yitong",
+  anim_type = "drawcard",
+  events = { fk.CardUsing, fk.CardResponding },
+  frequency = Skill.Compulsory,
+  on_use = function(self, event, target, player, data)
+    local room = player.room
+    -- local x = player:usedSkillTimes(self.name, Player.HistoryTurn)
+    for _, r in ipairs(table.filter(room:getAlivePlayers(), function(p) return p.id < 0 end)) do
+      room:damage({
+        from = player,
+        to = r,
+        damage = 1,
+        damageType = fk.NormalDamage,
+        skillName = self.name,
+      })
+      room:askForDiscard(r, 2, 2, false, self.name, false)
+    end
+  end,
+}
+
+local liaoran = General(extension, "jy__trad__liaoran", "qun", 6, 6)
+liaoran.hidden = true
+liaoran:addSkill(yitong)
+
+Fk:loadTranslationTable {
+  ["jy__trad__liaoran"] = [[典了然]],
+  ["#jy__trad__liaoran"] = pve,
+  ["designer:jy__trad__liaoran"] = "了然",
+
+  ["jy_trad_yitong"] = [[亿统]],
+  [":jy_trad_yitong"] = [[锁定技，你使用或打出一张牌时，你对所有机器人造成一点伤害并令其弃置两张牌。]],
 }
 
 return extension
