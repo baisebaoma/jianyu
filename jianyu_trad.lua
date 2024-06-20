@@ -846,6 +846,7 @@ local yitong = fk.CreateTriggerSkill {
 local liaoran = General(extension, "jy__trad__liaoran", "qun", 6, 6)
 liaoran.hidden = true
 liaoran:addSkill(yitong)
+liaoran:addSkill("jy_juewu")
 
 Fk:loadTranslationTable {
   ["jy__trad__liaoran"] = [[典了然]],
