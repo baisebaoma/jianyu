@@ -627,10 +627,10 @@ local heiyong = fk.CreateTriggerSkill {
 local juewu = fk.CreateTriggerSkill {
   name = "jy_juewu",
   anim_type = "offensive",
-  events = { fk.DamageCaused },
+  events = { fk.DamageInflicted },
   frequency = Skill.Compulsory,
   can_trigger = function(self, event, target, player, data)
-    return player:hasSkill(self) and data.from and data.from == player and data.to.maxHp >= 3
+    return player:hasSkill(self) and data.to.id < 0 and data.to.maxHp >= 3
   end,
   on_use = function(self, event, target, player, data)
     data.damage = data.damage + data.to.maxHp // 3
@@ -660,7 +660,7 @@ Fk:loadTranslationTable {
   ["@jy_trad_silie"] = [[撕裂]],
 
   ["jy_juewu"] = [[死神]],
-  [":jy_juewu"] = [[锁定技，你造成伤害时，目标每有3点体力上限，该伤害+1。]],
+  [":jy_juewu"] = [[锁定技，一名机器人受到伤害时，其每有3点体力上限，该伤害+1。]],
 }
 
 local otto = General(extension, "jy__trad__god", "god", 3)
@@ -714,7 +714,7 @@ local pojun = fk.CreateTriggerSkill {
     local to = room:getPlayerById(data.to)
     local cards = to:getCardIds("hej")
     room:moveCardTo(cards, Player.Hand,
-      player, fk.ReasonPrey, "jy_trad_pojun")
+      player, fk.ReasonJustMove, "jy_trad_pojun") -- 使用ReasonJustMove，防止其他技能阻止移动牌
     room:changeShield(player, #cards)
   end,
 }
@@ -728,26 +728,24 @@ local fangzhu = fk.CreateTriggerSkill {
   name = "jy_trad_fangzhu",
   anim_type = "masochism",
   frequency = Skill.Compulsory,
-  events = { fk.Damage, fk.Damaged, fk.TurnStart, fk.TurnEnd },
+  events = { fk.Damaged },
   on_use = function(self, event, target, player, data)
     local room = player.room
     local robots = table.filter(room:getAlivePlayers(), function(p) return p.id < 0 end)
     local x = player.maxHp - player.hp
-    -- player:drawCards(x, self.name)
     for _, p in ipairs(robots) do
       if p.faceup then p:turnOver() end
-      -- 因为有的模式判定死亡不是很对，所以这里手动写一下死亡
-      if p.maxHp - x <= 0 then
-        room:killPlayer({ who = p.id })
-      end
+      -- -- 因为有的模式判定死亡不是很对，所以这里手动写一下死亡（尽管他好像还是没死。肯定是有什么别的包里写了什么全局技能）
+      -- if p.maxHp - x <= 0 then
+      --   room:killPlayer({ who = p.id })
+      -- end
       room:changeMaxHp(p, -x)
-      if p.maxHp <= 0 then
-        room:killPlayer({ who = p.id })
-      end
-      -- room:killPlayer({ who = p.id })
+      -- if p.maxHp <= 0 then
+      --   room:killPlayer({ who = p.id })
+      -- end
     end
-    room:changeMaxHp(player, x)
-    room:changeShield(player, x)
+    -- room:changeMaxHp(player, x)
+    -- room:changeShield(player, x)
   end,
 }
 
@@ -788,7 +786,7 @@ local fangzhu = fk.CreateTriggerSkill {
 -- }
 
 local caopi = General(extension, "jy__trad__caopi", "wei", 6, 6)
-caopi.total_hidden = true
+caopi.hidden = true
 caopi:addSkill(fangzhu)
 caopi:addSkill("xingshang")
 -- caopi:addSkill(songwei)
@@ -811,7 +809,8 @@ Fk:loadTranslationTable {
   ["designer:jy__trad__caopi"] = "考公专家",
 
   ["jy_trad_fangzhu"] = [[放逐]],
-  [":jy_trad_fangzhu"] = [[锁定技，回合开始时、回合结束时、你造成或受到伤害后，所有机器人翻面并减X点体力上限，然后你增加X点体力上限并获得X点护甲（X为你已损失的体力值）。]],
+  [":jy_trad_fangzhu"] = [[锁定技，你受到伤害后，所有机器人翻至背面并减X点体力上限。]]
+  -- [[锁定技，你受到伤害后，所有机器人翻至背面并减X点体力上限，然后你增加X点体力上限并获得X点护甲（X为你已损失的体力值）。]]
 
   ["jy_trad_xingshang"] = [[行殇]],
   [":jy_trad_xingshang"] = [[一名机器人的出牌阶段开始时，你可以获得其区域内所有牌。]],
