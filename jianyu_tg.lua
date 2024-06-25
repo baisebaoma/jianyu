@@ -2064,7 +2064,7 @@ local quanyu = fk.CreateTriggerSkill {
       end
     elseif #max_targets == 1 then
       self.cost_data = max_targets[1]
-      return true
+      return room:askForSkillInvoke(player, self.name)
     end
   end,
   on_use = function(self, event, target, player, data)
