@@ -868,14 +868,14 @@ local zhiheng = fk.CreateActiveSkill {
       return "#jy_trad_zhiheng-self"
     end
   end,
-  can_use = function(self, player)
-    -- 如果有一个人有牌，那就可以亮起来技能按钮
-    for _, p in ipairs(Fk:currentRoom().alive_players) do
-      if #p:getCardIds("he") ~= 0 then
-        return true
-      end
-    end
-  end,
+  -- can_use = function(self, player)
+  --   -- 如果有一个人有牌，那就可以亮起来技能按钮
+  --   for _, p in ipairs(Fk:currentRoom():getOtherPlayers(player)) do
+  --     if #p:getCardIds("he") ~= 0 then
+  --       return true
+  --     end
+  --   end
+  -- end,
   card_filter = function(self, card, to_select, selected, selected_targets)
     return not Self:prohibitDiscard(Fk:getCardById(to_select)) and #selected_targets == 0
   end,
