@@ -868,27 +868,24 @@ local zhiheng = fk.CreateActiveSkill {
       return "#jy_trad_zhiheng-self"
     end
   end,
-  -- can_use = function(self, player)
-  --   -- 如果有一个人有牌，那就可以亮起来技能按钮
-  --   for _, p in ipairs(Fk:currentRoom():getOtherPlayers(player)) do
-  --     if #p:getCardIds("he") ~= 0 then
-  --       return true
-  --     end
-  --   end
-  -- end,
+  can_use = function(self, player)
+    -- 如果有一个人有牌，那就可以亮起来技能按钮
+    for _, p in ipairs(Fk:currentRoom():getOtherPlayers(player)) do
+      if #p:getCardIds("he") ~= 0 then
+        return true
+      end
+    end
+  end,
   card_filter = function(self, card, to_select, selected, selected_targets)
     return not Self:prohibitDiscard(Fk:getCardById(to_select)) and #selected_targets == 0
   end,
-  mod_target_filter = function(self, to_select, selected, user, card)
-    local player = Fk:currentRoom():getPlayerById(to_select)
-    return user ~= to_select and not player:isAllNude()
-  end,
   target_filter = function(self, to_select, selected, selected_cards, card)
-    if #selected < self:getMaxTargetNum(Self, card) then
-      return self:modTargetFilter(to_select, selected, Self.id, card) and #selected_cards == 0
-    end
+    return #selected == 0 and to_select ~= Self.id and #selected_cards == 0
   end,
   max_target_num = 1,
+  feasible = function(self, selected, selected_cards)
+    return #selected == 0 or #selected_cards == 0
+  end,
   on_use = function(self, room, use)
     local card_num = 0
     local from = room:getPlayerById(use.from)
