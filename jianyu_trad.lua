@@ -651,7 +651,7 @@ Fk:loadTranslationTable {
   ["illustrator:jy__trad__tjzs"] = [[未知]],
 
   ["jy_trad_heiyong"] = [[黑拥]],
-  [":jy_trad_heiyong"] = [[锁定技，每回合每个牌名限一次，你使用或打出一张牌时，你摸两张牌。]],
+  [":jy_trad_heiyong"] = [[锁定技，每回合每个牌名限一次，你使用或打出牌时，你摸两张牌。]],
   ["$jy_trad_heiyong1"] = [[龙战于野，其血玄黄！]],
   ["@$jy_trad_heiyong-turn"] = [[黑拥]],
 
@@ -785,7 +785,7 @@ local fangzhu = fk.CreateTriggerSkill {
 
 -- }
 
-local caopi = General(extension, "jy__trad__caopi", "wei", 6, 6)
+local caopi = General(extension, "jy__trad__caopi", "wei", 3, 3)
 caopi.hidden = true
 caopi:addSkill(fangzhu)
 caopi:addSkill("xingshang")
@@ -841,7 +841,7 @@ local yitong = fk.CreateTriggerSkill {
   end,
 }
 
-local liaoran = General(extension, "jy__trad__liaoran", "qun", 6, 6)
+local liaoran = General(extension, "jy__trad__liaoran", "qun", 3, 3)
 liaoran.hidden = true
 liaoran:addSkill(yitong)
 liaoran:addSkill("jy_juewu")
@@ -852,7 +852,88 @@ Fk:loadTranslationTable {
   ["designer:jy__trad__liaoran"] = "了然",
 
   ["jy_trad_yitong"] = [[亿统]],
-  [":jy_trad_yitong"] = [[锁定技，你使用或打出一张牌时，你对所有机器人造成一点伤害并令其弃置两张牌。]],
+  [":jy_trad_yitong"] = [[锁定技，你使用或打出牌时，你对所有机器人造成一点伤害并令其弃置两张牌。]],
+}
+
+local zhiheng = fk.CreateActiveSkill {
+  name = "jy_trad_zhiheng",
+  anim_type = "drawcard",
+  prompt = function(self, selected_cards, selected_targets)
+    if #selected_cards == 0 and #selected_targets == 0 then
+      return "#jy_trad_zhiheng"
+    end
+
+    if #selected_targets > 0 then
+      return "#jy_trad_zhiheng-other"
+    else
+      return "#jy_trad_zhiheng-self"
+    end
+  end,
+  can_use = function(self, player)
+    -- 如果有一个人有牌，那就可以亮起来技能按钮
+    for _, p in ipairs(Fk:currentRoom().alive_players) do
+      if p:getCardIds("he") ~= 0 then
+        return true
+      end
+    end
+  end,
+  card_filter = function(self, card, to_select, selected)
+    return not Self:prohibitDiscard(Fk:getCardById(to_select))
+  end,
+  min_card_num = 0,
+  mod_target_filter = function(self, to_select, selected, user, card)
+    local player = Fk:currentRoom():getPlayerById(to_select)
+    return user ~= to_select and not player:isAllNude()
+  end,
+  target_filter = function(self, to_select, selected, _, card)
+    if #selected < self:getMaxTargetNum(Self, card) then
+      return self:modTargetFilter(to_select, selected, Self.id, card) and #selected_cards == 0
+    end
+  end,
+
+  min_target_num = 0,
+  max_target_num = 1,
+  on_use = function(self, room, use)
+    local card_num = 0
+    local from = room:getPlayerById(use.from)
+    if #use.cards == 0 then
+      for _, to in ipairs(use.tos) do
+        -- 选了其他人，弃别人的
+        local p = room:getPlayerById(to)
+        local cards = room:askForCardsChosen(from, p, 1, p:getCardIds("he"), "he", self.name)
+        room:throwCard(cards, self.name, to, from)
+        card_num = #cards
+      end
+    else
+      -- 选了自己的牌，弃自己的
+      room:throwCard(use.cards, self.name, from, from)
+      card_num = #use.cards
+    end
+    if from:isAlive() then
+      -- 给自己摸牌
+      from:drawCards(card_num, self.name)
+    end
+  end,
+}
+
+local sunquan = General(extension, "jy__trad__sunquan", "wu", 4, 4)
+sunquan.hidden = true
+sunquan:addSkill(zhiheng)
+
+Fk:loadTranslationTable {
+  ["jy__trad__sunquan"] = [[典孙权]],
+  ["#jy__trad__sunquan"] = pve,
+  ["designer:jy__trad__sunquan"] = "考公专家",
+  ["~jy__trad__sunquan"] = [[父亲，大哥，仲谋愧矣！]],
+
+  ["$jy_trad_zhiheng1"] = [[容我三思。]],
+  ["$jy_trad_zhiheng2"] = [[且慢！]],
+
+  ["jy_trad_zhiheng"] = [[制衡]],
+  ["#jy_trad_zhiheng"] = [[制衡：选择自己的牌或一名其他角色]],
+  ["#jy_trad_zhiheng-other"] = [[制衡：弃置该角色的牌，然后摸等量的牌]],
+  ["#jy_trad_zhiheng-self"] = [[制衡：弃置自己的牌，然后摸等量的牌]],
+  [":jy_trad_zhiheng"] = [[出牌阶段，你可以弃置一名角色任意张牌，然后你摸等量的牌。]],
 }
 
 return extension
