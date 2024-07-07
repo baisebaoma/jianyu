@@ -870,8 +870,8 @@ local zhiheng = fk.CreateActiveSkill {
   end,
   can_use = function(self, player)
     -- 如果有一个人有牌，那就可以亮起来技能按钮
-    for _, p in ipairs(Fk:currentRoom():getOtherPlayers(player)) do
-      if #p:getCardIds("he") ~= 0 then
+    for _, p in ipairs(Fk:currentRoom().alive_players) do
+      if p.id ~= player.id and #p:getCardIds("he") ~= 0 then
         return true
       end
     end
