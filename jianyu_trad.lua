@@ -872,7 +872,7 @@ local zhiheng = fk.CreateActiveSkill {
   can_use = function(self, player)
     -- 如果有一个人有牌，那就可以亮起来技能按钮
     for _, p in ipairs(Fk:currentRoom().alive_players) do
-      if p:getCardIds("he") ~= 0 then
+      if #p:getCardIds("he") ~= 0 then
         return true
       end
     end
@@ -890,7 +890,6 @@ local zhiheng = fk.CreateActiveSkill {
       return self:modTargetFilter(to_select, selected, Self.id, card) and #selected_cards == 0
     end
   end,
-
   min_target_num = 0,
   max_target_num = 1,
   on_use = function(self, room, use)
@@ -900,7 +899,7 @@ local zhiheng = fk.CreateActiveSkill {
       for _, to in ipairs(use.tos) do
         -- 选了其他人，弃别人的
         local p = room:getPlayerById(to)
-        local cards = room:askForCardsChosen(from, p, 1, p:getCardIds("he"), "he", self.name)
+        local cards = room:askForCardsChosen(from, p, 1, #p:getCardIds("he"), "he", self.name)
         room:throwCard(cards, self.name, to, from)
         card_num = #cards
       end
