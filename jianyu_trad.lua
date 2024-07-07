@@ -844,7 +844,7 @@ local yitong = fk.CreateTriggerSkill {
 local liaoran = General(extension, "jy__trad__liaoran", "qun", 3, 3)
 liaoran.hidden = true
 liaoran:addSkill(yitong)
-liaoran:addSkill("jy_juewu")
+-- liaoran:addSkill("jy_juewu")
 
 Fk:loadTranslationTable {
   ["jy__trad__liaoran"] = [[典了然]],
@@ -873,10 +873,14 @@ local zhiheng = fk.CreateActiveSkill {
       end
     end
   end,
+  card_num = 0,
+  card_filter = function(self)
+    return false
+  end,
+  max_target_num = 1,
   target_filter = function(self, to_select, selected, selected_cards, card)
     return #selected == 0
   end,
-  max_target_num = 1,
   on_use = function(self, room, use)
     local card_num = 0
     local from = room:getPlayerById(use.from)
