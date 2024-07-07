@@ -900,7 +900,7 @@ local zhiheng = fk.CreateActiveSkill {
         -- 选了其他人，弃别人的
         local p = room:getPlayerById(to)
         local cards = room:askForCardsChosen(from, p, 1, #p:getCardIds("he"), "he", self.name)
-        room:throwCard(cards, self.name, to, from)
+        room:throwCard(cards, self.name, p, from)
         card_num = #cards
       end
     else
