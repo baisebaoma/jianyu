@@ -877,10 +877,10 @@ local zhiheng = fk.CreateActiveSkill {
     end
   end,
   card_filter = function(self, card, to_select, selected, selected_targets)
-    return not Self:prohibitDiscard(Fk:getCardById(to_select)) and #selected_targets == 0
+    return not Self:prohibitDiscard(Fk:getCardById(to_select)) -- and #selected_targets == 0
   end,
   target_filter = function(self, to_select, selected, selected_cards, card)
-    return #selected == 0 and to_select ~= Self.id and #selected_cards == 0
+    return #selected == 0 and to_select ~= Self.id -- and #selected_cards == 0
   end,
   max_target_num = 1,
   feasible = function(self, selected, selected_cards)
