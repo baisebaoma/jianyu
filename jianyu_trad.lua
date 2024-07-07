@@ -874,7 +874,7 @@ local zhiheng = fk.CreateActiveSkill {
     end
   end,
   target_filter = function(self, to_select, selected, selected_cards, card)
-    return #selected == 0 and to_select ~= Self.id
+    return #selected == 0
   end,
   max_target_num = 1,
   on_use = function(self, room, use)
