@@ -859,48 +859,33 @@ local zhiheng = fk.CreateActiveSkill {
   name = "jy_trad_zhiheng",
   anim_type = "drawcard",
   prompt = function(self, selected_cards, selected_targets)
-    if #selected_cards == 0 and #selected_targets == 0 then
+    if #selected_targets == 0 then
       return "#jy_trad_zhiheng"
-    end
-    if #selected_targets > 0 then
-      return "#jy_trad_zhiheng-other"
     else
-      return "#jy_trad_zhiheng-self"
+      return "#jy_trad_zhiheng-other"
     end
   end,
   can_use = function(self, player)
     -- 如果有一个人有牌，那就可以亮起来技能按钮
     for _, p in ipairs(Fk:currentRoom().alive_players) do
-      if p.id ~= player.id and #p:getCardIds("he") ~= 0 then
+      if #p:getCardIds("he") ~= 0 then
         return true
       end
     end
   end,
-  card_filter = function(self, card, to_select, selected, selected_targets)
-    return not Self:prohibitDiscard(Fk:getCardById(to_select)) -- and #selected_targets == 0
-  end,
   target_filter = function(self, to_select, selected, selected_cards, card)
-    return #selected == 0 and to_select ~= Self.id -- and #selected_cards == 0
+    return #selected == 0 and to_select ~= Self.id
   end,
   max_target_num = 1,
-  feasible = function(self, selected, selected_cards)
-    return #selected == 0 or #selected_cards == 0
-  end,
   on_use = function(self, room, use)
     local card_num = 0
     local from = room:getPlayerById(use.from)
-    if #use.cards == 0 then
-      for _, to in ipairs(use.tos) do
-        -- 选了其他人，弃别人的
-        local p = room:getPlayerById(to)
-        local cards = room:askForCardsChosen(from, p, 1, #p:getCardIds("he"), "he", self.name)
-        room:throwCard(cards, self.name, p, from)
-        card_num = #cards
-      end
-    else
-      -- 选了自己的牌，弃自己的
-      room:throwCard(use.cards, self.name, from, from)
-      card_num = #use.cards
+    for _, to in ipairs(use.tos) do
+      -- 选了其他人，弃别人的
+      local p = room:getPlayerById(to)
+      local cards = room:askForCardsChosen(from, p, 1, #p:getCardIds("he"), "he", self.name)
+      room:throwCard(cards, self.name, p, from)
+      card_num = #cards
     end
     if from:isAlive() then
       -- 给自己摸牌
@@ -923,9 +908,9 @@ Fk:loadTranslationTable {
   ["$jy_trad_zhiheng2"] = [[且慢！]],
 
   ["jy_trad_zhiheng"] = [[制衡]],
-  ["#jy_trad_zhiheng"] = [[制衡：选择自己的牌或一名其他角色]],
+  ["#jy_trad_zhiheng"] = [[制衡：选择一名角色]],
   ["#jy_trad_zhiheng-other"] = [[制衡：弃置该角色的牌，然后摸等量的牌]],
-  ["#jy_trad_zhiheng-self"] = [[制衡：弃置自己的牌，然后摸等量的牌]],
+  -- ["#jy_trad_zhiheng-self"] = [[制衡：弃置自己的牌，然后摸等量的牌]],
   [":jy_trad_zhiheng"] = [[出牌阶段，你可以弃置一名角色任意张牌，然后你摸等量的牌。]],
 }
 
