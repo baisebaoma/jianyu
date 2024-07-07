@@ -885,7 +885,7 @@ local zhiheng = fk.CreateActiveSkill {
     local player = Fk:currentRoom():getPlayerById(to_select)
     return user ~= to_select and not player:isAllNude()
   end,
-  target_filter = function(self, to_select, selected, _, card)
+  target_filter = function(self, to_select, selected, selected_cards, card)
     if #selected < self:getMaxTargetNum(Self, card) then
       return self:modTargetFilter(to_select, selected, Self.id, card) and #selected_cards == 0
     end
