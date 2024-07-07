@@ -862,7 +862,6 @@ local zhiheng = fk.CreateActiveSkill {
     if #selected_cards == 0 and #selected_targets == 0 then
       return "#jy_trad_zhiheng"
     end
-
     if #selected_targets > 0 then
       return "#jy_trad_zhiheng-other"
     else
@@ -877,10 +876,9 @@ local zhiheng = fk.CreateActiveSkill {
       end
     end
   end,
-  card_filter = function(self, card, to_select, selected)
-    return not Self:prohibitDiscard(Fk:getCardById(to_select))
+  card_filter = function(self, card, to_select, selected, selected_targets)
+    return not Self:prohibitDiscard(Fk:getCardById(to_select)) and #selected_targets == 0
   end,
-  min_card_num = 0,
   mod_target_filter = function(self, to_select, selected, user, card)
     local player = Fk:currentRoom():getPlayerById(to_select)
     return user ~= to_select and not player:isAllNude()
@@ -890,7 +888,6 @@ local zhiheng = fk.CreateActiveSkill {
       return self:modTargetFilter(to_select, selected, Self.id, card) and #selected_cards == 0
     end
   end,
-  min_target_num = 0,
   max_target_num = 1,
   on_use = function(self, room, use)
     local card_num = 0
