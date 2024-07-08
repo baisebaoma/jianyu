@@ -925,7 +925,7 @@ local duanchang = fk.CreateTriggerSkill {
   events = { fk.Damaged },
   on_use = function(self, event, target, player, data)
     local room = player.room
-    local to = data.damage.from
+    local to = data.from
     local skills = {}
     for _, s in ipairs(to.player_skills) do
       if s:isPlayerSkill(to) then
