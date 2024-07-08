@@ -951,7 +951,6 @@ Fk:loadTranslationTable {
   ["jy__trad__caiwenji"] = [[典蔡文姬]],
   ["#jy__trad__caiwenji"] = pve,
   ["designer:jy__trad__caiwenji"] = "考公专家",
-  ["~jy__trad__caiwenji"] = [[父亲，大哥，仲谋愧矣！]],
 
   ["jy_trad_duanchang"] = [[断肠]],
   [":jy_trad_duanchang"] = [[锁定技，当你受到伤害后，你令伤害来源失去所有技能。]],
@@ -1009,11 +1008,10 @@ Fk:loadTranslationTable {
   ["jy__trad__peixiu"] = [[典裴秀]],
   ["#jy__trad__peixiu"] = pve,
   ["designer:jy__trad__peixiu"] = "考公专家",
-  ["~jy__trad__peixiu"] = [[父亲，大哥，仲谋愧矣！]],
 
   ["jy_trad_xingtu"] = [[行图]],
   ["#jy_trad_xingtu_mod"] = [[行图]],
-  [":jy_trad_duanchang"] = [[锁定技，你使用牌时，你摸一张牌；你使用牌无次数限制。]],
+  [":jy_trad_xingtu"] = [[锁定技，你使用牌时，你摸一张牌；你使用牌无次数限制。]],
 
   ["jy_trad_juezhi"] = [[爵制]],
   ["#jy_trad_juezhi"] = [[爵制：弃置偶数张牌，摸一半的牌]],
