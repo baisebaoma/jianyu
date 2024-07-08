@@ -988,7 +988,7 @@ local juezhi = fk.CreateActiveSkill {
     return not Self:prohibitDiscard(Fk:getCardById(to_select))
   end,
   feasible = function(self, selected, selected_cards)
-    return #selected_cards % 2 == 0
+    return #selected_cards ~= 0 and #selected_cards % 2 == 0
   end,
   on_use = function(self, room, effect)
     local from = room:getPlayerById(effect.from)
