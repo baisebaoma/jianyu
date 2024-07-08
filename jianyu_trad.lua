@@ -802,7 +802,7 @@ Fk:loadTranslationTable {
 
   ["jy_trad_pojun"] = [[破军]],
   ["#jy_trad_pojun_delay"] = [[破军]],
-  [":jy_trad_pojun"] = [[锁定技，当你使用【杀】指定一个目标后，你获得其区域内所有牌和X点护甲（X为以此法获得的牌数）。]],
+  [":jy_trad_pojun"] = [[锁定技，当你使用【杀】指定一个目标后，你获得其区域内所有牌和等量护甲。]],
 
   ["jy__trad__caopi"] = [[典曹丕]],
   ["#jy__trad__caopi"] = pve,
@@ -915,7 +915,109 @@ Fk:loadTranslationTable {
   ["#jy_trad_zhiheng"] = [[制衡：选择一名角色]],
   ["#jy_trad_zhiheng-other"] = [[制衡：弃置该角色的牌，然后摸等量的牌]],
   -- ["#jy_trad_zhiheng-self"] = [[制衡：弃置自己的牌，然后摸等量的牌]],
-  [":jy_trad_zhiheng"] = [[出牌阶段，你可以弃置一名角色任意张牌，然后你摸等量的牌。]],
+  [":jy_trad_zhiheng"] = [[出牌阶段，你可以弃置一名角色任意张牌，然后摸等量的牌。]],
+}
+
+local duanchang = fk.CreateTriggerSkill {
+  name = "jy_trad_duanchang",
+  anim_type = "control",
+  frequency = Skill.Compulsory,
+  events = { fk.Damaged },
+  on_use = function(self, event, target, player, data)
+    local room = player.room
+    local to = data.damage.from
+    local skills = {}
+    for _, s in ipairs(to.player_skills) do
+      if s:isPlayerSkill(to) then
+        table.insertIfNeed(skills, s.name)
+      end
+    end
+    if room.settings.gameMode == "m_1v2_mode" and to.role == "lord" then
+      table.removeOne(skills, "m_feiyang")
+      table.removeOne(skills, "m_bahu")
+    end
+    if #skills > 0 then
+      room:handleAddLoseSkills(to, "-" .. table.concat(skills, "|-"), nil, true, false)
+    end
+  end,
+}
+
+local caiwenji = General(extension, "jy__trad__caiwenji", "qun", 3, 3, General.Female)
+caiwenji.hidden = true
+caiwenji:addSkill(duanchang)
+caiwenji:addSkill("beige")
+
+Fk:loadTranslationTable {
+  ["jy__trad__caiwenji"] = [[典蔡文姬]],
+  ["#jy__trad__caiwenji"] = pve,
+  ["designer:jy__trad__caiwenji"] = "考公专家",
+  ["~jy__trad__caiwenji"] = [[父亲，大哥，仲谋愧矣！]],
+
+  ["jy_trad_duanchang"] = [[断肠]],
+  [":jy_trad_duanchang"] = [[锁定技，当你受到伤害后，你令伤害来源失去所有技能。]],
+}
+
+local xingtu = fk.CreateTriggerSkill {
+  name = "jy_trad_xingtu",
+  anim_type = "drawcard",
+  events = { fk.CardUsing },
+  frequency = Skill.Compulsory,
+  on_use = function(self, event, target, player, data)
+    player:drawCards(1, self.name)
+  end,
+}
+
+local xingtu_mod = fk.CreateTargetModSkill {
+  name = "#jy_trad_xingtu_mod",
+  bypass_times = function(self, player)
+    return player:hasSkill(self)
+  end,
+}
+
+xingtu:addRelatedSkill(xingtu_mod)
+
+local juezhi = fk.CreateActiveSkill {
+  name = "jy_trad_juezhi",
+  prompt = "#jy_trad_juezhi",
+  anim_type = "drawcard",
+  can_use = function(self, player)
+    return #player:getCardIds("he") >= 2
+  end,
+  target_num = 0,
+  min_card_num = 2,
+  card_filter = function(self, to_select)
+    return not Self:prohibitDiscard(Fk:getCardById(to_select))
+  end,
+  feasible = function(self, selected, selected_cards)
+    return #selected_cards % 2 == 0
+  end,
+  on_use = function(self, room, effect)
+    local from = room:getPlayerById(effect.from)
+    room:throwCard(effect.cards, self.name, from, from)
+    if from:isAlive() then
+      from:drawCards(#effect.cards // 2, self.name)
+    end
+  end,
+}
+
+local peixiu = General(extension, "jy__trad__peixiu", "qun", 3)
+peixiu.hidden = true
+peixiu:addSkill(xingtu)
+peixiu:addSkill(juezhi)
+
+Fk:loadTranslationTable {
+  ["jy__trad__peixiu"] = [[典裴秀]],
+  ["#jy__trad__peixiu"] = pve,
+  ["designer:jy__trad__peixiu"] = "考公专家",
+  ["~jy__trad__peixiu"] = [[父亲，大哥，仲谋愧矣！]],
+
+  ["jy_trad_xingtu"] = [[行图]],
+  ["#jy_trad_xingtu_mod"] = [[行图]],
+  [":jy_trad_duanchang"] = [[锁定技，你使用牌时，你摸一张牌；你使用牌无次数限制。]],
+
+  ["jy_trad_juezhi"] = [[爵制]],
+  ["#jy_trad_juezhi"] = [[爵制：弃置偶数张牌，摸一半的牌]],
+  [":jy_trad_juezhi"] = [[出牌阶段，你可以弃置偶数张牌，然后摸一半的牌。]],
 }
 
 return extension
