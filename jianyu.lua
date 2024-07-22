@@ -91,11 +91,11 @@ local jy_xizao = fk.CreateTriggerSkill {
     local room = player.room
     if player.dead then return end
     -- player:reset()
-    player:drawCards(3, self.name)
+    -- player:drawCards(3, self.name)
     if player.dead or not player:isWounded() then return end
     room:recover({
       who = player,
-      num = math.min(#room:getAlivePlayers(), player.maxHp) - player.hp,
+      num = math.max(#room:getAllPlayers() - #room:getAlivePlayers(), 1) - player.hp,
       recoverBy = player,
       skillName = self.name,
     })
@@ -177,7 +177,7 @@ Fk:loadTranslationTable {
   ["$jy_shengnu3"] = "恶心我，我也恶心你啊，互恶心呗！",
 
   ["jy_xizao"] = "洗澡",
-  [":jy_xizao"] = "限定技，你处于濒死状态时，可以将体力恢复至X点、摸三张牌并翻面，X为存活角色数。",
+  [":jy_xizao"] = "限定技，你处于濒死状态时，可以将体力恢复至X点并翻面（X为阵亡角色数且至少为1）。",
   ["$jy_xizao1"] = "呃啊啊啊啊啊啊啊！！",
   ["$jy_xizao2"] = "也不是稳赢吧，我觉得赢了！",
   ["$jy_xizao3"] = "真的我是真玩不了，这跟变态没关系，我好他妈的气！",
@@ -187,7 +187,8 @@ Fk:loadTranslationTable {
 
 
 -- 第二代简自豪
-local jy__jianzihao = General(extension, "jy__new__jianzihao", "god", 3)
+local jy__new__jianzihao = General(extension, "jy__new__jianzihao", "god", 3)
+jy__new__jianzihao.total_hidden = true
 
 local jy_sanjian = fk.CreateTriggerSkill {
   name = "jy_sanjian",
@@ -242,10 +243,10 @@ local jy_kaiju_2 = fk.CreateActiveSkill {
   end,
 }
 
-jy__jianzihao:addSkill(jy_kaiju_2)
-jy__jianzihao:addSkill(jy_sanjian)
-jy__jianzihao:addSkill("jy_shengnu")
-jy__jianzihao:addSkill("jy_xizao")
+jy__new__jianzihao:addSkill(jy_kaiju_2)
+jy__new__jianzihao:addSkill(jy_sanjian)
+jy__new__jianzihao:addSkill("jy_shengnu")
+jy__new__jianzihao:addSkill("jy_xizao")
 
 Fk:loadTranslationTable {
   ["jy__new__jianzihao"] = "神简自豪",
@@ -335,6 +336,7 @@ local jy_huxiao_xiao = fk.CreateTriggerSkill {
     local room = player.room
     player:broadcastSkillInvoke("jy_huxiao")
     room:notifySkillInvoked(player, "jy_huxiao", "drawcard")
+    player:drawCards(1, self.name)
     local dummy = Fk:cloneCard("dilu")
     dummy:addSubcards(room:getNCards(1))
     player:addToPile("jy__liyuanhao_xiao", dummy, true, self.name)
@@ -435,7 +437,7 @@ Fk:loadTranslationTable {
   ["jy__liyuanhao_xiao"] = "啸",
 
   ["jy_huxiao"] = "虎啸",
-  [":jy_huxiao"] = [[当你使用或打出一张【杀】时，可以将牌堆顶的一张牌置于武将牌上，称为“啸”；你可以将“啸”当【酒】或【闪】使用或打出。每当你的“啸”数为2时，你将所有“啸”收入手牌并恢复一点体力。<br><font color="grey"><i>“我希望我的后辈们能够记住，在你踏上职业道路的这一刻开始，你的目标就只有，冠军。”</i></font>]],
+  [":jy_huxiao"] = [[当你使用或打出一张【杀】时，你可以摸一张牌并将牌堆顶的一张牌置于武将牌上，称为“啸”。你可以将一张“啸”当【酒】或【闪】使用或打出。每当你的“啸”数为2时，你获得所有“啸”并恢复一点体力。<br><font color="grey"><i>“我希望我的后辈们能够记住，在你踏上职业道路的这一刻开始，你的目标就只有冠军。”</i></font>]],
 }
 
 -- 高天亮
@@ -490,7 +492,7 @@ local jy_yuyu_trigger = fk.CreateTriggerSkill {
   events = { fk.DamageCaused },
   can_trigger = function(self, event, target, player, data)
     return player:hasSkill(self) and target == player and data.to:getMark("@jy_yuyu_enemy") ~= 0 and
-        not data.chain
+        data.damageType ~= fk.NormalDamage
   end,
   on_cost = Util.TrueFunc,
   on_use = function(self, event, target, player, data)
@@ -512,7 +514,7 @@ Fk:loadTranslationTable {
   ["illustrator:jy__gaotianliang"] = "高天亮",
 
   ["jy_yuyu"] = "玉玉",
-  [":jy_yuyu"] = [[当你因【杀】受到伤害时，伤害来源获得“玉玉”标记。受到没有“玉玉”的角色或因本次伤害而获得“玉玉”的角色造成的伤害时，你可以选择一项：摸三张牌；摸两张牌并翻面，然后对自己造成一点伤害。你对有“玉玉”的角色造成非传导伤害时，该伤害+1。]],
+  [":jy_yuyu"] = [[你受到伤害后：若该伤害是【杀】造成的，你令伤害来源获得“玉玉”标记；若伤害来源没有“玉玉”或因本次伤害而获得“玉玉”，你可以选择一项：摸三张牌；摸两张牌并翻面，然后对自己造成一点伤害。你对有“玉玉”的角色造成属性伤害时，该伤害+1。]],
   ["@jy_yuyu_enemy"] = "玉玉",
   ["#jy_yuyu_ask_which"] = "玉玉：请选择",
   ["#jy_yuyu_draw3"] = "摸三张牌",
@@ -849,12 +851,12 @@ Fk:loadTranslationTable {
   ["$jy_hebao1"] = "Siu~",
 
   ["jy_tiaoshui"] = "跳水",
-  [":jy_tiaoshui"] = "你受到伤害时，可以弃置一张“点”。",
+  [":jy_tiaoshui"] = "你受到伤害后，可以弃置一张“点”。",
   ["#jy_tiaoshui"] = "弃置一张“点”",
   ["$jy_tiaoshui1"] = "Siu, hahahaha!",
 
   ["jy_luojiao"] = "罗绞",
-  [":jy_luojiao"] = [[每当你的武将牌上的“点”的数量变化后：若你有“点”且任意2张“点”的花色都不相同，你可以视为使用【南蛮入侵】；若你有4张“点”，你可以视为使用【万箭齐发】。]],
+  [":jy_luojiao"] = [[每当你的“点”的数量变化后：若你有“点”且任意2张“点”的花色都不相同，你可以视为使用【南蛮入侵】；若你有4张“点”，你可以视为使用【万箭齐发】。]],
   ["$jy_luojiao1"] = "Muchas gracias afición, esto es para vosotros, Siuuu!!",
   ["#jy_luojiao_after"] = "罗绞",
   ["#jy_luojiao_archery_attack"] = "罗绞·万箭",
@@ -1320,7 +1322,7 @@ Fk:loadTranslationTable {
   ["#jy_sichi_4"] = "四吃：选择至多3名角色，你和他们各失去一点体力",
 
   ["jy_huapen"] = "花盆",
-  [":jy_huapen"] = [[锁定技，其他角色使用♣普通锦囊牌或基本牌指定唯一不为你的目标时，你判定，若为<font color="red">♥</font>，额外指定你为目标。]],
+  [":jy_huapen"] = [[锁定技，其他角色使用♣普通锦囊牌或基本牌指定唯一不为你的目标时，你判定，若为<font color="red">♥</font>，你也成为该牌的目标。]],
 
   ["jy_boshi"] = "搏时",
   [":jy_boshi"] = [[觉醒技，准备阶段，若你已判定过至少X次（X为存活角色数），你增加一点体力上限、失去〖花盆〗并获得〖奖杯〗。]],
@@ -1802,7 +1804,7 @@ local jy_jieyin = fk.CreateActiveSkill {
 
       -- 获得其所有牌
       if not p:isNude() then
-        local cards_id = p:getCardIds { Player.Hand, Player.Equip, Player.Judge }
+        local cards_id = p:getCardIds("hej")
         local dummy = Fk:cloneCard 'slash'
         dummy:addSubcards(cards_id)
         room:obtainCard(player.id, dummy, false, fk.ReasonPrey)
@@ -1841,7 +1843,7 @@ Fk:loadTranslationTable {
   ["illustrator:jy__liuxian"] = "意间AI",
 
   ["jy_jieyin"] = "结姻",
-  [":jy_jieyin"] = [[限定技，出牌阶段，你可以令一名已受伤的男性角色与你各回复1点体力、你获得其所有牌并视为拥有其所有技能、其不是你本阶段使用牌的合法目标。]],
+  [":jy_jieyin"] = [[限定技，出牌阶段，你可以令一名已受伤的男性角色与你各回复1点体力，你获得其所有牌并视为拥有其所有技能。若如此做，本阶段其不是你使用牌的合法目标。]],
   ["$jy_jieyin1"] = [[夫君，身体要紧。]],
   ["$jy_jieyin2"] = [[他好，我也好。]],
 }
@@ -1963,8 +1965,8 @@ Fk:loadTranslationTable {
   ["$jy_bazhen3"] = "怎么还没结束……",
   ["$jy_bazhen4"] = "说不定我也能做到……",
 
-  ["jy_lingfu"] = "灵符",
-  [":jy_lingfu"] = [[出牌阶段限一次，你可以弃置X+2张牌并令X名角色回复一点体力、摸两张牌、重置武将牌，然后你获得其判定区的牌（X由你选择，X不小于1且不大于3）。]],
+  ["jy_lingfu"] = "驱邪",
+  [":jy_lingfu"] = [[出牌阶段限一次，你可以弃置X+2张牌并令X名角色（X由你选择且不能大于3）回复一点体力、摸两张牌、重置武将牌，最后你获得其判定区的牌。]],
   ["$jy_lingfu1"] = [[驱邪……缚魅……]],
   ["$jy_lingfu2"] = [[灵符……保命……]],
 }
@@ -2063,7 +2065,7 @@ Fk:loadTranslationTable {
 
 -- 下面的这一堆函数是用于判断“这个玩家是否是满足某一属性的玩家”，有可能是它的名字符合，也有可能是它的势力符合，或者还有别的判断标准。总之不是特定的针对某个势力的，不要误以为是。
 
--- 以武将名为判定是否为原神角色的标准。按照bwiki排序，截止2024.3.21
+-- 以武将名为判定是否为原神角色的标准。按照bwiki排序，截止4.8
 -- 也要收录私服有人写了的怪物，丘丘人什么的，看到一个收一个
 -- 使用哈希表，时间复杂度低
 local genshin_names = {
@@ -2150,10 +2152,16 @@ local genshin_names = {
   ["闲云"] = true,
   ["千织"] = true,
   ["阿蕾奇诺"] = true,
+  ["赛索斯"] = true,
+  ["克洛琳德"] = true,
+  ["希格雯"] = true,
+  ["艾梅莉埃"] = true,
   -- 以下是已知的怪物
   ["兽境猎犬"] = true,
   ["深渊咏者"] = true,
   ["海乱鬼"] = true,
+  ["遗迹守卫"] = true,
+  ["遗迹猎者"] = true,
 }
 
 local function is_genshin(player)
@@ -2169,6 +2177,7 @@ local function is_moe(player)
   return player.kingdom == "moe"
 end
 
+-- 这里的顺序使用的是首字母，可以参考yz.lol.qq.com，目前更新至阿萝拉
 local lol_names = {
   ["亚托克斯"] = true,
   ["阿狸"] = true,
@@ -2182,6 +2191,7 @@ local lol_names = {
   ["艾希"] = true,
   ["奥瑞利安·索尔"] = true,
   ["奥瑞利安索尔"] = true,
+  ["阿萝拉"] = true,
   ["阿兹尔"] = true,
   ["巴德"] = true,
   ["卑尔维斯"] = true,
@@ -2504,15 +2514,15 @@ local lmgs = General(extension, "jy__lol__master", "qun", 4, 4, General.Female)
 lmgs:addSkill(master_createTriggerSkill(is_lol, "lol"))
 
 local function master_des(property)
-  return [[你使用普通锦囊牌和基本牌可以额外指定任意]] ..
+  return [[你使用普通锦囊牌和基本牌可以额外指定任意<font color="red">]] ..
       property ..
-      [[角色为目标。除你以外的]] ..
+      [[</font>角色为目标。除你以外的<font color="red">]] ..
       property ..
-      [[角色造成伤害后或你对]] ..
+      [[</font>角色造成伤害后或你对<font color="red">]] ..
       property ..
-      [[角色造成伤害后，你摸一张牌。准备阶段或结束阶段，若除你以外没有存活的]] ..
+      [[</font>角色造成伤害后，你摸一张牌。准备阶段或结束阶段，若除你以外没有存活的<font color="red">]] ..
       property ..
-      [[角色且你武将牌上有该技能，你变更该武将，若为准备阶段，你回复一点体力。]]
+      [[</font>角色且你武将牌上有该技能，你变更该武将，若为准备阶段，你回复一点体力。]]
 end
 
 Fk:loadTranslationTable {
@@ -2942,7 +2952,7 @@ local ruju_trigger = fk.CreateTriggerSkill {
 ruju:addRelatedSkill(ruju_trigger)
 
 local test = General(extension, "jy__test", "qun", 3, 3)
-test.hidden = true
+test.total_hidden = true
 test:addSkill(kanxi)
 test:addSkill(ruju)
 

@@ -630,7 +630,7 @@ local juewu = fk.CreateTriggerSkill {
   events = { fk.DamageInflicted },
   frequency = Skill.Compulsory,
   can_trigger = function(self, event, target, player, data)
-    return player:hasSkill(self) and data.to.id < 0 and data.to.maxHp >= 3
+    return player:hasSkill(self) and target == player and data.to.id < 0 and data.to.maxHp >= 3
   end,
   on_use = function(self, event, target, player, data)
     data.damage = data.damage + data.to.maxHp // 3
@@ -660,7 +660,7 @@ Fk:loadTranslationTable {
   ["@jy_trad_silie"] = [[撕裂]],
 
   ["jy_juewu"] = [[死神]],
-  [":jy_juewu"] = [[锁定技，一名机器人受到伤害时，其每有3点体力上限，该伤害+1。]],
+  [":jy_juewu"] = [[锁定技，你对一名机器人造成伤害时，其每有3点体力上限，该伤害+1。]],
 }
 
 local otto = General(extension, "jy__trad__god", "god", 3)
