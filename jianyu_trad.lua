@@ -627,8 +627,8 @@ local heiyong = fk.CreateTriggerSkill {
 local juewu = fk.CreateTriggerSkill {
   name = "jy_juewu",
   anim_type = "offensive",
-  events = { fk.DamageInflicted },
   frequency = Skill.Compulsory,
+  events = { fk.DamageCaused },
   can_trigger = function(self, event, target, player, data)
     return player:hasSkill(self) and target == player and data.to.id < 0 and data.to.maxHp >= 3
   end,
