@@ -622,10 +622,60 @@ local yiji_viewas = fk.CreateViewAsSkill {
 }
 yiji:addRelatedSkill(yiji_viewas)
 
+local yingcai = fk.CreateTriggerSkill {
+  name = "jy_yingcai",
+  anim_type = "control",
+  events = { fk.TargetConfirming },
+  can_trigger = function(self, event, target, player, data)
+    if data.from == player.id and player:hasSkill(self) and data.card:isCommonTrick() then -- 这一段是sheyan的代码，但是因为TargetConfirming是对每一个人都生效，所以当你加了一个新目标，又会触发这个，导致触发多次，和原来的不一样。
+      if player:getMark("jy_yingcai_used") ~= 0 then return false end
+      local room = player.room
+      local targets = U.getUseExtraTargets(room, data, true, true)
+      local origin_targets = U.getActualUseTargets(room, data, event)
+      if #origin_targets > 1 then
+        table.insertTable(targets, origin_targets)
+      end
+      if #targets > 0 then
+        self.cost_data = targets
+        return true
+      end
+    end
+  end,
+  on_cost = function(self, event, target, player, data)
+    local room = player.room
+    local ret = false
+    local plist, cid = room:askForChooseCardAndPlayers(player, self.cost_data, 1, 1, nil,
+      "#jy_yingcai-choose:::" .. data.card:toLogString(), self.name, true)
+    if #plist > 0 then -- 如果他选择了目标，那就发动
+      self.cost_data = { plist[1], cid }
+      ret = true
+    end
+    room:setPlayerMark(player, "jy_yingcai_used", true)
+    return ret
+  end,
+  on_use = function(self, event, target, player, data)
+    local room = player.room
+    room:throwCard(self.cost_data[2], self.name, player, player)
+    if table.contains(AimGroup:getAllTargets(data.tos), self.cost_data[1]) then
+      AimGroup:cancelTarget(data, self.cost_data[1])
+      return self.cost_data[1] == player.id
+    else
+      AimGroup:addTargets(player.room, data, self.cost_data[1])
+    end
+  end,
+  refresh_events = { fk.CardUseFinished },
+  can_refresh = function(self, event, target, player, data)
+    return player:hasSkill(self) and player:getMark("jy_yingcai_used") ~= 0
+  end,
+  on_refresh = function(self, event, target, player, data)
+    player.room:setPlayerMark(player, "jy_yingcai_used", 0)
+  end,
+}
+
 local guojia = General(extension, "jy__guojia", "wei", 3)
 guojia:addSkill(tiandu)
 guojia:addSkill(yiji)
-guojia:addSkill("jy_trad_yingcai")
+guojia:addSkill(yingcai)
 
 Fk:loadTranslationTable {
   ["jy__guojia"] = [[简郭嘉]],
@@ -649,6 +699,10 @@ Fk:loadTranslationTable {
   ["#jy_yiji_draw2"] = [[<font color="gold">摸两张牌</font>]],
   ["$jy_yiji1"] = [[也好。]],
   ["$jy_yiji2"] = [[罢了。]],
+
+  ["jy_yingcai"] = [[英才]],
+  [":jy_yingcai"] = [[当你使用锦囊牌时，你可以弃一张牌，为该锦囊牌增加或减少一个目标（目标数至少为1）。]],
+  ["#jy_yingcai-choose"] = "英才：你可以弃一张牌，为 %arg 增加/减少一个目标",
 }
 
 local yangbai = fk.CreateTriggerSkill {
@@ -1194,7 +1248,7 @@ local heiyong = fk.CreateTriggerSkill {
 
 local tjzs = General(extension, "jy__tjzs", "shu", 3, 3, General.Female)
 tjzs:addSkill(heiyong)
--- tjzs:addSkill("jy_trad_silie")
+-- tjzs:addSkill("jy_silie")
 
 Fk:loadTranslationTable {
   ["jy__tjzs"] = [[铁甲战士]],
@@ -1333,10 +1387,11 @@ local jiaofeng = fk.CreateTriggerSkill {
   name = "jy_jiaofeng",
   anim_type = "drawcard",
   frequency = Skill.Compulsory,
-  events = { fk.CardUseFinished, fk.CardRespondFinished },
+  events = { fk.CardUseFinished },
   can_trigger = function(self, event, target, player, data)
-    return player:hasSkill(self) and target == player and not table.find(player:getCardIds(Player.Hand),
-      function(id) return Fk:getCardById(id).type == data.card.type end)
+    return player:hasSkill(self) and target == player and player.phase ~= Player.NotActive and
+        not table.find(player:getCardIds(Player.Hand),
+          function(id) return Fk:getCardById(id).type == data.card.type end)
   end,
   on_use = function(self, event, target, player, data)
     player:drawCards(2, self.name)
@@ -1355,9 +1410,9 @@ local jiaofeng_mod = fk.CreateTargetModSkill {
   bypass_times = function(self, player, skill, scope, card, to)
     return player:hasSkill(self) and player:getMark("@jy_jiaofeng") ~= 0
   end,
-  bypass_distances = function(self, player, skill, card, to)
-    return player:hasSkill(self) and player:getMark("@jy_jiaofeng") ~= 0
-  end,
+  -- bypass_distances = function(self, player, skill, card, to)
+  --   return player:hasSkill(self) and player:getMark("@jy_jiaofeng") ~= 0
+  -- end,
 }
 jiaofeng:addRelatedSkill(jiaofeng_mod)
 
@@ -1369,10 +1424,10 @@ Fk:loadTranslationTable {
   ["illustrator:jy__zhanshige"] = [[未知]],
 
   ["jy_jiaofeng"] = [[交锋]],
-  [":jy_jiaofeng"] = [[锁定技，你使用或打出牌后，若手牌中没有与之相同类型的牌，你摸两张牌且你使用的下一张牌无距离和次数限制。]],
+  [":jy_jiaofeng"] = [[锁定技，你的回合内，你使用牌后，若你的手牌中没有相同类型的牌，则你摸两张牌且你使用的下一张牌无次数限制。]],
   ["@jy_jiaofeng"] = [[交锋]],
 }
-local zsg = General(extension, "jy__zhanshige", "shu", 4, 4, General.Female)
+local zsg = General(extension, "jy__zhanshige", "shu", 3, 3, General.Female)
 zsg:addSkill(jiaofeng)
 
 local yingyuan = fk.CreateTriggerSkill {

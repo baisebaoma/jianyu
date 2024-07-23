@@ -532,7 +532,7 @@ local yingcai = fk.CreateTriggerSkill {
 }
 
 local guojia = General(extension, "jy__trad__guojia", "wei", 3)
-guojia.hidden = true
+guojia.total_hidden = true
 guojia:addSkill(tiandu)
 guojia:addSkill(yiji)
 guojia:addSkill(yingcai)
@@ -687,7 +687,7 @@ local jy_fuzhu = fk.CreateTriggerSkill {
 otto:addSkill(jy_fuzhu)
 
 Fk:loadTranslationTable {
-  ["jy__trad__god"] = [[侯国玉]],
+  ["jy__trad__god"] = [[神]],
   ["#jy__trad__god"] = rjhd,
   ["designer:jy__trad__god"] = [[考公专家]],
   ["cv:jy__trad__god"] = [[无]],
