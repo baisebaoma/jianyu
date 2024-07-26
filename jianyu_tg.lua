@@ -2216,7 +2216,8 @@ local jianyan = fk.CreateTriggerSkill {
   name = "jy_jianyan",
   events = { fk.PreCardEffect },
   can_trigger = function(self, event, target, player, data)
-    return player:hasSkill(self) and target:getMark("jy_jianyan-turn") == 1 and target.phase ~= Player.NotActive and
+    return player:hasSkill(self) and target and target:getMark("jy_jianyan-turn") == 1 and
+        target.phase ~= Player.NotActive and
         not data.card.is_jy_jianyan and (data.card.type == Card.TypeBasic or data.card:isCommonTrick())
   end,
   on_use = function(self, event, target, player, data)
