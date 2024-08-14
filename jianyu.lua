@@ -491,8 +491,7 @@ local jy_yuyu_trigger = fk.CreateTriggerSkill {
   mute = true,
   events = { fk.DamageCaused },
   can_trigger = function(self, event, target, player, data)
-    return player:hasSkill(self) and target == player and data.to:getMark("@jy_yuyu_enemy") ~= 0 and
-        data.damageType ~= fk.NormalDamage
+    return player:hasSkill(self) and target == player and data.to:getMark("@jy_yuyu_enemy") ~= 0
   end,
   on_cost = Util.TrueFunc,
   on_use = function(self, event, target, player, data)
@@ -514,11 +513,11 @@ Fk:loadTranslationTable {
   ["illustrator:jy__gaotianliang"] = "高天亮",
 
   ["jy_yuyu"] = "玉玉",
-  [":jy_yuyu"] = [[你受到伤害后：若该伤害是【杀】造成的，你令伤害来源获得“玉玉”标记；若伤害来源没有“玉玉”或因本次伤害而获得“玉玉”，你可以选择一项：摸三张牌；摸两张牌并翻面，然后对自己造成一点伤害。你对有“玉玉”的角色造成属性伤害时，该伤害+1。]],
+  [":jy_yuyu"] = [[你受到伤害后：若该伤害是【杀】造成的，你令伤害来源获得“玉玉”标记；若伤害来源没有“玉玉”或因本次伤害而获得“玉玉”，你可以选择一项：摸三张牌；摸两张牌并翻面，然后对自己造成一点伤害。你对有“玉玉”的角色造成伤害时，该伤害+1。]],
   ["@jy_yuyu_enemy"] = "玉玉",
   ["#jy_yuyu_ask_which"] = "玉玉：请选择",
   ["#jy_yuyu_draw3"] = "摸三张牌",
-  ["#jy_yuyu_draw4turnover"] = "摸两张牌并翻面，然后对自己造成一点伤害",
+  ["#jy_yuyu_draw4turnover"] = "摸两张牌并翻面，然后对自己造成一点伤害（可以再次触发〖玉玉〗）",
   ["$jy_yuyu1"] = "我……我真的很想听到你们说话……",
   ["$jy_yuyu2"] = "我天天被队霸欺负，他们天天骂我。",
   ["$jy_yuyu3"] = "有什么话是真的不能讲的……为什么一定……每次都是……一个人在讲……",
@@ -579,7 +578,7 @@ local jy_tiaoshui = fk.CreateTriggerSkill {
   can_trigger = function(self, event, target, player, data)
     local dians = player:getPile("jy_aweiluo_dian")
     return target == player and target:hasSkill(self.name) and
-        #dians ~= 0
+        #dians ~= 0 and player:usedSkillTimes(self.name, Player.HistoryRound) == 0
   end,
   on_use = function(self, event, target, player, data)
     local room = player.room
@@ -851,7 +850,7 @@ Fk:loadTranslationTable {
   ["$jy_hebao1"] = "Siu~",
 
   ["jy_tiaoshui"] = "跳水",
-  [":jy_tiaoshui"] = "你受到伤害后，可以弃置一张“点”。",
+  [":jy_tiaoshui"] = "每轮限一次，你受到伤害后，可以弃置一张“点”。",
   ["#jy_tiaoshui"] = "弃置一张“点”",
   ["$jy_tiaoshui1"] = "Siu, hahahaha!",
 
@@ -867,7 +866,7 @@ Fk:loadTranslationTable {
   ["#jy_luojiao_ask_which"] = "罗绞 两个条件同时达成并发动，请选择要先视为使用的牌",
 
   ["jy_yusu"] = "玉玊",
-  [":jy_yusu"] = "你的回合内，你使用或打出第二张基本牌时，可以将其作为“点”置于武将牌上。",
+  [":jy_yusu"] = "你的回合内，你使用或打出第二张基本牌时，你可以将其作为“点”置于武将牌上。",
   ["@jy_yusu_basic_count"] = "玉玊",
   ["$jy_yusu1"] = "Siu...",
   ["#jy_yusu_triggered"] = "已触发",
@@ -1528,7 +1527,7 @@ Fk:loadTranslationTable {
   [":jy_fengnu"] = [[锁定技，你的回合开始时，你失去一点体力上限；你的回合内限X次，你可以将两张手牌当任意锦囊牌使用（X为存活角色数）。]],
 }
 
-local jy__raiden = General(extension, "jy__raiden", "god", 4, 4, General.Female)
+local jy__raiden = General(extension, "jy__raiden", "god", 3, 3, General.Female)
 
 local jy_leiyan = fk.CreateActiveSkill {
   name = "jy_leiyan",
@@ -2827,7 +2826,7 @@ local wanghun = fk.CreateTriggerSkill {
 local function doExecute(player, target, damage)
   local room = player.room
   room:doIndicate(player.id, { target.id })
-  room:changeShield(target, -target.shield)
+  -- room:changeShield(target, -target.shield)
   room:damage({
     from = player,
     to = target,
@@ -2844,7 +2843,7 @@ local function doExecute(player, target, damage)
     if #result == 0 then
       player:setSkillUseHistory("jy_yonghen", 0, Player.HistoryGame)
     else
-      doExecute(player, room:getPlayerById(result[1]), 2)
+      doExecute(player, room:getPlayerById(result[1]), 1)
     end
   end
 end
@@ -2883,9 +2882,9 @@ Fk:loadTranslationTable {
   [":jy_wanghun"] = [[转换技，锁定技，每名角色的回合结束时，你①回复一点体力；②摸一张牌。]],
 
   ["jy_yonghen"] = [[涌恨]],
-  [":jy_yonghen"] = [[限定技，当一名其他角色的体力值改变为1后，你可以移除其所有护甲并对其造成2点伤害。若该伤害结算后其死亡，则你选择一项：对一名其他角色重复此流程，或重置此技能。]],
+  [":jy_yonghen"] = [[限定技，当一名其他角色的体力值改变为1后，你可以对其造成2点伤害。若该伤害结算后其死亡，则你选择一项：对一名其他角色重复一次仅造成1点伤害的此流程，或重置此技能。]],
   ["#jy_yonghen-invoke"] = [[涌恨：你可以对 %dest 造成2点伤害，若其死亡则可继续或重置该技能！]],
-  ["#jy_yonghen-ask"] = [[涌恨：对一名其他角色造成2点伤害，若其死亡则可继续，点击取消重置该技能]],
+  ["#jy_yonghen-ask"] = [[涌恨：对一名其他角色造成1点伤害，若其死亡则可继续，点击取消重置该技能]],
   -- 获得〖修行〗
   ["$jy_yonghen1"] = [[没有痛苦，长眠吧。]],
   ["$jy_yonghen2"] = [[欢迎来到……深渊……]],

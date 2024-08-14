@@ -1389,11 +1389,13 @@ local jiaofeng = fk.CreateTriggerSkill {
   frequency = Skill.Compulsory,
   events = { fk.CardUseFinished },
   can_trigger = function(self, event, target, player, data)
-    return player:hasSkill(self) and target == player and player.phase ~= Player.NotActive and
+    return player:hasSkill(self) and target == player and player.phase == Player.Play and
         not table.find(player:getCardIds(Player.Hand),
           function(id) return Fk:getCardById(id).type == data.card.type end)
   end,
   on_use = function(self, event, target, player, data)
+    local hands = player:getCardIds("h")
+    player:showCards(hands)
     player:drawCards(2, self.name)
     player.room:setPlayerMark(player, "@jy_jiaofeng", "")
   end,
@@ -1424,7 +1426,7 @@ Fk:loadTranslationTable {
   ["illustrator:jy__zhanshige"] = [[未知]],
 
   ["jy_jiaofeng"] = [[交锋]],
-  [":jy_jiaofeng"] = [[锁定技，你的回合内，你使用牌后，若你的手牌中没有相同类型的牌，则你摸两张牌且你使用的下一张牌无次数限制。]],
+  [":jy_jiaofeng"] = [[锁定技，出牌阶段，你使用牌后，若你的手牌中没有相同类型的牌，则你展示所有手牌、摸两张牌且你使用的下一张牌无次数限制。]],
   ["@jy_jiaofeng"] = [[交锋]],
 }
 local zsg = General(extension, "jy__zhanshige", "shu", 3, 3, General.Female)
@@ -2100,7 +2102,7 @@ local zhiheng_2 = fk.CreateActiveSkill {
 -- }
 
 local quanyu = fk.CreateTriggerSkill {
-  name = "jy_quanyu",
+  name = "jy_quanyu$",
   events = { fk.EventPhaseProceeding },
   can_trigger = function(self, event, target, player, data)
     return target == player and player:hasSkill(self) and player.phase == Player.Start
@@ -2206,7 +2208,7 @@ Fk:loadTranslationTable {
   ["$jy_qiongtu1"] = [[好舒服啊！]],
 
   ["jy_quanyu"] = [[权御]],
-  [":jy_quanyu"] = [[准备阶段，你可以弃置一名手牌数最多的吴势力角色区域里的一张牌，然后你可以令一名手牌数最少的吴势力角色摸一张牌。]],
+  [":jy_quanyu"] = [[主公技，准备阶段，你可以弃置一名手牌数最多的吴势力角色区域里的一张牌，然后你可以令一名手牌数最少的吴势力角色摸一张牌。]],
   ["#jy_quanyu_discard-prompt"] = [[权御：你可以弃置一名手牌数最多的吴势力角色区域里的一张牌]],
   ["#jy_quanyu_draw-prompt"] = [[权御：你可以令一名手牌数最少的吴势力角色摸一张牌]],
   ["$jy_quanyu1"] = [[有汝辅佐，甚好！]],
