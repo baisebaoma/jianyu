@@ -198,7 +198,7 @@ local jy_jieju_success = fk.CreateTriggerSkill {
   on_use = function(self, event, target, player)
     local room = player.room
     room:updateQuestSkillState(player, "jy_jieju")
-    player:drawCards(2, "jy_jieju")
+    -- player:drawCards(2, "jy_jieju")
     room:recover({
       who = player,
       num = 2,
@@ -477,8 +477,8 @@ Fk:loadTranslationTable {
 
   ["jy_jieju"] = "熬夜",
   [":jy_jieju"] = [[使命技，出牌阶段，你可以失去一点体力使〖做题〗视为未发动过。<br>
-  成功：回合结束时，若你答对比答错至少多2次，你摸2张牌、回复2点体力，然后获得〖集智〗、〖看破〗、〖享乐〗；<br>
-  失败：回合结束时，若你答错比答对至少多2次，你翻面，然后获得〖玉玉〗、〖红温〗。]],
+  成功：结束阶段，若你答对比答错至少多2次，你回复2点体力，然后获得〖集智〗、〖看破〗、〖享乐〗；<br>
+  失败：结束阶段，若你答错比答对至少多2次，你翻面，然后获得〖玉玉〗、〖红温〗。]],
   ["#jy_jieju_success"] = "结局：成功",
   ["#jy_jieju_fail"] = "结局：失败",
 
