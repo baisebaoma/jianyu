@@ -192,7 +192,7 @@ local jy_jieju_success = fk.CreateTriggerSkill {
       return false
     end
     return player:hasSkill("jy_jieju") and player.phase == Player.Finish and
-        player:getMark("@jy_zuoti_correct_count") >= player:getMark("@jy_zuoti_incorrect_count") + 2
+        player:getMark("@jy_zuoti_correct_count") >= player:getMark("@jy_zuoti_incorrect_count") + 3
   end,
   on_cost = Util.TrueFunc,
   on_use = function(self, event, target, player)
@@ -221,7 +221,7 @@ local jy_jieju_fail = fk.CreateTriggerSkill {
       return false
     end
     return player:hasSkill("jy_jieju") and player.phase == Player.Finish and
-        player:getMark("@jy_zuoti_incorrect_count") >= player:getMark("@jy_zuoti_correct_count") + 2
+        player:getMark("@jy_zuoti_incorrect_count") >= player:getMark("@jy_zuoti_correct_count") + 3
   end,
   on_cost = Util.TrueFunc,
   on_use = function(self, event, target, player)
@@ -429,7 +429,7 @@ local jy_guina_refresh = fk.CreateTriggerSkill {
 jy_guina:addRelatedSkill(jy_guina_refresh)
 
 
-local jy__kgdxs = General(extension, "jy__kgdxs", "qun", 6, 6, General.Female)
+local jy__kgdxs = General(extension, "jy__kgdxs", "qun", 5, 5, General.Female)
 jy__kgdxs:addSkill(jy_zuoti)
 jy__kgdxs:addSkill(jy_jieju)
 jy__kgdxs:addRelatedSkill("jizhi")
@@ -477,10 +477,10 @@ Fk:loadTranslationTable {
 
   ["jy_jieju"] = "熬夜",
   [":jy_jieju"] = [[使命技，出牌阶段，你可以失去一点体力使〖做题〗视为未发动过。<br>
-  成功：结束阶段，若你答对比答错至少多2次，你回复2点体力，然后获得〖集智〗、〖看破〗、〖享乐〗；<br>
-  失败：结束阶段，若你答错比答对至少多2次，你翻面，然后获得〖玉玉〗、〖红温〗。]],
-  ["#jy_jieju_success"] = "结局：成功",
-  ["#jy_jieju_fail"] = "结局：失败",
+  成功：结束阶段，若你答对比答错至少多3次，你回复2点体力，然后获得〖集智〗、〖看破〗、〖享乐〗；<br>
+  失败：结束阶段，若你答错比答对至少多3次，你翻面，然后获得〖玉玉〗、〖红温〗。]],
+  ["#jy_jieju_success"] = "熬夜：成功",
+  ["#jy_jieju_fail"] = "熬夜：失败",
 
   ["jy__kgds"] = "考公专家",
   ["#jy__kgds"] = "正厅级",
