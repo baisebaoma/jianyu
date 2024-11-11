@@ -117,7 +117,7 @@ local jy_kaiju = fk.CreateTriggerSkill {
   on_use = function(self, event, target, player, data)
     local room = player.room
     for _, p in ipairs(room:getOtherPlayers(player, true)) do
-      if not p:isAllNude() and not player.dead then -- 如果我自己死了，那就不要继续了
+      if #p:getCardIds("he") ~= 0 and not player.dead then -- 如果我自己死了，那就不要继续了
         local id = room:askForCard(p, 1, 1, true, self.name, false, nil, "#jy_kaiju-choose")
         if #id ~= 0 then
           room:moveCardTo(id, Card.PlayerHand, player, fk.ReasonJustMove, self.name, nil, false, nil)
@@ -132,7 +132,7 @@ local jy_kaiju = fk.CreateTriggerSkill {
 
 jy__jianzihao:addSkill(jy_kaiju)
 jy__jianzihao:addSkill(jy_hongwen)
--- jy__jianzihao:addSkill(jy_zouwei)
+jy__jianzihao:addSkill(jy_zouwei)
 jy__jianzihao:addSkill(jy_shengnu)
 jy__jianzihao:addSkill(jy_xizao)
 
@@ -145,7 +145,7 @@ Fk:loadTranslationTable {
   ["illustrator:jy__jianzihao"] = "简自豪",
 
   ["jy_kaiju"] = "开局",
-  [":jy_kaiju"] = [[锁定技，准备阶段，其他角色需交给你一张牌，视为对你使用【杀】。<br>
+  [":jy_kaiju"] = [[锁定技，准备阶段，其他有牌的角色需交给你一张牌，视为对你使用【杀】。<br>
   <font color="grey"><i>“从未如此美妙的开局！”</i></font>]],
   ["$jy_kaiju1"] = "不是啊，我炸一对鬼的时候我在打什么，打一对10。一对10，他四个9炸我，我不输了吗？",
   ["$jy_kaiju2"] = "怎么赢啊？你别瞎说啊！",
