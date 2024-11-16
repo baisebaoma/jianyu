@@ -336,7 +336,7 @@ local jy_huxiao_xiao = fk.CreateTriggerSkill {
     local room = player.room
     player:broadcastSkillInvoke("jy_huxiao")
     room:notifySkillInvoked(player, "jy_huxiao", "drawcard")
-    player:drawCards(1, self.name)
+    -- player:drawCards(1, self.name)
     local dummy = Fk:cloneCard("dilu")
     dummy:addSubcards(room:getNCards(1))
     player:addToPile("jy__liyuanhao_xiao", dummy, true, self.name)
@@ -414,12 +414,13 @@ local jy_erduanxiao = fk.CreateTriggerSkill {
     -- 将所有“啸”纳入自己的手牌
     room:moveCardTo(xiaos, Card.PlayerHand, player, fk.ReasonJustMove, self.name, "jy__liyuanhao_xiao", true,
       player.id)
-    room:recover({
-      who = player,
-      num = 1,
-      recoverBy = player,
-      skillName = self.name,
-    })
+    -- room:recover({
+    --   who = player,
+    --   num = 1,
+    --   recoverBy = player,
+    --   skillName = self.name,
+    -- })
+    player:drawCards(1, self.name)
   end,
 }
 jy_huxiao:addRelatedSkill(jy_erduanxiao)
@@ -437,7 +438,7 @@ Fk:loadTranslationTable {
   ["jy__liyuanhao_xiao"] = "啸",
 
   ["jy_huxiao"] = "虎啸",
-  [":jy_huxiao"] = [[当你使用或打出一张【杀】时，你可以摸一张牌并将牌堆顶的一张牌置于武将牌上，称为“啸”。你可以将一张“啸”当【酒】或【闪】使用或打出。每当你的“啸”数为2时，你获得所有“啸”并恢复一点体力。<br><font color="grey"><i>“我希望我的后辈们能够记住，在你踏上职业道路的这一刻开始，你的目标就只有冠军。”</i></font>]],
+  [":jy_huxiao"] = [[当你使用或打出一张【杀】时，你可以将牌堆顶的一张牌置于武将牌上（称为“啸”）。你可以将一张“啸”当【酒】或【闪】使用或打出。当你的“啸”数为2时，你获得所有“啸”并摸一张牌。<br><font color="grey"><i>“我希望我的后辈们能够记住，在你踏上职业道路的这一刻开始，你的目标就只有冠军。”</i></font>]],
 }
 
 -- 高天亮
@@ -1140,10 +1141,10 @@ local jy_huapen = fk.CreateTriggerSkill {
     local judge = {
       who = player,
       reason = self.name,
-      pattern = ".|.|heart",
+      pattern = ".|.|spade,club,diamond",
     }
     room:judge(judge)
-    if judge.card.suit == Card.Heart then
+    if judge.card.suit ~= Card.Heart then
       room:doIndicate(data.from, { player.id })      -- 播放指示线
       -- TODO：这里写的不对吧，targets根本就没用上
       if #AimGroup:getAllTargets(data.tos) == 1 then -- 如果只有一个人，那么把我也加进去
@@ -1157,7 +1158,7 @@ local jy_huapen = fk.CreateTriggerSkill {
 local jy_boshi = fk.CreateTriggerSkill {
   name = "jy_boshi",
   frequency = Skill.Wake,
-  events = { fk.EventPhaseStart },
+  events = { fk.EventPhaseProceeding },
   can_trigger = function(self, event, target, player, data)
     return target == player and player:hasSkill(self) and
         player:usedSkillTimes(self.name, Player.HistoryGame) == 0 and
@@ -1214,27 +1215,27 @@ local jy_jiangbei_club = fk.CreateTargetModSkill {
 }
 -- ♣无视防具
 -- 注意：targetSpecified事件只有一个data.to，因为是对每个target做一次。
-local jy_jiangbei_club_2 = fk.CreateTriggerSkill {
-  name = "#jy_jiangbei_club_2",
-  frequency = Skill.Compulsory,
-  events = { fk.TargetSpecified },
-  can_trigger = function(self, event, target, player, data)
-    if not player:hasSkill(self) then return false end
-    if target == player and data.card and data.card.suit == Card.Club then
-      return data.card.type == Card.TypeBasic or data.card.type == Card.TypeTrick
-    end
-  end,
-  on_use = function(self, event, target, player, data)
-    local room = player.room
-    local to = room:getPlayerById(data.to)
-    local use_event = room.logic:getCurrentEvent():findParent(GameEvent.UseCard, true)
-    if use_event == nil then return end
-    room:addPlayerMark(to, fk.MarkArmorNullified)
-    use_event:addCleaner(function()
-      room:removePlayerMark(to, fk.MarkArmorNullified)
-    end)
-  end,
-}
+-- local jy_jiangbei_club_2 = fk.CreateTriggerSkill {
+--   name = "#jy_jiangbei_club_2",
+--   frequency = Skill.Compulsory,
+--   events = { fk.TargetSpecified },
+--   can_trigger = function(self, event, target, player, data)
+--     if not player:hasSkill(self) then return false end
+--     if target == player and data.card and data.card.suit == Card.Club then
+--       return data.card.type == Card.TypeBasic or data.card.type == Card.TypeTrick
+--     end
+--   end,
+--   on_use = function(self, event, target, player, data)
+--     local room = player.room
+--     local to = room:getPlayerById(data.to)
+--     local use_event = room.logic:getCurrentEvent():findParent(GameEvent.UseCard, true)
+--     if use_event == nil then return end
+--     room:addPlayerMark(to, fk.MarkArmorNullified)
+--     use_event:addCleaner(function()
+--       room:removePlayerMark(to, fk.MarkArmorNullified)
+--     end)
+--   end,
+-- }
 -- 计算出牌阶段使用打出了多少张红桃梅花。一旦使用打出了别的牌，就变为字符串。
 -- TargetSpecified对每个目标都会执行一次，所以改成CardUsing。前面的虎啸也一并改了已经。
 local jy_jiangbei_draw_count = fk.CreateTriggerSkill {
@@ -1287,7 +1288,7 @@ local jy_jiangbei_draw = fk.CreateTriggerSkill {
   end,
 }
 jy_jiangbei:addRelatedSkill(jy_jiangbei_club)
-jy_jiangbei:addRelatedSkill(jy_jiangbei_club_2)
+-- jy_jiangbei:addRelatedSkill(jy_jiangbei_club_2)
 jy_jiangbei:addRelatedSkill(jy_jiangbei_draw_count)
 jy_jiangbei:addRelatedSkill(jy_jiangbei_draw)
 
@@ -1322,14 +1323,14 @@ Fk:loadTranslationTable {
   ["#jy_sichi_4"] = "四吃：选择至多3名角色，你和他们各失去一点体力",
 
   ["jy_huapen"] = "花盆",
-  [":jy_huapen"] = [[锁定技，其他角色使用♣普通锦囊牌或基本牌指定唯一不为你的目标时，你判定，若为<font color="red">♥</font>，你也成为该牌的目标。]],
+  [":jy_huapen"] = [[锁定技，其他角色使用♣普通锦囊牌或基本牌指定唯一角色为目标时，若不为你，则你进行判定，若判定结果不为<font color="red">♥</font>，则你也成为该牌的目标。]],
 
   ["jy_boshi"] = "搏时",
   [":jy_boshi"] = [[觉醒技，准备阶段，若你已判定过至少X次（X为存活角色数），你减一点体力上限、失去〖花盆〗并获得〖奖杯〗。]],
   ["@jy_boshi_judge_count"] = "搏时",
 
   ["jy_jiangbei"] = "奖杯",
-  [":jy_jiangbei"] = [[锁定技，你的♣基本牌和锦囊牌无距离和次数限制且无视防具；你的<font color="red">♥</font>基本牌和锦囊牌不可被响应；出牌阶段结束时，你摸X张牌（X为你出牌阶段使用或打出的♣和<font color="red">♥</font>牌数）。]],
+  [":jy_jiangbei"] = [[锁定技，你的♣基本牌和锦囊牌无距离和次数限制；你的<font color="red">♥</font>基本牌和锦囊牌不可被响应；出牌阶段结束时，你摸X张牌（X为你出牌阶段使用或打出的♣和<font color="red">♥</font>牌数）。]],
   ["#jy_jiangbei_heart"] = "奖杯",
   ["#jy_jiangbei_club"] = "奖杯",
   ["#jy_jiangbei_club_2"] = "奖杯",
@@ -2357,7 +2358,7 @@ Fk:loadTranslationTable {
   ["illustrator:jy__pyke"] = "Riot",
 
   ["jy_wanghun"] = [[亡魂]],
-  [":jy_wanghun"] = [[转换技，锁定技，每名角色的回合结束时，你①回复一点体力；②摸一张牌。]],
+  [":jy_wanghun"] = [[转换技，锁定技，每名角色的回合结束时，①若你已受伤，你回复一点体力；②若你的手牌数小于4，你摸一张牌。]],
 
   ["jy_yonghen"] = [[涌恨]],
   [":jy_yonghen"] = [[限定技，当一名其他角色的体力值改变为1后，你可以对其造成1点伤害。若该伤害结算后其死亡，则你选择一项：对一名其他角色重复此流程，或重置此技能。]],
