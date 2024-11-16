@@ -2870,4 +2870,291 @@ Fk:loadTranslationTable {
   ["$jy_dingfei3"] = [[还来劲了啊你！]],
 }
 
+local duwu = fk.CreateActiveSkill{
+  name = "jy_duwu",
+  anim_type = "control",
+  card_num = 2,
+  min_target_num = 0,
+  max_target_num = 1,
+  prompt = "#jy_duwu",
+  can_use = function(self, player)
+    return #player:getCardIds("he") > 1
+  end,
+  card_filter = function(self, to_select, selected)
+    if #selected < 2 and
+      not Self:prohibitDiscard(Fk:getCardById(to_select)) then
+      if #selected == 0 then
+        return true
+      else
+        return Fk:getCardById(to_select).suit == Fk:getCardById(selected[1]).suit
+      end
+    end
+  end,
+  target_filter = function(self, to_select, selected)
+    if #selected == 0 and to_select ~= Self.id then
+      local target = Fk:currentRoom():getPlayerById(to_select)
+      return not target:isNude() and not target.dead and (target:getNextAlive() == Self or Self:getNextAlive() == target) 
+    end
+  end,
+  on_use = function(self, room, effect)
+    local player = room:getPlayerById(effect.from)
+    room:throwCard(effect.cards, self.name, player, player)
+    if #effect.tos == 0 then
+      -- 视为使用一张未以此法使用过的伤害牌
+      local mark = player:getMark("jy_duwu_names")
+      if type(mark) ~= "table" then
+        mark = {}
+        for _, id in ipairs(Fk:getAllCardIds()) do
+          local card = Fk:getCardById(id)
+          if card.is_damage_card and not card.is_derived then
+            table.insertIfNeed(mark, card.name)
+          end
+        end
+        room:setPlayerMark(player, "jy_duwu_names", mark)
+      end
+      local mark2 = player:getMark("@$jy_duwu_names") -- 这是禁止继续使用的
+      if mark2 == 0 then mark2 = {} end
+      local names, choices = {}, {}
+      for _, name in ipairs(mark) do
+        local card = Fk:cloneCard(name)
+        card.skillName = self.name
+        if player:canUse(card) and not player:prohibitUse(card) then
+          table.insert(names, name)
+          if not table.contains(mark2, name) then
+            table.insert(choices, name)
+          end
+        end
+      end
+      local choice = room:askForChoice(player, choices, self.name, "#jy_duwu-invoke::" .. player.id, false, names)
+
+      -- 问他用哪个牌，并且要他用
+      mark = player:getMark("@$jy_duwu_names")
+      if mark == 0 then mark = {} end
+      table.insert(mark, choice)
+      room:setPlayerMark(player, "@$jy_duwu_names", mark)
+      room:setPlayerMark(player, "jy_duwu-tmp", choice)
+
+      local success, dat = room:askForUseActiveSkill(player, "#jy_duwu_viewas",
+        "#jy_duwu_use:::" .. Fk:translate(choice))
+      room:setPlayerMark(player, "jy_duwu-tmp", 0)
+      if success then
+        local card = Fk:cloneCard(choice)
+        card:addSubcards(dat.cards)
+        card.skillName = self.name
+        room:useCard {
+          from = player.id,
+          tos = table.map(dat.targets, function(p) return { p } end),
+          card = card,
+        }
+        room:setPlayerMark(player, "jy_duwu-tmp", 0)
+      end
+    else
+      -- 顺一张并将一张放到场上
+      local target = room:getPlayerById(effect.tos[1])
+      -- 顺一张
+      local cid = room:askForCardChosen(player, target, "hej", self.name)
+      room:obtainCard(player, cid, false, fk.ReasonPrey)
+      -- 将一张放到场上
+      if player.dead or player:isNude() then return end
+      local _, dat = room:askForUseActiveSkill(player, "#jy_duwu_move", "#jy_duwu_card", false)
+      local card_id = dat and dat.cards[1] or player:getCardIds("he")[1]
+      local choice = dat and dat.interaction or "Top"
+      local reset_self = room:getCardArea(card_id) == Card.PlayerEquip
+      if choice == "Field" then
+        local to = room:getPlayerById(dat.targets[1])
+        local card = Fk:getCardById(card_id)
+        if card.type == Card.TypeEquip then
+          room:moveCardTo(card, Card.PlayerEquip, to, fk.ReasonPut, "jy_duwu", "", true, player.id)
+          if not to.dead then
+            to:reset()
+          end
+        elseif card.sub_type == Card.SubtypeDelayedTrick then
+          -- FIXME : deal with visual DelayedTrick
+          room:moveCardTo(card, Card.PlayerJudge, to, fk.ReasonPut, "jy_duwu", "", true, player.id)
+        end
+      else
+        local drawPilePosition = 1
+        if choice == "Bottom" then
+          drawPilePosition = -1
+        end
+        room:moveCards({
+          ids = {card_id},
+          from = player.id,
+          toArea = Card.DrawPile,
+          moveReason = fk.ReasonPut,
+          skillName = "jy_duwu",
+          drawPilePosition = drawPilePosition,
+          moveVisible = true
+        })
+      end
+      if reset_self and not player.dead then
+        player:reset()
+      end
+    end
+  end,
+}
+
+local duwu_move = fk.CreateActiveSkill{
+  name = "#jy_duwu_move",
+  mute = true,
+  card_num = 1,
+  max_target_num = 1,
+  interaction = function()
+    return UI.ComboBox {choices = {"Field", "Top"}}
+  end,
+  card_filter = function(self, to_select, selected, targets)
+    if #selected == 0 then
+      if self.interaction.data == "Field" then
+        local card = Fk:getCardById(to_select)
+        return card.type == Card.TypeEquip or card.sub_type == Card.SubtypeDelayedTrick
+      end
+      return true
+    end
+  end,
+  target_filter = function(self, to_select, selected, selected_cards)
+    if #selected == 0 and self.interaction.data == "Field" and #selected_cards == 1 then
+      local card = Fk:getCardById(selected_cards[1])
+      local target = Fk:currentRoom():getPlayerById(to_select)
+      if card.type == Card.TypeEquip then
+        return target:hasEmptyEquipSlot(card.sub_type)
+      elseif card.sub_type == Card.SubtypeDelayedTrick then
+        return not target:isProhibited(target, card)
+      end
+    end
+    return false
+  end,
+  feasible = function(self, selected, selected_cards)
+    if #selected_cards == 1 then
+      if self.interaction.data == "Field" then
+        return #selected == 1
+      else
+        return true
+      end
+    end
+  end,
+}
+
+local duwu_viewas = fk.CreateViewAsSkill {
+  name = "#jy_duwu_viewas",
+  anim_type = "offensive",
+  card_filter = Util.FalseFunc,
+  view_as = function(self)
+    local card = Fk:cloneCard(Self:getMark("jy_duwu-tmp"))
+    card.skillName = "jy_duwu"
+    return card
+  end,
+}
+duwu:addRelatedSkill(duwu_move)
+duwu:addRelatedSkill(duwu_viewas)
+
+local aocai = fk.CreateTriggerSkill{
+  name = "jy_aocai",
+  events = {fk.EventPhaseChanging, fk.EventPhaseStart, fk.TargetConfirmed},
+  anim_type = "masochism",
+  frequency = Skill.Compulsory,
+  mute = true,
+  can_trigger = function(self, event, target, player, data)
+    if not player:hasSkill(self) then return false end
+    if event == fk.EventPhaseChanging then
+      return target == player and data.to == Player.Draw
+    elseif event == fk.EventPhaseStart then
+      return target == player and player:hasSkill(self) and player.phase == Player.Start
+    else
+      if data.card and data.card.is_damage_card then
+        for _, v in pairs(AimGroup:getAllTargets(data.tos)) do
+          if v == player.id then
+            return true
+          end
+        end
+      end
+    end
+  end,
+  on_use = function(self, event, target, player, data)
+    local room = player.room
+    player:broadcastSkillInvoke(self.name)
+    if event == fk.EventPhaseChanging then
+      room:notifySkillInvoked(player, self.name, "negative")
+      return true
+    else
+      room:notifySkillInvoked(player, self.name, "drawcard")
+      -- 直接使用观星当然简单多了，只是我觉得要多点两下有点呆。使用五谷丰登。
+      -- local result = room:askForGuanxing(player, room:getNCards(3), nil, {1, 1}, "jy_aocai", true, {"Top", "#jy_aocai_get"})
+      -- local top, cid = result.top, result.bottom[1]
+      -- for i = #top, 1, -1 do
+      --   table.insert(room.draw_pile, 1, top[i])
+      -- end
+      -- room:obtainCard(player, cid, false, fk.ReasonPrey, player.id, self.name)
+      local card_ids = room:getNCards(3)
+      room:fillAG(player, card_ids)
+      local card_id = room:askForAG(player, card_ids, false, self.name)
+      -- room:takeAG(player, card_id) -- 其实不需要了，毕竟只有一个人嘛
+      table.removeOne(card_ids, card_id)
+      room:obtainCard(player, card_id, false, fk.ReasonPrey, player.id, self.name)
+      for i = #card_ids, 1, -1 do
+        table.insert(room.draw_pile, 1, card_ids[i])
+      end
+      room:closeAG()
+    end
+  end,
+}
+
+local qianlv = fk.CreateActiveSkill{
+  name = "jy_qianlv",
+  anim_type = "switch",
+  switch_skill_name = "jy_qianlv",
+  prompt = function ()
+    return Self:getSwitchSkillState("jy_qianlv", false) == fk.SwitchYang and "#jy_qianlv_yang" or "#jy_qianlv_yin"
+  end,
+  can_use = function(self, player)
+    return player:usedSkillTimes(self.name, Player.HistoryPhase) < 1
+  end,
+  card_filter = Util.FalseFunc,
+  target_filter = Util.FalseFunc,
+  on_use = function(self, room, effect)
+    local from = room:getPlayerById(effect.from)
+    local isYang = from:getSwitchSkillState(self.name, true) == fk.SwitchYang
+    local n = isYang and 2 or 3
+    if isYang then
+      room:changeMaxHp(from, -1)
+      if from.dead then return end
+      from:drawCards(n, self.name, "bottom")
+    else
+      from:drawCards(n, self.name, "bottom")
+      room:loseHp(from, 1)
+    end
+  end,
+}
+
+local mzgk = General(extension, "jy__mou__zhugeke", "wu", 3, 4)
+mzgk:addSkill(duwu)
+mzgk:addSkill(aocai)
+mzgk:addSkill(qianlv)
+
+Fk:loadTranslationTable {
+  ["jy__mou__zhugeke"] = "谋诸葛恪",
+  ["#jy__mou__zhugeke"] = "雄才大略",
+  ["designer:jy__mou__zhugeke"] = "rolin",
+  ["cv:jy__mou__zhugeke"] = "无",
+  -- ["illustrator:jy__mou__zhugeke"] = "神",
+  ["~jy__mou__zhugeke"] = [[]],
+
+  ["jy_duwu"] = "黩武",
+  [":jy_duwu"] = [[出牌阶段，你可以弃置两张花色相同的牌并选择一项：①获得上家或下家的一张牌，然后将一张牌置于场上或牌堆顶；②视为使用一张未以此法使用过的伤害牌。]],
+  ["#jy_duwu"] = [[黩武：弃置两张花色相同的牌并<font color="red">可以选择上家或下家</font><br><font color="red">若选择</font>，则获得上家或下家的一张牌，然后将一张牌置于场上或牌堆顶；<br><font color="red">若不选</font>，则视为使用一张未以此法使用过的伤害牌]],
+  ["#jy_duwu_viewas"] = [[黩武]],
+  ["@$jy_duwu_names"] = [[黩武]],
+  ["#jy_duwu_move"] = [[黩武]],
+  ["#jy_duwu_use"] = [[黩武：视为使用 %arg]],
+  ["#jy_duwu_card"] = [[黩武：将一张牌置于场上或牌堆顶]],
+
+  ["jy_aocai"] = "傲才",
+  [":jy_aocai"] = [[锁定技，你跳过摸牌阶段；准备阶段或当你成为伤害牌的目标时，你观看牌堆顶三张牌并获得其中一张。]],
+  ["#jy_aocai_get"] = [[获得]],
+
+  ["jy_qianlv"] = "黔驴",
+  [":jy_qianlv"] = [[转换技，出牌阶段限一次，阳：你可以减少一点体力上限，然后从牌堆底获得两张牌；阴：你可以从牌堆底获得三张牌，然后失去一点体力。]],
+  ["#jy_qianlv_yang"] = [[黔驴：减少一点体力上限，从牌堆底获得两张牌]],
+  ["#jy_qianlv_yin"] = [[黔驴：从牌堆底获得三张牌，失去一点体力]]
+}
+
 return extension
