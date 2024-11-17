@@ -2925,7 +2925,7 @@ local duwu = fk.CreateActiveSkill{
           end
         end
       end
-      local choice = room:askForChoice(player, choices, self.name, "#jy_duwu-invoke::" .. player.id, false, names)
+      local choice = room:askForChoice(player, choices, self.name, "#jy_duwu-invoke", false, names)
 
       -- 问他用哪个牌，并且要他用
       mark = player:getMark("@$jy_duwu_names")
@@ -2938,6 +2938,7 @@ local duwu = fk.CreateActiveSkill{
         "#jy_duwu_use:::" .. Fk:translate(choice))
       room:setPlayerMark(player, "jy_duwu-tmp", 0)
       if success then
+        assert(dat)
         local card = Fk:cloneCard(choice)
         card:addSubcards(dat.cards)
         card.skillName = self.name
@@ -3139,11 +3140,12 @@ Fk:loadTranslationTable {
   ["~jy__mou__zhugeke"] = [[]],
 
   ["jy_duwu"] = "黩武",
-  [":jy_duwu"] = [[出牌阶段，你可以弃置两张花色相同的牌并选择一项：①获得上家或下家的一张牌，然后将一张牌置于场上或牌堆顶；②视为使用一张未以此法使用过的伤害牌。]],
+  [":jy_duwu"] = [[出牌阶段，你可以弃置两张花色相同的牌并选择一项：①获得上家或下家一张牌，然后将一张牌置于场上或牌堆顶；②视为使用一张未以此法使用过的伤害牌。]],
   ["#jy_duwu"] = [[黩武：弃置两张花色相同的牌并<font color="red">可以选择上家或下家</font><br><font color="red">若选择</font>，则获得上家或下家的一张牌，然后将一张牌置于场上或牌堆顶；<br><font color="red">若不选</font>，则视为使用一张未以此法使用过的伤害牌]],
   ["#jy_duwu_viewas"] = [[黩武]],
   ["@$jy_duwu_names"] = [[黩武]],
   ["#jy_duwu_move"] = [[黩武]],
+  ["#jy_duwu-invoke"] = [[黩武：选择要视为使用的伤害牌]],
   ["#jy_duwu_use"] = [[黩武：视为使用 %arg]],
   ["#jy_duwu_card"] = [[黩武：将一张牌置于场上或牌堆顶]],
 

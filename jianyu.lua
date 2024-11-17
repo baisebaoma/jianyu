@@ -2297,7 +2297,10 @@ local wanghun = fk.CreateTriggerSkill {
       })
     else
       player:drawCards(1, self.name)
-      -- player.room:askForDiscard(player, 4, 4, true, self.name, false, ".", nil, false)
+      local hands = #player:getCardIds("h")
+      if hands > 4 then
+        player.room:askForDiscard(player, hands - 4, hands - 4, true, self.name, false, ".", "#jy_wanghun_discard", false)
+      end
     end
   end,
 }
@@ -2358,7 +2361,8 @@ Fk:loadTranslationTable {
   ["illustrator:jy__pyke"] = "Riot",
 
   ["jy_wanghun"] = [[亡魂]],
-  [":jy_wanghun"] = [[转换技，锁定技，每名角色的回合结束时，①若你已受伤，你回复一点体力；②若你的手牌数小于4，你摸一张牌。]],
+  [":jy_wanghun"] = [[转换技，锁定技，每名角色的回合结束时，①你回复一点体力；②你摸一张牌，然后将手牌弃至4张。]],
+  ["#jy_wanghun_discard"] = [[亡魂：将手牌弃至4张]],
 
   ["jy_yonghen"] = [[涌恨]],
   [":jy_yonghen"] = [[限定技，当一名其他角色的体力值改变为1后，你可以对其造成1点伤害。若该伤害结算后其死亡，则你选择一项：对一名其他角色重复此流程，或重置此技能。]],
