@@ -740,6 +740,7 @@ local taoqiu = fk.CreateTriggerSkill {
     local success, dat = room:askForUseActiveSkill(player, "#jy_taoqiu_viewas", "#jy_taoqiu-use", true,
       { bypass_distances = true })
     if success then
+      assert(dat)
       local card = Fk:cloneCard("slash")
       card:addSubcards(dat.cards)
       card.skillName = self.name
@@ -1957,7 +1958,7 @@ Fk:loadTranslationTable {
 
   ["jy_nicai"] = [[匿才]],
   [":jy_nicai"] = [[当你不因此技能摸牌时，若你的手牌数为全场唯一最多，你弃置一张牌，否则你可以摸一张牌。]],
-  ["#jy_nicai-prompt"] = [[匿才：你需要弃置一张牌]],
+  ["#jy_nicai-prompt"] = [[匿才：弃置一张牌]],
 
   ["jy_chayi"] = [[察异]],
   [":jy_chayi"] = [[其他角色的结束阶段，你可以观看其手牌，然后可以选择一项：①交给其任意张花色不同且其没有该花色的手牌，然后你摸等量的牌；②弃置你与其等量张花色组合相同的手牌。]],
@@ -2296,7 +2297,7 @@ Fk:loadTranslationTable {
   ["#jy_jianyan-ask"] = [[谏言：选择要对 %src 使用的 %arg 发动的效果]],
 
   ["jy_jimin"] = [[济民]],
-  [":jy_jimin"] = [[锁定技，一名角色于其回合内首次使用【杀】指定你为目标时，此【杀】对你无效，然后你摸两张牌。]],
+  [":jy_jimin"] = [[锁定技，每名角色限一次，一名角色于其回合内使用【杀】指定你为目标时，此【杀】对你无效，然后你摸两张牌。]],
 }
 
 local guanxi = fk.CreateTriggerSkill {
@@ -2623,6 +2624,7 @@ local zhuojing = fk.CreateViewAsSkill {
         local success, dat = room:askForUseActiveSkill(target, skill_name,
           "#jy_zhuojing-use::" .. target.id .. ":" .. Fk:translate(skill_name))
         if skill_name == "jy_zhuojing" and success and dat.cards then
+          assert(dat)
           local card = Fk:cloneCard("peach")
           -- card:addSubcards(dat.cards)
           card:addSubcards(target:getCardIds("h")) -- 因为zhuojing没有选手牌这个动作，手牌数据不会传过来，所以在这里手动处理
@@ -2863,7 +2865,7 @@ Fk:loadTranslationTable {
   ["jy_dingfei"] = "鼎沸",
   [":jy_dingfei"] = [[每回合限一次，你受到伤害后，可以展示所有手牌并令伤害来源弃置手牌。若你展示的手牌与其弃置的牌花色一共不足四种，你回复一点体力。]],
   ["#jy_dingfei-prompt"] = [[鼎沸：是否展示手牌并令 %dest 弃牌，你有概率回复一点体力]],
-  ["#jy_dingfei-discard"] = [[鼎沸：%src 令你弃任意张牌，弃置 %arg手牌至少各一张，否则 %src 回复一点体力]], -- 这里%arg后没留空格是故意的，因为%arg里本身最后就带空格
+  ["#jy_dingfei-discard"] = [[鼎沸：弃置 %arg手牌至少各一张，否则 %src 回复一点体力]], -- 这里%arg后没留空格是故意的，因为%arg里本身最后就带空格
   ["#jy_dingfei-discard-no-recover"] = [[鼎沸：%src 令你弃任意张牌，你可以不弃，这次不会有什么效果]],
   ["$jy_dingfei1"] = [[哎哟，您可别放水。]],
   ["$jy_dingfei2"] = [[幸亏我练过！]],
