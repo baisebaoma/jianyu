@@ -2880,7 +2880,7 @@ local duwu = fk.CreateTriggerSkill {
     return player:hasSkill(self) and player.phase == Player.Finish
   end,
   on_use = function (self, event, target, player, data)
-    player:drawCards(1, self.name, "bottom")
+    player:drawCards(2, self.name, "bottom")
     local room = player.room
     -- 将一张放到场上
     if player.dead or player:isNude() then return end
@@ -2998,7 +2998,7 @@ local aocai = fk.CreateTriggerSkill{
       -- end
       -- room:obtainCard(player, cid, false, fk.ReasonPrey, player.id, self.name)
       -- 五谷丰登
-      local card_ids = room:getNCards(4)
+      local card_ids = room:getNCards(2)
       room:fillAG(player, card_ids)
       local card_id = room:askForAG(player, card_ids, false, self.name)
       table.removeOne(card_ids, card_id)
@@ -3081,11 +3081,11 @@ Fk:loadTranslationTable {
   ["designer:jy__mou__zhugeke"] = "rolin",
 
   ["jy_aocai"] = "瑕玉",
-  [":jy_aocai"] = [[锁定技，你跳过摸牌阶段；准备阶段或当你成为伤害牌的目标时，你观看牌堆顶四张牌并获得其中一张。]],
+  [":jy_aocai"] = [[锁定技，你跳过摸牌阶段；准备阶段或当你成为伤害牌的目标时，你观看牌堆顶两张牌并获得其中一张。]],
   -- ["#jy_aocai_get"] = [[获得]],
 
   ["jy_duwu"] = "跬步",
-  [":jy_duwu"] = [[结束阶段，你可以从牌堆底获得一张牌，然后将一张牌置于场上或牌堆顶。]],
+  [":jy_duwu"] = [[结束阶段，你可以从牌堆底获得两张牌，然后将一张牌置于场上或牌堆顶。]],
   ["#jy_duwu_move"] = [[跬步]],
   ["#jy_duwu_card"] = [[跬步：将一张牌置于场上或牌堆顶]],
 
