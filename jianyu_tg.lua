@@ -2961,7 +2961,7 @@ duwu:addRelatedSkill(duwu_move)
 
 local aocai = fk.CreateTriggerSkill{
   name = "jy_aocai",
-  events = {fk.EventPhaseChanging, fk.EventPhaseStart, fk.TargetConfirmed},
+  events = {fk.EventPhaseChanging, fk.EventPhaseProceeding, fk.TargetConfirmed},
   anim_type = "masochism",
   frequency = Skill.Compulsory,
   mute = true,
@@ -2969,7 +2969,7 @@ local aocai = fk.CreateTriggerSkill{
     if not player:hasSkill(self) then return false end
     if event == fk.EventPhaseChanging then
       return target == player and data.to == Player.Draw
-    elseif event == fk.EventPhaseStart then
+    elseif event == fk.EventPhaseProceeding then
       return target == player and player:hasSkill(self) and player.phase == Player.Start
     else
       if data.card and data.card.is_damage_card then

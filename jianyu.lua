@@ -2454,4 +2454,185 @@ Fk:loadTranslationTable {
   [":jy_ruju"] = [[限定技，出牌阶段，你可以将〖看戏〗改为所有伤害均可触发摸牌直到你的下回合开始。]],
 }
 
+local jisu = fk.CreateTriggerSkill{
+  name = "jy_jisu",
+  events = {fk.AfterCardsMove},
+  can_trigger = function(self, event, target, player, data)
+    if not player:hasSkill(self) then return false end
+    self.count = 0
+    for _, move in ipairs(data) do
+      if move.from == player.id then
+        for _, info in ipairs(move.moveInfo) do
+          if info.fromArea == Card.PlayerEquip then
+            self.count = self.count - 1
+          end
+        end
+      end
+    end
+    for _, move in ipairs(data) do
+      if move.to and move.to == player.id and move.toArea == Player.Equip then
+        self.count = self.count + 1
+      end
+    end
+    return self.count ~= 0
+  end,
+  on_cost = Util.TrueFunc,
+  on_use = function(self, event, target, player, data)
+    local room = player.room
+    local count = self.count
+
+    -- 如果count大于0，表示有卡牌进入装备区，增加体力上限并恢复体力
+    if count > 0 then
+      room:changeMaxHp(player, count)  -- 增加体力上限
+      room:recover { num = count, skillName = self.name, who = player, recoverBy = player }  -- 回复体力
+    -- 如果count小于0，表示有卡牌离开装备区，减少体力上限并失去体力
+    elseif count < 0 then
+      room:loseHp(player, -count, self.name)      -- 失去体力（-count是负值，表示减少）
+      room:changeMaxHp(player, count)  -- 减少体力上限
+    end
+  end,
+}
+
+local rengdao = fk.CreateActiveSkill {
+  name = "jy_rengdao",
+  anim_type = "offensive",
+  can_use = function(self, player)
+    return #table.filter(Fk:currentRoom().alive_players, function(p) return p ~= player and p.maxHp == p.hp end) > 0
+  end,
+  card_num = 0,
+  card_filter = Util.FalseFunc,
+  target_filter = function(self, to_select, selected)
+    local s = Fk:currentRoom():getPlayerById(to_select)
+    return to_select ~= Self.id and s.hp == s.maxHp and #selected < 1
+  end,
+  target_num = 1,
+  on_use = function(self, room, use)
+    local player = room:getPlayerById(use.from)
+    room:loseHp(player, 2, self.name)
+    local p = room:getPlayerById(use.tos[1])
+    if not player.dead then
+      room:damage({
+        from = player,
+        to = p,
+        damage = 1,
+        damageType = fk.NormalDamage,
+        skillName = self.name,
+      })
+    end
+    player:drawCards(1, self.name)
+  end,
+}
+
+local function changeAvatar(player, previous, after)
+  if player.general == previous then
+    player.general = after
+    player.room:broadcastProperty(player, "general")
+    return
+  end
+  if player.deputyGeneral == previous then
+    player.deputyGeneral = after
+    player.room:broadcastProperty(player, "deputyGeneral")
+  end
+end
+
+local dayao = fk.CreateActiveSkill {
+  name = "jy_dayao",
+  anim_type = "defensive",
+  frequency = Skill.Limited,
+  card_num = 0,
+  target_num = 0,
+  card_filter = Util.FalseFunc,
+  target_filter = Util.FalseFunc,
+  can_use = function(self, player)
+    return player:usedSkillTimes(self.name, Player.HistoryGame) == 0
+  end,
+  on_use = function(self, room, use)
+    local player = room:getPlayerById(use.from)
+    local maxHpAdded = player.maxHp - player.hp
+    room:changeMaxHp(player, maxHpAdded)
+    player:drawCards(maxHpAdded, self.name)
+    room:recover { num = 1, skillName = self.name, who = player, recoverBy = player}
+    room:setPlayerMark(player, "jy_dayao_maxHpAdded", maxHpAdded)
+    room:setPlayerMark(player, "@jy_dayao", player.maxHp)
+    changeAvatar(player, "jy__drmundo", "jy__hidden__drmundo")
+  end,
+}
+local dayao_trigger = fk.CreateTriggerSkill {
+  name = "#jy_dayao_trigger",
+  anim_type = "defensive",
+  mute = true,
+  frequency = Skill.Limited,
+  events = { fk.Damaged },
+  can_trigger = function(self, event, target, player, data)
+    return target == player and player:hasSkill(self) and
+        player:usedSkillTimes(dayao.name, Player.HistoryGame) == 0
+  end,
+  on_use = function(self, event, target, player, data)
+    local room = player.room
+    room:notifySkillInvoked(player, dayao.name)
+    player:setSkillUseHistory(dayao.name, 1, Player.HistoryGame)
+    local maxHpAdded = player.maxHp - player.hp
+    room:changeMaxHp(player, maxHpAdded)
+    player:drawCards(maxHpAdded, self.name)
+    room:recover { num = 1, skillName = self.name, who = player, recoverBy = player}
+    room:setPlayerMark(player, "jy_dayao_maxHpAdded", maxHpAdded)
+    room:setPlayerMark(player, "@jy_dayao", player.maxHp)
+    changeAvatar(player, "jy__drmundo", "jy__hidden__drmundo")
+  end,
+}
+local dayao_heal = fk.CreateTriggerSkill {
+  name = "#jy_dayao_heal",
+  frequency = Skill.Compulsory,
+  events = { fk.CardUsing },
+  can_trigger = function(self, event, target, player, data)
+    return player:hasSkill(self) and player:getMark("@jy_dayao") > 0
+  end,
+  on_use = function(self, event, target, player, data)
+    local room = player.room
+    room:removePlayerMark(player, "@jy_dayao")
+    if player:isWounded() then room:recover { num = 1, skillName = self.name, who = player, recoverBy = player} end
+    if player:getMark("@jy_dayao") == 0 then
+      room:changeMaxHp(player, -player:getMark("jy_dayao_maxHpAdded"))
+      room:removePlayerMark(player, "jy_dayao_maxHpAdded")
+      changeAvatar(player, "jy__hidden__drmundo", "jy__drmundo")
+    end
+  end,
+}
+dayao:addRelatedSkill(dayao_trigger)
+dayao:addRelatedSkill(dayao_heal)
+
+local mundo = General(extension, "jy__drmundo", "jin", 3, 3)
+mundo:addSkill(jisu)
+mundo:addSkill(rengdao)
+mundo:addSkill(dayao)
+
+-- TODO: find a new avatar jpg
+local hidden_mundo = General(extension, "jy__hidden__drmundo", "jin", 3, 3)
+hidden_mundo:addSkill("jisu")
+hidden_mundo:addSkill("rengdao")
+hidden_mundo:addSkill("dayao")
+hidden_mundo.total_hidden = true
+
+Fk:loadTranslationTable {
+  ["jy__drmundo"] = [[蒙多医生]],
+  ["jy__hidden__drmundo"] = [[蒙多医生]],
+  ["#jy__drmundo"] = "祖安狂人",
+  ["designer:jy__drmundo"] = "考公专家",
+  ["cv:jy__drmundo"] = "无",
+  ["illustrator:jy__drmundo"] = "无",
+
+  ["jy_jisu"] = [[激素]],
+  [":jy_jisu"] = [[锁定技，你的体力上限和体力+X（X为你装备区牌数）。]],
+  -- <br><font color="grey">每当一张牌进入你的装备区后，你增加一点体力上限然后回复一点体力；每当你失去一张装备区的牌后，你失去一点体力然后减少一点体力上限。</font>
+
+  ["jy_rengdao"] = [[扔刀]],
+  [":jy_rengdao"] = [[出牌阶段，你可以失去2点体力，对一名未受伤的其他角色造成一点伤害并摸一张牌。]],
+
+  ["jy_dayao"] = [[打药]],
+  ["#jy_dayao_trigger"] = [[打药]],
+  ["#jy_dayao_heal"] = [[打药]],
+  ["@jy_dayao"] = [[<font color="green">药</font>]],
+  [":jy_dayao"] = [[限定技，出牌阶段或你受到伤害后，你可以增加<strong>已损失体力值点</strong>体力上限并摸等量张牌，然后回复一点体力并获得<strong>体力上限枚</strong>“药”。一名角色使用牌时，你移除一枚“药”并回复一点体力。当你没有“药”时，你失去以此法获得的体力上限。]],
+}
+
 return extension
