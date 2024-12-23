@@ -2508,7 +2508,7 @@ local rengdao = fk.CreateActiveSkill {
   target_num = 1,
   on_use = function(self, room, use)
     local player = room:getPlayerById(use.from)
-    room:loseHp(player, 2, self.name)
+    room:loseHp(player, 1, self.name)
     local p = room:getPlayerById(use.tos[1])
     if not player.dead then
       room:damage({
@@ -2626,7 +2626,7 @@ Fk:loadTranslationTable {
   -- <br><font color="grey">每当一张牌进入你的装备区后，你增加一点体力上限然后回复一点体力；每当你失去一张装备区的牌后，你失去一点体力然后减少一点体力上限。</font>
 
   ["jy_rengdao"] = [[扔刀]],
-  [":jy_rengdao"] = [[出牌阶段，你可以失去2点体力，对一名未受伤的其他角色造成一点伤害并摸一张牌。]],
+  [":jy_rengdao"] = [[出牌阶段，你可以失去一点体力，对一名未受伤的其他角色造成一点伤害并摸一张牌。]],
 
   ["jy_dayao"] = [[打药]],
   ["#jy_dayao_trigger"] = [[打药]],
