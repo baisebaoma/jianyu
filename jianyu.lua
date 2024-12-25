@@ -2289,12 +2289,14 @@ local wanghun = fk.CreateTriggerSkill {
   end,
   on_use = function(self, event, target, player, data)
     if player:getSwitchSkillState(self.name, true) == fk.SwitchYang then
-      player.room:recover({
-        who = player,
-        num = 1,
-        recoverBy = player,
-        skillName = self.name,
-      })
+      if player.hp == 1 then
+        player.room:recover({
+          who = player,
+          num = 1,
+          recoverBy = player,
+          skillName = self.name,
+        })
+      end
     else
       player:drawCards(1, self.name)
       local hands = #player:getCardIds("h")
@@ -2361,7 +2363,7 @@ Fk:loadTranslationTable {
   ["illustrator:jy__pyke"] = "Riot",
 
   ["jy_wanghun"] = [[亡魂]],
-  [":jy_wanghun"] = [[转换技，锁定技，每名角色的回合结束时，①你回复一点体力；②你摸一张牌，然后将手牌弃至4张。]],
+  [":jy_wanghun"] = [[转换技，锁定技，每名角色的回合结束时，你发动此技能，①若你体力值为1，你回复一点体力；②你摸一张牌，然后将手牌弃至4张。]],
   ["#jy_wanghun_discard"] = [[亡魂：将手牌弃至4张]],
 
   ["jy_yonghen"] = [[涌恨]],
@@ -2499,8 +2501,11 @@ local rengdao = fk.CreateActiveSkill {
   can_use = function(self, player)
     return #table.filter(Fk:currentRoom().alive_players, function(p) return p ~= player and p.maxHp == p.hp end) > 0
   end,
-  card_num = 0,
-  card_filter = Util.FalseFunc,
+  min_card_num = 0,
+  max_card_num = 1,
+  card_filter = function(self, to_select, selected, selected_targets)
+    return #selected ~= 1 and Fk:getCardById(to_select).type == Card.TypeEquip
+  end,
   target_filter = function(self, to_select, selected)
     local s = Fk:currentRoom():getPlayerById(to_select)
     return to_select ~= Self.id and s.hp == s.maxHp and #selected < 1
@@ -2508,9 +2513,13 @@ local rengdao = fk.CreateActiveSkill {
   target_num = 1,
   on_use = function(self, room, use)
     local player = room:getPlayerById(use.from)
-    room:loseHp(player, 1, self.name)
     local p = room:getPlayerById(use.tos[1])
-    if not player.dead then
+    if #use.cards == 0 then
+      room:loseHp(player, 1, self.name)
+    else
+      room:moveCardTo(use.cards[1], Card.PlayerHand, p, fk.ReasonGive, self.name, nil, false, nil)
+    end
+    if not player.dead and not p.dead then
       room:damage({
         from = player,
         to = p,
@@ -2535,6 +2544,16 @@ local function changeAvatar(player, previous, after)
   end
 end
 
+local function dayao_awake (room, player, skill_name)
+  local maxHpAdded = player.maxHp - player.hp
+  room:changeMaxHp(player, maxHpAdded)
+  player:drawCards(maxHpAdded, skill_name)
+  room:recover { num = 1, skillName = skill_name, who = player, recoverBy = player}
+  room:setPlayerMark(player, "jy_dayao_maxHpAdded", maxHpAdded)
+  room:setPlayerMark(player, "@jy_dayao", 2 * player.maxHp)
+  changeAvatar(player, "jy__drmundo", "jy__hidden__drmundo")
+end
+
 local dayao = fk.CreateActiveSkill {
   name = "jy_dayao",
   anim_type = "defensive",
@@ -2548,13 +2567,7 @@ local dayao = fk.CreateActiveSkill {
   end,
   on_use = function(self, room, use)
     local player = room:getPlayerById(use.from)
-    local maxHpAdded = player.maxHp - player.hp
-    room:changeMaxHp(player, maxHpAdded)
-    player:drawCards(maxHpAdded, self.name)
-    room:recover { num = 1, skillName = self.name, who = player, recoverBy = player}
-    room:setPlayerMark(player, "jy_dayao_maxHpAdded", maxHpAdded)
-    room:setPlayerMark(player, "@jy_dayao", player.maxHp)
-    changeAvatar(player, "jy__drmundo", "jy__hidden__drmundo")
+    dayao_awake(room, player, self.name)
   end,
 }
 local dayao_trigger = fk.CreateTriggerSkill {
@@ -2571,13 +2584,7 @@ local dayao_trigger = fk.CreateTriggerSkill {
     local room = player.room
     room:notifySkillInvoked(player, dayao.name)
     player:setSkillUseHistory(dayao.name, 1, Player.HistoryGame)
-    local maxHpAdded = player.maxHp - player.hp
-    room:changeMaxHp(player, maxHpAdded)
-    player:drawCards(maxHpAdded, self.name)
-    room:recover { num = 1, skillName = self.name, who = player, recoverBy = player}
-    room:setPlayerMark(player, "jy_dayao_maxHpAdded", maxHpAdded)
-    room:setPlayerMark(player, "@jy_dayao", player.maxHp)
-    changeAvatar(player, "jy__drmundo", "jy__hidden__drmundo")
+    dayao_awake(room, player, "jy_dayao")
   end,
 }
 local dayao_heal = fk.CreateTriggerSkill {
@@ -2626,13 +2633,13 @@ Fk:loadTranslationTable {
   -- <br><font color="grey">每当一张牌进入你的装备区后，你增加一点体力上限然后回复一点体力；每当你失去一张装备区的牌后，你失去一点体力然后减少一点体力上限。</font>
 
   ["jy_rengdao"] = [[扔刀]],
-  [":jy_rengdao"] = [[出牌阶段，你可以失去一点体力，对一名未受伤的其他角色造成一点伤害并摸一张牌。]],
+  [":jy_rengdao"] = [[出牌阶段，你可以失去一点体力或将一张装备牌交给一名未受伤的其他角色。若如此做，你对其造成一点伤害并摸一张牌。]],
 
   ["jy_dayao"] = [[打药]],
   ["#jy_dayao_trigger"] = [[打药]],
   ["#jy_dayao_heal"] = [[打药]],
   ["@jy_dayao"] = [[<font color="green">药</font>]],
-  [":jy_dayao"] = [[限定技，出牌阶段或你受到伤害后，你可以增加<strong>已损失体力值点</strong>体力上限并摸等量张牌，然后回复一点体力并获得<strong>体力上限枚</strong>“药”。一名角色使用牌时，你移除一枚“药”并回复一点体力。当你没有“药”时，你失去以此法获得的体力上限。]],
+  [":jy_dayao"] = [[限定技，出牌阶段或你受到伤害后，你可以增加<strong>已损失体力值点</strong>体力上限并摸等量张牌，然后回复一点体力并获得<strong>两倍体力上限枚</strong>“药”。一名角色使用牌时，你移除一枚“药”并回复一点体力。当你没有“药”时，你失去以此法获得的体力上限。]],
 }
 
 return extension
