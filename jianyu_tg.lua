@@ -3101,4 +3101,136 @@ Fk:loadTranslationTable {
   ["~jy__mou__zhugeke"] = "重权震主，是我疏忽了……",
 }
 
+local quanlve = fk.CreateViewAsSkill {
+  name = "jy_quanlve",
+  anim_type = "control",
+  prompt = "#jy_quanlve",
+  pattern = ".",
+  interaction = function (self)
+    local all = {}
+    for _, id in ipairs(Fk:getAllCardIds()) do
+      local card = Fk:getCardById(id)
+      if (card.type == Card.TypeTrick and card.sub_type ~= Card.SubtypeDelayedTrick and not card.is_damage_card) or card.type == Card.TypeBasic and not card.is_derived then
+        table.insertIfNeed(all, card.name)
+      end
+    end
+    local mark2 = Self:getMark("@$jy_quanlve_names") -- 这是禁止继续使用的
+    if mark2 == 0 then mark2 = {} end
+    local choices, all_choices = {}, {}
+    -- local choices = {}
+    for _, name in ipairs(all) do
+      local card = Fk:cloneCard(name)
+      card.skillName = self.name
+      if (Fk.currentResponsePattern == nil and card.skill:canUse(Self, card) and not Self:prohibitUse(card)) or
+          (Fk.currentResponsePattern and Exppattern:Parse(Fk.currentResponsePattern):match(card)) then
+        table.insertIfNeed(all_choices, name)
+        if not table.contains(mark2, name) then
+          table.insertIfNeed(choices, name)
+        end
+      end
+    end
+    return UI.ComboBox { choices = choices, all_choices = all_choices }
+  end,
+  card_filter = function(self, to_select, selected)
+    if #selected == 1 then
+      return Fk:getCardById(to_select).suit == Fk:getCardById(selected[1]).suit
+    elseif #selected == 2 then
+      return false
+    end
+    return true
+  end,
+  view_as = function(self, cards)
+    if #cards ~= 2 or self.interaction.data == nil then return nil end
+    local c = Fk:cloneCard(self.interaction.data)
+    c.skillName = self.name
+    c:addSubcards(cards)
+    return c
+  end,
+  after_use = function(self, player, use)
+    local mark = player:getMark("@$jy_quanlve_names")
+    if mark == 0 then mark = {} end
+    table.insertIfNeed(mark, use.card.name)
+    player.room:setPlayerMark(player, "@$jy_quanlve_names", mark)
+  end,
+  enabled_at_response = function(self, player, response)
+    if response then return false end -- 只能使用，不能打出
+    if player:isNude() then return false end
+    local used = player:getMark("@$jy_quanlve_names")
+    if used == 0 then return true end
+    for _, name in ipairs(used) do
+      if Exppattern:Parse(Fk.currentResponsePattern):match(Fk:cloneCard(name)) then return false end
+    end
+    return true
+  end,
+}
+
+local xutu = fk.CreateTriggerSkill {
+  name = "jy_xutu",
+  anim_type = "control",
+  frequency = Skill.Compulsory,
+  events = { fk.AfterCardsMove },
+  -- 当有牌满足要求时直接返回true。其他的在这后面执行。
+  -- 因为这个技能一定会触发，所以在这个技能最后擦屁股就行了。
+  can_trigger = function(self, event, target, player, data)
+    if not player:hasSkill(self) then return end
+    for _, move in ipairs(data) do
+      if move.from == player.id and (move.toArea == Card.DiscardPile or move.toArea == Card.Processing) then
+        for _, info in ipairs(move.moveInfo) do
+          if info.fromArea == Card.PlayerHand or info.fromArea == Card.PlayerEquip then
+            local suit = Fk:getCardById(info.cardId):getSuitString(true)
+            local record = player:getTableMark("@jy_xutu_suits-round")
+            if not table.contains(record, suit) then
+              return true
+            end
+          end
+        end
+      end
+    end
+  end,
+  on_use = function(self, event, target, player, data)
+    local room = player.room
+    for _, move in ipairs(data) do
+      if move.from == player.id and (move.toArea == Card.DiscardPile or move.toArea == Card.Processing) then
+        for _, info in ipairs(move.moveInfo) do
+          if info.fromArea == Card.PlayerHand or info.fromArea == Card.PlayerEquip then
+            local suit = Fk:getCardById(info.cardId):getSuitString(true)
+            local record = player:getTableMark("@jy_xutu_suits-round")
+            if not table.contains(record, suit) then
+              -- 从这里开始询问花色
+              local selected_suit = room:askForChoice(player, {"spade", "heart", "club", "diamond"}, self.name, "#jy_xutu")
+              local randomId = room:getCardsFromPileByRule(".|.|"..selected_suit)
+              if #randomId > 0 then
+                room:obtainCard(player, randomId[1], true, fk.ReasonPrey)
+              end
+              -- 将这种花色加入不可选取的里面去
+              table.insertIfNeed(record, suit)
+              room:setPlayerMark(player, "@jy_xutu_suits-round", record)
+            end
+          end
+        end
+      end
+    end
+  end,
+}
+
+local mjs = General(extension, "jy__mou__jvshou", "qun", 3, 3)
+mjs:addSkill(quanlve)
+mjs:addSkill(xutu)
+
+Fk:loadTranslationTable {
+  ["jy__mou__jvshou"] = "谋沮授",
+  ["#jy__mou__jvshou"] = "很厉害",
+  ["designer:jy__mou__jvshou"] = "rolin",
+
+  ["jy_quanlve"] = "权略",
+  [":jy_quanlve"] = [[每个牌名限一次，你可以将两张相同花色的牌当一张基本牌或非伤害普通锦囊牌使用。]],
+  ["#jy_quanlve"] = "权略：将两张相同花色的牌转化使用",
+  ["@$jy_quanlve_names"] = "权略",
+
+  ["jy_xutu"] = "徐图",
+  [":jy_xutu"] = [[锁定技，当你的一张牌进入弃牌堆或处理区时，若本轮内你没有此花色的牌进入过弃牌堆或处理区，你从牌堆中获得一张指定花色的牌。]],
+  ["#jy_xutu"] = "徐图：选择一种花色并获得一张这种花色的牌",
+  ["@jy_xutu_suits-round"] = [[徐图]],
+}
+
 return extension
