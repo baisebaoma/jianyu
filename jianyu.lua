@@ -109,7 +109,7 @@ local jy_xizao = fk.CreateTriggerSkill {
 local jy_kaiju = fk.CreateTriggerSkill {
   name = "jy_kaiju", -- jy_kaiju$是主公技
   anim_type = "masochism",
-  frequency = Skill.Compulsory,
+  -- frequency = Skill.Compulsory,
   events = { fk.EventPhaseStart },
   can_trigger = function(self, event, target, player, data)
     return target == player and player:hasSkill(self) and player.phase == Player.Start
@@ -132,9 +132,9 @@ local jy_kaiju = fk.CreateTriggerSkill {
 
 jy__jianzihao:addSkill(jy_kaiju)
 jy__jianzihao:addSkill(jy_hongwen)
-jy__jianzihao:addSkill(jy_zouwei)
+-- jy__jianzihao:addSkill(jy_zouwei)
 jy__jianzihao:addSkill(jy_shengnu)
-jy__jianzihao:addSkill(jy_xizao)
+-- jy__jianzihao:addSkill(jy_xizao)
 
 
 Fk:loadTranslationTable {
@@ -145,7 +145,7 @@ Fk:loadTranslationTable {
   ["illustrator:jy__jianzihao"] = "简自豪",
 
   ["jy_kaiju"] = "开局",
-  [":jy_kaiju"] = [[锁定技，准备阶段，其他有牌的角色需交给你一张牌，视为对你使用【杀】。<br>
+  [":jy_kaiju"] = [[准备阶段，你可以令其他有牌的角色交给你一张牌并视为对你使用【杀】。<br>
   <font color="grey"><i>“从未如此美妙的开局！”</i></font>]],
   ["$jy_kaiju1"] = "不是啊，我炸一对鬼的时候我在打什么，打一对10。一对10，他四个9炸我，我不输了吗？",
   ["$jy_kaiju2"] = "怎么赢啊？你别瞎说啊！",
@@ -2378,25 +2378,19 @@ local kanxi = fk.CreateTriggerSkill {
   name = "jy_kanxi",
   anim_type = "drawcard",
   frequency = Skill.Compulsory,
-  events = { fk.EventPhaseChanging, fk.Damaged },
+  events = { fk.Damaged },
   can_trigger = function(self, event, target, player, data)
-    if player:hasSkill(self) then
-      if event == fk.EventPhaseChanging then
-        return target == player and data.to == Player.Draw
+    if player:hasSkill(self) and #player:getCardIds("h") < 8 then
+      if player:getMark("@jy_ruju") == 0 then
+        return target ~= player and data.from ~= player
       else
-        if player:getMark("@jy_ruju") == 0 then
-          return target ~= player and data.from ~= player
-        else
-          return true
-        end
+        return true
       end
     end
   end,
   on_use = function(self, event, target, player, data)
     if event == fk.EventPhaseChanging then
-      return true
-    else
-      player:drawCards(2, self.name)
+      player:drawCards(1, self.name)
     end
   end,
 }
@@ -2447,7 +2441,7 @@ Fk:loadTranslationTable {
   ["illustrator:jy__test"] = "无",
 
   ["jy_kanxi"] = [[看戏]],
-  [":jy_kanxi"] = [[锁定技，你跳过摸牌阶段；一名除你以外的角色受到伤害后，若伤害来源不为你，你摸两张牌。]],
+  [":jy_kanxi"] = [[锁定技，一名其他角色受到伤害后，若伤害来源不为你且你的手牌少于8张，你摸一张牌。]],
 
   ["jy_ruju"] = [[入局]],
   ["#jy_ruju_trigger"] = [[入局]],
@@ -2633,13 +2627,13 @@ Fk:loadTranslationTable {
   -- <br><font color="grey">每当一张牌进入你的装备区后，你增加一点体力上限然后回复一点体力；每当你失去一张装备区的牌后，你失去一点体力然后减少一点体力上限。</font>
 
   ["jy_rengdao"] = [[扔刀]],
-  [":jy_rengdao"] = [[出牌阶段，你可以失去一点体力或将一张装备牌交给一名未受伤的其他角色。若如此做，你对其造成一点伤害并摸一张牌。]],
+  [":jy_rengdao"] = [[出牌阶段，你可以对一名未受伤的其他角色造成一点伤害并摸一张牌。你需先失去一点体力或将一张装备牌交给其。]],
 
   ["jy_dayao"] = [[打药]],
   ["#jy_dayao_trigger"] = [[打药]],
   ["#jy_dayao_heal"] = [[打药]],
-  ["@jy_dayao"] = [[<font color="green">药</font>]],
-  [":jy_dayao"] = [[限定技，出牌阶段或你受到伤害后，你可以增加<strong>已损失体力值点</strong>体力上限并摸等量张牌，然后回复一点体力并获得<strong>两倍体力上限枚</strong>“药”。一名角色使用牌时，你移除一枚“药”并回复一点体力。当你没有“药”时，你失去以此法获得的体力上限。]],
+  ["@jy_dayao"] = [[<font color="green">打药</font>]],
+  [":jy_dayao"] = [[限定技，出牌阶段或你受到伤害后，你可以增加<strong>已损失体力值点</strong>体力上限、摸等量张牌并回复一点体力。然后<strong>两倍体力上限</strong>次，一名角色使用牌时，你回复一点体力。最后你失去以此法获得的体力上限。]],
 }
 
 return extension
