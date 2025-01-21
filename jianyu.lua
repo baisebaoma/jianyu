@@ -1678,7 +1678,7 @@ Fk:loadTranslationTable {
   ["~jy__raiden"] = "浮世一梦……",
 
   ["jy_leiyan"] = "雷眼",
-  [":jy_leiyan"] = [[出牌阶段限一次，你可以令一名没有<font color="Fuchsia">雷眼</font>标记的角色获得<font color="Fuchsia">雷眼</font>。持有<font color="Fuchsia">雷眼</font>的角色造成伤害后，若目标未死亡，你判定，若为黑色，你对目标造成一点雷电伤害（不会触发〖雷眼〗）；你进入濒死状态时，移除所有<font color="Fuchsia">雷眼</font>。]],
+  [":jy_leiyan"] = [[出牌阶段限一次，你可以令一名角色获得<font color="Fuchsia">雷眼</font>。有<font color="Fuchsia">雷眼</font>的角色不以此法造成伤害后，你判定，若为黑色，则你对目标造成一点雷电伤害。你进入濒死状态时，移除所有<font color="Fuchsia">雷眼</font>。]],
   ["@jy_raiden_leiyan"] = [[<font color="Fuchsia">雷眼</font>]],
   ["#jy_leiyan_trigger"] = "雷眼",
   ["$jy_leiyan1"] = "泡影看破！",
@@ -1756,7 +1756,7 @@ Fk:loadTranslationTable {
   ["#jy_jinghua_use"] = "镜花：你可以使用一张无次数限制且不可响应的【杀】",
 
   ["jy_jianying"] = "渐盈",
-  [":jy_jianying"] = [[锁定技，每名角色的结束阶段，若你的手牌数小于2，你摸一张牌。]],
+  [":jy_jianying"] = [[锁定技，每名角色的结束阶段，若你的手牌少于2张，你摸一张牌。]],
   ["$jy_jianying1"] = "冒进是大忌。",
   ["$jy_jianying2"] = "呵……余兴节目。",
 }
@@ -2056,7 +2056,7 @@ Fk:loadTranslationTable {
   [":jy_chunmei"] = [[锁定技，你造成或受到伤害时进行判定，若为红色，你获得该判定牌。]],
 
   ["jy_zhuhua"] = "驻花",
-  [":jy_zhuhua"] = [[出牌阶段，你可以弃三张或四张相同花色的牌。若为三张，你视为使用【万箭齐发】；若为四张，你对其他所有角色造成一点伤害。]],
+  [":jy_zhuhua"] = [[出牌阶段，你可以弃三张相同花色的牌并视为使用【万箭齐发】；你可以弃四张相同花色的牌并对其他所有角色造成一点伤害。]],
   ["$jy_zhuhua1"] = [[再次见到那道光芒之前……]],
   ["$jy_zhuhua2"] = [[银河中的一切美丽，我将捍卫至最后一刻！]],
   ["$jy_zhuhua3"] = [[……献给伊德莉拉。]],
@@ -2380,7 +2380,7 @@ local kanxi = fk.CreateTriggerSkill {
   frequency = Skill.Compulsory,
   events = { fk.Damaged },
   can_trigger = function(self, event, target, player, data)
-    if player:hasSkill(self) and #player:getCardIds("h") < 8 then
+    if player:hasSkill(self) then
       if player:getMark("@jy_ruju") == 0 then
         return target ~= player and data.from ~= player
       else
@@ -2389,9 +2389,7 @@ local kanxi = fk.CreateTriggerSkill {
     end
   end,
   on_use = function(self, event, target, player, data)
-    if event == fk.EventPhaseChanging then
-      player:drawCards(1, self.name)
-    end
+    player:drawCards(data.damage, self.name)
   end,
 }
 
@@ -2412,24 +2410,24 @@ local ruju = fk.CreateActiveSkill {
   target_num = 0,
   on_use = function(self, room, use)
     local player = room:getPlayerById(use.from)
-    -- room:changeMaxHp(player, -1)
+    room:changeMaxHp(player, -1)
     room:setPlayerMark(player, "@jy_ruju", "")
   end,
 }
-local ruju_trigger = fk.CreateTriggerSkill {
-  name = "#jy_ruju_trigger",
-  refresh_events = { fk.TurnStart },
-  can_refresh = function(self, event, target, player, data)
-    return target == player and player:hasSkill("jy_ruju") and player:getMark("@jy_ruju") ~= 0
-  end,
-  on_refresh = function(self, event, target, player, data)
-    player.room:setPlayerMark(player, "@jy_ruju", 0)
-  end,
-}
-ruju:addRelatedSkill(ruju_trigger)
+-- local ruju_trigger = fk.CreateTriggerSkill {
+--   name = "#jy_ruju_trigger",
+--   refresh_events = { fk.TurnStart },
+--   can_refresh = function(self, event, target, player, data)
+--     return target == player and player:hasSkill("jy_ruju") and player:getMark("@jy_ruju") ~= 0
+--   end,
+--   on_refresh = function(self, event, target, player, data)
+--     player.room:setPlayerMark(player, "@jy_ruju", 0)
+--   end,
+-- }
+-- ruju:addRelatedSkill(ruju_trigger)
 
 local test = General(extension, "jy__test", "qun", 3, 3)
-test.total_hidden = true
+test.hidden = true
 test:addSkill(kanxi)
 test:addSkill(ruju)
 
@@ -2441,13 +2439,13 @@ Fk:loadTranslationTable {
   ["illustrator:jy__test"] = "无",
 
   ["jy_kanxi"] = [[看戏]],
-  [":jy_kanxi"] = [[锁定技，一名其他角色受到伤害后，若伤害来源不为你且你的手牌少于8张，你摸一张牌。]],
+  [":jy_kanxi"] = [[锁定技，一名其他角色受到伤害后，若伤害来源不为你，你摸等同于伤害值张牌。]],
 
   ["jy_ruju"] = [[入局]],
   ["#jy_ruju_trigger"] = [[入局]],
   ["@jy_ruju"] = [[入局]],
-  ["#jy_ruju"] = [[入局：你可以将〖看戏〗改为所有伤害均可触发摸牌直到你的下回合开始]],
-  [":jy_ruju"] = [[限定技，出牌阶段，你可以将〖看戏〗改为所有伤害均可触发摸牌直到你的下回合开始。]],
+  ["#jy_ruju"] = [[入局：你可以减一点体力上限，将〖看戏〗改为所有伤害均可触发摸牌]],
+  [":jy_ruju"] = [[限定技，出牌阶段，你可以减一点体力上限，将〖看戏〗改为所有伤害均可触发摸牌。]],
 }
 
 local jisu = fk.CreateTriggerSkill{
